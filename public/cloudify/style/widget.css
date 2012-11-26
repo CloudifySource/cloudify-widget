@@ -1,0 +1,166 @@
+body {
+  background-image: url("/img/widget_background.png");
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.button {
+  height: 112px;
+  width: 112px;
+  position: absolute;
+  top: 125px;
+  right: 17px;
+}
+
+#start_btn {
+  background-image: url("/img/play_button.png");
+}
+
+#stop_btn {
+  background-image: url("/img/pause_button.png");
+}
+
+.button:hover {
+  cursor: pointer;
+}
+
+#patent_pending {
+  font-size: 10px;
+  top: 13px;
+  left: 208px;
+  list-style-type: none;
+  position: absolute;
+  color: black;
+  font-family: "Helvetica Neue";
+}
+
+#log {
+  font-size: 14px;
+  list-style-type: none;
+  position: absolute;
+  color: white;
+  left: -10px;
+  width: 440px;
+  top: 63px;
+  height: 110px;
+  overflow-y: hidden;
+}
+
+#log li.error {
+  color: #E95625;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+#log li.important {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+#title {
+  color: #F09927;
+  font-size: 28px;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+#time_left {
+  position: absolute;
+  color: white;
+  top: 199px;
+  left: 332px;
+  font-size: 14px;
+}
+
+#time_left_counter {
+  font-weight: bold;
+}
+
+#links {
+  list-style-type: none;
+  position: absolute;
+  top: 185px;
+  left: -9px;
+  font-size: 14px;
+}
+
+#links a {
+  color: black;
+}
+
+#links li {
+  float: left;
+  margin-right: 9px;
+  background: url("/img/arrow.png") no-repeat left top;
+  background-position-y: 2px;
+  padding: 0px 0px 0px 14px;
+}
+
+#footer {
+  font-size: 12px;
+  position: absolute;
+  bottom: 8px;
+  width: 580px;
+}
+
+.put_left {
+  float: right;
+}
+
+.brand_btns {
+  margin-bottom: -6px;
+  margin-right: 8px;
+}
+
+#advanced {
+  background-image: url("/img/advanced_form.png");
+  width: 272px;
+  height: 158px;
+  position: absolute;
+  bottom: 65px;
+  right: 20px;
+}
+
+#show_advanced {
+  position: absolute;
+  bottom: 178px;
+  right: 20px;
+}
+
+#youtube_iframe {
+  position: absolute;
+  left: 20px;
+  bottom: 65px;
+}
+
+#advanced form input {
+  position: absolute;
+  height: 21px;
+  width: 237px;
+  border: 0px none white;
+  box-shadow: none;
+}
+
+#advanced form input:-webkit-input-placeholder {
+    color:    #999;
+}
+#advanced form input:-moz-placeholder {
+    color:    #999;
+}
+#advanced form input:-ms-input-placeholder {
+    color:    #999;
+}
+
+
+#advanced form input:focus {
+  outline: none;
+}
+
+#advanced form input[name="hpcs_key"] {
+  top: 50px;
+  left: 15px;
+}
+
+#advanced form input[name="hpcs_secret_key"] {
+  top: 96px;
+  left: 15px;
+}
