@@ -147,12 +147,12 @@ $(function () {
   var field_tips = {
     productName: "The name of your product",
     productVersion: "The version of your product",
-    title: "The title of your product",
-    youtubeVideoUrl: "URL of Youtube video you want to display in the widget",
-    providerURL: "Provider URL",
-    recipeURL: "URL to a recipe zip file",
-    consolename: "The console link name",
-    consoleurl: "The console link URL like: http://$HOST:8080/tomcat/index.html"
+    title: "The widget title as it will appear when displaying the widget within a web page",
+    youtubeVideoUrl: "URL of a YouTube video you want to display within the widget (Optional)",
+    providerURL: "The URL of the product owner, e.g. http://www.mongodb.org",
+    recipeURL: "A URL (http/https)to the recipe zip file",
+    consolename: "The title of the link to the product dashboard / UI in the widget console",
+    consoleurl: "The URL to the product dashboard / UI. Use $HOST as the hostname placeholder, e.g.: http://$HOST:8080/tomcat/index.html"
   }
 
   if (!authToken) {
