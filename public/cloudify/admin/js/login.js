@@ -21,7 +21,7 @@ $(function () {
         $.cookie("admin", data.session["@admin"], { expires: 1 });
         $.cookie("authToken", data.session["@authToken"], { expires: 1 });
         $.cookie("username", username, { expires: 1 });
-        window.location.href = "widgets.html"
+        window.location.href = "widgets.html"; // /admin/widgets.html
       }
     });
   });
@@ -54,7 +54,7 @@ $(function () {
     var password = $("input[name=password]").val();
     var firstname = $("input[name=firstname]").val();
     var lastname = $("input[name=lastname]").val();
-    url = "/signup?email=" + username + "&password=" + password + "&firstname=" + firstname + "&lastname=" + lastname;
+    var url = "/signup?email=" + username + "&password=" + password + "&firstname=" + firstname + "&lastname=" + lastname;
     $.post(url, {}, function (data) {
       if (data.status == "error") {
         show_message(data.message, "error");
