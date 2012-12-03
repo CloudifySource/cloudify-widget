@@ -15,10 +15,13 @@ create table server_node (
 
 create table user (
   id                        bigint not null,
+  first_name                varchar(255),
+  last_name                 varchar(255),
   email                     varchar(255),
   password                  varchar(255),
   auth_token                varchar(255),
   expires                   varchar(255),
+  admin                     boolean,
   constraint pk_user primary key (id))
 ;
 

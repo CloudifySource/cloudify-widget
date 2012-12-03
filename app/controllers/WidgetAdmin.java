@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2011 GigaSpaces Technologies Ltd. All rights reserved
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *******************************************************************************/
 package controllers;
 
 import java.util.List;
@@ -52,7 +37,7 @@ public class WidgetAdmin extends Controller
 	{
 		try
 		{
-			User.Session session = User.newUser(email, password).getSession();
+			User.Session session = User.newUser( firstname, lastname, email, password).getSession();
 
 			return RestUtils.resultAsJson(session);
 		}catch( ServerException ex )
@@ -118,7 +103,12 @@ public class WidgetAdmin extends Controller
 	public static Result getAllWidgets( String authToken )
 	{
 		User user = User.validateAuthToken(authToken);
-		List<Widget> list = Utils.workaround(user.getWidgets());
+		List<Widget> list = null;
+		
+		if ( user.getSession().isAdmin() )
+			list = Utils.workaround(Widget.find.all());
+		else
+			list = Utils.workaround(user.getWidgets());
 
 		return resultAsJson(list);
 	}
@@ -164,21 +154,25 @@ public class WidgetAdmin extends Controller
 	
 	public static Result summary( String authToken )
 	{
-		User.validateAuthToken(authToken);
+		User user = User.validateAuthToken(authToken);
 
 		Summary summary = new Summary();
 
-		int totalUsers = User.find.findRowCount();
-		int totalWidgets = Widget.find.findRowCount();
-		int totalInstances = WidgetInstance.find.findRowCount();
-		int totalIdleServers = ServerNode.find.where().eq("busy", "false").findRowCount();
-		int totalBusyServers = ServerNode.find.where().eq("busy", "true").findRowCount();
-
-		summary.addAttribute("Users", String.valueOf( totalUsers ));
-		summary.addAttribute("Widgets", String.valueOf( totalWidgets ));
-		summary.addAttribute("Instances", String.valueOf( totalInstances ));
-		summary.addAttribute("Idle Servers", String.valueOf( totalIdleServers ));
-		summary.addAttribute("Busy Servers", String.valueOf( totalBusyServers ));
+		// only for admin users, we return summary information
+		if ( user.isAdmin() )
+		{		
+			int totalUsers = User.find.findRowCount();
+			int totalWidgets = Widget.find.findRowCount();
+			int totalInstances = WidgetInstance.find.findRowCount();
+			int totalIdleServers = ServerNode.find.where().eq("busy", "false").findRowCount();
+			int totalBusyServers = ServerNode.find.where().eq("busy", "true").findRowCount();
+	
+			summary.addAttribute("Users", String.valueOf( totalUsers ));
+			summary.addAttribute("Widgets", String.valueOf( totalWidgets ));
+			summary.addAttribute("Instances", String.valueOf( totalInstances ));
+			summary.addAttribute("Idle Servers", String.valueOf( totalIdleServers ));
+			summary.addAttribute("Busy Servers", String.valueOf( totalBusyServers ));
+		}
 
 
 		return resultAsJson(summary);

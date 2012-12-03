@@ -1,18 +1,4 @@
-/*******************************************************************************
- * Copyright (c) 2011 GigaSpaces Technologies Ltd. All rights reserved
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *******************************************************************************/
+import models.User;
 import play.Application;
 import play.GlobalSettings;
 import play.Logger;
@@ -34,6 +20,14 @@ public class Global extends GlobalSettings
 		Logger.info( Config.print() );
 		
 	    ApplicationContext.getServerPool();
+		
+		// create Admin user if not exists
+		if ( User.find.where().eq("email", Config.ADMIN_USERNAME).findUnique() == null )
+		{
+			User adminUser = User.newUser("Cloudify", "Administrator", Config.ADMIN_USERNAME, Config.ADMIN_PASSWORD);
+			adminUser.setAdmin(true);
+		    adminUser.save();
+		}
 	}
 
 	@Override
