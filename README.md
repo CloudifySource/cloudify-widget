@@ -11,51 +11,67 @@ The widget server was tested on CentOs 5.6 and ec2-linux. Technically it should 
 Installation
 ============
 * Install a Java SDK (1.6 or 1.7, OpenJDK will also work), e.g.
+
 ```
 yum install java-1.6.0-openjdk-devel
 ```
+
 Note that the above command requires sudo permissions.
 * set the JAVA_HOME environment variable, e.g.
+
 ```
 export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk.x86_64
 ```
+
 * From your home directory, install Play framework 2.0.x, e.g.
+
 ```
 wget 'http://download.playframework.org/releases/play-2.0.4.zip'
 unzip play-2.0.4.zip
 ```
+
 * From your home directory, install Cloudify:
+
 ```
 wget 'http://repository.cloudifysource.org/org/cloudifysource/2.2.0-RELEASE/gigaspaces-cloudify-2.2.0-ga-b2500.zip'
 unzip gigaspaces-cloudify-2.2.0-ga-b2500.zip
 ```
+
 * Install git on the server. You can do so using yum or apt-get depending on the linux flavor you use, e.g.:
+
 ```
 yum install git
 ```
+
 * Clone this repository with git
+
 ```
 git clone https://github.com/CloudifySource/cloudify-widget.git
 ```
+
 * Configure cloud credentials (cloud provider credentials, pem file, ssh user)
-** Copy your cloud ssh keypair file to a known location on the server machine
-** Set the location of the ssh key file in the `conf/cloudify.conf` file, e.g.
+Copy your cloud ssh keypair file to a known location on the server machine, and set the location of the ssh key file in the `conf/cloudify.conf` file, e.g.
+
 ```
 server.bootstrap.ssh-private-key=/bin/hpcloud.pem
 ```
-** Set the HPCloud credentials in the `conf/cloudify.conf` file. You should set the following two properties to your corresponding HPCloud account details:
+
+Set the HPCloud credentials in the `conf/cloudify.conf` file. You should set the following two properties to your corresponding HPCloud account details:
+
 ```
 server.bootstrap.api-key=<HP Cloud Password>
 server.bootstrap.username=<tenant>:<user>
 ```
+
 * Configure the location of the Cloudify distribution
 In the file `bin/deployer.sh`, edit the following line to point to the root of the cloudify distribution you installed on the server:
+
 ```
 GS_HOME=~/gigaspaces-cloudify-2.2.0-ga
 ```
+
 * Start Play:
-** cd to the directory in which you installed the Play framework
-** If you're in development mode, type `run <port number>`, otherwise type `start <port>`
+cd to the directory in which you installed the Play framework. If you're in development mode, type `run <port number>`, otherwise type `start <port>`
 
 * The login page for widget admins is located at `/admin/signin.html'
 
