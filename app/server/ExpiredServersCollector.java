@@ -1,5 +1,7 @@
 package server;
 
+import models.ServerNode;
+
 /**
  * ****************************************************************************
  * Copyright (c) 2010 GigaSpaces Technologies Ltd. All rights reserved
@@ -9,8 +11,9 @@ package server;
  * The license agreement granted to you by GigaSpaces.
  * User: guym
  * Date: 12/2/12
- * Time: 12:07 PM
+ * Time: 12:06 PM
  * *****************************************************************************
  */
-public interface ServerPool {
+public interface ExpiredServersCollector {
+    void scheduleToDestroy(ServerNode server);
 }

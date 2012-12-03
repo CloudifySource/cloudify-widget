@@ -29,14 +29,13 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import play.db.ebean.Model;
-import server.ServerBootstrapper;
 import server.Utils;
 
 /**
  * The ServerNode keeps all metadata of all created and available/busy servers.
  * 
  * @author Igor Goldenberg
- * @see ServerBootstrapper
+ * @see beans.ServerBootstrapper
  */
 @Entity
 @SuppressWarnings("serial")
@@ -162,8 +161,11 @@ public class ServerNode
 		if ( server != null )
 			server.delete();
 	}
-	
-	@Override
+
+    public String toDebugString() {
+        return String.format("ServerNode{id='%s\', serverId='%s\', expirationTime=%d, publicIP='%s\', privateIP='%s\', busy=%s}", id, serverId, expirationTime, publicIP, privateIP, busy);
+    }
+   @Override
 	public String toString()
 	{
 		return Utils.reflectedToString(this);

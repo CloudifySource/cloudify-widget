@@ -1,4 +1,8 @@
-package server;
+package mocks;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import server.DeployManager;
 
 /**
  * ****************************************************************************
@@ -9,8 +13,13 @@ package server;
  * The license agreement granted to you by GigaSpaces.
  * User: guym
  * Date: 12/2/12
- * Time: 12:07 PM
+ * Time: 4:54 PM
  * *****************************************************************************
  */
-public interface ServerPool {
+public class DeployManagerMock implements DeployManager {
+    private static Logger logger = LoggerFactory.getLogger(DeployManagerMock.class);
+
+    public void destroyExecutor(String id) {
+        logger.info("destroying executor : ", id);
+    }
 }

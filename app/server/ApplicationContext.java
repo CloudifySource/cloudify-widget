@@ -15,57 +15,44 @@
  *******************************************************************************/
 package server;
 
+import play.modules.spring.Spring;
 
 /**
  * A singleton class that helps to get an instance of different modules and keeps loose decoupling.
- * 
+ *
  * @author Igor Goldenberg
  */
 public class ApplicationContext
 {
-	static private DeployManager procManager;
-	static private WidgetServer widgetServer;
-	static private ServerPool serverPool;
-	static private ServerBootstrapper serverBootstrapper;
-	static private ExpireServersCollector expiredServerCollector;
-	
-	public static synchronized DeployManager getDeployManager()
+    public static final String PROC_MANAGER = "procManager";
+    public static final String WIDGET_SERVER = "widgetServer";
+    public static final String SERVER_POOL = "serverPool";
+    public static final String SERVER_BOOTSTRAPPER = "serverBootstrapper";
+    public static final String EXPIRED_SERVER_COLLECTOR = "expiredServerCollector";
+
+    public static DeployManager getDeployManager()
 	{
-		if ( procManager == null )
-			procManager = new DeployManager();
-		
-		return procManager;
-	}
-	
-	public static synchronized WidgetServer getWidgetServer()
-	{
-		if ( widgetServer == null )
-			widgetServer = new WidgetServer();
-		
-		return widgetServer;
-	}
-	
-	public static synchronized ServerPool getServerPool()
-	{
-		if ( serverPool == null )
-			serverPool = new ServerPool();
-		
-		return serverPool;
+        return (DeployManager) Spring.getBean(PROC_MANAGER);
+
 	}
 
-	public static synchronized ServerBootstrapper getServerBootstrapper()
+	public static WidgetServer getWidgetServer()
 	{
-		if ( serverBootstrapper == null )
-			serverBootstrapper = new ServerBootstrapper();
-		
-		return serverBootstrapper;
+        return (WidgetServer) Spring.getBean(WIDGET_SERVER);
 	}
-	
-	public static synchronized ExpireServersCollector getExpiredServersCollector()
+
+	public static ServerPool getServerPool()
 	{
-		if ( expiredServerCollector == null )
-			expiredServerCollector = new ExpireServersCollector();
-		
-		return expiredServerCollector;
+        return (ServerPool) Spring.getBean(SERVER_POOL);
+    }
+
+	public static ServerBootstrapper getServerBootstrapper()
+	{
+		return (ServerBootstrapper) Spring.getBean(SERVER_BOOTSTRAPPER);
+	}
+
+	public static ExpiredServersCollector getExpiredServersCollector()
+	{
+		return (ExpiredServersCollector) Spring.getBean(EXPIRED_SERVER_COLLECTOR);
 	}
 }

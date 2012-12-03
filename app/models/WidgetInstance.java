@@ -28,7 +28,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import controllers.Application;
 
 /**
- * This class represents a widget instance with a deployment metadata and instantiated on {@link Application#start()}
+ * This class represents a widget instance with a deployment metadata and instantiated on {@link Application#start(String, String, String)} }
  * The metadata contains on which server the widget instance has been deployed.
  * 
  * @author Igor Goldenberg

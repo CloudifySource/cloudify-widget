@@ -23,6 +23,7 @@ import models.Summary;
 import models.User;
 import models.Widget;
 import models.WidgetInstance;
+import org.jboss.netty.handler.codec.http.CookieEncoder;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -59,6 +60,19 @@ public class WidgetAdmin extends Controller
 			return resultErrorAsJson(ex.getMessage());
 		}
 	}
+
+    public static Result index()
+    {
+        // lets assume that if we have "authToken" we are already logged in
+        // and we can redirect to widgets.html
+        Http.Cookie authToken = request().cookies().get( "authToken" );
+        if ( authToken != null && User.validateAuthToken( authToken.value(), true ) != null ) {
+            return redirect( "/admin/widgets.html" );
+        }
+        else{
+            return redirect( "/admin/signin.html" );
+        }
+    }
 
 	/**
 	 * Login with existing account.
@@ -165,7 +179,8 @@ public class WidgetAdmin extends Controller
 		summary.addAttribute("Instances", String.valueOf( totalInstances ));
 		summary.addAttribute("Idle Servers", String.valueOf( totalIdleServers ));
 		summary.addAttribute("Busy Servers", String.valueOf( totalBusyServers ));
-		
+
+
 		return resultAsJson(summary);
 	}
 	
@@ -176,11 +191,6 @@ public class WidgetAdmin extends Controller
 		Widget widget = Widget.regenerateApiKey(apiKey);
 		
 		return resultAsJson(widget);
-	}
-	
-	public static Result printConfig()
-	{
-		return ok(new Config().toString());
 	}
 
 	public static Result headers()

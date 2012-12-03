@@ -1,4 +1,9 @@
-package server;
+package mocks;
+
+import models.ServerNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import server.ExpiredServersCollector;
 
 /**
  * ****************************************************************************
@@ -9,8 +14,13 @@ package server;
  * The license agreement granted to you by GigaSpaces.
  * User: guym
  * Date: 12/2/12
- * Time: 12:07 PM
+ * Time: 4:58 PM
  * *****************************************************************************
  */
-public interface ServerPool {
+public class ExpireServersCollectorMock implements ExpiredServersCollector {
+    private static Logger logger = LoggerFactory.getLogger(ExpireServersCollectorMock.class);
+
+    public void scheduleToDestroy(ServerNode server) {
+        logger.info("schedule destroy for : " + server.toDebugString() );
+    }
 }

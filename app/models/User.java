@@ -171,15 +171,21 @@ public class User
 		
 		return user.getSession();
 	}
-	
+
 	static public User validateAuthToken( String authToken )
 	{
-		User user = User.find.where().eq("authToken", authToken).findUnique();
-		if ( user == null )
-			throw new ServerException(ResMessages.getFormattedString("auth_token_not_valid", authToken));
-		
-		return user;
+		return validateAuthToken( authToken, false );
 	}
+
+    static public User validateAuthToken( String authToken, boolean silent )
+    {
+        User user = User.find.where().eq( "authToken", authToken ).findUnique();
+        if ( user == null && !silent ) {
+            throw new ServerException( ResMessages.getFormattedString( "auth_token_not_valid", authToken ) );
+        }
+
+        return user;
+    }
 	
 	static public List<User> getAllUsers()
 	{

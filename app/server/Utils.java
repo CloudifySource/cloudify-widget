@@ -27,8 +27,9 @@ import java.util.List;
 import java.util.zip.ZipException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import org.springframework.util.ReflectionUtils;
 import play.Logger;
 import play.Play;
 
@@ -61,7 +62,11 @@ public class Utils
 			SUBSTRING_OUTPUT_STRINGS[i] = SUBSTRING_OUTPUT_STRINGS[i].trim();
 	}
 	
-	
+
+    // TODO : lets not rescue only on IllegaException, lets catch on all Exception
+    // TODO : silent failure... lets log a warning.
+    // TODO : instead of writing our own implementation, lets try using : http://commons.apache.org/lang/api-2.4/org/apache/commons/lang/builder/ReflectionToStringBuilder.html
+
 	/** @return a String key=value of all fields of the passed object */
 	static public String reflectedToString( Object obj )
 	{
@@ -132,7 +137,9 @@ public class Utils
 			}
 		}
 
-	  
+
+    // TODO : guy - need to use "future" or "promise" with "await"
+    // in play 2.0 this is called async result : https://github.com/playframework/Play20/wiki/JavaAsync
 	  public static void threadSleep( long time )
 	  {
 		  try

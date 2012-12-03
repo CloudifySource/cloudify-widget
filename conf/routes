@@ -20,7 +20,6 @@ POST     /widget/new              	    controllers.WidgetAdmin.createNewWidget(a
 GET      /widget/list 					controllers.WidgetAdmin.getAllWidgets( authToken: String )
 GET      /widget/summary 				controllers.WidgetAdmin.summary( authToken: String )
 GET      /server/list 					controllers.WidgetAdmin.getAllServers()
-GET      /server/config					controllers.WidgetAdmin.printConfig()
 GET      /server/headers            	controllers.WidgetAdmin.headers()
 
 
@@ -29,3 +28,5 @@ GET     /recipes/*file      	   		controllers.Assets.at(path="/public/recipes", 
 GET     /*file        		     	    controllers.Assets.at(path="/public/cloudify", file)
 
 #GET     /assets/*file             	    controllers.Assets.at(path="/public", file)
+
+GET     /                               controllers.WidgetAdmin.index()

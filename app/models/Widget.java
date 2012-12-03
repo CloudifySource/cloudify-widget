@@ -37,7 +37,7 @@ import controllers.WidgetAdmin;
 
 /**
  * This class represents a widget metadata and relates to a specific {@link User}.
- * See {@link WidgetAdmin#createNewWidget()}
+ * See {@link WidgetAdmin#createNewWidget(String, String, String, String, String, String, String, String, String)}
  * 
  * @author Igor Goldenberg
  * @see WidgetAdmin

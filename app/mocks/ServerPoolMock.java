@@ -1,4 +1,6 @@
-package server;
+package mocks;
+
+import server.ServerPool;
 
 /**
  * ****************************************************************************
@@ -9,8 +11,8 @@ package server;
  * The license agreement granted to you by GigaSpaces.
  * User: guym
  * Date: 12/2/12
- * Time: 12:07 PM
+ * Time: 4:59 PM
  * *****************************************************************************
  */
-public interface ServerPool {
+public class ServerPoolMock implements ServerPool {
 }

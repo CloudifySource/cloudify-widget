@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package server;
+package beans;
 
 import static server.Config.*;
 import java.util.Timer;
@@ -22,17 +22,23 @@ import java.util.TimerTask;
 import play.Logger;
 
 import models.ServerNode;
+import server.ApplicationContext;
+import server.ExpiredServersCollector;
+
+import javax.inject.Inject;
 
 /**
  * This class schedules to delete the expired servers.
  * On delete bootstrap new machine and add to a server-pool.
  * 
  * @author Igor Goldenberg
- * @see ServerPool
+ * @see beans.ServerPool
  */
-public class ExpireServersCollector extends Timer
+public class ExpireServersCollector extends Timer implements ExpiredServersCollector
 {
-	public void scheduleToDestroy( final ServerNode server )
+    @Inject
+    private ServerPool serverPool;
+	public void scheduleToDestroy(final ServerNode server)
 	{
 		server.setExpirationTime( System.currentTimeMillis() + SERVER_POOL_EXPIRATION_TIME );
 		
@@ -42,9 +48,13 @@ public class ExpireServersCollector extends Timer
 		{
 			public void run()
 			{
-				ApplicationContext.getServerPool().destroy(server.getId());
+				serverPool.destroy(server.getId());
 			}
 			
 		}, server.getElapsedTime() );
 	}
+
+    public void setServerPool(ServerPool serverPool) {
+        this.serverPool = serverPool;
+    }
 }
