@@ -2,7 +2,7 @@ cloudify-widget
 ===============
 
 The Cloudify Widget for embedding a Cloudify "recipe player" in other website, to allow visitors to launch a certain recipe with a single click.
-The widget supports installation only on [HPCloud](www.hpcloud.com) at the moment, but provisioning and interaction with the cloud APIs is done via the [jclouds](www.jclouds.org) library.
+The widget supports installation only on [HPCloud](http://www.hpcloud.com) at the moment, but provisioning and interaction with the cloud APIs is done via the [jclouds](http://www.jclouds.org) library.
 
 Supported Platforms
 ===================
