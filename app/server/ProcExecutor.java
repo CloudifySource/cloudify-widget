@@ -1,6 +1,6 @@
 package server;
 
-import models.ServerNode;
+import org.apache.commons.exec.Executor;
 
 /**
  * ****************************************************************************
@@ -10,13 +10,16 @@ import models.ServerNode;
  * You may use the software source code solely under the terms and limitations of
  * The license agreement granted to you by GigaSpaces.
  * User: guym
- * Date: 12/2/12
- * Time: 12:07 PM
+ * Date: 12/3/12
+ * Time: 8:09 PM
  * *****************************************************************************
  */
-public interface ServerPool {
+public interface ProcExecutor extends Executor {
+    String getId();
 
-    public ServerNode get();
+    String getPrivateServerIP();
 
-    public void destroy( String serverId );
+    String getOutput();
+
+    int getElapsedTimeMin();
 }

@@ -37,6 +37,7 @@ import org.apache.commons.exec.PumpStreamHandler;
 
 import play.Logger;
 import server.Config;
+import server.ProcExecutor;
 import server.ResMessages;
 import server.ServerException;
 
@@ -46,91 +47,11 @@ import server.ServerException;
  * 
  * @author Igor Goldenberg
  */
-public class DeployManager implements server.DeployManager
+public class DeployManagerImpl implements server.DeployManager
 {
 	// keep all widget instances key=instanceId, value=Executor
 	private Hashtable<String, ProcExecutor> _intancesTable = new Hashtable<String, ProcExecutor>();
 
-	final static class ProcessStreamHandler extends PumpStreamHandler
-	 {
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		
-		@Override
-		protected void createProcessOutputPump(InputStream is, OutputStream os)
-		{
-			super.createProcessOutputPump(is, baos);
-		}
-		
-		public String getOutput()
-		{
-			return baos.toString();
-		}
-	 }
-	 
-
-	final static public class ProcExecutor extends DefaultExecutor
-	{
-		private String id;
-		private String publicIP;
-		private String privateIP;
-		private File recipe;
-		private String[] args;
-		private long expirationTime;
-		private ProcessStreamHandler procHandler;
-		
-		public ProcExecutor(ServerNode server, File recipe, String...args)
-		{
-			this.id = server.getId();
-			
-			this.publicIP = server.getPublicIP();
-			this.privateIP = server.getPrivateIP();
-			this.recipe = recipe;
-			this.args = args;
-			this.expirationTime = server.getExpirationTime();
-			
-			procHandler = new ProcessStreamHandler();
-			setStreamHandler(procHandler);
-		}
-
-		public String getId()
-		{
-			return id;
-		}
-		
-		public String getPublicServerIP()
-		{
-			return publicIP;
-		}
-		
-		public String getPrivateServerIP()
-		{
-			return privateIP;
-		}
-
-		public File getRecipe()
-		{
-			return recipe;
-		}
-
-		public String[] getArgs()
-		{
-			return args;
-		}
-
-		public String getOutput()
-		{
-			return procHandler.getOutput();
-		}
-		
-		public int getElapsedTimeMin()
-		{
-			long elapsedTime = expirationTime - System.currentTimeMillis();
-			if ( elapsedTime <=0 )
-				return 0;
-			else
-				return (int)TimeUnit.MILLISECONDS.toMinutes(elapsedTime);
-		}
-	}
 
 	static enum RecipeType
 	{
@@ -191,7 +112,7 @@ public class DeployManager implements server.DeployManager
 		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 
 		ExecuteWatchdog watchdog = new ExecuteWatchdog(Config.CLOUDIFY_DEPLOY_TIMEOUT);
-		ProcExecutor executor = new ProcExecutor(server, recipe);
+		ProcExecutor executor = new ProcExecutorImpl(server, recipe);
 		
 		executor.setExitValue(1);
 		executor.setWatchdog(watchdog);

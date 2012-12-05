@@ -51,7 +51,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import models.ServerNode;
-import server.ApplicationContext;
+import server.DeployManager;
 import server.ServerException;
 import server.Utils;
 
@@ -69,7 +69,7 @@ import static server.Config.*;
  * 
  * @author Igor Goldenberg
  */
-public class ServerBootstrapper implements server.ServerBootstrapper
+public class ServerBootstrapperImpl implements server.ServerBootstrapper
 {
 	private ComputeService _compute;
 	private RestContext<NovaApi, NovaAsyncApi> _nova;
@@ -109,7 +109,7 @@ public class ServerBootstrapper implements server.ServerBootstrapper
 	}
 
 	
-	public ServerBootstrapper()
+	public ServerBootstrapperImpl()
 	{
 		ComputeServiceContext context = ContextBuilder.newBuilder(COMPUTE_PROVIDER)
 				.credentials(COMPUTE_USERNAME, COMPUTE_APIKEY)

@@ -5,11 +5,11 @@
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 
-    <bean id="deployManager" class="beans.DeployManager"/>
-    <bean id="expiresServersCollector" class="beans.ExpireServersCollector"/>
-    <bean id="serverBootstrapper" class="beans.ServerBootstrapper"/>
-    <bean id="serverPool" class="beans.ServerPool"/>
-    <bean id="widgetServer" class="beans.WidgetServer"/>
+    <bean id="deployManager" class="beans.DeployManagerImpl"/>
+    <bean id="expiresServersCollector" class="beans.ExpireServersCollectorImpl"/>
+    <bean id="serverBootstrapper" class="beans.ServerBootstrapperImpl"/>
+    <bean id="serverPool" class="beans.ServerPoolImpl"/>
+    <bean id="widgetServer" class="beans.WidgetServerImpl"/>
 
     <context:annotation-config />
     <!--<context:component-scan base-package="beans" />-->

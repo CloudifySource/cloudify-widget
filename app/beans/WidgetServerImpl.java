@@ -29,10 +29,7 @@ import models.ServerNode;
 import models.Widget;
 import models.Widget.Status;
 import models.WidgetInstance;
-import server.ApplicationContext;
-import server.ResMessages;
-import server.ServerException;
-import server.Utils;
+import server.*;
 
 import javax.inject.Inject;
 
@@ -41,10 +38,10 @@ import javax.inject.Inject;
  * Before that the user must create an account by WidgetAdmin and register a new widget.
  * 
  * @author Igor Goldenberg
- * @see ServerPool
+ * @see ServerPoolImpl
  * @see WidgetAdmin
  */
-public class WidgetServer implements server.WidgetServer
+public class WidgetServerImpl implements WidgetServer
 {
     @Inject
     private ServerPool serverPool;
@@ -91,7 +88,7 @@ public class WidgetServer implements server.WidgetServer
 	
 	public Status getWidgetStatus( String instanceId )
 	{
-		DeployManager.ProcExecutor pe = deployManager.getExecutor(instanceId);
+		ProcExecutor pe = deployManager.getExecutor(instanceId);
 		if ( pe == null )
 			return new Status(Status.STATE_STOPPED, ResMessages.getString("server_was_terminated"));
 		

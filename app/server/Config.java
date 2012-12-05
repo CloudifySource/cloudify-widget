@@ -78,7 +78,6 @@ public class Config
         return file.getAbsolutePath();
     }
 
-
 	static
 	{
 		try

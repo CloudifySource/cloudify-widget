@@ -1,5 +1,10 @@
 package server;
 
+import beans.DeployManagerImpl;
+import models.ServerNode;
+
+import java.io.File;
+
 /**
  * ****************************************************************************
  * Copyright (c) 2010 GigaSpaces Technologies Ltd. All rights reserved
@@ -13,5 +18,9 @@ package server;
  * *****************************************************************************
  */
 public interface DeployManager {
-    void destroyExecutor(String id);
+    public void destroyExecutor(String id);
+
+   public ProcExecutor fork( ServerNode server, File recipe );
+
+    ProcExecutor getExecutor( String id );
 }

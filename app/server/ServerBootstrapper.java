@@ -18,11 +18,11 @@ import java.util.List;
  * *****************************************************************************
  */
 public interface ServerBootstrapper {
-    List<Server> getServerList();
+    public List<Server> getServerList();
 
-    void destroyServer(String serverId);
+    public void destroyServer(String serverId);
 
-    List<ServerNode> createServers(int numOfServers);
+    public List<ServerNode> createServers(int numOfServers);
 
-    void close();
+    public void close();
 }

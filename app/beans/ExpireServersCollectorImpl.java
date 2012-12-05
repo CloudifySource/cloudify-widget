@@ -22,7 +22,6 @@ import java.util.TimerTask;
 import play.Logger;
 
 import models.ServerNode;
-import server.ApplicationContext;
 import server.ExpiredServersCollector;
 
 import javax.inject.Inject;
@@ -32,12 +31,13 @@ import javax.inject.Inject;
  * On delete bootstrap new machine and add to a server-pool.
  * 
  * @author Igor Goldenberg
- * @see beans.ServerPool
+ * @see ServerPoolImpl
  */
-public class ExpireServersCollector extends Timer implements ExpiredServersCollector
+public class ExpireServersCollectorImpl extends Timer implements ExpiredServersCollector
 {
     @Inject
-    private ServerPool serverPool;
+    private ServerPoolImpl serverPool;
+
 	public void scheduleToDestroy(final ServerNode server)
 	{
 		server.setExpirationTime( System.currentTimeMillis() + SERVER_POOL_EXPIRATION_TIME );
@@ -54,7 +54,7 @@ public class ExpireServersCollector extends Timer implements ExpiredServersColle
 		}, server.getElapsedTime() );
 	}
 
-    public void setServerPool(ServerPool serverPool) {
+    public void setServerPool(ServerPoolImpl serverPool) {
         this.serverPool = serverPool;
     }
 }

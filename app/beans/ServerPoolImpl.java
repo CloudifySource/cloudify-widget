@@ -36,9 +36,9 @@ import javax.inject.Inject;
  * It also provides ability to startup with a cold init which deletes a running server. See {@link server.Config} class.
  * 
  * @author Igor Goldenberg
- * @see ServerBootstrapper
+ * @see ServerBootstrapperImpl
  */
-public class ServerPool implements server.ServerPool
+public class ServerPoolImpl implements ServerPool
 {
     @Inject
     private server.ServerBootstrapper serverBootstrapper;
@@ -46,7 +46,7 @@ public class ServerPool implements server.ServerPool
     @Inject
     private server.ExpiredServersCollector expiredServerCollector;
 
-	public ServerPool()
+	public ServerPoolImpl()
 	{
 		init();
 	}

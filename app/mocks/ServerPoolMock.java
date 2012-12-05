@@ -1,5 +1,8 @@
 package mocks;
 
+import models.ServerNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.ServerPool;
 
 /**
@@ -15,4 +18,16 @@ import server.ServerPool;
  * *****************************************************************************
  */
 public class ServerPoolMock implements ServerPool {
+    private static Logger logger = LoggerFactory.getLogger( ServerPoolMock.class );
+
+    public ServerNode get()
+    {
+        logger.info( "getting server node" );
+        return null;
+    }
+
+    public void destroy( String serverId )
+    {
+        logger.info( "destroying : %s " , serverId );
+    }
 }

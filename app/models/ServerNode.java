@@ -35,7 +35,7 @@ import server.Utils;
  * The ServerNode keeps all metadata of all created and available/busy servers.
  * 
  * @author Igor Goldenberg
- * @see beans.ServerBootstrapper
+ * @see beans.ServerBootstrapperImpl
  */
 @Entity
 @SuppressWarnings("serial")

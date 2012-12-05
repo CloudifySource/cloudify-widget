@@ -98,7 +98,7 @@ public class Utils
 		 * Download the archived recipe from url, save file it to local directory and unzip it.
 		 * NOTE: The recipe file must be archived in zip format.
 		 * 
-		 * @param url the recipe url.
+		 * @param recUrl the recipe url.
 		 * @param apiKey the apiKey this recipe belongs to
 		 * @return the local path to a recipe unzipped directory
 		 */

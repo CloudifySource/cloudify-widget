@@ -1,8 +1,12 @@
 package mocks;
 
+import models.ServerNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import server.DeployManager;
+import server.ProcExecutor;
+
+import java.io.File;
 
 /**
  * ****************************************************************************
@@ -18,6 +22,16 @@ import server.DeployManager;
  */
 public class DeployManagerMock implements DeployManager {
     private static Logger logger = LoggerFactory.getLogger(DeployManagerMock.class);
+
+    public ProcExecutor fork( ServerNode server, File recipe )
+    {
+        return null;
+    }
+
+    public ProcExecutor getExecutor( String id )
+    {
+        return null;
+    }
 
     public void destroyExecutor(String id) {
         logger.info("destroying executor : ", id);
