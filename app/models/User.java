@@ -26,6 +26,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 
+import org.apache.commons.lang.BooleanUtils;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
 import server.ResMessages;
@@ -82,7 +83,7 @@ public class User
 		
 		public boolean isAdmin()
 		{
-			return admin;
+			return BooleanUtils.isTrue( admin );
 		}
 	}
 	
