@@ -13,3 +13,4 @@ dist
 .target/
 */.DS_Store
 .DS_Store
+conf/dev
