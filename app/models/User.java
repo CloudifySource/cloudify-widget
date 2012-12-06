@@ -283,7 +283,7 @@ public class User
 
 	public boolean isAdmin()
 	{
-		return admin;
+		return BooleanUtils.isTrue( admin );
 	}
 
 	public void setAdmin(Boolean admin)
