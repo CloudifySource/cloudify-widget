@@ -8,10 +8,10 @@
     <bean id="deployManager" class="beans.DeployManagerImpl"/>
     <bean id="expiresServersCollector" class="beans.ExpireServersCollectorImpl"/>
     <bean id="serverBootstrapper" class="beans.ServerBootstrapperImpl"/>
-    <bean id="serverPool" class="beans.ServerPoolImpl"/>
+    <bean id="serverPool" class="beans.ServerPoolImpl" init-method="init"/>
     <bean id="widgetServer" class="beans.WidgetServerImpl"/>
 
     <context:annotation-config />
-    <!--<context:component-scan base-package="beans" />-->
+    <context:component-scan base-package="beans" />
 
 </beans>

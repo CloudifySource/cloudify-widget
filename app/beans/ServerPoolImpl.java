@@ -41,15 +41,11 @@ import javax.inject.Inject;
 public class ServerPoolImpl implements ServerPool
 {
     @Inject
-    private server.ServerBootstrapper serverBootstrapper;
+    private ServerBootstrapper serverBootstrapper;
 
     @Inject
-    private server.ExpiredServersCollector expiredServerCollector;
+    private ExpiredServersCollector expiredServerCollector;
 
-	public ServerPoolImpl()
-	{
-		init();
-	}
 
 	private void init()
 	{
