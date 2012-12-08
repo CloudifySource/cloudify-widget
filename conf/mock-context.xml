@@ -6,7 +6,7 @@
 
 
     <bean id="deployManager" class="mocks.DeployManagerMock"/>
-    <bean id="expiresServersCollector" class="mocks.ExpireServersCollectorMock"/>
+    <bean id="expiredServerCollector" class="mocks.ExpireServersCollectorMock"/>
     <bean id="serverBootstrapper" class="mocks.ServerBootstrapperMock"/>
     <bean id="serverPool" class="mocks.ServerPoolMock"/>
     <bean id="widgetServer" class="mocks.WidgetServerMock"/>

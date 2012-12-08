@@ -45,7 +45,7 @@ public class ServerNode
 {
 	@Id
 	@XStreamOmitField
-	private String id;
+	private Long id;
 	
 	@XStreamAsAttribute
 	private String serverId;
