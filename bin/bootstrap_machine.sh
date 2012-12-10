@@ -11,6 +11,9 @@ service iptables save
 echo add hostname to /etc/hosts
 echo "127.0.0.1 `hostname`" >> /etc/hosts
 
+echo Setting sudo privileged mode
+sudo sed -i 's/^Defaults.*requiretty/#&/g' /etc/sudoers
+
 JAVA_64_URL="http://repository.cloudifysource.org/com/oracle/java/1.6.0_32/jdk-6u32-linux-x64.bin"
 CLOUDIFY_URL="http://repository.cloudifysource.org/org/cloudifysource/2.2.0-RELEASE/gigaspaces-cloudify-2.2.0-ga-b2500.zip"
 
