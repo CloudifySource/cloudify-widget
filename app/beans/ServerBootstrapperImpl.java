@@ -52,6 +52,7 @@ import com.google.inject.Injector;
 
 import models.ServerNode;
 import server.DeployManager;
+import server.ServerBootstrapper;
 import server.ServerException;
 import server.Utils;
 
@@ -69,7 +70,7 @@ import static server.Config.*;
  * 
  * @author Igor Goldenberg
  */
-public class ServerBootstrapperImpl implements server.ServerBootstrapper
+public class ServerBootstrapperImpl implements ServerBootstrapper
 {
 	private ComputeService _compute;
 	private RestContext<NovaApi, NovaAsyncApi> _nova;

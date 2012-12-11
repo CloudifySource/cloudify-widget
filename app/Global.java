@@ -2,7 +2,6 @@ import models.User;
 import play.Application;
 import play.GlobalSettings;
 import play.Logger;
-import play.modules.spring.Spring;
 import server.ApplicationContext;
 import server.Config;
 

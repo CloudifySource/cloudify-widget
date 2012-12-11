@@ -1,26 +1,43 @@
+/*******************************************************************************
+ * Copyright (c) 2011 GigaSpaces Technologies Ltd. All rights reserved
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *******************************************************************************/
+
 package server;
 
-import beans.DeployManagerImpl;
 import models.ServerNode;
 
 import java.io.File;
 
 /**
- * ****************************************************************************
- * Copyright (c) 2010 GigaSpaces Technologies Ltd. All rights reserved
- * <p/>
- * The software source code is proprietary and confidential information of GigaSpaces.
- * You may use the software source code solely under the terms and limitations of
- * The license agreement granted to you by GigaSpaces.
- * User: guym
- * Date: 12/2/12
- * Time: 12:06 PM
- * *****************************************************************************
+ * The main abstraction to deploy recipe.
+ *
+ * The interface allows to
+ * <ul>
+ *  <li>to fork process on specific Server</li>
+ *  <li>get the process executor of the forked process and get the output</li>
+ *  <li>destroy process executor</li>
+ * </ul>
+ * 
+ * @author Igor Goldenberg
+ * @see ProcExecutor
  */
-public interface DeployManager {
-    public void destroyExecutor(String id);
-
+public interface DeployManager 
+{
    public ProcExecutor fork( ServerNode server, File recipe );
 
-    ProcExecutor getExecutor( String id );
+   public ProcExecutor getExecutor( String id );
+
+   public void destroyExecutor(String id);
 }
