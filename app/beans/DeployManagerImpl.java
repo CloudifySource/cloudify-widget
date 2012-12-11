@@ -16,27 +16,22 @@
 package beans;
 
 import static server.Config.*;
-import java.io.ByteArrayOutputStream;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Hashtable;
-import java.util.concurrent.TimeUnit;
 
 import models.ServerNode;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
-import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
-import org.apache.commons.exec.PumpStreamHandler;
 
 import play.Logger;
 import server.Config;
+import server.DeployManager;
 import server.ProcExecutor;
 import server.ResMessages;
 import server.ServerException;
@@ -47,7 +42,7 @@ import server.ServerException;
  * 
  * @author Igor Goldenberg
  */
-public class DeployManagerImpl implements server.DeployManager
+public class DeployManagerImpl implements DeployManager
 {
 	// keep all widget instances key=instanceId, value=Executor
 	private Hashtable<String, ProcExecutor> _intancesTable = new Hashtable<String, ProcExecutor>();
