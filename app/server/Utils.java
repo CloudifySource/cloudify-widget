@@ -121,8 +121,12 @@ public class Utils
 
 				ZipUtils.unzipArchive(recipeLocalURL, recDir );
 				
-				// returns the unzipped directory path
-				return new File(recipeLocalURL.getPath().substring(0, recipeLocalURL.getPath().lastIndexOf(".")));
+				// returns the unzipped directory path, sometimes a zip file compressed without a root directory
+				File unzippedDir = new File(recipeLocalURL.getPath().substring(0, recipeLocalURL.getPath().lastIndexOf(".")));
+				if ( !unzippedDir.exists() )
+					return recDir;
+				else
+					return unzippedDir;
 			}catch(MalformedURLException e)
 			{
 				throw new ServerException("Wrong recipe url format: " + recUrl, e);
