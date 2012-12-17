@@ -28,9 +28,11 @@ rm -f ~/input.txt
 rm ~/java.bin
 
 echo Exporing JAVA_HOME
-export JAVA_HOME="`pwd`/jdk1.6.0_32"
-echo "export JAVA_HOME=$JAVA_HOME" >> ~/.bashrc
+# export JAVA_HOME="`pwd`/jdk1.6.0_32"
+# export PATH=$PATH:$JAVA_HOME/bin
+echo "export JAVA_HOME=`pwd`/jdk1.6.0_32" >> ~/.bashrc
 echo 'export PATH=$PATH:$JAVA_HOME/bin' >> ~/.bashrc
+source ~/.bashrc
 
 echo Downloading cloudify installation from $CLOUDIFY_URL
 wget -q $CLOUDIFY_URL -O ~/cloudify.zip || error_exit $? "Failed downloading cloudify installation"
