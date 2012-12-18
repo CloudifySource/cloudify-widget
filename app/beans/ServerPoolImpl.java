@@ -89,8 +89,7 @@ public class ServerPoolImpl implements ServerPool
 		}// for
 
 		
-		/*
-		 * check whether in server-pool left some orphans servers,
+		/* check whether in server-pool left some orphans servers,
 		 * it may happen if server-pool still keeps some server that already terminated 
 		 */
 		Logger.info("Check whether in server-pool left some orphans servers...");	
