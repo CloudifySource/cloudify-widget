@@ -18,7 +18,7 @@ public class Global extends GlobalSettings
 		// print cloudify configuration
 		Logger.info( Config.print() );
 		
-	    ApplicationContext.getServerPool();
+	    ApplicationContext.initialize();
 		
 		// create Admin user if not exists
 		if ( User.find.where().eq("email", Config.ADMIN_USERNAME).findUnique() == null )

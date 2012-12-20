@@ -86,7 +86,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		{
 			ServerNode srvNode = null;
 	    	try {
-				srvNode = createServerNode();
+				srvNode =  createServerNode();
 				servers.add( srvNode );
 				
 				return servers;

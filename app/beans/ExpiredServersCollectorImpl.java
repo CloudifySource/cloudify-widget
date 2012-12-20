@@ -23,6 +23,7 @@ import play.Logger;
 
 import models.ServerNode;
 import server.ExpiredServersCollector;
+import server.ServerPool;
 
 import javax.inject.Inject;
 
@@ -33,10 +34,10 @@ import javax.inject.Inject;
  * @author Igor Goldenberg
  * @see ServerPoolImpl
  */
-public class ExpireServersCollectorImpl extends Timer implements ExpiredServersCollector
+public class ExpiredServersCollectorImpl extends Timer implements ExpiredServersCollector
 {
     @Inject
-    private ServerPoolImpl serverPool;
+    private ServerPool serverPool;
 
 	public void scheduleToDestroy(final ServerNode server)
 	{
@@ -53,6 +54,12 @@ public class ExpireServersCollectorImpl extends Timer implements ExpiredServersC
 			
 		}, server.getElapsedTime() );
 	}
+
+    @Override
+    public void cancel() {
+        Logger.error("ExpiredServersCollectorImpl - timer cancelled", new Exception());
+        super.cancel();
+    }
 
     public void setServerPool(ServerPoolImpl serverPool) {
         this.serverPool = serverPool;

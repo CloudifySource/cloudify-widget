@@ -30,29 +30,38 @@ public class ApplicationContext
     public static final String SERVER_BOOTSTRAPPER = "serverBootstrapper";
     public static final String EXPIRED_SERVER_COLLECTOR = "expiredServerCollector";
 
-    public static DeployManager getDeployManager()
-	{
-        return (DeployManager) Spring.getBean(PROC_MANAGER);
 
-	}
+    private static DeployManager deployManager;
+    private static WidgetServer widgetServer;
+    private static ServerPool serverPool;
+    private static ServerBootstrapper serverBootstrapper;
+    private static ExpiredServersCollector expiredServersCollector;
 
-	public static WidgetServer getWidgetServer()
-	{
-        return (WidgetServer) Spring.getBean(WIDGET_SERVER);
-	}
-
-	public static ServerPool getServerPool()
-	{
-        return (ServerPool) Spring.getBean(SERVER_POOL);
+    public static DeployManager getDeployManager() {
+        return deployManager;
     }
 
-	public static ServerBootstrapper getServerBootstrapper()
-	{
-		return (ServerBootstrapper) Spring.getBean(SERVER_BOOTSTRAPPER);
-	}
+    public static WidgetServer getWidgetServer() {
+        return widgetServer;
+    }
 
-	public static ExpiredServersCollector getExpiredServersCollector()
-	{
-		return (ExpiredServersCollector) Spring.getBean(EXPIRED_SERVER_COLLECTOR);
-	}
+    public static ServerPool getServerPool() {
+        return serverPool;
+    }
+
+    public static ServerBootstrapper getServerBootstrapper() {
+        return serverBootstrapper;
+    }
+
+    public static ExpiredServersCollector getExpiredServersCollector() {
+        return expiredServersCollector;
+    }
+
+    public static void initialize() {
+        deployManager = (DeployManager) Spring.getBean(PROC_MANAGER);
+        widgetServer  = (WidgetServer) Spring.getBean(WIDGET_SERVER);
+        serverPool = (ServerPool) Spring.getBean(SERVER_POOL);
+        serverBootstrapper = (ServerBootstrapper) Spring.getBean(SERVER_BOOTSTRAPPER);
+        expiredServersCollector = (ExpiredServersCollector) Spring.getBean(EXPIRED_SERVER_COLLECTOR);
+    }
 }
