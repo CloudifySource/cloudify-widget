@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8">
     <title>Cloudify Widget Signin</title>
-    <link href="style/bootstrap.min.css" rel="stylesheet">
-    <link href="style/login.css" rel="stylesheet">
+    <link href="../style/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../../app/assets/cloudify/style/login.css" rel="stylesheet">
     <script src="js/jquery.min.js"></script>
     <script src="js/jquery.cookie.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/login.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/login.js"></script>
   </head>
   <body>
     <div class="navbar navbar-inverse">
@@ -19,8 +19,9 @@
         <div class="brand">Welcome to the Cloudify Widget Dashboard</div>
       </div>
     </div>
-    <div id="message"></div>
+
     <div class="container">
+      <div id="message" class="login-error-message"></div>
       <div class="logos">
         <a href="http://www.cloudifysource.org"><img src="img/cloudify_logo.png"></a>
         <a href="http://hpcloud.com"><img id="hp_cloud_logo" src="img/hp_cloud_logo.png"></a>
@@ -40,6 +41,7 @@
                 <button class="btn btn-primary" type="submit">Sign in</button>
               </fieldset>
               <a href="signup.html">Don't you have account? - Sign Up</a>
+              <a href="forgotPassword.html">Forgot Password</a>
             </form>
           </div>
         </div>

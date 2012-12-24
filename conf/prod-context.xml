@@ -1,15 +1,30 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 
-    <bean id="deployManager" class="beans.DeployManagerImpl"/>
+    <bean id="deployManager" class="beans.DeployManagerImpl"
+            p:conf="conf"
+            />
+
+
     <bean id="expiredServerCollector" class="beans.ExpireServersCollectorImpl"/>
     <bean id="serverBootstrapper" class="beans.ServerBootstrapperImpl"/>
+
+    <bean id="gsRoutes" class="beans.GsRoutesImpl"/>
+    <bean id="hmac" class="beans.HmacImpl"/>
+
+    <bean id="mailSender" class="beans.MailSenderImpl"/>
+
     <bean id="serverPool" class="beans.ServerPoolImpl" init-method="init"/>
     <bean id="widgetServer" class="beans.WidgetServerImpl"/>
+
+    <bean id="confBean" class="beans.config.ConfigBean"/>
+    <bean id="conf" factory-method="getConfiguration" factory-bean="confBean"/>
+
 
     <context:annotation-config />
     <context:component-scan base-package="beans" />

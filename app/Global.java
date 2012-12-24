@@ -1,10 +1,11 @@
+import beans.config.Conf;
 import models.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.Application;
 import play.GlobalSettings;
-import play.Logger;
-import play.modules.spring.Spring;
+import play.libs.Json;
 import server.ApplicationContext;
-import server.Config;
 
 /**
  * On system startup trigger event onStart or onStop.
@@ -13,21 +14,29 @@ import server.Config;
  */
 public class Global extends GlobalSettings
 {
+    private static Logger logger = LoggerFactory.getLogger( Global.class );
 	@Override
 	public void onStart(Application app)
 	{
 		// print cloudify configuration
-		Logger.info( Config.print() );
-		
+        Conf conf = ApplicationContext.conf();
+
+        logger.info( Json.stringify( Json.toJson( conf ) ) );
+
 	    ApplicationContext.getServerPool();
-		
-		// create Admin user if not exists
-		if ( User.find.where().eq("email", Config.ADMIN_USERNAME).findUnique() == null )
+
+        // create Admin user if not exists
+		if ( User.find.where().eq("admin", Boolean.TRUE ).findRowCount() <= 0 )
 		{
-			User adminUser = User.newUser("Cloudify", "Administrator", Config.ADMIN_USERNAME, Config.ADMIN_PASSWORD);
+            logger.info( "no admin user. creating from configuration" );
+			User adminUser = User.newUser("Cloudify", "Administrator",
+                    conf.server.admin.username,
+                    conf.server.admin.password );
 			adminUser.setAdmin(true);
 		    adminUser.save();
-		}
+		}else{
+            logger.info( "found admin user" );
+        }
 	}
 
 	@Override

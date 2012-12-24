@@ -29,7 +29,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import play.db.ebean.Model;
-import server.Utils;
+import utils.Utils;
 
 /**
  * The ServerNode keeps all metadata of all created and available/busy servers.

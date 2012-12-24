@@ -26,9 +26,9 @@ import javax.persistence.OneToMany;
 
 
 import play.db.ebean.Model;
-import server.ResMessages;
+import play.i18n.Messages;
 import server.ServerException;
-import server.Utils;
+import utils.Utils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -163,7 +163,7 @@ public class Widget
 		Widget widget = Widget.find.where().eq("apiKey", apiKey).findUnique();
 
 		if ( widget == null )
-		    throw new ServerException(ResMessages.getFormattedString("widget_apikey_not_valid", apiKey));
+		    throw new ServerException( Messages.get( "widget.apikey.not.valid", apiKey ) );
 		
 		return widget;
 	}

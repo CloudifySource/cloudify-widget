@@ -1,0 +1,31 @@
+@import tags._
+
+@context.set("head"){
+    <link href="/public/style/login.css" rel="stylesheet">
+    <script src="/public/js/login.js"></script>
+    @context.get("head")
+}
+
+
+@context.set("body"){
+    <div id="base" class="container">
+
+          <div id="message" class="login-error-message global-error-message"></div>
+
+                <div class="logos">
+                    <a href="http://www.cloudifysource.org"><img src="/public/img/common/cloudify_logo.png"></a>
+                    <a href="http://hpcloud.com"><img id="hp_cloud_logo" src="/public/img/common/hp_cloud_logo.png"></a>
+                  </div>
+
+                <div class="well">
+                    <div class="container">
+                        @context.get("body")
+                    </div>
+                </div>
+
+
+    </div>
+
+}
+
+@templates.page()

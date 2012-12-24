@@ -72,7 +72,7 @@ GS_HOME=~/gigaspaces-cloudify-2.2.0-ga
 * Start Play:
 cd to the directory in which you installed the Play framework. If you're in development mode, type `run <port number>`, otherwise type `start <port number>`
 
-* The login page for widget admins is located at `/admin/signin.html`
+* The login page for widget admins is located at route `/admin/signin` which maps to template widgets/admin/signin.scala.html
 
 Configuration Options
 =====================

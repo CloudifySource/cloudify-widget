@@ -23,15 +23,16 @@ import models.Summary;
 import models.User;
 import models.Widget;
 import models.WidgetInstance;
-import org.jboss.netty.handler.codec.http.CookieEncoder;
+import org.apache.commons.lang3.StringUtils;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import server.ApplicationContext;
-import server.Config;
 import server.ServerException;
-import server.Utils;
-import static controllers.RestUtils.*;
+import utils.Utils;
+import utils.RestUtils;
+
+import static utils.RestUtils.*;
 
 
 /**
@@ -53,8 +54,7 @@ public class WidgetAdmin extends Controller
 		try
 		{
 			User.Session session = User.newUser( firstname, lastname, email, password).getSession();
-
-			return RestUtils.resultAsJson(session);
+			return RestUtils.resultAsJson( session );
 		}catch( ServerException ex )
 		{
 			return resultErrorAsJson(ex.getMessage());
@@ -67,11 +67,58 @@ public class WidgetAdmin extends Controller
         // and we can redirect to widgets.html
         Http.Cookie authToken = request().cookies().get( "authToken" );
         if ( authToken != null && User.validateAuthToken( authToken.value(), true ) != null ) {
-            return redirect( "/admin/widgets.html" );
+            return redirect( ApplicationContext.routes().getWidgetsRoute() ); // todo : serve from templates and use "routes"
         }
         else{
-            return redirect( "/admin/signin.html" );
+            return redirect( routes.WidgetAdmin.getSigninPage() );
         }
+    }
+
+    /**
+     *
+     * this method will reset the user's password.
+     * the parameters are cryptic on purpose.
+     *
+     * @param p - the hmac
+     * @param pi - the user id
+     * @return -
+     */
+    public static Result resetPasswordAction( String p, Long pi ){
+        User user = User.findById( pi );
+        // validate p
+        if ( !ApplicationContext.getHmac().compare( p, user.getEmail(),  user.getId(), user.getPassword()  )){
+            return badRequest(  views.html.common.linkExpired.render() );
+        }
+        // if p is valid lets reset the password
+        String newPassword = StringUtils.substring( p, 0, 7 );
+        user.setPassword( newPassword );
+        user.save();
+        return ok( views.html.widgets.admin.newPassword.render( newPassword ) );
+    }
+
+    public static Result postResetPassword( String email, String h ){
+        if ( !StringUtils.isEmpty( h ) ){
+            return badRequest(  ); // this is a bot.. lets block it.
+        }
+        User user = User.find.where(  ).eq( "email",email ).findUnique();
+        if ( user == null ){
+            return ok(  ); // do not notify if user does not exist. this is a security breach..
+            // simply reply that an email was sent to the address.
+        }
+
+        ApplicationContext.getMailSender().resetPasswordMail( user );
+        return ok(  );
+    }
+
+    public static Result getSigninPage(){
+        return ok(views.html.widgets.admin.signin.render());
+    }
+
+    public static Result getSignupPage(){
+        return ok( views.html.widgets.admin.signup.render() );
+    }
+    public static Result getResetPasswordPage(){
+        return ok( views.html.widgets.admin.resetPassword.render() );
     }
 
 	/**
@@ -97,7 +144,8 @@ public class WidgetAdmin extends Controller
 	
 	public static Result getAllUsers( String authToken )
 	{
-		User.validateAuthToken(authToken);
+		User.validateAuthToken(authToken);   // TODO : remove these validations and use "action interceptor"
+                                            // there's no official documentation for interceptors. see code sample at : http://stackoverflow.com/questions/9629250/how-to-avoid-passing-parameters-everywhere-in-play2
 		List<User> users = User.getAllUsers();
 
 		return resultAsJson(users);

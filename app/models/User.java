@@ -15,28 +15,30 @@
  *******************************************************************************/
 package models;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import controllers.WidgetAdmin;
+import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import play.cache.Cache;
+import play.data.validation.Constraints.Required;
+import play.db.ebean.Model;
+import play.i18n.Messages;
+import play.mvc.Http;
+import server.ApplicationContext;
+import server.ServerException;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-
-import org.apache.commons.lang.BooleanUtils;
-import play.data.validation.Constraints.Required;
-import play.db.ebean.Model;
-import server.ResMessages;
-import server.ServerException;
-
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
-
-import controllers.WidgetAdmin;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class creates on sign-up, serves for authentication and keeps information about login and user's widgets.
@@ -51,7 +53,7 @@ public class User
 {
 	private static final long serialVersionUID = 1L;
 
-	/** instantiated on user's sign-in/sign-out */
+    /** instantiated on user's sign-in/sign-out */
 	@XStreamAlias("session")
 	final public static class Session
 	{
@@ -98,6 +100,7 @@ public class User
 	private String lastName;
 
 	@Required
+    @Column( unique = true )
 	@XStreamAsAttribute
 	private String email;
 	
@@ -111,16 +114,40 @@ public class User
 	
 	@XStreamOmitField
 	private Boolean admin;
-	
-	@OneToMany(cascade=CascadeType.ALL) 
+
+	@OneToMany(cascade= CascadeType.ALL)
 	private List<Widget> widgets;
+
+    public static enum Role{
+        ADMIN, USER
+    }
 	
-	public static Finder<Long,User> find = new Finder<Long,User>(Long.class, User.class); 
+	public static Finder<Long,User> find = new Finder<Long,User>(Long.class, User.class);
+
+
 
 	public User(String email, String password)
 	{
 		this(null, null, email, password);
 	}
+
+    public String getFullName(){
+        StringBuilder b = new StringBuilder(  );
+        boolean hasFirstName = false;
+        if ( !StringUtils.isEmpty(firstName) ){
+            b.append( firstName );
+            hasFirstName = true;
+        }
+
+        if ( !StringUtils.isEmpty( lastName )){
+            if ( hasFirstName ){
+                b.append( " " );
+            }
+            b.append( lastName );
+        }
+
+        return b.length() == 0 ? email : b.toString();
+    }
 	
 	public User(String firstName, String lastName, String email, String password)
 	{
@@ -168,7 +195,7 @@ public class User
 			user.save();
 		}
 		else
-			throw new ServerException(ResMessages.getFormattedString("user_already_exists", email));
+			throw new ServerException( Messages.get( "user.already.exists", email ));
 			
 		return user;
 	}
@@ -177,17 +204,33 @@ public class User
 	// TODO create a real authToken mechanism with expiration: currTime + 1 hour
 	static private void createAuthToken( User user )
 	{
-		user.setAuthToken(UUID.randomUUID().toString());
+		user.renewAuthToken();
 		user.setExpires(new Date().toString());
 	}
-	
-	static public Session authenticate( String email, String password )
+
+    private void renewAuthToken(){
+        setAuthToken( UUID.randomUUID().toString() );
+    }
+
+    public static User findById( Long pi )
+    {
+        return User.find.where().eq( "id", pi ).findUnique();
+    }
+
+    static public Session authenticate( String email, String password )
 	{
 		User user = find.where().eq("email", email).eq("password", password).findUnique();
-		
+
 		if ( user == null )
-			throw new ServerException( ResMessages.getString("invalid_username_password") );
-		
+        {
+			throw new ServerException( Messages.get( "invalid.username.password" ) );
+        }
+
+        String authToken = user.getAuthToken();
+        user.renewAuthToken();
+        user.save();
+
+        prolongSession( authToken, user.getId() );
 		return user.getSession();
 	}
 
@@ -196,16 +239,37 @@ public class User
 		return validateAuthToken( authToken, false );
 	}
 
+    // guy - temporarily, the "session" is artificially made with expiring the authtoken.
+    // however, this should not be the case.. We need to create another controller to serve our GUI
+    // which will be separated from the REST API - like all REST clients..
+    // unlike all the rest APIs we have the ability yo skip the network overhead, and communicate directly with the REST API.
+    // so we can simply invoke methods. However, the "session" should be handled by the GUI controller and not Javascript.
     static public User validateAuthToken( String authToken, boolean silent )
     {
-        User user = User.find.where().eq( "authToken", authToken ).findUnique();
-        if ( user == null && !silent ) {
-            throw new ServerException( ResMessages.getFormattedString( "auth_token_not_valid", authToken ) );
+        Long userId = (Long) Cache.get(authToken); // for now, lets use the cache as session. we should implement an encrypted cookie.
+        if ( userId == null ){
+            Http.Context.current().response().setHeader( "session-expired", "session-expired" );
+            throw new ServerException( Messages.get("session.expired" ) );
         }
+
+
+        User user = User.find.byId( userId );
+        if ( user == null && !silent ) {
+            throw new ServerException( Messages.get( "auth.token.not.valid", authToken ) );
+        }
+
+        Http.Context.current().session().put("authToken", authToken );
+        prolongSession( authToken, user.id );
 
         return user;
     }
-	
+
+    // makes the session longer. expiration is only if user is idle.
+    private static void prolongSession( String authToken, Long userId )
+    {
+        Cache.set( authToken, userId, ( int ) (ApplicationContext.conf().server.sessionTimeoutMillis / 1000) ); // cache for one hour
+    }
+
 	static public List<User> getAllUsers()
 	{
 		return find.all();
@@ -290,7 +354,12 @@ public class User
 	{
 		this.admin = admin;
 	}
-	
+
+    public String toDebugString()
+    {
+        return email + " (" + id + ")";
+    }
+
 	/*
 	@Override
 	public String toString()

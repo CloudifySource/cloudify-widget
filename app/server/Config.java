@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.Configuration;
 import play.Play;
+import scala.collection.JavaConversions;
 
 /**
  * Cloudify configuration class. All config properties locates in /conf/cloudify.conf file.
@@ -35,6 +36,7 @@ public class Config
     private static Logger logger = LoggerFactory.getLogger( Config.class );
 	final public static String WIDGET_SERVER_ID;
 	final public static int WIDGET_STOP_TIMEOUT; // sec
+    final public static String APP_SECRET;
 
 	final public static boolean SERVER_POOL_COLD_INIT;
 	final public static int SERVER_POOL_MIN_NODES;
@@ -55,12 +57,12 @@ public class Config
 	final public static String COMPUTE_PROVIDER;
 	final public static String COMPUTE_BOOTSTRAP_SCRIPT;
 
+    final public static SmtpConfiguration SMTP_CONFIG;
+
 	final public static String CLOUDIFY_DEPLOY_SCRIPT;
 
 	final public static String ADMIN_USERNAME;
 	final public static String ADMIN_PASSWORD;
-
-	final public static String MESSAGES_CONFIG_FILE;
 
 	// if the process hasn't finished within the defined timeout, the process will be killed
 	final public static long CLOUDIFY_DEPLOY_TIMEOUT; // ms
@@ -122,11 +124,82 @@ public class Config
 			ADMIN_USERNAME                  = getValue( conf.getString( "server.admin.username" ), "admin@gigaspaces.com");
 			ADMIN_PASSWORD                  = getValue( conf.getString( "server.admin.password" ), "cloudify1324");
 
-			MESSAGES_CONFIG_FILE            = getFullPath( getValue( conf.getString( "cloudify.messages-config-file" ), "/conf/messages.conf" ) );
+            APP_SECRET = conf.getString( "application.secret" );
+
+            SMTP_CONFIG = new SmtpConfiguration();
 		} catch ( Exception e ){
             throw new ServerException( "unable to load configuration", e  );
         }
 	}
+
+
+    /**
+     * Guy - this class represents an SmtpConfiguration.
+     * It uses a direct access to "conf" so we will be able to modify it at runtime.
+     */
+    public static class SmtpConfiguration{
+        private Configuration conf;
+
+        public SmtpConfiguration(){
+            conf = Play.application().configuration().getConfig( "smtp" );
+        }
+
+        public int getPort(){
+            return getValue( conf.getInt( "port" ), 0 );
+        }
+
+        public String getHost(){
+            return getValue( conf.getString( "host" ), "N/A" );
+        }
+
+        public boolean isTls(){
+            return getValue( conf.getBoolean( "tls" ), false );
+        }
+
+        public boolean isMock(){
+            return getValue(  conf.getBoolean( "mock" ), false );
+        }
+
+        public boolean isEnabled(){
+            return getValue( conf.getBoolean( "enabled" ), true );
+        }
+
+        public boolean isDebug(){
+            return getValue( conf.getBoolean( "debug" ), false );
+        }
+
+        public String getUser(){
+            return getValue( conf.getString( "user" ), "N/A" );
+        }
+
+        public String getPassword(){
+            return getValue( conf.getString( "password" ), "N/A" );
+        }
+
+        public boolean isSsl(){
+            return getValue( conf.getBoolean( "ssl" ), false );
+        }
+
+        public boolean isAuth(){
+            return getValue( conf.getBoolean( "auth" ), false );
+        }
+
+
+
+
+        //        @Override
+        public String toString()
+        {
+            return String.format( "SmtpConfiguration{port=%d, host=%s, tls=%s, user=%s, auth=%s, enabled=%s, debug=%s}",
+                    getPort(),
+                    getHost(),
+                    isTls(),
+                    getUser(),
+                    isAuth(),
+                    isEnabled(),
+                    isDebug());
+        }
+    }
 
 
 	public static String print()
@@ -139,6 +212,7 @@ public class Config
 	@Override
 	public String toString()
 	{
+
 		StringBuilder b = new StringBuilder("Cloudify widget configuration:\n");
 
 		Field[] fields = getClass().getDeclaredFields();

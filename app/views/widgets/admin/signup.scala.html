@@ -1,0 +1,27 @@
+@import tags._
+@context.set("title"){Cloudify Widget Signup}
+@context.set("brand"){Welcome to the Cloudify Widget Dashboard}
+@fieldDisplay( fPlaceholder:String, name:String, fType:String="text", fClass:String="required")={
+    <div class="clearfix">
+      <input type="@fType" placeholder="@fPlaceholder" name="@name" class="@fClass"/>
+    </div>
+
+}
+@context.set("body"){
+          <div class="login-form">
+            <h2>Sign Up</h2>
+            <form id="signup_form">
+              <fieldset>
+                  @fieldDisplay("Email","username" )
+                  @fieldDisplay("First Name","firstname" )
+                  @fieldDisplay("Last Name","lastname" )
+                  @fieldDisplay("Password","password" )
+                  @fieldDisplay("Password Configuration","passwordConfirmation" )
+                <button class="btn btn-primary" type="submit">Create Account</button>
+                <a href="@routes.WidgetAdmin.getSigninPage()" class="btn">Cancel</a>
+              </fieldset>
+            </form>
+      </div>
+}
+
+@widgets.admin.loginTemplate()

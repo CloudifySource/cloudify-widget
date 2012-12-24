@@ -1,0 +1,45 @@
+@import tags._
+ <!DOCTYPE html>
+<!--
+  ~ Copyright (c) 2012 GigaSpaces Technologies Ltd. All rights reserved
+  ~ <p/>
+  ~ The software source code is proprietary and confidential information of GigaSpaces.
+  ~ You may use the software source code solely under the terms and limitations of
+  ~ the license agreement granted to you by GigaSpaces.
+
+  To read more about how to write templates and views in play 2.0 , please read : http://www.playframework.org/documentation/2.0/ScalaTemplateUseCases
+  -->
+@* This template is for head only. it includes the minimum required for all pages.
+   do not add logic or body elements to it
+   all templates should inherit this one unless some other
+*@
+ @args()=@{play.mvc.Http.Context.current().args}
+ <html>
+   <head>
+     <title>@context.get("title")</title>
+
+     <script src="/public/js/jquery.min.js"></script>
+     <script src="/public/js/jquery.tmpl.min.js"></script>
+     <script src="/public/js/jquery.quicksearch.js"></script>
+     <script src="/public/js/jquery.formparams.min.js"></script>
+     <script src="/public/js/jquery.cookie.js"></script>
+     <script src="/public/js/bootstrap.min.js"></script>
+       <link rel="shortcut icon" type="image/png" href="/guy.ico">
+      <link href="/public/style/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+     @context.get("head")
+
+       <script>
+
+           $(function(){$(document).ajaxError( function(event, jqXHR, ajaxSettings, thrownError){
+                console.log(["ajax error occurred", arguments]);
+                        $(".global-error-message" ).text("Error - please try again later");
+                })});
+
+        </script>
+   </head>
+   <body>
+    @context.get("body")
+   </body>
+ </html>
+

@@ -15,6 +15,10 @@
  *******************************************************************************/
 package server;
 
+import beans.GsMailer;
+import beans.HmacImpl;
+import beans.config.Conf;
+import beans.config.ConfigBean;
 import play.modules.spring.Spring;
 
 /**
@@ -24,17 +28,55 @@ import play.modules.spring.Spring;
  */
 public class ApplicationContext
 {
-    public static final String PROC_MANAGER = "procManager";
-    public static final String WIDGET_SERVER = "widgetServer";
-    public static final String SERVER_POOL = "serverPool";
-    public static final String SERVER_BOOTSTRAPPER = "serverBootstrapper";
-    public static final String EXPIRED_SERVER_COLLECTOR = "expiredServerCollector";
+    private static final String PROC_MANAGER = "procManager";
+    private static final String WIDGET_SERVER = "widgetServer";
+    private static final String SERVER_POOL = "serverPool";
+    private static final String SERVER_BOOTSTRAPPER = "serverBootstrapper";
+    private static final String EXPIRED_SERVER_COLLECTOR = "expiredServerCollector";
+    private static final String CONF_BEAN = "confBean";
+    private static final String MAIL_SENDER = "mailSender";
+    private static final String HMAC = "hmac";
+    private static final String GS_ROUTES = "gsRoutes";
+
+    public static Conf conf(){
+        ConfigBean bean = getBean( CONF_BEAN );
+        return bean.getConfiguration();
+    }
+
+    public static MailSender getMailSender(){
+        return getBean( MAIL_SENDER );
+    }
+
+    public static HmacImpl getHmac(){
+        return getBean( HMAC );
+    }
+
+    public static GsRoutes routes(){
+        return getBean( GS_ROUTES );
+    }
+
+    public static GsRoutes getGsRoutes(){
+        return routes();
+    }
+
+    @Deprecated // do not use - use "conf()" instead . do not deleted.
+    public static Conf getConf(){
+        return conf();
+    }
+
+    private static <T> T getBean( String bean ){
+        return (T) Spring.getBean( bean );
+    }
+
 
     public static DeployManager getDeployManager()
 	{
         return (DeployManager) Spring.getBean(PROC_MANAGER);
-
 	}
+
+    public static GsMailer.IMailer getMailer(){
+        return play.Play.application().plugin( GsMailer.class ).email();
+    }
 
 	public static WidgetServer getWidgetServer()
 	{

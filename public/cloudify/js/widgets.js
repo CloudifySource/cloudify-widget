@@ -7,7 +7,7 @@ $(function () {
     $.removeCookie("authToken");
     $.removeCookie("username");
     $.removeCookie("admin");
-    window.location.href = "signin.html"
+    window.location.href = "/admin/signin"; // todo : ?? -- what is this method? --
   }
 
   function render_summary() {
@@ -83,9 +83,9 @@ $(function () {
 
   function youtube_parser(url) {
     if (url.indexOf("/embed/") == -1) {
-      var video_id = parse_url(url)["v"]
+      var video_id = parse_url(url)["v"];
       if (!video_id)
-        return
+        return null;
       return "http://www.youtube.com/embed/" + video_id;
     } else
       return url;
@@ -104,7 +104,7 @@ $(function () {
         $("#search_panel").hide();
         $("#widgets_panel").hide();
         $("#summary").hide();
-        return
+        return;
       }
 
       $("#welcome_window").hide();
@@ -118,24 +118,20 @@ $(function () {
 
         $("#widget_" + widget["@id"] + "_instances_modal").on("show", function () {
           clearInterval(update_interval);
-        });
-
-        $("#widget_" + widget["@id"] + "_instances_modal").on("hide", function () {
+        }).on("hide", function () {
           window.update_interval = setInterval(update_widget_list, update_time_interval);
         });
 
         $("#widget_" + widget["@id"] + "_get_embed_modal").on("show", function () {
           clearInterval(update_interval);
-        });
-
-        $("#widget_" + widget["@id"] + "_get_embed_modal").on("hide", function () {
+        }).on("hide", function () {
           window.update_interval = setInterval(update_widget_list, update_time_interval);
         });
       });
 
       render_summary();
     });
-  }
+  };
 
   window.authToken = $.cookie("authToken");
   window.username = $.cookie("username");
@@ -153,14 +149,16 @@ $(function () {
     recipeURL: "A URL (http/https)to the recipe zip file",
     consolename: "The title of the link to the product dashboard / UI in the widget console",
     consoleurl: "The URL to the product dashboard / UI. Use $HOST as the hostname placeholder, e.g.: http://$HOST:8080/tomcat/index.html"
-  }
+  };
 
   if (!authToken) {
-    window.location.href = "signin.html"
+    window.location.href = "/admin/signin"; // todo : ??? -- login verification?? -- should be on server side.
   }
 
   $("#username").text(username);
-  if (admin) $("#user_name_column").show();
+  if (admin) {
+      $("#user_name_column").show();
+  }
 
   for (var key in field_tips) {
     if (field_tips[key]) {
@@ -173,38 +171,29 @@ $(function () {
   window.update_interval = setInterval(update_widget_list, update_time_interval);
   update_widget_list();
 
-  $(".required_mark").attr("title", "This field is mandatory")
-  $(".required_mark").tooltip();
-
-  $("#logout").click(function(e) {
-    e.preventDefault();
-    if (confirm("Are you sure you want to logout?")) {
-      $.removeCookie("authToken");
-      $.removeCookie("username");
-      window.location.href = "signin.html"
-    }   
-  });
+  $(".required_mark").attr("title", "This field is mandatory").tooltip();
 
   $("#new_widget_form").submit(function (e) {
     e.preventDefault();
 
     var error = false;
-    $.each($("#new_widget_form input.required"), function (index, object) {
+    $("#new_widget_form").find("input.required" ).each( function (index, object) {
       if ($(object).val() == "") {
         error = true;
         $(object).parents(".control-group").addClass("error");
       }
     });
 
-    var youtube_video_url = $("#youtubeVideoUrl").val();
+      var $youtubeVideoUrl = $("#youtubeVideoUrl");
+      var youtube_video_url = $youtubeVideoUrl.val();
     if (youtube_video_url) {
-      var youtube_video_url = youtube_parser(youtube_video_url);
+      youtube_video_url = youtube_parser(youtube_video_url);
       if (youtube_video_url) {
-        $("#youtubeVideoUrl").val(youtube_video_url);
-        $("#youtubeVideoUrl").parents(".control-group").removeClass("error");
+        $youtubeVideoUrl.val(youtube_video_url);
+        $youtubeVideoUrl.parents(".control-group").removeClass("error");
       } else {
         error = true;
-        $("#youtubeVideoUrl").parents(".control-group").addClass("error");
+        $youtubeVideoUrl.parents(".control-group").addClass("error");
         alert("Youtube video url is incorrect");
       }
     }
@@ -231,6 +220,11 @@ $(function () {
     }
   });
 
+    function setEnabledButtons( widget_container, enabled ){
+        widget_container.find(".disable_widget_btn, .instances_btn").hide();
+        widget_container.find(".enable_widget_btn, .disabled_marker").show();
+    }
+
   $(".disable_widget_btn").live("click", function (e) {
     var widget_container = $(e.target).parents("tr.widget");
     var api_key = widget_container.data("api_key");
@@ -241,27 +235,26 @@ $(function () {
           return
         }
 
-        widget_container.find(".disable_widget_btn").hide();
-        widget_container.find(".instances_btn").hide();
-        widget_container.find(".enable_widget_btn").show();
-        widget_container.find(".disabled_marker").show();
+        setEnabledButtons( widget_container, false);
       });
     }
   });
 
+    function toUrlParams( data ){
+          return $.param(data);
+      }
+
   $(".enable_widget_btn").live("click", function (e) {
     var widget_container = $(e.target).parents("tr.widget");
-    var api_key = widget_container.data("api_key");
-    $.post("/widget/enable?authToken=" + authToken + "&apiKey=" + api_key, {}, function (data) {
+    var postData = { apiKey : widget_container.data("api_key"), authToken: authToken };
+    $.post("/widget/enable?" + toUrlParams( postData ), {}, function (data) {
       if (data.status == "session-expired") {
         remove_session();
         return
       }
       widget_container.removeClass("error");
-      widget_container.find(".enable_widget_btn").hide();
-      widget_container.find(".disabled_marker").hide();
-      widget_container.find(".instances_btn").show();
-      widget_container.find(".disable_widget_btn").show();
+      setEnabledButtons( widget_container, true);
+
     });
   });
 

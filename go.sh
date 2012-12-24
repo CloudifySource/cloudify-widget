@@ -12,7 +12,7 @@ else
         fi
 
         echo "starting play server"
-        play "start 80" &> res.out
+        play_start.sh &> res.out
 
         if [ $? -ne 0 ]; then
             echo "something wrong when trying to run play"

@@ -15,31 +15,22 @@
  *******************************************************************************/
 package beans;
 
-import static server.Config.*;
-import java.io.ByteArrayOutputStream;
+import beans.config.Conf;
+import models.ServerNode;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecuteResultHandler;
+import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.exec.ExecuteWatchdog;
+import play.Logger;
+import play.i18n.Messages;
+import server.ProcExecutor;
+import server.ServerException;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Hashtable;
-import java.util.concurrent.TimeUnit;
-
-import models.ServerNode;
-
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecuteResultHandler;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.ExecuteWatchdog;
-import org.apache.commons.exec.PumpStreamHandler;
-
-import play.Logger;
-import server.Config;
-import server.ProcExecutor;
-import server.ResMessages;
-import server.ServerException;
 
 /**
  * This class deploys a recipe file vi cloudify non-interactive CLI. 
@@ -51,6 +42,9 @@ public class DeployManagerImpl implements server.DeployManager
 {
 	// keep all widget instances key=instanceId, value=Executor
 	private Hashtable<String, ProcExecutor> _intancesTable = new Hashtable<String, ProcExecutor>();
+
+    @Inject
+    private Conf conf;
 
 
 	static enum RecipeType
@@ -104,14 +98,14 @@ public class DeployManagerImpl implements server.DeployManager
 		RecipeType recipeType = getRecipeType( recipe );
 		Logger.info( String.format("Deploying: [ServerIP=%s] [recipe=%s] [type=%s]", server.getPublicIP(), recipe, recipeType.name()));
 
-		CommandLine cmdLine = new CommandLine(CLOUDIFY_DEPLOY_SCRIPT);
+		CommandLine cmdLine = new CommandLine( conf.cloudify.deployScript );
 		cmdLine.addArgument(server.getPublicIP());
 		cmdLine.addArgument(recipe.getPath());
 		cmdLine.addArgument(recipeType.getCmdParam());
 		
 		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 
-		ExecuteWatchdog watchdog = new ExecuteWatchdog(Config.CLOUDIFY_DEPLOY_TIMEOUT);
+		ExecuteWatchdog watchdog = new ExecuteWatchdog( conf.cloudify.deployWatchDogProcessTimeoutMillis );
 		ProcExecutor executor = new ProcExecutorImpl(server, recipe);
 		
 		executor.setExitValue(1);
@@ -154,13 +148,18 @@ public class DeployManagerImpl implements server.DeployManager
 		} );
 		   
 		if ( files == null || files.length == 0 )
-			throw new ServerException(ResMessages.getFormattedString("recipe_not_valid_1",
-                    RecipeType.APPLICATION.getFileIdentifier(), RecipeType.SERVICE.getFileIdentifier()));
+			throw new ServerException( Messages.get( "recipe.not.value.1",
+                    RecipeType.APPLICATION.getFileIdentifier(), RecipeType.SERVICE.getFileIdentifier() ));
 		
 		if ( files.length > 1)
-			throw new ServerException(ResMessages.getFormattedString("recipe_not_valid_2",
-					RecipeType.APPLICATION.getFileIdentifier(), RecipeType.SERVICE.getFileIdentifier()));
+			throw new ServerException( Messages.get( "recipe.not.valid.2",
+                    RecipeType.APPLICATION.getFileIdentifier(), RecipeType.SERVICE.getFileIdentifier() ));
 
 		return RecipeType.getRecipeTypeByFileName(files[0]);
 	}
+
+    public void setConf( Conf conf )
+    {
+        this.conf = conf;
+    }
 }

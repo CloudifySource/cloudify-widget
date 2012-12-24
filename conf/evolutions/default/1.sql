@@ -1,92 +1,117 @@
-# --- Created by Ebean DDL
-# To stop Ebean DDL generation, remove this comment and start using Evolutions
+-- MySQL dump 10.13  Distrib 5.1.66, for redhat-linux-gnu (x86_64)
+--
+-- Host: localhost    Database: cloudifyWidget_prod
+-- ------------------------------------------------------
+-- Server version	5.1.66
 
-# --- !Ups
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-create table server_node (
-  id                        varchar(255) not null,
-  server_id                 varchar(255),
-  expiration_time           bigint,
-  public_ip                 varchar(255),
-  private_ip                varchar(255),
-  busy                      boolean,
-  constraint pk_server_node primary key (id))
-;
+--
+-- Table structure for table `patchlevel`
+--
 
-create table user (
-  id                        bigint not null,
-  first_name                varchar(255),
-  last_name                 varchar(255),
-  email                     varchar(255),
-  password                  varchar(255),
-  auth_token                varchar(255),
-  expires                   varchar(255),
-  admin                     boolean,
-  constraint pk_user primary key (id))
-;
+--
+-- Table structure for table `server_node`
+--
 
-create table widget (
-  id                        varchar(255) not null,
-  user_id                   bigint not null,
-  user_name                 varchar(255),
-  product_name              varchar(255),
-  provider_url              varchar(255),
-  product_version           varchar(255),
-  title                     varchar(255),
-  youtube_video_url         varchar(255),
-  recipe_url                varchar(255),
-  allow_anonymous           boolean,
-  api_key                   varchar(255),
-  launches                  integer,
-  enabled                   boolean,
-  console_name              varchar(255),
-  console_url               varchar(255),
-  constraint pk_widget primary key (id))
-;
+DROP TABLE IF EXISTS `server_node`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `server_node` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `server_id` varchar(255) DEFAULT NULL,
+  `expiration_time` bigint(20) DEFAULT NULL,
+  `public_ip` varchar(255) DEFAULT NULL,
+  `private_ip` varchar(255) DEFAULT NULL,
+  `busy` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=534 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-create table widget_instance (
-  id                        bigint not null,
-  widget_id                 varchar(255) not null,
-  instance_id               varchar(255),
-  anonymouse                boolean,
-  public_ip                 varchar(255),
-  constraint pk_widget_instance primary key (id))
-;
+--
+-- Table structure for table `user`
+--
 
-create sequence server_node_seq;
+DROP TABLE IF EXISTS `user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `user` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `first_name` varchar(255) DEFAULT NULL,
+  `last_name` varchar(255) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `auth_token` varchar(255) DEFAULT NULL,
+  `expires` varchar(255) DEFAULT NULL,
+  `admin` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=130 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-create sequence user_seq;
+--
+-- Table structure for table `widget`
+--
 
-create sequence widget_seq;
+DROP TABLE IF EXISTS `widget`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `widget` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL,
+  `user_name` varchar(255) DEFAULT NULL,
+  `product_name` varchar(255) DEFAULT NULL,
+  `provider_url` varchar(255) DEFAULT NULL,
+  `product_version` varchar(255) DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `youtube_video_url` varchar(255) DEFAULT NULL,
+  `recipe_url` varchar(255) DEFAULT NULL,
+  `allow_anonymous` tinyint(1) DEFAULT NULL,
+  `api_key` varchar(255) DEFAULT NULL,
+  `launches` int(11) DEFAULT NULL,
+  `enabled` tinyint(1) DEFAULT NULL,
+  `console_name` varchar(255) DEFAULT NULL,
+  `console_url` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_widget_user_1` (`user_id`),
+  CONSTRAINT `fk_widget_user_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=230 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-create sequence widget_instance_seq;
+--
+-- Table structure for table `widget_instance`
+--
 
-alter table widget add constraint fk_widget_user_1 foreign key (user_id) references user (id) on delete restrict on update restrict;
-create index ix_widget_user_1 on widget (user_id);
-alter table widget_instance add constraint fk_widget_instance_widget_2 foreign key (widget_id) references widget (id) on delete restrict on update restrict;
-create index ix_widget_instance_widget_2 on widget_instance (widget_id);
+DROP TABLE IF EXISTS `widget_instance`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `widget_instance` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `widget_id` bigint(20) DEFAULT NULL,
+  `instance_id` varchar(255) DEFAULT NULL,
+  `anonymouse` tinyint(1) DEFAULT NULL,
+  `public_ip` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_widget_instance_widget_2` (`widget_id`),
+  CONSTRAINT `fk_widget_instance_widget_2` FOREIGN KEY (`widget_id`) REFERENCES `widget` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=153 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
-
-# --- !Downs
-
-SET REFERENTIAL_INTEGRITY FALSE;
-
-drop table if exists server_node;
-
-drop table if exists user;
-
-drop table if exists widget;
-
-drop table if exists widget_instance;
-
-SET REFERENTIAL_INTEGRITY TRUE;
-
-drop sequence if exists server_node_seq;
-
-drop sequence if exists user_seq;
-
-drop sequence if exists widget_seq;
-
-drop sequence if exists widget_instance_seq;
-
+-- Dump completed on 2012-12-16  2:57:27

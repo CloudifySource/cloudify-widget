@@ -1,0 +1,21 @@
+# this file contains all messages thrown to user
+
+recipe.not.valid.1=The recipe archive is not valid. Failed to find: %s or %s
+recipe.not.valid.2=The recipe archive is not valid. Found 2 files with %s and %s
+server.was.terminated=The server was terminated.
+no.available.servers=No servers are available to process your request, please retry later.
+widget.disabled.by.administrator=This widget has been disabled and cannot be used to launch recipes.
+please.wait.x.sec=Please wait for %s seconds...
+
+invalid.username.password=Invalid username or password
+auth.token.not.valid=Authentication token is not valid: %s
+
+user.already.exists=User '%s' already exists
+widget.apikey.not.valid=The widget apiKey is not valid: %s
+session.expired=session-expired
+
+# any following string that has been met in the output stream,
+
+
+
+

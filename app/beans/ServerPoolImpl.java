@@ -15,14 +15,15 @@
  *******************************************************************************/
 package beans;
 
-import static server.Config.*;
 import java.util.List;
 
+import beans.config.Conf;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
 
 import models.ServerNode;
 import models.WidgetInstance;
-import play.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.*;
 
 import javax.inject.Inject;
@@ -40,16 +41,21 @@ import javax.inject.Inject;
  */
 public class ServerPoolImpl implements ServerPool
 {
+
+    private static Logger logger = LoggerFactory.getLogger( ServerPoolImpl.class );
     @Inject
     private ServerBootstrapper serverBootstrapper;
 
     @Inject
     private ExpiredServersCollector expiredServerCollector;
 
+    @Inject
+    private Conf conf;
+
 
 	private void init()
 	{
-		Logger.info("Started to initialize ServerPool, cold-init=" + SERVER_POOL_COLD_INIT);
+		logger.info( String.format( "Started to initialize ServerPool, cold-init=%s", conf.server.pool.coldInit ) );
 		
 		// get all available running servers
 		List<Server> serverList = serverBootstrapper.getServerList();
@@ -58,7 +64,7 @@ public class ServerPoolImpl implements ServerPool
 			Server srv = iter.next();
 			
 			// ignore our server
-			if ( srv.getId().equals( WIDGET_SERVER_ID ) )
+			if ( srv.getId().equals( conf.widget.serverId ) )
 			{
 				iter.remove();
 				continue;
@@ -67,9 +73,9 @@ public class ServerPoolImpl implements ServerPool
 			ServerNode server = ServerNode.getServerNode(srv.getId());
 			
 			// if null this server wasn't found in our DB or server expired - we terminate it
-			if ( server == null || server.isExpired() || SERVER_POOL_COLD_INIT )
+			if ( server == null || server.isExpired() || conf.server.pool.coldInit )
 			{
-				Logger.info("ServerId: " + srv.getId() + " expired or not found in server-pool, address: " + srv.getAddresses());
+				logger.info( String.format( "ServerId: %s expired or not found in server-pool, address: %s", srv.getId(), srv.getAddresses() ) );
 				ApplicationContext.getServerBootstrapper().destroyServer(srv.getId());
 				iter.remove();
 			}
@@ -77,14 +83,14 @@ public class ServerPoolImpl implements ServerPool
 			{
 				if ( server.isBusy() )
 				{
-				   Logger.info("Found a busy server, leave it: " + srv);
+				   logger.info( String.format( "Found a busy server, leave it: %s", srv ) );
 				   iter.remove();
 				      
 				   if ( server.isTimeLimited() )
 				     expiredServerCollector.scheduleToDestroy(server);
 				}
 				else
-				   Logger.info("Found a free bootstrapped server, add to a server pool: " + srv);	
+				   logger.info( String.format( "Found a free bootstrapped server, add to a server pool: %s", srv ) );
 			}
 		}// for
 
@@ -92,7 +98,7 @@ public class ServerPoolImpl implements ServerPool
 		/* check whether in server-pool left some orphans servers,
 		 * it may happen if server-pool still keeps some server that already terminated 
 		 */
-		Logger.info("Check whether in server-pool left some orphans servers...");	
+		logger.info("Check whether in server-pool left some orphans servers...");
 		for( ServerNode node : ServerNode.all() )
 		{
 			boolean isFound = false;
@@ -107,17 +113,17 @@ public class ServerPoolImpl implements ServerPool
 			
 			if ( !isFound )
 			{
-				Logger.info("Delete orphans server from a server pool " + node);	
+				logger.info("Delete orphans server from a server pool " + node);
 				node.delete();
 			}
 		}
 		
 		// create new servers if need
-		if ( serverList.size() < SERVER_POOL_MIN_NODES )
+		if ( serverList.size() < conf.server.pool.minNode )
 		{
-			int serversToInit = SERVER_POOL_MIN_NODES - serverList.size();
+			int serversToInit = conf.server.pool.minNode - serverList.size();
 			
-			Logger.info( "ServerPool starting to initialize " + serversToInit + " servers..." );
+			logger.info( "ServerPool starting to initialize " + serversToInit + " servers..." );
 			
 			List<ServerNode> servers = serverBootstrapper.createServers(serversToInit);
 
@@ -158,9 +164,9 @@ public class ServerPoolImpl implements ServerPool
 	
 	void addNewServerToPool()
 	{
-		if ( ServerNode.count() >= SERVER_POOL_MAX_NODES )
+		if ( ServerNode.count() >= conf.server.pool.maxNodes )
 		{
-			Logger.info("Server-pool has reached maximum capacity: " + SERVER_POOL_MAX_NODES);	
+			logger.info("Server-pool has reached maximum capacity: " + conf.server.pool.maxNodes);
 			return;
 		}
 
@@ -174,7 +180,7 @@ public class ServerPoolImpl implements ServerPool
 					servers.get(0).save();
 				} catch (Exception e)
 				{
-					Logger.error("ServerPool failed to create a new server node", e);
+					logger.error("ServerPool failed to create a new server node", e);
 				}
 			}
 		}).start();
@@ -186,5 +192,10 @@ public class ServerPoolImpl implements ServerPool
 
     public void setExpiredServerCollector(ExpiredServersCollector expiredServerCollector) {
         this.expiredServerCollector = expiredServerCollector;
+    }
+
+    public void setConf( Conf conf )
+    {
+        this.conf = conf;
     }
 }

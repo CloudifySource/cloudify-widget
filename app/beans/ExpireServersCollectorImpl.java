@@ -15,11 +15,12 @@
  *******************************************************************************/
 package beans;
 
-import static server.Config.*;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import play.Logger;
+import beans.config.Conf;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import models.ServerNode;
 import server.ExpiredServersCollector;
@@ -38,11 +39,16 @@ public class ExpireServersCollectorImpl extends Timer implements ExpiredServersC
     @Inject
     private ServerPoolImpl serverPool;
 
+    @Inject
+    private Conf conf;
+
+    private static Logger logger = LoggerFactory.getLogger( ExpireServersCollectorImpl.class );
+
 	public void scheduleToDestroy(final ServerNode server)
 	{
-		server.setExpirationTime( System.currentTimeMillis() + SERVER_POOL_EXPIRATION_TIME );
+		server.setExpirationTime( System.currentTimeMillis() + conf.server.pool.expirationTimeMillis );
 		
-		Logger.info( "This server " + server.getPublicIP() + " was scheduled for destroy after: " + server.getElapsedTime() + " ms");
+		logger.info( String.format( "This server %s was scheduled for destroy after: %d ms", server.getPublicIP(), server.getElapsedTime() ) );
 
 		schedule(new TimerTask()
 		{
@@ -56,5 +62,10 @@ public class ExpireServersCollectorImpl extends Timer implements ExpiredServersC
 
     public void setServerPool(ServerPoolImpl serverPool) {
         this.serverPool = serverPool;
+    }
+
+    public void setConf( Conf conf )
+    {
+        this.conf = conf;
     }
 }

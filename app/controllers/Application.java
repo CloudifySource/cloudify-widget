@@ -21,7 +21,8 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import server.ApplicationContext;
 import server.ServerException;
-import static controllers.RestUtils.*;
+
+import static utils.RestUtils.*;
 
 
 /**
@@ -36,6 +37,7 @@ public class Application extends Controller
 		try
 		{
 			WidgetInstance wi = ApplicationContext.getWidgetServer().deploy(apiKey);
+
 			
 			return resultAsJson(wi);
 		}catch(ServerException ex)

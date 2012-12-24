@@ -23,6 +23,7 @@ import java.util.List;
 import controllers.WidgetAdmin;
 
 import play.cache.Cache;
+import play.i18n.Messages;
 import play.mvc.Controller;
 
 import models.ServerNode;
@@ -30,6 +31,7 @@ import models.Widget;
 import models.Widget.Status;
 import models.WidgetInstance;
 import server.*;
+import utils.Utils;
 
 import javax.inject.Inject;
 
@@ -57,17 +59,21 @@ public class WidgetServerImpl implements WidgetServer
 		// don't allow for 30 seconds to start the widget again
 		Long timeLeft = (Long)Cache.get(Controller.request().remoteAddress());
 		if ( timeLeft != null )
-			throw new ServerException(ResMessages.getFormattedString("please_wait_x_sec", (timeLeft - System.currentTimeMillis()) / 1000));
+        {
+			throw new ServerException( Messages.get( "please.wait.x.sec", (timeLeft - System.currentTimeMillis()) / 1000) );
+        }
 
 		Widget widget = Widget.getWidgetByApiKey(apiKey);
 		if ( !widget.isEnabled() )
-			throw new ServerException("widget_disabled_by_administrator");
+        {
+			throw new ServerException( Messages.get( "widget.disabled.by.administrator" ) );
+        }
 			
-		File recipeDir = Utils.downloadAndUnzip(widget.getRecipeURL(), apiKey);
+		File recipeDir = Utils.downloadAndUnzip( widget.getRecipeURL(), apiKey );
 
 		ServerNode server = serverPool.get();
 		if ( server == null )
-			throw new ServerException(ResMessages.getString("no_available_servers"));
+			throw new ServerException(Messages.get("no.available.servers"));
 		
 		widget.countLaunch();
 		
@@ -90,7 +96,7 @@ public class WidgetServerImpl implements WidgetServer
 	{
 		ProcExecutor pe = deployManager.getExecutor(instanceId);
 		if ( pe == null )
-			return new Status(Status.STATE_STOPPED, ResMessages.getString("server_was_terminated"));
+			return new Status(Status.STATE_STOPPED, Messages.get( "server.was.terminated" ) );
 		
 		List<String> output = Utils.formatOutput(pe.getOutput(), pe.getPrivateServerIP() + "]");
 		Status wstatus = new Status(Status.STATE_RUNNING, output, pe.getElapsedTimeMin());

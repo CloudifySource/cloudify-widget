@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package controllers;
+package utils;
 
 import play.mvc.Controller;
 import play.mvc.Results.Status;
@@ -97,6 +97,7 @@ public class RestUtils
 
 		public static Status resultErrorAsJson( String errorMsg )
 		{
+            // TODO : guy - 200 on error?? we should return 500.
 			return Controller.ok(String.format(ERROR_STATUS, errorMsg)).as("application/json");
 		}
 }

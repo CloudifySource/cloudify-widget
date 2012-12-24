@@ -1,0 +1,21 @@
+@* this is a static error page. *@
+@import tags._
+
+@context.set("body"){
+
+    <div class="error-page-content">
+        <div>
+        @context.get("errorMessage")
+        </div>
+        <br/>
+        <div>
+            <a href="@routes.WidgetAdmin.getSignupPage()">Don't you have account? - Sign Up</a><br/>
+            <a href="@routes.WidgetAdmin.getSigninPage()">Sign In</a>
+        </div>
+
+    </div>
+}
+
+@widgets.admin.loginTemplate()
+
+

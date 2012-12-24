@@ -23,6 +23,7 @@ import java.io.File;
 public class DeployManagerMock implements DeployManager {
     private static Logger logger = LoggerFactory.getLogger(DeployManagerMock.class);
 
+
     public ProcExecutor fork( ServerNode server, File recipe )
     {
         return null;
@@ -36,4 +37,5 @@ public class DeployManagerMock implements DeployManager {
     public void destroyExecutor(String id) {
         logger.info("destroying executor : ", id);
     }
+
 }

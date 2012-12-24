@@ -15,15 +15,13 @@
  *******************************************************************************/
 package beans;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeoutException;
-
-import org.apache.commons.io.IOUtils;
+import beans.config.Conf;
+import com.google.common.collect.FluentIterable;
+import com.google.common.net.HostAndPort;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import models.ServerNode;
+import org.apache.commons.io.FileUtils;
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
@@ -42,22 +40,21 @@ import org.jclouds.rest.RestContext;
 import org.jclouds.ssh.SshClient;
 import org.jclouds.sshj.config.SshjSshClientModule;
 import org.jclouds.util.Strings2;
-
-import play.Logger;
-
-import com.google.common.collect.FluentIterable;
-import com.google.common.net.HostAndPort;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-
-import models.ServerNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import play.Play;
+import server.ApplicationContext;
 import server.DeployManager;
 import server.ServerException;
-import server.Utils;
+import utils.Utils;
 
 import javax.inject.Inject;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeoutException;
 
-import static server.Config.*;
 
 
 /**
@@ -71,8 +68,13 @@ import static server.Config.*;
  */
 public class ServerBootstrapperImpl implements server.ServerBootstrapper
 {
+
+    private static Logger logger = LoggerFactory.getLogger( ServerBootstrapperImpl.class );
 	private ComputeService _compute;
 	private RestContext<NovaApi, NovaAsyncApi> _nova;
+
+    @Inject
+    private Conf conf;
 
     @Inject
     private DeployManager deployManager;
@@ -95,7 +97,7 @@ public class ServerBootstrapperImpl implements server.ServerBootstrapper
 				if ( srvNode != null )
 					destroyServer(srvNode.getId());
 					
-				Logger.error("Failed to bootstrap machine. ", e);
+				logger.error("Failed to bootstrap machine. ", e);
 			}
 		}
 		
@@ -111,8 +113,8 @@ public class ServerBootstrapperImpl implements server.ServerBootstrapper
 	
 	public ServerBootstrapperImpl()
 	{
-		ComputeServiceContext context = ContextBuilder.newBuilder(COMPUTE_PROVIDER)
-				.credentials(COMPUTE_USERNAME, COMPUTE_APIKEY)
+		ComputeServiceContext context = ContextBuilder.newBuilder( conf.server.bootstrap.cloudProvider )
+				.credentials( conf.server.bootstrap.username, conf.server.bootstrap.apiKey)
 				.buildView(ComputeServiceContext.class);
 		_compute = context.getComputeService();
 		_nova = context.unwrap();
@@ -121,27 +123,27 @@ public class ServerBootstrapperImpl implements server.ServerBootstrapper
 	
 	private ServerNode createServerNode() throws RunNodesException, TimeoutException
 	{
-		Logger.info(String.format("Starting to create new Server [imageId=%s, flavorId=%s]", COMPUTE_IMAGE_ID, COMPUTE_FLAVOR_ID));
+		logger.info(String.format("Starting to create new Server [imageId=%s, flavorId=%s]", conf.server.bootstrap.imageId, conf.server.bootstrap.flavorId ));
 
-		ServerApi serverApi = _nova.getApi().getServerApiForZone(COMPUTE_ZONE_NAME);
+		ServerApi serverApi = _nova.getApi().getServerApiForZone(conf.server.bootstrap.zoneName);
 		
 		CreateServerOptions serverOpts = new CreateServerOptions();
-		serverOpts.keyPairName(COMPUTE_KEY_PAIR);
-		serverOpts.securityGroupNames(COMPUTE_SECURITY_GROUP);
+		serverOpts.keyPairName( conf.server.bootstrap.keyPair );
+		serverOpts.securityGroupNames( conf.server.bootstrap.securityGroup );
 		
-		ServerCreated serverCreated = serverApi.create(COMPUTE_SERVER_NAME_PREF + System.currentTimeMillis(), COMPUTE_IMAGE_ID, COMPUTE_FLAVOR_ID, serverOpts);
+		ServerCreated serverCreated = serverApi.create( conf.server.bootstrap.serverNamePrefix + System.currentTimeMillis(), conf.server.bootstrap.imageId , conf.server.bootstrap.flavorId, serverOpts);
 		blockUntilServerInState(serverCreated.getId(), Server.Status.ACTIVE, 1000, 5, serverApi);
 		Server server = serverApi.get(serverCreated.getId());
 
 		ServerNode serverNode = new ServerNode( server );
 		
-		Logger.info("Server created, wait 10 seconds before starting to bootstrap machine: " +  serverNode.getPublicIP() );
+		logger.info("Server created, wait 10 seconds before starting to bootstrap machine: " +  serverNode.getPublicIP() );
 		Utils.threadSleep(10000); // need for a network interfaces initialization
 		
 		// bootstrap machine: firewall, jvm, start cloudify
 		bootstrapMachine( serverNode );
 		
-		Logger.info("Server created. " +  server.getAddresses() );
+		logger.info("Server created. " +  server.getAddresses() );
 		
 		return serverNode;
 	}
@@ -149,7 +151,7 @@ public class ServerBootstrapperImpl implements server.ServerBootstrapper
 	
 	public List<Server> getServerList()
 	{
-		ServerApi serverApi = _nova.getApi().getServerApiForZone(COMPUTE_ZONE_NAME);
+		ServerApi serverApi = _nova.getApi().getServerApiForZone( conf.server.bootstrap.zoneName );
 		
 		FluentIterable<? extends Server> serverIterator = serverApi.listInDetail().concat();   
 		
@@ -164,10 +166,10 @@ public class ServerBootstrapperImpl implements server.ServerBootstrapper
 	private void deleteServer( String serverId )
 	{
 		deployManager.destroyExecutor(serverId);
-		ServerApi serverApi = _nova.getApi().getServerApiForZone(COMPUTE_ZONE_NAME);
+		ServerApi serverApi = _nova.getApi().getServerApiForZone( conf.server.bootstrap.zoneName );
 		serverApi.delete(serverId);
 
-		Logger.info("Server id: " + serverId + " was deleted.");
+		logger.info("Server id: " + serverId + " was deleted.");
 	}
 	
 	
@@ -190,7 +192,7 @@ public class ServerBootstrapperImpl implements server.ServerBootstrapper
 
 		while (totalSeconds < timeoutSeconds)
 		{
-			Logger.info("Waiting for a server activation... Left timeout: " + (timeoutSeconds - totalSeconds) + " sec");
+			logger.info("Waiting for a server activation... Left timeout: " + (timeoutSeconds - totalSeconds) + " sec");
 
 			Server server = serverApi.get(serverId);
 
@@ -212,12 +214,12 @@ public class ServerBootstrapperImpl implements server.ServerBootstrapper
 	{
 		try
 		{
-			Logger.info("Starting bootstrapping for server: " +  server.getPublicIP() );
+			logger.info("Starting bootstrapping for server: " +  server.getPublicIP() );
 
-			String script = IOUtils.toString(new URL(COMPUTE_BOOTSTRAP_SCRIPT));
+			String script = FileUtils.readFileToString( conf.server.bootstrap.script );
 			ExecResponse response = runScriptOnNode( server.getPublicIP(), script );
 			
-			Logger.info("Bootstrap for server: " +  server.getPublicIP() +
+			logger.info("Bootstrap for server: " +  server.getPublicIP() +
 					" finished successfully successfully. ExitStatus: " + response.getExitStatus() + 
 					"\nOutput: " + response.getOutput() );
 		}catch(Exception ex)
@@ -227,15 +229,15 @@ public class ServerBootstrapperImpl implements server.ServerBootstrapper
 	}
 	
 	static public ExecResponse runScriptOnNode(String serverIP, String script)
-			throws NumberFormatException, FileNotFoundException, IOException
+			throws NumberFormatException, IOException
 	{
-		Logger.info("Run ssh on server: " + serverIP + " script: " + script);
-
-		Injector i = Guice.createInjector(new SshjSshClientModule(), new NullLoggingModule());
+		logger.info("Run ssh on server: " + serverIP + " script: " + script);
+        Conf conf = ApplicationContext.conf();
+        Injector i = Guice.createInjector(new SshjSshClientModule(), new NullLoggingModule());
 		SshClient.Factory factory = i.getInstance(SshClient.Factory.class);
-		SshClient sshConnection = factory.create(HostAndPort.fromParts(serverIP, COMPUTE_SSH_PORT),
-				LoginCredentials.builder().user(COMPUTE_SSH_USER)
-						.privateKey(Strings2.toStringAndClose(new FileInputStream(COMPUTE_SSH_PRIVATE_KEY))).build());
+		SshClient sshConnection = factory.create(HostAndPort.fromParts(serverIP, conf.server.bootstrap.ssh.port ),
+				LoginCredentials.builder().user( conf.server.bootstrap.ssh.user )
+						.privateKey(Strings2.toStringAndClose(new FileInputStream( conf.server.bootstrap.ssh.privateKey ))).build());
 
 		ExecResponse execResponse = null;
 
@@ -257,7 +259,7 @@ public class ServerBootstrapperImpl implements server.ServerBootstrapper
 	 */
 	public void close()
 	{
-		if (_compute != null)
+         if (_compute != null)
 		{
 			_compute.getContext().close();
 		}
@@ -265,5 +267,10 @@ public class ServerBootstrapperImpl implements server.ServerBootstrapper
 
     public void setDeployManager(DeployManager deployManager) {
         this.deployManager = deployManager;
+    }
+
+    public void setConf( Conf conf )
+    {
+        this.conf = conf;
     }
 }
