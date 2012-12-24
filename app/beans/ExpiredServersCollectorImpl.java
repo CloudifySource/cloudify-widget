@@ -1,18 +1,10 @@
-/*******************************************************************************
- * Copyright (c) 2011 GigaSpaces Technologies Ltd. All rights reserved
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *******************************************************************************/
+/*
+ * Copyright (c) 2012 GigaSpaces Technologies Ltd. All rights reserved
+ * <p/>
+ * The software source code is proprietary and confidential information of GigaSpaces.
+ * You may use the software source code solely under the terms and limitations of
+ * the license agreement granted to you by GigaSpaces.
+ */
 package beans;
 
 import java.util.Timer;
@@ -43,7 +35,7 @@ public class ExpiredServersCollectorImpl extends Timer implements ExpiredServers
     @Inject
     private Conf conf;
 
-    private static Logger logger = LoggerFactory.getLogger( ExpireServersCollectorImpl.class );
+    private static Logger logger = LoggerFactory.getLogger( ExpiredServersCollectorImpl.class );
 
 	public void scheduleToDestroy(final ServerNode server)
 	{
@@ -63,7 +55,7 @@ public class ExpiredServersCollectorImpl extends Timer implements ExpiredServers
 
     @Override
     public void cancel() {
-        Logger.error("ExpiredServersCollectorImpl - timer cancelled", new Exception());
+        logger.error("ExpiredServersCollectorImpl - timer cancelled", new Exception());
         super.cancel();
     }
 

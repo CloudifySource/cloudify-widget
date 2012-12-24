@@ -233,7 +233,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			throws NumberFormatException, IOException
 	{
 		logger.info("Run ssh on server: " + serverIP + " script: " + script);
-        Conf conf = ApplicationContext.conf();
+        Conf conf = ApplicationContext.get().conf();
         Injector i = Guice.createInjector(new SshjSshClientModule(), new NullLoggingModule());
 		SshClient.Factory factory = i.getInstance(SshClient.Factory.class);
 		SshClient sshConnection = factory.create(HostAndPort.fromParts(serverIP, conf.server.bootstrap.ssh.port ),

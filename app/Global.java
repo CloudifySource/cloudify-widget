@@ -1,11 +1,9 @@
 import beans.config.Conf;
 import models.User;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.Application;
 import play.GlobalSettings;
 import play.libs.Json;
-import play.Logger;
 import server.ApplicationContext;
 
 /**
@@ -15,16 +13,14 @@ import server.ApplicationContext;
  */
 public class Global extends GlobalSettings
 {
-    private static Logger logger = LoggerFactory.getLogger( Global.class );
+    private static org.slf4j.Logger logger = LoggerFactory.getLogger( Global.class );
 	@Override
 	public void onStart(Application app)
 	{
 		// print cloudify configuration
-        Conf conf = ApplicationContext.conf();
+        Conf conf = ApplicationContext.get().conf();
 
         logger.info( Json.stringify( Json.toJson( conf ) ) );
-
-	    ApplicationContext.initialize();
 
         // create Admin user if not exists
 		if ( User.find.where().eq("admin", Boolean.TRUE ).findRowCount() <= 0 )
@@ -43,6 +39,6 @@ public class Global extends GlobalSettings
 	@Override
 	public void onStop(Application app)
 	{
-		ApplicationContext.getServerBootstrapper().close();
+		ApplicationContext.get().getServerBootstrapper().close();
 	}
 }

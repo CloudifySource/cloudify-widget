@@ -26,6 +26,8 @@
     <bean id="confBean" class="beans.config.ConfigBean"/>
     <bean id="conf" factory-method="getConfiguration" factory-bean="confBean"/>
 
+    <bean id="applicationContext" class="server.ApplicationContext"/>
+
 
     <context:annotation-config />
     <context:component-scan base-package="beans" />

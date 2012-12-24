@@ -17,4 +17,12 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
         return (T) l;
     }
 
+    public static boolean isEmpty( String[] values )
+    {
+        return values == null || size ( values ) == 0 ;
+    }
+
+    public static int size( String[] vals ){
+        return vals == null ? 0 : vals.length;
+    }
 }

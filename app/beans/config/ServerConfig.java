@@ -18,12 +18,17 @@ public class ServerConfig {
 
     public DefaultAdmin admin = new DefaultAdmin();
 
+    @Config( ignoreNullValues = true )
     public long sessionTimeoutMillis = Utils.parseTimeToMillis( "15mn" );
 
     public static class PoolConfiguration{
+        @Config( ignoreNullValues = true )
         public boolean coldInit = false ;
+        @Config( ignoreNullValues = true )
         public int minNode = 2;
+        @Config( ignoreNullValues = true )
         public int maxNodes = 5;
+        @Config( ignoreNullValues = true )
         public long expirationTimeMillis = Utils.parseTimeToMillis("60mn");
 
     }
@@ -44,6 +49,7 @@ public class ServerConfig {
 
     public static class SshConfiguration{
         public String user="root";
+        @Config( ignoreNullValues = true )
         public int port=22;
         public String privateKey="/bin/hpcloud.pem";
     }

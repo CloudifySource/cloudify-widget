@@ -21,97 +21,144 @@ import beans.config.Conf;
 import beans.config.ConfigBean;
 import play.modules.spring.Spring;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
 /**
- * A singleton class that helps to get an instance of different modules and keeps loose decoupling.
+ * A static class that helps to get an instance of different modules and keeps loose decoupling.
+ * There are 2 ways to get a bean:
+ *
+ * 1. On init, set it to a field and serve it on get - suites for singeltons
+ * 2. call directly to {@link #getBean(String)} on get - suites for prototypes.
+ *
+ * If you modify the XML please make sure to modify it here as well.
  *
  * @author Igor Goldenberg
+ * @author Guy Mograbi
+ *
+ *
  */
 public class ApplicationContext
 {
-    private static final String PROC_MANAGER = "procManager";
-    private static final String WIDGET_SERVER = "widgetServer";
-    private static final String SERVER_POOL = "serverPool";
-    private static final String SERVER_BOOTSTRAPPER = "serverBootstrapper";
-    private static final String EXPIRED_SERVER_COLLECTOR = "expiredServerCollector";
-    private static final String CONF_BEAN = "confBean";
-    private static final String MAIL_SENDER = "mailSender";
-    private static final String HMAC = "hmac";
-    private static final String GS_ROUTES = "gsRoutes";
 
-    public static Conf conf(){
-        ConfigBean bean = getBean( CONF_BEAN );
-        return bean.getConfiguration();
+    @Inject private DeployManager deployManager;
+    @Inject private WidgetServer widgetServer;
+    @Inject private ServerPool serverPool;
+    @Inject private ServerBootstrapper serverBootstrapper;
+    @Inject private ExpiredServersCollector expiredServersCollector;
+    @Inject private MailSender mailSender;
+    @Inject private GsRoutes gsRoutes;
+    @Inject private HmacImpl hmac;
+    @Inject private Conf conf;
+
+    private static ApplicationContext instance;
+
+    public static ApplicationContext get(){
+        return instance;
     }
 
-    public static MailSender getMailSender(){
-        return getBean( MAIL_SENDER );
+    @PostConstruct
+    public void init(){
+        instance = (ApplicationContext) Spring.getBean( "applicationContext" );
     }
 
-    public static HmacImpl getHmac(){
-        return getBean( HMAC );
+
+    public  Conf conf(){
+        return conf;
     }
 
-    public static GsRoutes routes(){
-        return getBean( GS_ROUTES );
+    public  MailSender getMailSender(){
+
+        return mailSender;
     }
 
-    public static GsRoutes getGsRoutes(){
+    public  HmacImpl getHmac(){
+        return hmac;
+    }
+
+    public  GsRoutes routes(){
+        return gsRoutes;
+    }
+
+    public  GsRoutes getGsRoutes(){
         return routes();
     }
 
     @Deprecated // do not use - use "conf()" instead . do not deleted.
-    public static Conf getConf(){
+    public Conf getConf(){
         return conf();
     }
 
-    private static <T> T getBean( String bean ){
+    private  <T> T getBean( String bean ){
         return (T) Spring.getBean( bean );
     }
 
-
-    public static DeployManager getDeployManager()
-	{
-        return (DeployManager) Spring.getBean(PROC_MANAGER);
-	}
-    private static DeployManager deployManager;
-    private static WidgetServer widgetServer;
-    private static ServerPool serverPool;
-    private static ServerBootstrapper serverBootstrapper;
-    private static ExpiredServersCollector expiredServersCollector;
-
-    public static GsMailer.IMailer getMailer(){
+    public  GsMailer.IMailer getMailer(){
         return play.Play.application().plugin( GsMailer.class ).email();
     }
 
-	public static WidgetServer getWidgetServer()
-	{
-        return (WidgetServer) Spring.getBean(WIDGET_SERVER);
-	}
-    public static DeployManager getDeployManager() {
+    public  DeployManager getDeployManager() {
         return deployManager;
     }
 
-    public static WidgetServer getWidgetServer() {
+    public  WidgetServer getWidgetServer() {
         return widgetServer;
     }
 
-    public static ServerPool getServerPool() {
+    public  ServerPool getServerPool() {
         return serverPool;
     }
 
-    public static ServerBootstrapper getServerBootstrapper() {
+    public  ServerBootstrapper getServerBootstrapper() {
         return serverBootstrapper;
     }
 
-    public static ExpiredServersCollector getExpiredServersCollector() {
+    public  ExpiredServersCollector getExpiredServersCollector() {
         return expiredServersCollector;
     }
 
-    public static void initialize() {
-        deployManager = (DeployManager) Spring.getBean(PROC_MANAGER);
-        widgetServer  = (WidgetServer) Spring.getBean(WIDGET_SERVER);
-        serverPool = (ServerPool) Spring.getBean(SERVER_POOL);
-        serverBootstrapper = (ServerBootstrapper) Spring.getBean(SERVER_BOOTSTRAPPER);
-        expiredServersCollector = (ExpiredServersCollector) Spring.getBean(EXPIRED_SERVER_COLLECTOR);
+    public void setDeployManager( DeployManager deployManager )
+    {
+        this.deployManager = deployManager;
+    }
+
+    public void setWidgetServer( WidgetServer widgetServer )
+    {
+        this.widgetServer = widgetServer;
+    }
+
+    public void setServerPool( ServerPool serverPool )
+    {
+        this.serverPool = serverPool;
+    }
+
+    public void setServerBootstrapper( ServerBootstrapper serverBootstrapper )
+    {
+        this.serverBootstrapper = serverBootstrapper;
+    }
+
+    public void setExpiredServersCollector( ExpiredServersCollector expiredServersCollector )
+    {
+        this.expiredServersCollector = expiredServersCollector;
+    }
+
+    public void setMailSender( MailSender mailSender )
+    {
+        this.mailSender = mailSender;
+    }
+
+    public void setGsRoutes( GsRoutes gsRoutes )
+    {
+        this.gsRoutes = gsRoutes;
+    }
+
+    public void setHmac( HmacImpl hmac )
+    {
+        this.hmac = hmac;
+    }
+
+    public void setConf( Conf conf )
+    {
+        this.conf = conf;
     }
 }

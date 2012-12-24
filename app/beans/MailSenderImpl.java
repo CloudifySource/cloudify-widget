@@ -59,7 +59,7 @@ public class MailSenderImpl implements MailSender {
                 .setReplyTo( conf.mailer )
                 .setSubject( "Reset Password" );
 
-        ApplicationContext.getMailer().send(mConf);
+        ApplicationContext.get().getMailer().send(mConf);
     }
 
     public void setConf( Conf conf )

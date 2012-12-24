@@ -18,14 +18,13 @@ package utils;
 import models.Widget;
 import models.WidgetInstance;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
+import utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.Play;
 import play.i18n.Lang;
 import play.libs.Time;
 import play.mvc.Http;
-import server.ApplicationContext;
 import server.ServerException;
 
 import java.io.File;
@@ -37,15 +36,6 @@ import java.net.URL;
 import java.util.*;
 import java.util.zip.ZipException;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import play.Logger;
-import play.Play;
-
-import models.Widget;
-import models.WidgetInstance;
-
 /**
  * This class provides different static utility methods.
  * 
@@ -56,26 +46,6 @@ public class Utils
 	final static String RECIPE_FOLDER = Play.application().path().getPath() + "/recipes";
     private static Logger logger = LoggerFactory.getLogger( Utils.class );
 
-	/** used for formatOutput() method */
-	final static String[] FILTER_OUTPUT_LINES;
-	final static String[] SUBSTRING_OUTPUT_STRINGS;
-	
-	static
-	{
-
-         String msg = ApplicationContext.conf().cloudify.removeOutputLines;
-		FILTER_OUTPUT_LINES = StringUtils.split(msg, "|");
-		for( int i = 0; i < FILTER_OUTPUT_LINES.length; i++ ) {
-			FILTER_OUTPUT_LINES[i] = FILTER_OUTPUT_LINES[i].trim();
-        }
-
-		msg = ApplicationContext.conf().cloudify.removeOutputString;
-		SUBSTRING_OUTPUT_STRINGS = StringUtils.split(msg, "|");
-		for( int i = 0; i < SUBSTRING_OUTPUT_STRINGS.length; i++ ){
-			SUBSTRING_OUTPUT_STRINGS[i] = SUBSTRING_OUTPUT_STRINGS[i].trim();
-        }
-	}
-	
 
     // TODO : lets not rescue only on IllegaException, lets catch on all Exception
     // TODO : silent failure... lets log a warning.
@@ -186,6 +156,16 @@ public class Utils
 		  String[] splitStr = content.split( regex );
 		  return Arrays.asList( splitStr );
 	  }
+
+    public static void addAllTrimmed( Collection<String> result, String[] values ){
+        if ( !CollectionUtils.isEmpty( values )){
+            for ( String value : values ) {
+                if ( !StringUtils.isEmptyOrSpaces( value )){
+                    result.add( value.trim() );
+                }
+            }
+        }
+    }
 	  
 	  
 	  /** 
@@ -214,19 +194,19 @@ public class Utils
 	  }
 	  
 	  /** Format string output by different patters */
-	  public static List<String> formatOutput(String str, String substringPrefix)
+	  public static List<String> formatOutput( String str, String substringPrefix , Collection<String> filterOutputLines, Collection<String> filterOutputStrings )
 	  {
 		  List<String> list = split(str, "\n");
 		  for( int i=0; i < list.size(); i++ )
 		  {
 			  // remove by filter
-			  for( String f : FILTER_OUTPUT_LINES )
+			  for( String f : filterOutputLines )
 			  {
 				  if ( list.get(i).contains(f) )
 					list.set(i, "");
 			  }
 
-			  for( String f : SUBSTRING_OUTPUT_STRINGS )
+			  for( String f : filterOutputStrings )
 			  {
 				  String s = list.get(i);
 				  if ( s.contains( f ) )

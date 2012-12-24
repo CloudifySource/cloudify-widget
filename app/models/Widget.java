@@ -121,7 +121,7 @@ public class Widget
 			this.output = output;
 			
 			if ( output.isEmpty() )
-				output.add(ResMessages.getFormattedString("wait_while_preping_env"));
+				output.add( Messages.get("wait.while.preparing.env"));
 				
 			this.timeleft = timeleftMin == 0 ? 1 : timeleftMin; // since we show in minutes, the latest minute show always 1 minute.
 		}

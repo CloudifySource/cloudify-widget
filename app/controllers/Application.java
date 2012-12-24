@@ -36,7 +36,7 @@ public class Application extends Controller
 	{
 		try
 		{
-			WidgetInstance wi = ApplicationContext.getWidgetServer().deploy(apiKey);
+			WidgetInstance wi = ApplicationContext.get().getWidgetServer().deploy(apiKey);
 
 			
 			return resultAsJson(wi);
@@ -49,7 +49,7 @@ public class Application extends Controller
 	
 	public static Result stop( String apiKey, String instanceId )
 	{
-		ApplicationContext.getWidgetServer().undeploy(instanceId);
+		ApplicationContext.get().getWidgetServer().undeploy(instanceId);
 
 		return ok(OK_STATUS).as("application/json");
 	}
@@ -59,7 +59,7 @@ public class Application extends Controller
 	{
 		try
 		{
-			Widget.Status wstatus = ApplicationContext.getWidgetServer().getWidgetStatus(instanceId);
+			Widget.Status wstatus = ApplicationContext.get().getWidgetServer().getWidgetStatus(instanceId);
 
 			return resultAsJson( wstatus );
 		}catch(ServerException ex)

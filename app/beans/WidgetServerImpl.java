@@ -18,10 +18,13 @@ package beans;
 import static server.Config.WIDGET_STOP_TIMEOUT;
 
 import java.io.*;
+import java.util.LinkedList;
 import java.util.List;
 
+import beans.config.Conf;
 import controllers.WidgetAdmin;
 
+import org.apache.commons.lang3.StringUtils;
 import play.cache.Cache;
 import play.i18n.Messages;
 import play.mvc.Controller;
@@ -33,6 +36,7 @@ import models.WidgetInstance;
 import server.*;
 import utils.Utils;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 /**
@@ -49,7 +53,19 @@ public class WidgetServerImpl implements WidgetServer
     private ServerPool serverPool;
 
     @Inject
+    private Conf conf;
+
+    @Inject
     private DeployManager deployManager;
+
+    private List<String> filterOutputLines = new LinkedList<String>(  );
+    private List<String> filterOutputStrings = new LinkedList<String>(  );
+
+    @PostConstruct
+    public void init(){
+        Utils.addAllTrimmed( filterOutputLines,  StringUtils.split( conf.cloudify.removeOutputLines, "|" ));
+        Utils.addAllTrimmed( filterOutputStrings,  StringUtils.split( conf.cloudify.removeOutputString, "|" ));
+    }
 	/**
 	 * Deploy a widget instance.
 	 * @param apiKey 
@@ -98,7 +114,7 @@ public class WidgetServerImpl implements WidgetServer
 		if ( pe == null )
 			return new Status(Status.STATE_STOPPED, Messages.get( "server.was.terminated" ) );
 		
-		List<String> output = Utils.formatOutput(pe.getOutput(), pe.getPrivateServerIP() + "]");
+		List<String> output = Utils.formatOutput(pe.getOutput(), pe.getPrivateServerIP() + "]", filterOutputLines, filterOutputStrings );
 		Status wstatus = new Status(Status.STATE_RUNNING, output, pe.getElapsedTimeMin());
 		
 		return wstatus;
@@ -110,5 +126,10 @@ public class WidgetServerImpl implements WidgetServer
 
     public void setDeployManager(DeployManager deployManager) {
         this.deployManager = deployManager;
+    }
+
+    public void setConf( Conf conf )
+    {
+        this.conf = conf;
     }
 }

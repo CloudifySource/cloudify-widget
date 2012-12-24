@@ -267,7 +267,7 @@ public class User
     // makes the session longer. expiration is only if user is idle.
     private static void prolongSession( String authToken, Long userId )
     {
-        Cache.set( authToken, userId, ( int ) (ApplicationContext.conf().server.sessionTimeoutMillis / 1000) ); // cache for one hour
+        Cache.set( authToken, userId, ( int ) (ApplicationContext.get().conf().server.sessionTimeoutMillis / 1000) ); // cache for one hour
     }
 
 	static public List<User> getAllUsers()

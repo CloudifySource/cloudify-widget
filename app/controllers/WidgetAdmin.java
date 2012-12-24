@@ -67,7 +67,7 @@ public class WidgetAdmin extends Controller
         // and we can redirect to widgets.html
         Http.Cookie authToken = request().cookies().get( "authToken" );
         if ( authToken != null && User.validateAuthToken( authToken.value(), true ) != null ) {
-            return redirect( ApplicationContext.routes().getWidgetsRoute() ); // todo : serve from templates and use "routes"
+            return redirect( ApplicationContext.get().routes().getWidgetsRoute() ); // todo : serve from templates and use "routes"
         }
         else{
             return redirect( routes.WidgetAdmin.getSigninPage() );
@@ -86,7 +86,7 @@ public class WidgetAdmin extends Controller
     public static Result resetPasswordAction( String p, Long pi ){
         User user = User.findById( pi );
         // validate p
-        if ( !ApplicationContext.getHmac().compare( p, user.getEmail(),  user.getId(), user.getPassword()  )){
+        if ( !ApplicationContext.get().getHmac().compare( p, user.getEmail(),  user.getId(), user.getPassword()  )){
             return badRequest(  views.html.common.linkExpired.render() );
         }
         // if p is valid lets reset the password
@@ -106,7 +106,7 @@ public class WidgetAdmin extends Controller
             // simply reply that an email was sent to the address.
         }
 
-        ApplicationContext.getMailSender().resetPasswordMail( user );
+        ApplicationContext.get().getMailSender().resetPasswordMail( user );
         return ok(  );
     }
 
@@ -188,7 +188,7 @@ public class WidgetAdmin extends Controller
 	public static Result shutdownInstance( String authToken, String instanceId )
 	{
 		User.validateAuthToken(authToken);
-		ApplicationContext.getWidgetServer().undeploy(instanceId);
+		ApplicationContext.get().getWidgetServer().undeploy(instanceId);
 		
 		return ok(OK_STATUS).as("application/json");
 	}

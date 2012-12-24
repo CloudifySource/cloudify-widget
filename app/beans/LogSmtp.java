@@ -27,7 +27,7 @@ public class LogSmtp extends AppenderBase<ILoggingEvent> {
     protected void append( ILoggingEvent eventObject )
     {
         try {
-            if ( ApplicationContext.conf().sendErrorEmails ) {
+            if ( ApplicationContext.get().conf().sendErrorEmails ) {
                 GsMailer.GsMailConfiguration mail = new GsMailer.GsMailConfiguration();
                 // TODO : move configuration to configuration files.
                 // TODO : add dev mode support
@@ -35,7 +35,7 @@ public class LogSmtp extends AppenderBase<ILoggingEvent> {
                 mail.addRecipient( GsMailer.RecipientType.TO, "guym@gigaspaces.com", "Guy Mograbi" );
                 mail.setBodyText( eventObject.getFormattedMessage() );
                 mail.setFrom( "it@gigaspaces.com", "gigaspaces" );
-                ApplicationContext.getMailer().send( mail );
+                ApplicationContext.get().getMailer().send( mail );
             }
         } catch ( Exception e ) {
             Writer writer = new StringWriter();

@@ -76,7 +76,7 @@ public class ServerPoolImpl implements ServerPool
 			if ( server == null || server.isExpired() || conf.server.pool.coldInit )
 			{
 				logger.info( String.format( "ServerId: %s expired or not found in server-pool, address: %s", srv.getId(), srv.getAddresses() ) );
-				ApplicationContext.getServerBootstrapper().destroyServer(srv.getId());
+				ApplicationContext.get().getServerBootstrapper().destroyServer(srv.getId());
 				iter.remove();
 			}
 			else
@@ -143,7 +143,7 @@ public class ServerPoolImpl implements ServerPool
 			
 			// schedule to destroy after time expiration 
 			// TODO when unlimited server will support uncomment this line if ( freeServer.isTimeLimited() )
-			ApplicationContext.getExpiredServersCollector().scheduleToDestroy(freeServer);
+			ApplicationContext.get().getExpiredServersCollector().scheduleToDestroy(freeServer);
 		}
 
 		addNewServerToPool();
@@ -159,7 +159,7 @@ public class ServerPoolImpl implements ServerPool
 
 		WidgetInstance.deleteByInstanceId(serverId);
 		ServerNode.deleteServer( serverId );
-		ApplicationContext.getServerBootstrapper().destroyServer( serverId );
+		ApplicationContext.get().getServerBootstrapper().destroyServer( serverId );
 	}
 	
 	void addNewServerToPool()
@@ -176,7 +176,7 @@ public class ServerPoolImpl implements ServerPool
 			{
 				try
 				{
-					List<ServerNode> servers = ApplicationContext.getServerBootstrapper().createServers(1);
+					List<ServerNode> servers = ApplicationContext.get().getServerBootstrapper().createServers(1);
 					
 					for( ServerNode srv :  servers )
 						srv.save();

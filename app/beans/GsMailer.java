@@ -39,28 +39,22 @@ public class GsMailer implements Plugin {
 
     private static Logger logger = LoggerFactory.getLogger( GsMailer.class );
 
-
-    private boolean mock;
     private IMailer mockMailer;
     private IMailer gsMailer;
     private Application app;
 
-    // guy - play plugins require a constructor with app
-    public GsMailer( Application app )
+    public GsMailer( Application application )
     {
-        this.app = app;
+        this.app = application;
     }
-
 
     @Override
     public void onStart()
     {
         try {
-            Conf conf = ApplicationContext.conf();
+
             logger.info( "starting... " );
-            mock = conf.smtp.mock;
             mockMailer = new GsMockMailer();
-            gsMailer = new GsMailerImpl( conf.smtp );
             logger.info( "enabled " + enabled() );
         } catch ( RuntimeException e ) {
             System.out.println( "e = " + e );
@@ -80,9 +74,20 @@ public class GsMailer implements Plugin {
         return app.configuration().getBoolean( "smtp.enabled" ) != Boolean.FALSE;
     }
 
+    private IMailer getGsMailer(){
+        if ( gsMailer == null ){
+            gsMailer = new GsMailerImpl( ApplicationContext.get().conf().smtp );
+        }
+        return gsMailer;
+    }
+
+    private boolean isMock(){
+        return ApplicationContext.get().conf().smtp.mock;
+    }
+
     public IMailer email()
     {
-        return mock ? mockMailer : gsMailer;
+        return isMock() ? mockMailer : getGsMailer();
     }
 
 

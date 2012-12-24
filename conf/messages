@@ -13,7 +13,7 @@ auth.token.not.valid=Authentication token is not valid: %s
 user.already.exists=User '%s' already exists
 widget.apikey.not.valid=The widget apiKey is not valid: %s
 session.expired=session-expired
-wait.while.preping.env=Please wait, preparing enviroment...
+wait.while.preparing.env=Please wait, preparing environment...
 
 # any following string that has been met in the output stream,
 
