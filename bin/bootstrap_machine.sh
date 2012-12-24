@@ -11,6 +11,9 @@ service iptables save
 echo add hostname to /etc/hosts
 echo "127.0.0.1 `hostname`" >> /etc/hosts
 
+echo Setting sudo privileged mode
+sudo sed -i 's/^Defaults.*requiretty/#&/g' /etc/sudoers
+
 JAVA_64_URL="http://repository.cloudifysource.org/com/oracle/java/1.6.0_32/jdk-6u32-linux-x64.bin"
 CLOUDIFY_URL="http://repository.cloudifysource.org/org/cloudifysource/2.2.0-RELEASE/gigaspaces-cloudify-2.2.0-ga-b2500.zip"
 
@@ -25,9 +28,11 @@ rm -f ~/input.txt
 rm ~/java.bin
 
 echo Exporing JAVA_HOME
-export JAVA_HOME="`pwd`/jdk1.6.0_32"
-echo "export JAVA_HOME=$JAVA_HOME" >> ~/.bashrc
+# export JAVA_HOME="`pwd`/jdk1.6.0_32"
+# export PATH=$PATH:$JAVA_HOME/bin
+echo "export JAVA_HOME=`pwd`/jdk1.6.0_32" >> ~/.bashrc
 echo 'export PATH=$PATH:$JAVA_HOME/bin' >> ~/.bashrc
+source ~/.bashrc
 
 echo Downloading cloudify installation from $CLOUDIFY_URL
 wget -q $CLOUDIFY_URL -O ~/cloudify.zip || error_exit $? "Failed downloading cloudify installation"

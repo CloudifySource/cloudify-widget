@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import play.Play;
 import server.ApplicationContext;
 import server.DeployManager;
+import server.ServerBootstrapper;
 import server.ServerException;
 import utils.Utils;
 
@@ -66,7 +67,7 @@ import java.util.concurrent.TimeoutException;
  * 
  * @author Igor Goldenberg
  */
-public class ServerBootstrapperImpl implements server.ServerBootstrapper
+public class ServerBootstrapperImpl implements ServerBootstrapper
 {
 
     private static Logger logger = LoggerFactory.getLogger( ServerBootstrapperImpl.class );
@@ -87,7 +88,7 @@ public class ServerBootstrapperImpl implements server.ServerBootstrapper
 		{
 			ServerNode srvNode = null;
 	    	try {
-				srvNode = createServerNode();
+				srvNode =  createServerNode();
 				servers.add( srvNode );
 				
 				return servers;

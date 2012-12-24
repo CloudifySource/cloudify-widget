@@ -16,13 +16,22 @@
 package beans;
 
 import beans.config.Conf;
+import static server.Config.*;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.Hashtable;
+
 import models.ServerNode;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
+
 import play.Logger;
 import play.i18n.Messages;
+import server.DeployManager;
 import server.ProcExecutor;
 import server.ServerException;
 
@@ -38,7 +47,7 @@ import java.util.Hashtable;
  * 
  * @author Igor Goldenberg
  */
-public class DeployManagerImpl implements server.DeployManager
+public class DeployManagerImpl implements DeployManager
 {
 	// keep all widget instances key=instanceId, value=Executor
 	private Hashtable<String, ProcExecutor> _intancesTable = new Hashtable<String, ProcExecutor>();

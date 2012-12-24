@@ -177,7 +177,9 @@ public class ServerPoolImpl implements ServerPool
 				try
 				{
 					List<ServerNode> servers = ApplicationContext.getServerBootstrapper().createServers(1);
-					servers.get(0).save();
+					
+					for( ServerNode srv :  servers )
+						srv.save();
 				} catch (Exception e)
 				{
 					logger.error("ServerPool failed to create a new server node", e);

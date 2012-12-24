@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import play.Application;
 import play.GlobalSettings;
 import play.libs.Json;
+import play.Logger;
 import server.ApplicationContext;
 
 /**
@@ -23,7 +24,7 @@ public class Global extends GlobalSettings
 
         logger.info( Json.stringify( Json.toJson( conf ) ) );
 
-	    ApplicationContext.getServerPool();
+	    ApplicationContext.initialize();
 
         // create Admin user if not exists
 		if ( User.find.where().eq("admin", Boolean.TRUE ).findRowCount() <= 0 )
