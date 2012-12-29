@@ -27,7 +27,7 @@ import javax.persistence.OneToMany;
 
 import play.db.ebean.Model;
 import play.i18n.Messages;
-import server.ServerException;
+import server.exceptions.ServerException;
 import utils.Utils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;

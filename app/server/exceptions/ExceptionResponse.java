@@ -6,14 +6,15 @@
  * the license agreement granted to you by GigaSpaces.
  */
 
-package server;
+package server.exceptions;
 
 /**
  * User: guym
- * Date: 12/16/12
- * Time: 8:04 AM
+ * Date: 12/26/12
+ * Time: 10:26 AM
  */
-public interface GsRoutes {
+public interface ExceptionResponse {
 
-    public String getWidgetsRoute();
+    public ExceptionResponseDetails getResponseDetails();
+
 }

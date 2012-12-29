@@ -42,11 +42,10 @@ import org.jclouds.sshj.config.SshjSshClientModule;
 import org.jclouds.util.Strings2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import play.Play;
 import server.ApplicationContext;
 import server.DeployManager;
 import server.ServerBootstrapper;
-import server.ServerException;
+import server.exceptions.ServerException;
 import utils.Utils;
 
 import javax.inject.Inject;

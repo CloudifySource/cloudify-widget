@@ -13,30 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package server;
+package server.exceptions;
 
 /**
  * Throws on any business logic or communication/execution errors.
  * 
  * @author Igor Goldenberg
  */
-public class ServerException extends RuntimeException
+public class ServerException extends RuntimeException implements ExceptionResponse
 {
 	private static final long serialVersionUID = 1L;
+
+    private final ExceptionResponseDetails response;
 
 	public ServerException(String msg, Throwable exception)
 	{
 		super(msg, exception);
+        response = new ExceptionResponseDetails( this );
 	}
 
 	public ServerException(String msg)
 	{
 		super(msg);
+        response = new ExceptionResponseDetails( this );
 	}
 
-	public ServerException(Throwable exception)
-	{
-		super(exception);
-	}
-
+    @Override
+    public ExceptionResponseDetails getResponseDetails()
+    {
+        return response;
+    }
 }

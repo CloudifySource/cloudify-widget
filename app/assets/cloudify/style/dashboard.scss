@@ -1,7 +1,5 @@
-
 #main {
   margin: 20px;
-  &.container{ width: 400px; margin: 15px auto; }
 }
 
 #new_widget_modal form {
@@ -39,27 +37,9 @@ td.action_col {
   text-align: left !important;
 }
 
-.summary {
-    display:table;
-    width:100%;
-    padding:0;
-    margin:0 0 20px 0;
-  ul {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    display: table-row;
-  }
-  li {
-    margin: 0;
-    padding: 19px;
-    display: table-cell;
-    border-right: 1px solid #eee;
-    &:last-child{ border:none }
-  }
-}
-
-.summary li
+.summary {display:table; width:100%; padding:0; margin:0 0 20px 0;}
+.summary ul {margin:0; padding:0; overflow:hidden; display:table-row;}
+.summary li {margin:0; padding:19px; display:table-cell; border-right:1px solid #eee;}
 .summary li:last-child {border:none;}
 .summary a {display:block; font-size:1.2em; line-height:1.4em; text-transform:uppercase; color:#000;}
 .summary .count {display:block; font-size:1.75em; font-weight:bold;}

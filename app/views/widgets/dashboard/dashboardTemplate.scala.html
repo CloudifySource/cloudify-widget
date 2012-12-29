@@ -1,0 +1,15 @@
+@import tags._
+
+@context.set("title"){ Cloudify Widget Dashboard }
+@context.set("navmenu"){
+    <li><a href="/admin/account" id="account">Account</a></li>
+    <li><a href="javascript:void(0)" id="username">Dashboard</a></li>
+    <li><a href="/admin/logout" id="logout">Logout</a></li>
+}
+
+@context.set("head"){
+    <link href="/public/style/widgets.css" rel="stylesheet">
+    <script src="/public/js/widgets.js"></script>
+}
+
+@templates.page()

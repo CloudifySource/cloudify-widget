@@ -17,10 +17,11 @@ package controllers;
 
 import models.Widget;
 import models.WidgetInstance;
+import play.Routes;
 import play.mvc.Controller;
 import play.mvc.Result;
 import server.ApplicationContext;
-import server.ServerException;
+import server.exceptions.ServerException;
 
 import static utils.RestUtils.*;
 
@@ -67,4 +68,20 @@ public class Application extends Controller
 			return resultErrorAsJson(ex.getMessage());
 		}
 	}
+
+    public static Result javascriptRoutes()
+    {
+        response().setContentType( "text/javascript" );
+        return ok(
+                Routes.javascriptRouter( "jsRoutes",
+
+                        // Routes for Projects
+                        routes.javascript.WidgetAdmin.getAllWidgets(),
+                        routes.javascript.WidgetAdmin.postChangePassword()
+
+
+                )
+        );
+
+    }
 }

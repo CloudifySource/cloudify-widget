@@ -93,7 +93,9 @@ $(function () {
 
   window.update_widget_list = function() {
     $("#widget_list").empty();
-    $.get("/widget/list?authToken=" + authToken, {}, function (data) {
+      jsRoutes.controllers.WidgetAdmin.getAllWidgets( authToken ).ajax({
+          success: function(data){
+
       if (data.status == "session-expired") {
         remove_session();
         return
@@ -119,18 +121,18 @@ $(function () {
         $("#widget_" + widget["@id"] + "_instances_modal").on("show", function () {
           clearInterval(update_interval);
         }).on("hide", function () {
-          window.update_interval = setInterval(update_widget_list, update_time_interval);
+          window.update_interval = setInterval(update_widget_list, update_time_interval); // todo :??
         });
 
         $("#widget_" + widget["@id"] + "_get_embed_modal").on("show", function () {
           clearInterval(update_interval);
         }).on("hide", function () {
-          window.update_interval = setInterval(update_widget_list, update_time_interval);
+          window.update_interval = setInterval(update_widget_list, update_time_interval); // todo: ??
         });
       });
 
       render_summary();
-    });
+    }});
   };
 
   window.authToken = $.cookie("authToken");
@@ -173,16 +175,41 @@ $(function () {
 
   $(".required_mark").attr("title", "This field is mandatory").tooltip();
 
+    function missingRequiredFields( form ){
+        var error = false;
+        $(form).find("input.required" ).each( function (index, object) {
+              if ($(object).val() == "") {
+                  error = true;
+                $(object).parents(".control-group").addClass("error");
+              }
+            });
+        return error;
+    }
+
+    $( "form#change_password" ).submit( function ( e )
+    {
+        try {
+            if ( missingRequiredFields( this ) ) {
+                return false;
+            }
+            var $me = $( this );
+            var data = $me.formParams();
+            jsRoutes.controllers.WidgetAdmin.postChangePassword( authToken, data.oldPassword, data.newPassword, data.confirmPassword ).ajax( { complete: function ()
+            {
+                $me[0].reset()
+            }} );
+        } finally {
+            e.stopPropagation();
+            return false;
+        }
+
+    } );
+
   $("#new_widget_form").submit(function (e) {
     e.preventDefault();
 
     var error = false;
-    $("#new_widget_form").find("input.required" ).each( function (index, object) {
-      if ($(object).val() == "") {
-        error = true;
-        $(object).parents(".control-group").addClass("error");
-      }
-    });
+      error = missingRequiredFields( this );
 
       var $youtubeVideoUrl = $("#youtubeVideoUrl");
       var youtube_video_url = $youtubeVideoUrl.val();

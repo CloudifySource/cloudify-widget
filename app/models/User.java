@@ -27,7 +27,7 @@ import play.db.ebean.Model;
 import play.i18n.Messages;
 import play.mvc.Http;
 import server.ApplicationContext;
-import server.ServerException;
+import server.exceptions.ServerException;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * This class creates on sign-up, serves for authentication and keeps information about login and user's widgets.
@@ -105,7 +104,7 @@ public class User
 	private String email;
 	
 	@Required
-	@XStreamAsAttribute
+	@XStreamOmitField
 	private String password;
 	
 	private String authToken; 
@@ -209,8 +208,23 @@ public class User
 	}
 
     private void renewAuthToken(){
+
         setAuthToken( UUID.randomUUID().toString() );
     }
+
+    public boolean comparePassword( String password ){
+
+        if ( StringUtils.equals( password, this.password )){ // backward compatibility..
+            return true;
+        }
+        return ApplicationContext.get().getHmac().compare( this.password, password );
+    }
+
+    public void encryptAndSetPassword( String unencryptedPassword ){
+        password = ApplicationContext.get().getHmac().sign( unencryptedPassword );
+    }
+
+
 
     public static User findById( Long pi )
     {
@@ -219,19 +233,31 @@ public class User
 
     static public Session authenticate( String email, String password )
 	{
-		User user = find.where().eq("email", email).eq("password", password).findUnique();
+		User user = find.where().eq("email", email).findUnique();
 
 		if ( user == null )
         {
-			throw new ServerException( Messages.get( "invalid.username.password" ) );
+            String msg = Messages.get( "invalid.username.password" );
+            throw new ServerException( msg ).getResponseDetails().setError( msg ).done();
         }
 
-        String authToken = user.getAuthToken();
-        user.renewAuthToken();
-        user.save();
+        if ( StringUtils.equals( user.getPassword(), password ) ){ // we should encrypt
+            user.encryptAndSetPassword( password );
+        }
+        else if ( !user.comparePassword( password )){
+            String msg = Messages.get( "invalid.username.password" );
+            throw new ServerException( msg ).getResponseDetails().setError( msg ).done();
+        }
 
-        prolongSession( authToken, user.getId() );
-		return user.getSession();
+        Session session = user.getSession();
+
+        if ( ApplicationContext.get().conf().settings.expireSession ){
+            user.renewAuthToken();
+            user.save();
+        }
+
+        prolongSession( session.authToken, user.getId() );
+        return session;
 	}
 
 	static public User validateAuthToken( String authToken )
@@ -246,10 +272,19 @@ public class User
     // so we can simply invoke methods. However, the "session" should be handled by the GUI controller and not Javascript.
     static public User validateAuthToken( String authToken, boolean silent )
     {
-        Long userId = (Long) Cache.get(authToken); // for now, lets use the cache as session. we should implement an encrypted cookie.
+        Long userId = null;
+        if ( ApplicationContext.get().conf().settings.expireSession ) {
+            userId = ( Long ) Cache.get( authToken ); // for now, lets use the cache as session. we should implement an encrypted cookie.
+        } else {
+            User u = User.find.where().eq( "authToken", authToken ).findUnique();
+            if ( u != null ) {
+                userId = u.id;
+            }
+        }
+
         if ( userId == null ){
             Http.Context.current().response().setHeader( "session-expired", "session-expired" );
-            throw new ServerException( Messages.get("session.expired" ) );
+            throw new ServerException( Messages.get("session.expired" ) ).getResponseDetails().setHeaderKey( "session-expired" ).setError( "Session Expired" ).done();
         }
 
 
@@ -288,11 +323,6 @@ public class User
 	public String getPassword()
 	{
 		return password;
-	}
-
-	public void setPassword(String password)
-	{
-		this.password = password;
 	}
 
 	static public List<User> all()

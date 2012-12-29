@@ -47,7 +47,6 @@ public class ApplicationContext
     @Inject private ServerBootstrapper serverBootstrapper;
     @Inject private ExpiredServersCollector expiredServersCollector;
     @Inject private MailSender mailSender;
-    @Inject private GsRoutes gsRoutes;
     @Inject private HmacImpl hmac;
     @Inject private Conf conf;
 
@@ -76,13 +75,6 @@ public class ApplicationContext
         return hmac;
     }
 
-    public  GsRoutes routes(){
-        return gsRoutes;
-    }
-
-    public  GsRoutes getGsRoutes(){
-        return routes();
-    }
 
     @Deprecated // do not use - use "conf()" instead . do not deleted.
     public Conf getConf(){
@@ -145,11 +137,6 @@ public class ApplicationContext
     public void setMailSender( MailSender mailSender )
     {
         this.mailSender = mailSender;
-    }
-
-    public void setGsRoutes( GsRoutes gsRoutes )
-    {
-        this.gsRoutes = gsRoutes;
     }
 
     public void setHmac( HmacImpl hmac )

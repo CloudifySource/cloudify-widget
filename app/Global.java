@@ -3,8 +3,27 @@ import models.User;
 import org.slf4j.LoggerFactory;
 import play.Application;
 import play.GlobalSettings;
+import play.api.mvc.Request;
+import play.api.mvc.RequestHeader;
+import play.api.mvc.Results;
+
+import play.api.mvc.SimpleResult;
+import play.api.mvc.WrappedRequest;
+import play.core.j.JavaHelpers;
+import play.core.j.JavaHelpers$;
+import play.core.j.JavaResults;
 import play.libs.Json;
+import play.mvc.Http;
+import play.mvc.Result;
+import scala.Tuple2;
+import scala.collection.JavaConversions;
 import server.ApplicationContext;
+import server.exceptions.ExceptionResponse;
+import server.exceptions.ExceptionResponseDetails;
+import utils.Utils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * On system startup trigger event onStart or onStop.
@@ -35,6 +54,53 @@ public class Global extends GlobalSettings
             logger.info( "found admin user" );
         }
 	}
+
+    @Override
+    public Result onError( Http.RequestHeader requestHeader, Throwable throwable )
+    {
+
+        logger.error( String.format( "experienced error %s", Utils.requestToString( requestHeader ) ), throwable );
+
+        // todo : maybe this should be a method implemented in the exception.
+        // I assume there is an easier way to do this, but this is what I have so far.
+        // the code below simply detects this is our exception, and it sets headers so the GUI can respond accordingly.
+        Results.Status status = JavaResults.InternalServerError();
+        SimpleResult result;
+        if ( throwable.getCause() != null && throwable.getCause() instanceof  ExceptionResponse ){ // customize response according to this exception
+            ExceptionResponseDetails res = ( ( ExceptionResponse) throwable.getCause() ).getResponseDetails();
+//
+//
+            Tuple2<String, String> ac = new Tuple2<String, String>( res.getHeaderKey(), res.toJson());
+                    ArrayList<Tuple2<String, String>> list = new ArrayList<Tuple2<String, String>>();
+                    list.add(ac);
+                    scala.collection.immutable.List<Tuple2<String, String>> headers =
+                      JavaConversions.asBuffer( list ).toList();
+//
+//
+//            guy -- important.. even though Intellij marks this as error, it is not an error.. ignore it.
+            status.header().headers().$plus(  ac );
+           result = status.withHeaders( headers );
+//            return result;
+//            return play.mvc.Results.internalServerError();
+        }else{
+            return null;
+        }
+
+        final SimpleResult finalResult = result;
+        return new Result() {
+            @Override
+            public play.api.mvc.Result getWrappedResult()
+            {
+                return finalResult;
+            }
+        };
+
+
+
+    }
+
+
+
 
 	@Override
 	public void onStop(Application app)

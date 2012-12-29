@@ -28,7 +28,8 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import server.ApplicationContext;
-import server.ServerException;
+import server.HeaderMessage;
+import server.exceptions.ServerException;
 import utils.Utils;
 import utils.RestUtils;
 
@@ -61,16 +62,21 @@ public class WidgetAdmin extends Controller
 		}
 	}
 
+    public static Result logout(){
+        response().discardCookies( "authToken" );
+        return redirect( routes.WidgetAdmin.index() );
+    }
+
     public static Result index()
     {
         // lets assume that if we have "authToken" we are already logged in
         // and we can redirect to widgets.html
         Http.Cookie authToken = request().cookies().get( "authToken" );
         if ( authToken != null && User.validateAuthToken( authToken.value(), true ) != null ) {
-            return redirect( ApplicationContext.get().routes().getWidgetsRoute() ); // todo : serve from templates and use "routes"
+            return redirect( routes.WidgetAdmin.getWidgetsPage() );
         }
         else{
-            return redirect( routes.WidgetAdmin.getSigninPage() );
+            return redirect( routes.WidgetAdmin.getSigninPage( null ) );
         }
     }
 
@@ -91,7 +97,7 @@ public class WidgetAdmin extends Controller
         }
         // if p is valid lets reset the password
         String newPassword = StringUtils.substring( p, 0, 7 );
-        user.setPassword( newPassword );
+        user.encryptAndSetPassword( newPassword );
         user.save();
         return ok( views.html.widgets.admin.newPassword.render( newPassword ) );
     }
@@ -110,8 +116,16 @@ public class WidgetAdmin extends Controller
         return ok(  );
     }
 
-    public static Result getSigninPage(){
-        return ok(views.html.widgets.admin.signin.render());
+
+    public static Result getAccountPage(){
+        return ok( views.html.widgets.dashboard.account.render() );
+    }
+
+    public static Result getWidgetsPage(){
+        return ok( views.html.widgets.dashboard.widgets.render() );
+    }
+    public static Result getSigninPage( String message ){
+        return ok(views.html.widgets.admin.signin.render( message ));
     }
 
     public static Result getSignupPage(){
@@ -119,6 +133,27 @@ public class WidgetAdmin extends Controller
     }
     public static Result getResetPasswordPage(){
         return ok( views.html.widgets.admin.resetPassword.render() );
+    }
+
+
+    public static Result postChangePassword( String authToken, String oldPassword, String newPassword, String confirmPassword ){
+
+        User user = User.validateAuthToken( authToken );
+        if ( !user.comparePassword( oldPassword )){
+            new HeaderMessage().setError( "Wrong Password" ).apply( response().getHeaders() );
+            return internalServerError();
+        }
+
+        if ( !StringUtils.equals( newPassword, confirmPassword )){
+            new HeaderMessage().setError( "Passwords do not match" ).apply( response().getHeaders() );
+            response().getHeaders().put("message", "Passwords do not match");
+            return internalServerError(  );
+        }
+
+        user.encryptAndSetPassword( newPassword );
+        user.save();
+        new HeaderMessage().setSuccess( "Password Changed Successfully" ).apply( response().getHeaders() );
+        return ok(  );
     }
 
 	/**
@@ -167,13 +202,15 @@ public class WidgetAdmin extends Controller
 	{
 		User user = User.validateAuthToken(authToken);
 		List<Widget> list = null;
-		
-		if ( user.getSession().isAdmin() )
-			list = Utils.workaround(Widget.find.all());
-		else
-			list = Utils.workaround(user.getWidgets());
 
-		return resultAsJson(list);
+        if ( user.getSession().isAdmin() )   {
+            list = Utils.workaround( Widget.find.all() );
+        }
+        else {
+            list = Utils.workaround( user.getWidgets() );
+        }
+
+        return resultAsJson(list);
 	}
 	
 	
@@ -255,13 +292,13 @@ public class WidgetAdmin extends Controller
     	Http.Request req = Http.Context.current().request();
     	
     	StringBuilder sb = new StringBuilder("HEADERS:");
-    	sb.append( "\nRemote address: " + req.remoteAddress() );
+    	sb.append( "\nRemote address: " ).append( req.remoteAddress() );
     	
     	Map<String, String[]> headerMap = req.headers();
     	for (String headerKey : headerMap.keySet()) 
     	{
     	    for( String s : headerMap.get(headerKey) )
-    	    	sb.append( "\n" + headerKey + "=" + s);
+    	    	sb.append( "\n" ).append( headerKey ).append( "=" ).append( s );
     	}
 
     	return ok(sb.toString());

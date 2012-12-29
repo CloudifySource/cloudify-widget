@@ -2,6 +2,8 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
+GET     /javascriptRoutes               controllers.Application.javascriptRoutes
+
 # Widget
 POST     /widget/start		     	    controllers.Application.start( apiKey: String, hpcsKey ?= "", hpcsSecretKey ?= "" ) 
 POST     /widget/:instanceId/stop		controllers.Application.stop( apiKey: String, instanceId: String  ) 
@@ -9,13 +11,17 @@ GET      /widget/:instanceId/status   	controllers.Application.getWidgetStatus( 
 
 
 # Admin API
-POST    /admin/resetPassword            controllers.WidgetAdmin.postResetPassword( email:String, h:String )
-GET     /admin/resetPasswordAction      controllers.WidgetAdmin.resetPasswordAction( p:String, pi:Long)
+POST    /admin/changePassword           controllers.WidgetAdmin.postChangePassword( authToken:String, oldPassword:String, newPassword:String, confirmPassword:String )
+POST     /admin/resetPassword           controllers.WidgetAdmin.postResetPassword( email:String, h:String )
+GET      /admin/resetPasswordAction     controllers.WidgetAdmin.resetPasswordAction( p:String, pi:Long)
 GET      /admin/signup                  controllers.WidgetAdmin.getSignupPage
-GET       /admin/resetPassword          controllers.WidgetAdmin.getResetPasswordPage
-GET      /admin/signin                  controllers.WidgetAdmin.getSigninPage
-POST     /signin	     		     	controllers.WidgetAdmin.signIn( email: String, password: String ) 
-POST     /signup      		     		controllers.WidgetAdmin.signUp( email: String, password: String, firstname: String, lastname: String  ) 
+GET     /admin/account                  controllers.WidgetAdmin.getAccountPage
+GET      /admin/resetPassword           controllers.WidgetAdmin.getResetPasswordPage
+GET      /admin/signin                  controllers.WidgetAdmin.getSigninPage( message:String ?= null )
+GET      /admin/widgets                 controllers.WidgetAdmin.getWidgetsPage
+GET      /admin/logout                  controllers.WidgetAdmin.logout
+POST     /signin	     		     	controllers.WidgetAdmin.signIn( email: String, password: String )
+POST     /signup      		     		controllers.WidgetAdmin.signUp( email: String, password: String, firstname: String, lastname: String  )
 POST     /widget/regenerate	   			controllers.WidgetAdmin.regenerateWidgetApiKey( authToken: String, apiKey: String )
 POST     /widget/:instanceId/shutdown	controllers.WidgetAdmin.shutdownInstance( authToken: String, instanceId: String )
 POST     /widget/disable				controllers.WidgetAdmin.disableWidget( authToken: String, apiKey: String )

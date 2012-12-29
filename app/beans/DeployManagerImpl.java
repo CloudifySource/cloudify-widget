@@ -16,7 +16,6 @@
 package beans;
 
 import beans.config.Conf;
-import static server.Config.*;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -33,13 +32,9 @@ import play.Logger;
 import play.i18n.Messages;
 import server.DeployManager;
 import server.ProcExecutor;
-import server.ServerException;
+import server.exceptions.ServerException;
 
 import javax.inject.Inject;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.Hashtable;
 
 /**
  * This class deploys a recipe file vi cloudify non-interactive CLI. 

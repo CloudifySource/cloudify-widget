@@ -8,7 +8,11 @@
            </div>
            <div class="navbar-inner">
              <div class="brand">@context.get("brand")</div>
+               <ul class="nav pull-right">
+                @context.get("navmenu")
+               </ul>
            </div>
+
          </div>
 
     @context.get("body")

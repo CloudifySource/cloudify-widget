@@ -1,0 +1,188 @@
+@import tags._
+
+@field( id:String, title:String, required:Boolean  )={
+<div class="control-group">
+    <label class="control-label" for="@id">@title @if(required){<abbr class="required_mark">*</abbr>}</label>
+    <div class="controls">
+        <input type="text" id="@id" name="@id" class="@if(required){required}">
+    </div>
+</div>
+}
+
+@context.set("body"){
+    <div id="main">
+        <div class="hero-unit" id="welcome_window" style="display:none;">
+            <h1>Welcome to the Cloudify Widget Dashboard!</h1>
+            <p>We are thrilled to have you on board. This dashboard helps you to create a new Widget, embed the widget into your website and then monitor and administrate the running widget instances.</p>
+            <p>
+                <a class="btn btn-primary" role="button" data-toggle="modal" href="#new_widget_modal">
+                    Create new widget
+                </a>
+            </p>
+        </div>
+
+        <div class="row" id="search_panel" style="display:none;">
+            <div class="span1">
+                <form class="form-search">
+                    <input id="search" type="text" placeholder="Filter widgets" class="input-medium search-query">
+                </form>
+            </div>
+            <div class="pull-right">
+                <a class="btn btn-primary" role="button" data-toggle="modal" href="#new_widget_modal">
+                    Create new widget
+                </a>
+            </div>
+        </div>
+
+        <div id="summary" style="display:none;" class="well summary">
+            <ul>
+            </ul>
+        </div>
+
+        <div id="widgets_panel" style="display:none;">
+            <table class="table table-bordered table-striped">
+                <thead class="list_head">
+                    <tr>
+                        <th id="user_name_column" style="display:none;">User name</th>
+                        <th>Product name</th>
+                        <th>Product version</th>
+                        <th>Provider URL</th>
+                        <th>Title</th>
+                        <th>Video URL</th>
+                        <th>Recipe URL</th>
+                        <th>Launches</th>
+                        <th>API Key</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="widget_list">
+                </tbody>
+            </table>
+        </div>
+    </div> <!-- main -->
+
+
+
+    <script id="widget_record" type="text/x-jquery-tmpl">
+             <tr class="widget" data-api_key="${api_key}" id="widget_${id}">
+               {{if admin}}
+                 <td>${user_name}</td>
+               {{/if}}
+               <td>${product_name}</td>
+               <td>${product_version}</td>
+               <td><a href="${url}">${url}</a></td>
+               <td>${title}</td>
+               <td>
+                 {{if video_url}}
+                   <a href="${video_url}" target="_blank">View</a>
+                 {{else}}
+                   N/A
+                 {{/if}}
+               </td>
+               <td><a href="${recipe_url}">Download</a></td>
+               <td><span class="badge">${launches}</span></td>
+               <td>${api_key}</td>
+               <td class="action_col">
+                 <div class="btn-group">
+                   <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                     Action
+                     <span class="caret"></span>
+                   </a>
+                   <ul class="dropdown-menu">
+                     <li><a class="regenerate_key_btn" href="#">Regenerate Key</a></li>
+                     <li><a class="disable_widget_btn" style="display:none;" href="#">Disable</a></li>
+                     <li><a class="enable_widget_btn" style="display:none;" href="#">Enable</a></li>
+                     <li><a href="#widget_${id}_get_embed_modal" data-toggle="modal">Get Embed Code</a></li>
+                   </ul>
+                 </div>
+               </td>
+               <td class="instances_col">
+                 <span class="label label-important disabled_marker" style="display:none">Disabled</span>
+                 <span class="label label-success instances_btn" style="display:none"><a data-toggle="modal" href="#widget_${id}_instances_modal">View Instances</a></span>
+                 <div id="widget_${id}_instances_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="widget_${id}_instances_label" aria-hidden="true">
+                   <div class="modal-header">
+                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                     <h3 id="widget_${id}_instances_label">${instance_count} Running instances</h3>
+                   </div>
+                   <div class="modal-body">
+                     <form class="form-search pull-left">
+                       <input type="text" placeholder="Filter instances" class="instance_search input-medium search-query">
+                     </form>
+
+                     <table class="table table-hover">
+                       <thead class="list_head">
+                         <tr>
+                           <th>Id</th>
+                           <th>Anonymous</th>
+                           <th>Public IP</th>
+                           <th></th>
+                         </tr>
+                       </thead>
+                       <tbody id="widget_${id}_instances">
+                       </tbody>
+                     </table>
+                   </div>
+                 </div>
+                 <div id="widget_${id}_get_embed_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="widget_${id}_get_embed_label" aria-hidden="true">
+                   <div class="modal-header">
+                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                     <h3 id="widget_${id}_get_embed_label">Embed Code</h3>
+                   </div>
+                   <div class="modal-body">
+                     <textarea autofocus readonly class="code">&lt;script type=&quot;text/javascript&quot; id=&quot;cloudify-widget&quot; data-api-key=&quot;${api_key}&quot; data-title=&quot;${title}&quot; data-video_url=&quot;${video_url}&quot; src=&quot;http://${domain}/js/get_widget.js&quot;&gt;&lt;/script&gt;</textarea>
+                   </div>
+                 </div>
+               </td>
+             </tr>
+   </script>
+
+    <script id="widget_instance_tmpl" type="text/x-jquery-tmpl">
+        <tr class="instance" data-instance_id="${instance_id}">
+          <td>${instance_id}</td>
+          <td>${anonymouse}</td>
+          <td>${public_ip}</td>
+          <td><a href="#" class="btn btn-danger shutdown_instance btn-small">Shutdown</a></td>
+        </tr>
+  </script>
+
+
+
+<div id="new_widget_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="create_widget_form_label" aria-hidden="true">
+      <form id="new_widget_form" class="form-horizontal">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="create_widget_form_label">Create new widget</h3>
+        </div>
+        <div class="modal-body">
+          <fieldset>
+
+              @field("productName", "Product Name", required =true )
+              @field("productVersion", "Product Version", required = true )
+              @field("title", "Title", required =true )
+              @field("youtubeVideoUrl", "Youtube Video URL",required = false )
+              @field("providerURL", "Provider URL",required = true )
+              @field("recipeURL", "Recipe URL", required =true )
+              @field("consolename", "Console Link Title", required =false )
+              @field("consoleurl", "Console Link URL", required =false )
+
+            <div class="control-group">
+              <div class="control-label">
+                <abbr style="color:red">*</abbr> Mandatory fields
+              </div>
+            </div>
+          </fieldset>
+        </div>
+        <div class="modal-footer">
+          <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+          <input type="submit" class="btn btn-primary" value="Create">
+        </div>
+      </form>
+    </div><!-- new_widget_modal -->
+
+
+
+}
+
+
+@dashboardTemplate()

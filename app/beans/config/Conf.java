@@ -23,12 +23,18 @@ public class Conf {
 
     public ServerConfig server = new ServerConfig();
 
+    public SettingsConfig settings = new SettingsConfig();
+
     @Config(ignoreNullValues = true)
     public boolean sendErrorEmails = false;
 
     public CloudifyConfiguration cloudify = new CloudifyConfiguration();
 
 
+    public static class SettingsConfig{
+        @Config( ignoreNullValues = true )
+        public boolean expireSession = false; // do not use the session expired mechanism.
+    }
 
 
     public static class WidgetConfiguration{

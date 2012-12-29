@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.Configuration;
 import play.Play;
-import scala.collection.JavaConversions;
+import server.exceptions.ServerException;
 
 /**
  * Cloudify configuration class. All config properties locates in /conf/cloudify.conf file.

@@ -15,7 +15,6 @@
     <bean id="expiredServerCollector" class="beans.ExpiredServersCollectorImpl"/>
     <bean id="serverBootstrapper" class="beans.ServerBootstrapperImpl"/>
 
-    <bean id="gsRoutes" class="beans.GsRoutesImpl"/>
     <bean id="hmac" class="beans.HmacImpl"/>
 
     <bean id="mailSender" class="beans.MailSenderImpl"/>

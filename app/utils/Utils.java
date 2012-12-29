@@ -18,14 +18,13 @@ package utils;
 import models.Widget;
 import models.WidgetInstance;
 import org.apache.commons.io.FileUtils;
-import utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.Play;
 import play.i18n.Lang;
 import play.libs.Time;
 import play.mvc.Http;
-import server.ServerException;
+import server.exceptions.ServerException;
 
 import java.io.File;
 import java.io.IOException;
@@ -317,4 +316,21 @@ public class Utils
         Http.Context.current.set(new Http.Context(request, new HashMap <String, String>(),
         new HashMap<String, String>()));
     }
+
+    public static String requestToString( Http.RequestHeader requestHeader )
+    {
+//        StringBuilder sb = new StringBuilder(  );
+//        return sb.append( requestHeader.toString() )
+//                .toString();
+        return requestHeader.toString();
+    }
+
+    public static String requestToString(){
+        Http.Context context = Http.Context.current();
+        if ( context != null && context.request() != null ){
+            return requestToString( context.request() );
+        }
+        return "N/A";
+    }
+
 }

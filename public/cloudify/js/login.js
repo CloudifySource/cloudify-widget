@@ -1,20 +1,9 @@
 $(function () {
 
-    var $alert = $(".alert");
+    function show_message(text, alert_class) {
+        $("#message" ).trigger("showMessage", { "msg" : text, "class" : alert_class})
+      }
 
-  function show_message(text, alert_class) {
-      $( "#message" ).empty()
-          .append( $( "<div/>" )
-              .addClass( "alert" )
-              .addClass( "alert-" + (alert_class || "success") )
-              .append( $( "<button/>" )
-                  .attr( "type", 'button' )
-                  .addClass( 'close' )
-                  .attr( "data-dismiss", 'alert' )
-                  .html( '&times;' ) )
-              .append( $( "<span/>" ).text( text ) ) );
-    $alert.alert();
-  }
 
   function toUrlParams( data ){
       return $.param(data);
@@ -22,7 +11,7 @@ $(function () {
 
     function before(e){
         e.stopPropagation();
-        $alert.alert("close");
+        $(".alert").alert("close");
     }
 
   function fillFormData( keys , $form ){
@@ -37,7 +26,7 @@ $(function () {
   $("#signin_form").submit(function (e) {
       before(e);
         var formData = fillFormData(["email","password"], $(this));
-
+    console.log("I am about to login");
     var url = "/signin?" + toUrlParams(formData);
     $.ajax({ type:'POST',
         url:url,
@@ -48,10 +37,11 @@ $(function () {
                     show_message(data.message, "error");
                     $("input[name=password]").val("" ).focus();
                 } else {
+                    console.log(["after login",data]);
                     $.cookie("admin", data.session["@admin"], { expires: 1, path:'/' });
                     $.cookie("authToken", data.session["@authToken"], { expires: 1 , path:'/'});
                     $.cookie("username", formData.email, { expires: 1 , path:'/'});
-                    window.location.href = "widgets.html"; // /admin/widgets.html
+                    window.location.href = "/admin/widgets"; // /admin/widgets.html
                 }
          },
         error: function(data){
@@ -95,7 +85,7 @@ $(function () {
       } else {
         $.cookie("authToken", data.session["@authToken"], { expires: 1 , path:'/'});
         $.cookie("username", username, { expires: 1, path:'/' });
-        window.location.href = "widgets.html"
+        window.location.href = "/admin/widgets";
       }
     });
       return false;

@@ -34,6 +34,7 @@ import models.Widget;
 import models.Widget.Status;
 import models.WidgetInstance;
 import server.*;
+import server.exceptions.ServerException;
 import utils.Utils;
 
 import javax.annotation.PostConstruct;
