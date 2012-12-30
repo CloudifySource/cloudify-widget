@@ -16,15 +16,18 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import play.db.ebean.Model;
 import play.i18n.Messages;
 import server.exceptions.ServerException;
@@ -52,9 +55,6 @@ public class Widget
 	@XStreamAsAttribute
 	private Long id;
 
-	@XStreamAsAttribute
-	private String userName;
-	
 	@XStreamAsAttribute
 	private String productName;
 
@@ -91,6 +91,11 @@ public class Widget
 	@XStreamAsAttribute
 	private String consoleURL;
 
+    @XStreamOmitField
+    @ManyToOne( optional = false )
+    private User user;
+
+
 	@OneToMany(cascade=CascadeType.ALL) 
 	private List<WidgetInstance> instances;
 
@@ -111,8 +116,7 @@ public class Widget
 		{
 			this.state = state;
 			output = new ArrayList<String>();
-			for( String msg : messages )
-				output.add( msg );
+            Collections.addAll( output, messages );
 		}
 		
 		public Status( String state, List<String> output, int timeleftMin )
@@ -147,8 +151,9 @@ public class Widget
 	{
 		WidgetInstance wInstance = new WidgetInstance( instanceId, publicIP, consoleName, consoleURL );
 		
-		if (instances == null)
+		if (instances == null){
 			instances = new ArrayList<WidgetInstance>();
+        }
 
 		instances.add( wInstance );
 		
@@ -157,20 +162,35 @@ public class Widget
 		return wInstance;
 	}
 
-	/** @return the widget by apiKey or null  */
-	static public Widget getWidgetByApiKey( String apiKey )
-	{
-		Widget widget = Widget.find.where().eq("apiKey", apiKey).findUnique();
+    @Deprecated // todo : DO NOT USE THIS.. this is strictly for "WidgetServerImpl".
+               //  todo : we should implement a different mechanism there, but for now there is no time.
+    public static Widget getWidget( String apiKey )
+    {
+        Widget widget = Widget.find.where().eq( "apiKey", apiKey ).findUnique();
+        if ( widget == null ) {
+            String msg = Messages.get( "widget.apikey.not.valid", apiKey );
+            throw new ServerException( msg ).getResponseDetails().setError( msg ).done();
+        }
+        return widget;
+    }
 
-		if ( widget == null )
-		    throw new ServerException( Messages.get( "widget.apikey.not.valid", apiKey ) );
+    /** @return the widget by apiKey or null  */
+    // guy - NOTE : we must always add "user" to the mix.. otherwise we never verify the user really owns the widget.
+	static public Widget getWidgetByApiKey( User user, String apiKey )
+	{
+		Widget widget = Widget.find.where().eq( "apiKey", apiKey ).eq( "user", user).findUnique();
+
+		if ( widget == null ) {
+            String msg = Messages.get( "widget.apikey.not.valid", apiKey );
+            throw new ServerException( msg ).getResponseDetails().setError( msg ).done();
+        }
 		
 		return widget;
 	}
 	
-	static public Widget regenerateApiKey( String oldApiKey )
+	static public Widget regenerateApiKey( User user, String oldApiKey )
 	{
-		Widget widget = getWidgetByApiKey( oldApiKey );
+		Widget widget = getWidgetByApiKey( user, oldApiKey );
 		widget.apiKey = UUID.randomUUID().toString();
 		widget.save();
 		
@@ -189,17 +209,8 @@ public class Widget
 		this.id = id;
 	}
 
-	public String getUserName()
-	{
-		return userName;
-	}
 
-	public void setUserName(String userName)
-	{
-		this.userName = userName;
-	}
 
-	
 	public String getApiKey()
 	{
 		return apiKey;

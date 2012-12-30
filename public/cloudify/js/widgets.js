@@ -257,6 +257,7 @@ $(function () {
     var widget_container = $(e.target).parents("tr.widget");
     var api_key = widget_container.data("api_key");
     if (confirm("Are you sure you want to disable widget " + api_key + "?")) {
+        // todo : we should probably use widget's ID to identify the widget. api_key is not as effective.
       $.post("/widget/disable?authToken=" + authToken + "&apiKey=" + api_key, {}, function (data) {
         if (data.status == "session-expired") {
           remove_session();
@@ -274,6 +275,7 @@ $(function () {
 
   $(".enable_widget_btn").live("click", function (e) {
     var widget_container = $(e.target).parents("tr.widget");
+      // todo : we should probably use widget's ID to identify the widget. api_key is not as effective.
     var postData = { apiKey : widget_container.data("api_key"), authToken: authToken };
     $.post("/widget/enable?" + toUrlParams( postData ), {}, function (data) {
       if (data.status == "session-expired") {
@@ -286,7 +288,26 @@ $(function () {
     });
   });
 
-  $(".regenerate_key_btn").live("click", function (e) {
+    $( ".delete_widget_btn" ).live( "click", function ( e )
+    {
+        if ( confirm( "Are you sure you want to delete this widget? This operation is not recoverable" ) ) {
+            var $widget_container = $( e.target ).parents( "tr.widget" ); // guy - todo - I think we want closest here.. if have multiple tr.widget parent we will get faulty behavior.
+            var postData = { apiKey: $widget_container.data( "api_key" ), authToken: authToken };
+            // todo : we should probably use widget's ID to identify the widget. api_key is not as effective.
+            jsRoutes.controllers.WidgetAdmin.deleteWidget( postData.authToken, postData.apiKey ).ajax( {
+                success: function ( data )
+                {
+                    $widget_container.hide( 1000, function ()
+                    {
+                        $( this ).remove()
+                    } );
+                }
+            } )
+        }
+
+    } );
+
+    $(".regenerate_key_btn").live("click", function (e) {
     var widget_container = $(e.target).parents("tr.widget");
     var api_key = widget_container.data("api_key");
     if (confirm("Are you sure you want to regenerate api key for " + api_key + "?")) {
@@ -301,21 +322,24 @@ $(function () {
     }
   });
 
-  $(".shutdown_instance").live("click", function (e) {
-    var instance_container = $(e.target).parents("tr.instance");
-    var instance_id = instance_container.data("instance_id");
-    if (confirm("Are you sure you want to shutdown the instance " + instance_id + "?")) {
-      $.post("/widget/" + instance_id + "/shutdown?authToken=" + authToken, {}, function (data) {
-        if (data.status == "session-expired") {
-          remove_session();
-          return
+    $( ".shutdown_instance" ).live( "click", function ( e )
+    {
+        var instance_container = $( e.target ).parents( "tr.instance" );
+        var instance_id = instance_container.data( "instance_id" );
+        if ( confirm( "Are you sure you want to shutdown the instance " + instance_id + "?" ) ) {
+            $.post( "/widget/" + instance_id + "/shutdown?authToken=" + authToken, {}, function ( data )
+            {
+                if ( data.status == "session-expired" ) {
+                    remove_session();
+                    return
+                }
+                instance_container.fadeOut( 'fast', function ()
+                {
+                    instance_container.remove();
+                } );
+            } );
         }
-        instance_container.fadeOut('fast', function(){
-          instance_container.remove();
-        });
-      });
-    }
-  });
+    } );
 
     /****
      *

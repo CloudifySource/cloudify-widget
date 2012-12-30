@@ -270,34 +270,36 @@ public class WidgetAdmin extends Controller
 	public static Result shutdownInstance( String authToken, String instanceId )
 	{
 		User.validateAuthToken(authToken);
-		ApplicationContext.get().getWidgetServer().undeploy(instanceId);
-		
+		ApplicationContext.get().getWidgetServer().undeploy(instanceId); // todo : link to user somehow
 		return ok(OK_STATUS).as("application/json");
 	}
-	
+
 
 	public static Result disableWidget( String authToken, String apiKey )
 	{
-		User.validateAuthToken(authToken);
-		Widget widget = Widget.getWidgetByApiKey( apiKey );
-		widget.setEnabled( false );
-		
-		return ok(OK_STATUS).as("application/json");
+        return enableDisableWidget( authToken, apiKey, false );
 	}
-	
 
-	public static Result enableWidget( String authToken, String apiKey )
+    private static Result enableDisableWidget( String authToken, String apiKey, boolean enabled )
+    {
+        getWidgetSafely( authToken, apiKey ).setEnabled( enabled );
+        return ok(OK_STATUS).as("application/json");
+    }
+
+
+    public static Result enableWidget( String authToken, String apiKey )
 	{
-		User.validateAuthToken(authToken);
-
-		Widget widget = Widget.getWidgetByApiKey( apiKey );
-		widget.setEnabled( true );
-		
-		return ok(OK_STATUS).as("application/json");
+        return enableDisableWidget( authToken, apiKey, true );
 	}
-	
-	
-	public static Result summary( String authToken )
+
+    private static Widget getWidgetSafely( String authToken, String apiKey )
+    {
+        User user = User.validateAuthToken(authToken);
+        return Widget.getWidgetByApiKey( user, apiKey );
+    }
+
+
+    public static Result summary( String authToken )
 	{
 		User user = User.validateAuthToken(authToken);
 
@@ -322,13 +324,17 @@ public class WidgetAdmin extends Controller
 
 		return resultAsJson(summary);
 	}
+
+    public static Result deleteWidget( String authToken, String apiKey ){
+        Widget widget = getWidgetSafely( authToken, apiKey );
+        widget.delete(  );
+        return ok( );
+    }
 	
 	public static Result regenerateWidgetApiKey( String authToken, String apiKey )
 	{
-		User.validateAuthToken(authToken);
-
-		Widget widget = Widget.regenerateApiKey(apiKey);
-		
+        User user = User.validateAuthToken( authToken );
+        Widget widget = Widget.regenerateApiKey(user, apiKey);
 		return resultAsJson(widget);
 	}
 

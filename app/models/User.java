@@ -114,7 +114,7 @@ public class User
 	@XStreamOmitField
 	private Boolean admin;
 
-	@OneToMany(cascade= CascadeType.ALL)
+	@OneToMany(cascade= CascadeType.ALL, mappedBy = "user")
 	private List<Widget> widgets;
 
     public static enum Role{
@@ -162,8 +162,11 @@ public class User
 								   String recipeURL, String consolename, String consoleURL )
 	{
 		Widget widget = new Widget( productName, productVersion, title, youtubeVideoUrl, providerURL, recipeURL, consolename, consoleURL );
-		widget.setUserName(email);
-		
+
+        // guy - removing "setUsername" - it is unclear what that was..
+        // if we want Widget to refer to a user, we should use a foreign key..
+
+
 		if (widgets == null)
 			widgets = new ArrayList<Widget>();
 
@@ -243,6 +246,7 @@ public class User
 
         if ( StringUtils.equals( user.getPassword(), password ) ){ // we should encrypt
             user.encryptAndSetPassword( password );
+            user.save(  );
         }
         else if ( !user.comparePassword( password )){
             String msg = Messages.get( "invalid.username.password" );

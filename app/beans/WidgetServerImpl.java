@@ -80,7 +80,7 @@ public class WidgetServerImpl implements WidgetServer
 			throw new ServerException( Messages.get( "please.wait.x.sec", (timeLeft - System.currentTimeMillis()) / 1000) );
         }
 
-		Widget widget = Widget.getWidgetByApiKey(apiKey);
+		Widget widget = Widget.getWidget( apiKey );
 		if ( !widget.isEnabled() )
         {
 			throw new ServerException( Messages.get( "widget.disabled.by.administrator" ) );

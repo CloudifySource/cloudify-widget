@@ -15,8 +15,15 @@
  *******************************************************************************/
 package controllers;
 
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.config.dbplatform.MySqlPlatform;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import models.Widget;
 import models.WidgetInstance;
+import play.Play;
 import play.Routes;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -33,13 +40,13 @@ import static utils.RestUtils.*;
  */
 public class Application extends Controller
 {
+    // guy - todo - apiKey should be an encoded string that contains the userId and widgetId.
+    //              we should be able to decode it, verify user's ownership on the widget and go from there.
 	public static Result start( String apiKey, String hpcsKey, String hpcsSecretKey )
 	{
 		try
 		{
 			WidgetInstance wi = ApplicationContext.get().getWidgetServer().deploy(apiKey);
-
-			
 			return resultAsJson(wi);
 		}catch(ServerException ex)
 		{
@@ -69,6 +76,22 @@ public class Application extends Controller
 		}
 	}
 
+    public static Result generateDDL(){
+        if ( Play.isDev() ) {
+            EbeanServer defaultServer = Ebean.getServer( "default" );
+
+            ServerConfig config = new ServerConfig();
+            config.setDebugSql( true );
+
+            DdlGenerator ddlGenerator = new DdlGenerator( ( SpiEbeanServer ) defaultServer, new MySqlPlatform(), config );
+            String createDdl = ddlGenerator.generateCreateDdl();
+            String dropDdl = ddlGenerator.generateDropDdl();
+            return ok( createDdl );
+        }else{
+            return forbidden(  );
+        }
+    }
+
     public static Result javascriptRoutes()
     {
         response().setContentType( "text/javascript" );
@@ -78,7 +101,8 @@ public class Application extends Controller
                         // Routes for Projects
                         routes.javascript.WidgetAdmin.getAllWidgets(),
                         routes.javascript.WidgetAdmin.postChangePassword(),
-                        routes.javascript.WidgetAdmin.getPasswordMatch()
+                        routes.javascript.WidgetAdmin.getPasswordMatch(),
+                        routes.javascript.WidgetAdmin.deleteWidget()
 
 
                 )

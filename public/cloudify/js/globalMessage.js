@@ -9,7 +9,7 @@
 $(function(){
 
     $(".global-message" ).bind("showMessage", function( e, conf){
-        debugger;
+//        debugger;
             $( this ).empty()
                           .append( $( "<div/>" )
                               .addClass( "alert" )
