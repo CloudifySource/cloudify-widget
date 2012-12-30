@@ -234,10 +234,10 @@ public class WidgetAdmin extends Controller
 
 	public static Result createNewWidget( String authToken,  String productName, String productVersion,
 										  String title, String youtubeVideoUrl, String providerURL,
-										  String recipeURL, String consolename, String consoleurl )
+										  String recipeURL, String consolename, String consoleurl, String rootpath )
 	{
 		User user = User.validateAuthToken(authToken);
-		Widget widget = user.createNewWidget( productName, productVersion, title, youtubeVideoUrl, providerURL, recipeURL, consolename, consoleurl );
+		Widget widget = user.createNewWidget( productName, productVersion, title, youtubeVideoUrl, providerURL, recipeURL, consolename, consoleurl, rootpath );
 		
 		return resultAsJson(widget);
 	}

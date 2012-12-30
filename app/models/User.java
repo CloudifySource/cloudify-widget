@@ -159,9 +159,9 @@ public class User
 	
 	public Widget createNewWidget( String productName, String productVersion, String title,
 								   String youtubeVideoUrl, String providerURL,
-								   String recipeURL, String consolename, String consoleURL )
+								   String recipeURL, String consolename, String consoleURL, String recipeRootPath )
 	{
-		Widget widget = new Widget( productName, productVersion, title, youtubeVideoUrl, providerURL, recipeURL, consolename, consoleURL );
+		Widget widget = new Widget( productName, productVersion, title, youtubeVideoUrl, providerURL, recipeURL, consolename, consoleURL, recipeRootPath );
 
         // guy - removing "setUsername" - it is unclear what that was..
         // if we want Widget to refer to a user, we should use a foreign key..

@@ -38,6 +38,7 @@ $(function () {
       recipe_url: widget["@recipeURL"],
       video_url: widget["@youtubeVideoUrl"],
       console_url: widget["@consoleurl"],
+      root_path: widget["@recipeRootPath"],
       launches: widget["@launches"],
       enabled: widget["@enabled"],
       domain: document.domain,

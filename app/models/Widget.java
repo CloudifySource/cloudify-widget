@@ -91,6 +91,9 @@ public class Widget
 	@XStreamAsAttribute
 	private String consoleURL;
 
+    @XStreamAsAttribute
+    private String recipeRootPath;
+
     @XStreamOmitField
     @ManyToOne( optional = false )
     private User user;
@@ -132,7 +135,7 @@ public class Widget
 	}
 	
 	public Widget( String productName, String productVersion, String title, String youtubeVideoUrl,
-					String providerURL, String recipeURL, String consoleName, String consoleURL )
+					String providerURL, String recipeURL, String consoleName, String consoleURL, String recipeRootPath )
 	{
 		this.productName = productName;
 		this.title = title;
@@ -145,6 +148,7 @@ public class Widget
 		this.enabled = true;
 		this.launches = 0;
 		this.apiKey = UUID.randomUUID().toString();
+        this.recipeRootPath = recipeRootPath;
 	}
 	
 	public WidgetInstance addWidgetInstance( String instanceId, String publicIP )
@@ -326,8 +330,13 @@ public class Widget
 		this.enabled = enabled;
 		save();
 	}
-	
-	public void countLaunch()
+
+    public String getRecipeRootPath()
+    {
+        return recipeRootPath;
+    }
+
+    public void countLaunch()
 	{
 		launches++;
 		save();

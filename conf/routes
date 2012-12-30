@@ -29,7 +29,7 @@ POST     /widget/:instanceId/shutdown	controllers.WidgetAdmin.shutdownInstance( 
 POST     /widget/disable				controllers.WidgetAdmin.disableWidget( authToken: String, apiKey: String )
 POST     /widget/enable 				controllers.WidgetAdmin.enableWidget( authToken: String, apiKey: String )
 GET      /user/list	   					controllers.WidgetAdmin.getAllUsers( authToken: String )
-POST     /widget/new              	    controllers.WidgetAdmin.createNewWidget(authToken: String, productName: String, productVersion: String, title: String, youtubeVideoUrl: String, providerURL: String, recipeURL: String, consolename: String, consoleurl: String )
+POST     /widget/new              	    controllers.WidgetAdmin.createNewWidget(authToken: String, productName: String, productVersion: String, title: String, youtubeVideoUrl: String, providerURL: String, recipeURL: String, consolename: String, consoleurl: String, rootpath:String )
 GET      /widget/list 					controllers.WidgetAdmin.getAllWidgets( authToken: String )
 POST    /widget/delete                  controllers.WidgetAdmin.deleteWidget( authToken:String, apiKey:String )
 GET      /widget/summary 				controllers.WidgetAdmin.summary( authToken: String )

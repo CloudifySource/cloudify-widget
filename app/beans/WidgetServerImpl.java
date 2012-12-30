@@ -86,7 +86,13 @@ public class WidgetServerImpl implements WidgetServer
 			throw new ServerException( Messages.get( "widget.disabled.by.administrator" ) );
         }
 			
-		File recipeDir = Utils.downloadAndUnzip( widget.getRecipeURL(), apiKey );
+		File unzippedDir = Utils.downloadAndUnzip( widget.getRecipeURL(), apiKey );
+
+
+        File recipeDir = unzippedDir;
+        if ( widget.getRecipeRootPath() != null  ){
+            recipeDir = new File( unzippedDir, widget.getRecipeRootPath() );
+        }
 
 		ServerNode server = serverPool.get();
 		if ( server == null )
