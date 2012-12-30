@@ -15,8 +15,11 @@
  *******************************************************************************/
 package controllers;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import models.ServerNode;
 import models.Summary;
@@ -30,6 +33,7 @@ import play.mvc.Result;
 import server.ApplicationContext;
 import server.HeaderMessage;
 import server.exceptions.ServerException;
+import utils.CollectionUtils;
 import utils.Utils;
 import utils.RestUtils;
 
@@ -136,8 +140,43 @@ public class WidgetAdmin extends Controller
     }
 
 
-    public static Result postChangePassword( String authToken, String oldPassword, String newPassword, String confirmPassword ){
 
+    private static String isPasswordStrongEnough( String password, String email ){
+        if ( StringUtils.length( password ) < 8 ){
+            return "Password is too short";
+        }
+        if ( !Pattern.matches( "(?=^.{8,}$)((?=.*\\d)|(?=.*\\W+))(?![.\\n])(?=.*[A-Z])(?=.*[a-z]).*$", password ) && !StringUtils.containsIgnoreCase( email, password ) ){
+            return "Password must match requirements";
+        }
+
+        Set<String> strSet = new HashSet<String>(  );
+        for ( String s : password.split( "" ) ) {
+            if ( StringUtils.length( s ) > 0){
+                strSet.add( s.toLowerCase( ) );
+            }
+        }
+
+        if ( CollectionUtils.size( strSet ) < 3 ){
+            return "Too many repeating letters";
+        }
+
+        if ( StringUtils.getLevenshteinDistance( password, email.replaceAll( "@","" ).replaceAll( "\\.","" ) ) > 5 ){
+            return "Password similar to email";
+        }
+
+        return null;
+    }
+
+    public static Result getPasswordMatch( String authToken, String password ){
+        User user = User.validateAuthToken( authToken );
+        String passwordWeakReason = isPasswordStrongEnough( password, user.getEmail() );
+        if ( passwordWeakReason == null ){
+            return ok( );
+        }
+        return ok( passwordWeakReason );
+    }
+
+    public static Result postChangePassword( String authToken, String oldPassword, String newPassword, String confirmPassword ){
         User user = User.validateAuthToken( authToken );
         if ( !user.comparePassword( oldPassword )){
             new HeaderMessage().setError( "Wrong Password" ).apply( response().getHeaders() );
@@ -148,6 +187,12 @@ public class WidgetAdmin extends Controller
             new HeaderMessage().setError( "Passwords do not match" ).apply( response().getHeaders() );
             response().getHeaders().put("message", "Passwords do not match");
             return internalServerError(  );
+        }
+
+        String passwordWeakReason = isPasswordStrongEnough( newPassword, user.getEmail() );
+        if ( passwordWeakReason != null ){
+                    new HeaderMessage().setError( passwordWeakReason ).apply( response().getHeaders() );
+                    return internalServerError(  );
         }
 
         user.encryptAndSetPassword( newPassword );

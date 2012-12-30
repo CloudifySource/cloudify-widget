@@ -1,11 +1,12 @@
 @import tags._
 
 
-@field( id:String, title:String, required:Boolean, inputType:String ="test"  )={
+@field( id:String, title:String, required:Boolean, inputType:String="test", info:String=null  )={
 <div class="control-group">
     <label class="control-label" for="@id">@title @if(required){<abbr class="required_mark">*</abbr>}</label>
     <div class="controls">
         <input type="@inputType" id="@id" name="@id" class="@if(required){required}">
+        @if(info){ <i class='info-icon' data-html="true" title="@info"></i> }
     </div>
 </div>
 }
@@ -17,9 +18,9 @@
     <h2> Change Password </h2>
 
     <form id="change_password" class="form-horizontal">
-        @field( "oldPassword", "Old Password", required = true, "password" )
-        @field( "newPassword", "New Password", required = true, "password" )
-        @field( "confirmPassword", "Confirm Password", required = true, "password" )
+        @field( "oldPassword", "Old Password", required = true, inputType="password")
+        @field( "newPassword", "New Password", required = true, inputType="password", info="8 characters. <br/> At least 1 upper-case, <br/> 1 lower-case <br/> and 1 digit."  )
+        @field( "confirmPassword", "Confirm Password", required = true, inputType="password" )
         <button class="btn btn-primary">Submit</button>
     </form>
 

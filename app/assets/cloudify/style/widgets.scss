@@ -1,7 +1,8 @@
 
 #main {
   margin: 20px;
-  &.container{ width: 400px; margin: 15px auto; }
+  &.container{ width: 450px; margin: 15px auto; }
+  .controls { .tooltip { line-height:14px; }}
 }
 
 #new_widget_modal form {
@@ -66,7 +67,7 @@ td.action_col {
 
 .info-icon {
   margin-left: 10px;
-  background-image: url("/public/cloudify/admin/img/icon-help.png");
+  background-image: url("/public/admin/img/icon-help.png");
   display: inline-block;
   width: 20px;
   height: 20px;
@@ -74,7 +75,7 @@ td.action_col {
   *margin-right:.3em;
   line-height: 14px;
   vertical-align: text-top;
-  background-image: url("/public/cloudify/admin/img/icon-help.png");
+  background-image: url("/public/admin/img/icon-help.png");
   background-repeat: no-repeat;
   background-position-y: -20px;
 }

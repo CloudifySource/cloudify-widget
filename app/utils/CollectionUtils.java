@@ -25,4 +25,8 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
     public static int size( String[] vals ){
         return vals == null ? 0 : vals.length;
     }
+
+    public static int size( Collection c ){
+        return c == null ? 0 : c.size();
+    }
 }

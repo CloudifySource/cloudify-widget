@@ -162,6 +162,7 @@ $(function () {
       $("#user_name_column").show();
   }
 
+  $(".info-icon" ).tooltip();
   for (var key in field_tips) {
     if (field_tips[key]) {
       $("#" + key).after($("<i class='info-icon' id='" + key +"_info'></i>"));
@@ -315,4 +316,37 @@ $(function () {
       });
     }
   });
+
+    /****
+     *
+     * check password strength
+     *
+     *
+     */
+
+
+    var checkStrengthPointer;
+    function checkStrength(){
+        jsRoutes.controllers.WidgetAdmin.getPasswordMatch( authToken, $("#newPassword" ).val() ).ajax({
+            success:function( data ){
+                    if ( !data || data == "" ){
+
+                    }else{
+                        $(".global-message" ).trigger("showMessage", { class:'error', msg:data});
+                    }
+            }
+        });
+    }
+
+    $( '#newPassword' ).keyup( function ()
+    {
+        if ( checkStrengthPointer ){
+            clearTimeout( checkStrengthPointer );
+        }
+        checkStrengthPointer = setTimeout( checkStrength , 1000 );
+    });
+
+
+
+
 });
