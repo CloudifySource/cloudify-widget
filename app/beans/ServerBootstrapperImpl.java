@@ -110,15 +110,13 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	   deleteServer(serverId);
 	}
 
-	
-	public ServerBootstrapperImpl()
-	{
-		ComputeServiceContext context = ContextBuilder.newBuilder( conf.server.bootstrap.cloudProvider )
-				.credentials( conf.server.bootstrap.username, conf.server.bootstrap.apiKey)
-				.buildView(ComputeServiceContext.class);
-		_compute = context.getComputeService();
-		_nova = context.unwrap();
-	}
+    public void init(){
+        ComputeServiceContext context = ContextBuilder.newBuilder( conf.server.bootstrap.cloudProvider )
+        				.credentials( conf.server.bootstrap.username, conf.server.bootstrap.apiKey)
+        				.buildView(ComputeServiceContext.class);
+        		_compute = context.getComputeService();
+        		_nova = context.unwrap();
+    }
 
 	
 	private ServerNode createServerNode() throws RunNodesException, TimeoutException

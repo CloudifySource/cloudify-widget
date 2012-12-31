@@ -11,7 +11,7 @@
 
 
     <bean id="expiredServerCollector" class="beans.ExpiredServersCollectorImpl"/>
-    <bean id="serverBootstrapper" class="beans.ServerBootstrapperImpl"/>
+    <bean id="serverBootstrapper" class="beans.ServerBootstrapperImpl" init-method="init"/>
 
     <bean id="hmac" class="beans.HmacImpl"/>
 
