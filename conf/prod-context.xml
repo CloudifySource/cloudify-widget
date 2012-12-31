@@ -7,9 +7,7 @@
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
 
-    <bean id="deployManager" class="beans.DeployManagerImpl"
-            p:conf="conf"
-            />
+    <bean id="deployManager" class="beans.DeployManagerImpl"/>
 
 
     <bean id="expiredServerCollector" class="beans.ExpiredServersCollectorImpl"/>
