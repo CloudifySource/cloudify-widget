@@ -215,7 +215,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			logger.info("Starting bootstrapping for server: " +  server.getPublicIP() );
 
 			String script = FileUtils.readFileToString( conf.server.bootstrap.script );
-			ExecResponse response = runScriptOnNode( server.getPublicIP(), script );
+			ExecResponse response = runScriptOnNode( conf, server.getPublicIP(), script );
 			
 			logger.info("Bootstrap for server: " +  server.getPublicIP() +
 					" finished successfully successfully. ExitStatus: " + response.getExitStatus() + 
@@ -226,19 +226,16 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		}
 	}
 	
-	static public ExecResponse runScriptOnNode(String serverIP, String script)
+	static public ExecResponse runScriptOnNode( Conf conf, String serverIP, String script)
 			throws NumberFormatException, IOException
 	{
 		logger.info("Run ssh on server: " + serverIP + " script: " + script);
-        Conf conf = ApplicationContext.get().conf();
         Injector i = Guice.createInjector(new SshjSshClientModule(), new NullLoggingModule());
 		SshClient.Factory factory = i.getInstance(SshClient.Factory.class);
 		SshClient sshConnection = factory.create(HostAndPort.fromParts(serverIP, conf.server.bootstrap.ssh.port ),
 				LoginCredentials.builder().user( conf.server.bootstrap.ssh.user )
 						.privateKey(Strings2.toStringAndClose(new FileInputStream( conf.server.bootstrap.ssh.privateKey ))).build());
-
-		ExecResponse execResponse = null;
-
+        ExecResponse execResponse = null;
 		try
 		{
 			sshConnection.connect();
