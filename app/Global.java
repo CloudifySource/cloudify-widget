@@ -1,16 +1,13 @@
-import beans.config.Conf;
+import java.util.ArrayList;
+
 import models.User;
+
 import org.slf4j.LoggerFactory;
+
 import play.Application;
 import play.GlobalSettings;
-import play.api.mvc.Request;
-import play.api.mvc.RequestHeader;
 import play.api.mvc.Results;
-
 import play.api.mvc.SimpleResult;
-import play.api.mvc.WrappedRequest;
-import play.core.j.JavaHelpers;
-import play.core.j.JavaHelpers$;
 import play.core.j.JavaResults;
 import play.libs.Json;
 import play.mvc.Http;
@@ -21,9 +18,7 @@ import server.ApplicationContext;
 import server.exceptions.ExceptionResponse;
 import server.exceptions.ExceptionResponseDetails;
 import utils.Utils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
+import beans.config.Conf;
 
 /**
  * On system startup trigger event onStart or onStop.

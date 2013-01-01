@@ -1,9 +1,8 @@
 package beans.config;
 
-import play.libs.Time;
-import utils.Utils;
-
 import java.io.File;
+
+import utils.Utils;
 
 /**
  * User: guym
