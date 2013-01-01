@@ -15,12 +15,16 @@
  *******************************************************************************/
 package beans;
 
-import beans.config.Conf;
-import com.google.common.collect.FluentIterable;
-import com.google.common.net.HostAndPort;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeoutException;
+
+import javax.inject.Inject;
+
 import models.ServerNode;
+
 import org.apache.commons.io.FileUtils;
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
@@ -42,18 +46,17 @@ import org.jclouds.sshj.config.SshjSshClientModule;
 import org.jclouds.util.Strings2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import server.ApplicationContext;
+
 import server.DeployManager;
 import server.ServerBootstrapper;
 import server.exceptions.ServerException;
 import utils.Utils;
+import beans.config.Conf;
 
-import javax.inject.Inject;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeoutException;
+import com.google.common.collect.FluentIterable;
+import com.google.common.net.HostAndPort;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 
 
