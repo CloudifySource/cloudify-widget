@@ -76,7 +76,7 @@ public class ServerPoolImpl implements ServerPool
 			if ( server == null || server.isExpired() || conf.server.pool.coldInit )
 			{
 				logger.info( String.format( "ServerId: %s expired or not found in server-pool, address: %s", srv.getId(), srv.getAddresses() ) );
-				ApplicationContext.get().getServerBootstrapper().destroyServer(srv.getId());
+				serverBootstrapper.destroyServer(srv.getId());
 				iter.remove();
 			}
 			else
@@ -159,7 +159,7 @@ public class ServerPoolImpl implements ServerPool
 
 		WidgetInstance.deleteByInstanceId(serverId);
 		ServerNode.deleteServer( serverId );
-		ApplicationContext.get().getServerBootstrapper().destroyServer( serverId );
+        serverBootstrapper.destroyServer( serverId );
 	}
 	
 	void addNewServerToPool()
@@ -176,7 +176,7 @@ public class ServerPoolImpl implements ServerPool
 			{
 				try
 				{
-					List<ServerNode> servers = ApplicationContext.get().getServerBootstrapper().createServers(1);
+					List<ServerNode> servers = serverBootstrapper.createServers(1);
 					
 					for( ServerNode srv :  servers )
 						srv.save();
