@@ -67,7 +67,7 @@ $(function () {
     var $password = $("input[name=password]");
     var $passwordConfirmation=$("input[name=password_confirmation]");
 
-    var formData= fillFormData( ["password", "passwordConfirmation", "username", "firstname", "lastname"] , $(this) );
+    var formData= fillFormData( ["password", "passwordConfirmation", "email", "firstname", "lastname"] , $(this) );
 
     if ( formData.password != formData.passwordConfirmation ) { // TODO : guy - get rid of this here. do it on server side.
       show_message("Passwords do not match", "error");
@@ -84,7 +84,7 @@ $(function () {
 
       } else {
         $.cookie("authToken", data.session["@authToken"], { expires: 1 , path:'/'});
-        $.cookie("username", username, { expires: 1, path:'/' });
+        $.cookie("username", formData.email , { expires: 1, path:'/' });
         window.location.href = "/admin/widgets";
       }
     });

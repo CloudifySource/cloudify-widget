@@ -12,11 +12,11 @@
             <h2>Sign Up</h2>
             <form id="signup_form">
               <fieldset>
-                  @fieldDisplay("Email","username" )
+                  @fieldDisplay("Email","email" )
                   @fieldDisplay("First Name","firstname" )
                   @fieldDisplay("Last Name","lastname" )
-                  @fieldDisplay("Password","password" )
-                  @fieldDisplay("Password Configuration","passwordConfirmation" )
+                  @fieldDisplay("Password","password", fType="password" )
+                  @fieldDisplay("Password Configuration","passwordConfirmation", fType="password" )
                 <button class="btn btn-primary" type="submit">Create Account</button>
                 <a href="@routes.WidgetAdmin.getSigninPage()" class="btn">Cancel</a>
               </fieldset>

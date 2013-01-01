@@ -1,17 +1,17 @@
 # this file contains all messages thrown to user
 
-recipe.not.valid.1=The recipe archive is not valid. Failed to find: %s or %s
-recipe.not.valid.2=The recipe archive is not valid. Found 2 files with %s and %s
+recipe.not.valid.1=The recipe archive is not valid. Failed to find: {0} or {1}
+recipe.not.valid.2=The recipe archive is not valid. Found 2 files with {0} and {1}
 server.was.terminated=The server was terminated.
 no.available.servers=No servers are available to process your request, please retry later.
 widget.disabled.by.administrator=This widget has been disabled and cannot be used to launch recipes.
-please.wait.x.sec=Please wait for %s seconds...
+please.wait.x.sec=Please wait for {0} seconds...
 
 invalid.username.password=Invalid username or password
-auth.token.not.valid=Authentication token is not valid: %s
+auth.token.not.valid=Authentication token is not valid: {0}
 
-user.already.exists=User '%s' already exists
-widget.apikey.not.valid=The widget apiKey is not valid: %s
+user.already.exists=User {0} already exists
+widget.apikey.not.valid=The widget apiKey is not valid: {0}
 session.expired=session-expired
 wait.while.preparing.env=Please wait, preparing environment...
 
