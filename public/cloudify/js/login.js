@@ -98,7 +98,7 @@ $(function () {
           type:'POST',
           url:"/admin/resetPassword?" + toUrlParams( fillFormData(["email","h"], $(this) ) ),
           data: fillFormData( ["h", "email"], $(this)),
-          success:function(){ show_message("Check your inbox.")},
+          success:function(){ window.location.href = "/admin/signin?message=Check your inbox."},
           error:function(result){ console.log(result.responseText);}
       });
       return false;

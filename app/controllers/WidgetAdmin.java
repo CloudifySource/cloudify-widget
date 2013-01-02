@@ -114,6 +114,12 @@ public class WidgetAdmin extends Controller
         if ( !StringUtils.isEmpty( h ) ){
             return badRequest(  ); // this is a bot.. lets block it.
         }
+
+        if ( StringUtils.isEmpty( email ) || !(new Constraints.EmailValidator().isValid( email )) ){
+            new HeaderMessage().setError( "Invalid email" ).apply( response().getHeaders() );
+            return badRequest(  );
+        }
+
         User user = User.find.where(  ).eq( "email",email ).findUnique();
         if ( user == null ){
             return ok(  ); // do not notify if user does not exist. this is a security breach..
