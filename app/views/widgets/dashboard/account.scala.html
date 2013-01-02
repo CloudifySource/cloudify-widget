@@ -6,7 +6,10 @@
     <label class="control-label" for="@id">@title @if(required){<abbr class="required_mark">*</abbr>}</label>
     <div class="controls">
         <input type="@inputType" id="@id" name="@id" class="@if(required){required}">
-        @if(info){ <i class='info-icon' data-html="true" title="@info"></i> }
+        @* Using replace \n to <br/>. This is not the recommend way, but could not implement it any other way :
+            https://groups.google.com/forum/?fromgroups=&nomobile=true#!topic/play-framework/HU2x9ce6mLs
+        *@
+        @if(info){ <i class='info-icon' data-html="true" title="@Html(info.replace("\\n", "<br/>"))"></i> }
     </div>
 </div>
 }
@@ -19,7 +22,7 @@
 
     <form id="change_password" class="form-horizontal">
         @field( "oldPassword", "Old Password", required = true, inputType="password")
-        @field( "newPassword", "New Password", required = true, inputType="password", info="8 characters. <br/> At least 1 upper-case, <br/> 1 lower-case <br/> and 1 digit."  )
+        @field( "newPassword", "New Password", required = true, inputType="password", info=Messages("info.password.policy"))
         @field( "confirmPassword", "Confirm Password", required = true, inputType="password" )
         <button class="btn btn-primary">Submit</button>
     </form>

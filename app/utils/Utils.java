@@ -233,6 +233,10 @@ public class Utils
 		  return newList;
 	  }
 
+    public static File getFileByRelativePath( String relativePath ){
+        return Play.application().getFile( relativePath );
+    }
+
     public static long parseTimeToMillis( String timeExpression ){
         return Time.parseDuration( timeExpression ) * 1000 ;
     }

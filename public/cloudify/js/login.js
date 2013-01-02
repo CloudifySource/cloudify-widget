@@ -105,4 +105,26 @@ $(function () {
   });
 
   $("input[name=username]").focus();
+
+
+
+    // check signup password field value strength.
+
+    var checkStrengthPointer;
+        function checkStrength(){
+            var $signup_form = $("#signup_form");
+            var formData = fillFormData(["password","email"], $signup_form );
+            jsRoutes.controllers.WidgetAdmin.checkPasswordStrength ( formData.password, formData.email ).ajax({});
+        }
+
+        $( '#signup_form').find('[name=password]' ).keyup( function ()
+        {
+            if ( checkStrengthPointer ){
+                clearTimeout( checkStrengthPointer );
+            }
+            checkStrengthPointer = setTimeout( checkStrength , 1000 );
+        });
+
+
+
 });

@@ -7,6 +7,8 @@ no.available.servers=No servers are available to process your request, please re
 widget.disabled.by.administrator=This widget has been disabled and cannot be used to launch recipes.
 please.wait.x.sec=Please wait for {0} seconds...
 
+info.password.policy=Minimum of 8 characters. \n At least 1 upper-case, \n 1 lower-case \n and 1 digit.
+
 invalid.username.password=Invalid username or password
 auth.token.not.valid=Authentication token is not valid: {0}
 

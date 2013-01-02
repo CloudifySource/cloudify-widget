@@ -33,7 +33,6 @@ html, body {
 }
 
 .login-form {
-
 }
 
 legend {
@@ -74,7 +73,11 @@ h2 {
 }
 
 #signin_form {
-  margin: 0 0 17px;  
+  margin: 0 0 17px;
+}
+
+#signup_form{
+  width: 265px;
 }
 
 input.error {

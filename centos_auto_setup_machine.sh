@@ -23,6 +23,7 @@ cp ~/sysconfig_play /etc/sysconfig/play
 
 # assuming there is a prod.conf copied to here
 mv ~/prod.conf cloudify-widget/conf
+mv ~/hpcloud.pem cloudify-widget/bin
 chmod 755 cloudify-widget/*.sh
 chmod 755 cloudify-widget/bin/*.sh
 
