@@ -286,19 +286,20 @@ public class User
             }
         }
 
-        if ( userId == null ){
-            Http.Context.current().response().setHeader( "session-expired", "session-expired" );
-            throw new ServerException( Messages.get("session.expired" ) ).getResponseDetails().setHeaderKey( "session-expired" ).setError( "Session Expired" ).done();
+        User user = null;
+        if ( userId == null ) {
+            if ( !silent ) {
+                Http.Context.current().response().setHeader( "session-expired", "session-expired" );
+                throw new ServerException( Messages.get( "session.expired" ) ).getResponseDetails().setHeaderKey( "session-expired" ).setError( "Session Expired" ).done();
+            }
+        } else {
+            user = User.find.byId( userId );
+            if ( user == null && !silent ) {
+                throw new ServerException( Messages.get( "auth.token.not.valid", authToken ) );
+            }
+            Http.Context.current().session().put( "authToken", authToken );
+            prolongSession( authToken, user.id );
         }
-
-
-        User user = User.find.byId( userId );
-        if ( user == null && !silent ) {
-            throw new ServerException( Messages.get( "auth.token.not.valid", authToken ) );
-        }
-
-        Http.Context.current().session().put("authToken", authToken );
-        prolongSession( authToken, user.id );
 
         return user;
     }
