@@ -1,6 +1,5 @@
 package beans.config;
 
-import play.libs.Time;
 import utils.Utils;
 
 import java.io.File;
@@ -51,7 +50,7 @@ public class ServerConfig {
         public String user="root";
         @Config( ignoreNullValues = true )
         public int port=22;
-        public String privateKey="/bin/hpcloud.pem";
+        public File privateKey= Utils.getFileByRelativePath( "/bin/hpcloud.pem" );
     }
 
     public static class DefaultAdmin{
