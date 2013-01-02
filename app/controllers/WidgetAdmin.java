@@ -27,6 +27,7 @@ import models.User;
 import models.Widget;
 import models.WidgetInstance;
 import org.apache.commons.lang3.StringUtils;
+import play.data.validation.Constraints;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -53,6 +54,11 @@ public class WidgetAdmin extends Controller
 	public static Result signUp( String email, String passwordConfirmation, String password, String firstname, String lastname )
 	{
         try {
+            Constraints.EmailValidator ev =  new Constraints.EmailValidator();
+            if ( StringUtils.isEmpty( email ) || !ev.isValid( email ) ){
+                new HeaderMessage().setError( "Email is incorrect" ).apply( response().getHeaders() );
+                return internalServerError(  );
+            }
             if ( !validatePassword( password, passwordConfirmation, email ) ) {
                 return internalServerError();
             }
@@ -139,10 +145,13 @@ public class WidgetAdmin extends Controller
 
 
     public static Result checkPasswordStrength( String password, String email ){
-        String result = isPasswordStrongEnough( password, email );
-        if ( result != null ){
-            new HeaderMessage().setError( result ).apply( response().getHeaders() );
-            return internalServerError(  );
+        if ( !StringUtils.isEmpty( email  ) && new Constraints.EmailValidator().isValid( email )){
+            String result = isPasswordStrongEnough( password, email );
+            if ( result != null ){
+                new HeaderMessage().setError( result ).apply( response().getHeaders() );
+                return internalServerError(  );
+            }
+            return ok(  );
         }
         return ok(  );
     }
@@ -166,7 +175,7 @@ public class WidgetAdmin extends Controller
             return "Too many repeating letters";
         }
 
-        if ( StringUtils.getLevenshteinDistance( password, email.replaceAll( "@","" ).replaceAll( "\\.","" ) ) > 5 ){
+        if ( StringUtils.getLevenshteinDistance( password, email.split( "@" )[0] ) < 5 || StringUtils.getLevenshteinDistance( password, email.split( "@" )[1] ) < 5 ){
             return "Password similar to email";
         }
 
