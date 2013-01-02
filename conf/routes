@@ -32,6 +32,7 @@ GET      /user/list	   					controllers.WidgetAdmin.getAllUsers( authToken: Stri
 POST     /widget/new              	    controllers.WidgetAdmin.createNewWidget(authToken: String, productName: String, productVersion: String, title: String, youtubeVideoUrl: String, providerURL: String, recipeURL: String, consolename: String, consoleurl: String, rootpath:String )
 GET      /widget/list 					controllers.WidgetAdmin.getAllWidgets( authToken: String )
 POST    /widget/delete                  controllers.WidgetAdmin.deleteWidget( authToken:String, apiKey:String )
+GET     /widget/previewWidget           controllers.WidgetAdmin.previewWidget( apiKey:String )
 GET      /widget/summary 				controllers.WidgetAdmin.summary( authToken: String )
 GET      /server/list 					controllers.WidgetAdmin.getAllServers
 GET      /server/headers            	controllers.WidgetAdmin.headers

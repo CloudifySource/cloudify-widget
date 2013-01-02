@@ -25,6 +25,7 @@ $(function () {
     });
   }
 
+
   function render_widget(widget) {
     var widget_tr = $("#widget_record").tmpl({
       admin: admin,

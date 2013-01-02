@@ -16,3 +16,4 @@ dist
 conf/dev
 logFile.log
 .sass-cache/
+/.idea_modules

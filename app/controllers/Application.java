@@ -104,7 +104,6 @@ public class Application extends Controller
                         routes.javascript.WidgetAdmin.getPasswordMatch(),
                         routes.javascript.WidgetAdmin.deleteWidget()
 
-
                 )
         );
 

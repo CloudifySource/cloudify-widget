@@ -27,6 +27,8 @@ import models.User;
 import models.Widget;
 import models.WidgetInstance;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -329,6 +331,12 @@ public class WidgetAdmin extends Controller
         Widget widget = getWidgetSafely( authToken, apiKey );
         widget.delete(  );
         return ok( );
+    }
+
+    public static Result previewWidget( String apiKey ){
+        String authToken = request().cookies().get("authToken").value();
+        Widget widget = getWidgetSafely( authToken, apiKey );
+        return ok(views.html.widgets.dashboard.previewWidget.render(widget, request().host()));
     }
 	
 	public static Result regenerateWidgetApiKey( String authToken, String apiKey )
