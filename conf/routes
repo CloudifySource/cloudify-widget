@@ -24,7 +24,7 @@ GET      /admin/signin                  controllers.WidgetAdmin.getSigninPage( m
 GET      /admin/widgets                 controllers.WidgetAdmin.getWidgetsPage
 GET      /admin/logout                  controllers.WidgetAdmin.logout
 POST     /signin	     		     	controllers.WidgetAdmin.signIn( email: String, password: String )
-POST     /signup      		     		controllers.WidgetAdmin.signUp( email: String, passwordConfirm: String, password: String, firstname: String, lastname: String  )
+POST     /signup      		     		controllers.WidgetAdmin.signUp( email: String, passwordConfirmation: String, password: String, firstname: String, lastname: String  )
 POST     /widget/regenerate	   			controllers.WidgetAdmin.regenerateWidgetApiKey( authToken: String, apiKey: String )
 POST     /widget/:instanceId/shutdown	controllers.WidgetAdmin.shutdownInstance( authToken: String, instanceId: String )
 POST     /widget/disable				controllers.WidgetAdmin.disableWidget( authToken: String, apiKey: String )
