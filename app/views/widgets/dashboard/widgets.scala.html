@@ -131,7 +131,8 @@
                      <h3 id="widget_${id}_get_embed_label">Embed Code</h3>
                    </div>
                    <div class="modal-body">
-                     <textarea autofocus readonly class="code">&lt;script type=&quot;text/javascript&quot; id=&quot;cloudify-widget&quot; data-api-key=&quot;${api_key}&quot; data-title=&quot;${title}&quot; data-video_url=&quot;${video_url}&quot; src=&quot;http://${domain}/js/get_widget.js&quot;&gt;&lt;/script&gt;</textarea>
+                    @* todo: change this to be protocol insensitive once we support HTTPS *@
+                     <textarea autofocus readonly class="code">&lt;script type=&quot;text/javascript&quot; id=&quot;cloudify-widget&quot; data-api-key=&quot;${api_key}&quot; data-title=&quot;${title}&quot; data-host=&quot;${host}&quot; data-video_url=&quot;${video_url}&quot; src=&quot;http://${host}/js/get_widget.js&quot;&gt;&lt;/script&gt;</textarea>
                    </div>
                  </div>
                </td>

@@ -41,7 +41,7 @@ $(function () {
       root_path: widget["@recipeRootPath"],
       launches: widget["@launches"],
       enabled: widget["@enabled"],
-      domain: document.domain,
+      host: window.location.host,
       instance_count: (widget.instances ? widget.instances.length : 0)
     });
 
