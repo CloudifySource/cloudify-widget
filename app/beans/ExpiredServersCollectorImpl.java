@@ -41,7 +41,7 @@ public class ExpiredServersCollectorImpl extends Timer implements ExpiredServers
 	{
 		server.setExpirationTime( System.currentTimeMillis() + conf.server.pool.expirationTimeMillis );
 		
-		logger.info( String.format( "This server {} was scheduled for destroy after: {} ms", server.getPublicIP(), server.getElapsedTime() ) );
+		logger.info( "This server {} was scheduled for destroy after: {} ms", server.getPublicIP(), server.getElapsedTime() );
 
 		schedule(new TimerTask()
 		{

@@ -121,7 +121,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	
 	private ServerNode createServerNode() throws RunNodesException, TimeoutException
 	{
-		logger.info(String.format("Starting to create new Server [imageId={}, flavorId={}]", conf.server.bootstrap.imageId, conf.server.bootstrap.flavorId ));
+		logger.info( "Starting to create new Server [imageId={}, flavorId={}]", conf.server.bootstrap.imageId, conf.server.bootstrap.flavorId );
 
 		ServerApi serverApi = _nova.getApi().getServerApiForZone(conf.server.bootstrap.zoneName);
 		
