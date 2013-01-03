@@ -152,7 +152,7 @@ public class DeployManagerImpl implements DeployManager
 		} );
 		   
 		if ( files == null || files.length == 0 )
-			throw new ServerException( Messages.get( "recipe.not.value.1",
+			throw new ServerException( Messages.get( "recipe.not.valid.1",
                     RecipeType.APPLICATION.getFileIdentifier(), RecipeType.SERVICE.getFileIdentifier() ));
 		
 		if ( files.length > 1)

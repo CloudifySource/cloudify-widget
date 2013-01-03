@@ -14,14 +14,11 @@ function cloudifyWidgetInitialization(){
         element.parentNode.insertBefore(iframe, element.nextSibling);
 
         // todo : make protocol insensitive once we support HTTPS.
-        iframe.setAttribute("src", "http://" + domain + "/widget.html?" + params.join("&"));
+        iframe.setAttribute("src", "http://" + host + "/widget.html?" + params.join("&"));
         iframe.setAttribute("width", "600px");
         iframe.setAttribute("height", "463px");
         iframe.setAttribute("frameborder", "no");
     }
-    body.addEventListener("load", init(), false);
+    window.addEventListener("load", cloudifyWidgetOnLoadHandler, false);
 }
 cloudifyWidgetInitialization();
-
-
-
