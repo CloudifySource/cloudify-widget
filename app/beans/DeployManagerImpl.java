@@ -28,7 +28,8 @@ import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 
-import play.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.i18n.Messages;
 import server.DeployManager;
 import server.ProcExecutor;
@@ -46,6 +47,8 @@ public class DeployManagerImpl implements DeployManager
 {
 	// keep all widget instances key=instanceId, value=Executor
 	private Hashtable<String, ProcExecutor> _intancesTable = new Hashtable<String, ProcExecutor>();
+
+    private static Logger logger = LoggerFactory.getLogger( DeployManagerImpl.class );
 
     @Inject
     private Conf conf;
@@ -100,7 +103,7 @@ public class DeployManagerImpl implements DeployManager
 	public ProcExecutor fork(ServerNode server, File recipe)
 	{
 		RecipeType recipeType = getRecipeType( recipe );
-		Logger.info( String.format("Deploying: [ServerIP=%s] [recipe=%s] [type=%s]", server.getPublicIP(), recipe, recipeType.name()));
+		logger.info( "Deploying: [ServerIP={}] [recipe={}] [type={}]", new Object[]{server.getPublicIP(), recipe, recipeType.name()} );
 
 		CommandLine cmdLine = new CommandLine( conf.cloudify.deployScript );
 		cmdLine.addArgument(server.getPublicIP());
@@ -119,7 +122,7 @@ public class DeployManagerImpl implements DeployManager
 		{
 			executor.execute(cmdLine, resultHandler);
 
-			Logger.info("The process instanceId: " + executor.getId());
+			logger.info("The process instanceId: {}", executor.getId());
 
 			// keep the processID to pump an output stream
 			_intancesTable.put(executor.getId(), executor);
@@ -127,12 +130,12 @@ public class DeployManagerImpl implements DeployManager
 			return executor;
 		} catch (ExecuteException e)
 		{
-			Logger.error("Failed to execute process. Exit value: " + e.getExitValue(), e);
+			logger.error("Failed to execute process. Exit value: " + e.getExitValue(), e);
 
 			throw new ServerException("Failed to execute process. Exit value: " + e.getExitValue(), e);
 		} catch (IOException e)
 		{
-			Logger.error("Failed to execute process", e);
+			logger.error("Failed to execute process", e);
 
 			throw new ServerException("Failed to execute process.", e);
 		}

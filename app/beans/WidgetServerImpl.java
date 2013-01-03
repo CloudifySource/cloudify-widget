@@ -25,6 +25,8 @@ import beans.config.Conf;
 import controllers.WidgetAdmin;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.cache.Cache;
 import play.i18n.Messages;
 import play.mvc.Controller;
@@ -50,6 +52,7 @@ import javax.inject.Inject;
  */
 public class WidgetServerImpl implements WidgetServer
 {
+    private static Logger logger = LoggerFactory.getLogger( WidgetServerImpl.class );
     @Inject
     private ServerPool serverPool;
 
@@ -93,10 +96,12 @@ public class WidgetServerImpl implements WidgetServer
         if ( widget.getRecipeRootPath() != null  ){
             recipeDir = new File( unzippedDir, widget.getRecipeRootPath() );
         }
+        logger.info("Deploying an instance for recipe at : [{}] ", recipeDir );
 
 		ServerNode server = serverPool.get();
-		if ( server == null )
+		if ( server == null ){
 			throw new ServerException(Messages.get("no.available.servers"));
+        }
 		
 		widget.countLaunch();
 		
