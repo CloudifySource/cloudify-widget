@@ -25,6 +25,12 @@ public class ServerPoolMock implements ServerPool
 {
     private static Logger logger = LoggerFactory.getLogger( ServerPoolMock.class );
 
+    @Override
+    public void init()
+    {
+
+    }
+
     public ServerNode get()
     {
         logger.info( "getting server node" );
