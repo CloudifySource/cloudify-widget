@@ -59,12 +59,15 @@ public class ExpiredServersCollectorImpl extends Timer implements ExpiredServers
         super.cancel();
     }
 
-    public void setServerPool(ServerPoolImpl serverPool) {
-        this.serverPool = serverPool;
-    }
-
     public void setConf( Conf conf )
     {
         this.conf = conf;
+    }
+
+
+
+    public void setServerPool( ServerPool serverPool )
+    {
+        this.serverPool = serverPool;
     }
 }

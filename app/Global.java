@@ -34,6 +34,11 @@ public class Global extends GlobalSettings
 
         logger.info( Json.stringify( Json.toJson( conf ) ) );
 
+        // initialize the server pool.
+        // letting the bean do it is incorrect..
+        // TODO : this should open another thread.
+        ApplicationContext.get().getServerPool().init();
+
         // create Admin user if not exists
 		if ( User.find.where().eq("admin", Boolean.TRUE ).findRowCount() <= 0 )
 		{

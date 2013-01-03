@@ -28,4 +28,6 @@ public interface ServerPool
     public ServerNode get();
 
     public void destroy( String serverId );
+
+    void init();
 }

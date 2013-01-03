@@ -53,7 +53,8 @@ public class ServerPoolImpl implements ServerPool
     private Conf conf;
 
 
-	private void init()
+	@Override
+    public void init()
 	{
 		logger.info( "Started to initialize ServerPool, cold-init={}", conf.server.pool.coldInit );
 		
@@ -76,7 +77,7 @@ public class ServerPoolImpl implements ServerPool
 			if ( server == null || server.isExpired() || conf.server.pool.coldInit )
 			{
 				logger.info( "ServerId: {} expired or not found in server-pool, address: {}", srv.getId(), srv.getAddresses()  );
-				serverBootstrapper.destroyServer(srv.getId());
+				serverBootstrapper.destroyServer( srv.getId() );
 				iter.remove();
 			}
 			else
@@ -86,8 +87,9 @@ public class ServerPoolImpl implements ServerPool
 				   logger.info( "Found a busy server, leave it: {}", srv );
 				   iter.remove();
 				      
-				   if ( server.isTimeLimited() )
+				   if ( server.isTimeLimited() )  {
 				     expiredServerCollector.scheduleToDestroy(server);
+                   }
 				}
 				else
 				   logger.info( "Found a free bootstrapped server, add to a server pool: {}", srv );
@@ -176,7 +178,7 @@ public class ServerPoolImpl implements ServerPool
 			{
 				try
 				{
-					List<ServerNode> servers = serverBootstrapper.createServers(1);
+					List<ServerNode> servers = serverBootstrapper.createServers( 1 );
 					
 					for( ServerNode srv :  servers )
 						srv.save();
