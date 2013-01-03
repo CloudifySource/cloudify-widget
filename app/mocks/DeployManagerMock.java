@@ -40,7 +40,7 @@ public class DeployManagerMock implements DeployManager
     }
 
     public void destroyExecutor(String id) {
-        logger.info("destroying executor : ", id);
+        logger.info("destroying executor : {}", id);
     }
 
 }

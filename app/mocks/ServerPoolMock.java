@@ -33,6 +33,6 @@ public class ServerPoolMock implements ServerPool
 
     public void destroy( String serverId )
     {
-        logger.info( "destroying : %s " , serverId );
+        logger.info( "destroying : {} " , serverId );
     }
 }

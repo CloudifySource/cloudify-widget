@@ -122,7 +122,7 @@ public class ConfigBean {
         {
             File file = Play.application().getFile( conf.getString( key ) );
             if ( !file.exists() ) {
-                logger.warn( "file %s does not exists but required by the configuration", file.getAbsolutePath() );
+                logger.warn( "file {} does not exists but required by the configuration", file.getAbsolutePath() );
             }
             return file;
         }

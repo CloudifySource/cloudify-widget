@@ -25,16 +25,16 @@ import server.WidgetServer;
 public class WidgetServerMock implements WidgetServer {
     private static Logger logger = LoggerFactory.getLogger(WidgetServerMock.class);
     public WidgetInstance deploy(String apiKey) {
-        logger.info("deploying : " + apiKey);
+        logger.info("deploying : {}", apiKey);
         return null;
     }
 
     public void undeploy(String instanceId) {
-        logger.info("undeploying : " + instanceId);
+        logger.info("undeploying : {}", instanceId);
     }
 
     public Widget.Status getWidgetStatus(String instanceId) {
-        logger.info("getting widget status : " + instanceId);
+        logger.info("getting widget status : {}",  instanceId);
         return null;
     }
 }

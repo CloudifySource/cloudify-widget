@@ -27,6 +27,8 @@ import models.User;
 import models.Widget;
 import models.WidgetInstance;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.data.validation.Constraints;
 import play.mvc.Controller;
 import play.mvc.Http;
@@ -48,6 +50,8 @@ import static utils.RestUtils.*;
  */
 public class WidgetAdmin extends Controller
 {
+
+    private static Logger logger = LoggerFactory.getLogger( WidgetAdmin.class );
 	/*
 	 * Creates new account.
 	 */
@@ -111,6 +115,7 @@ public class WidgetAdmin extends Controller
     }
 
     public static Result postResetPassword( String email, String h ){
+        logger.info( "user {} requested password reset", email );
         if ( !StringUtils.isEmpty( h ) ){
             return badRequest(  ); // this is a bot.. lets block it.
         }

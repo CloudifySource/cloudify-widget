@@ -34,12 +34,12 @@ public class ServerBootstrapperMock implements ServerBootstrapper
     }
 
     public void destroyServer(String serverId) {
-        logger.info("destroying server",serverId);
+        logger.info("destroying server {}",serverId);
 
     }
 
     public List<ServerNode> createServers(int numOfServers) {
-        logger.info("creating servers", numOfServers);
+        logger.info("creating servers {}", numOfServers);
         return null;
     }
 
