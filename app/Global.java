@@ -1,6 +1,9 @@
-import beans.config.Conf;
+import java.util.ArrayList;
+
 import models.User;
+
 import org.slf4j.LoggerFactory;
+
 import play.Application;
 import play.GlobalSettings;
 import play.api.mvc.Results;
@@ -15,8 +18,11 @@ import server.ApplicationContext;
 import server.exceptions.ExceptionResponse;
 import server.exceptions.ExceptionResponseDetails;
 import utils.Utils;
+import beans.config.Conf;
+
 
 import java.util.ArrayList;
+
 
 /**
  * On system startup trigger event onStart or onStop.
