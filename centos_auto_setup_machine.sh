@@ -45,10 +45,10 @@ bin/migrate_db.sh create
 #find which is the latest version of DB
 # ll all the files, remove "create" script, remove extension, sort in descending order and output first line.
 db_version=`ls conf/evolutions/default -1 | grep -v create |  sed -e 's/\.[a-zA-Z]*$//' | sort -r | head -1`
-bin/migrate_db.sh $db_version
+playbin/migrate_db.sh $db_version
 
 echo "127.0.0.1 `hostname`" >> /etc/hosts
-ln -s ~/play-2.0.4/play /user/bin/play
+ln -s ~/play-2.0.4/play /usr/bin/play
 
 
 

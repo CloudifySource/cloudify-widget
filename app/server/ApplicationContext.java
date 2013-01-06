@@ -15,14 +15,13 @@
  *******************************************************************************/
 package server;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
+import play.modules.spring.Spring;
 import beans.GsMailer;
 import beans.HmacImpl;
 import beans.config.Conf;
-import beans.config.ConfigBean;
-import play.modules.spring.Spring;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 
 /**
  * A static class that helps to get an instance of different modules and keeps loose decoupling.
