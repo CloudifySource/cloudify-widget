@@ -370,6 +370,12 @@ public class WidgetAdmin extends Controller
         widget.delete(  );
         return ok( );
     }
+
+    public static Result previewWidget( String apiKey ){
+        String authToken = request().cookies().get("authToken").value();
+        Widget widget = getWidgetSafely( authToken, apiKey );
+        return ok(views.html.widgets.dashboard.previewWidget.render(widget, request().host()));
+    }
 	
 	public static Result regenerateWidgetApiKey( String authToken, String apiKey )
 	{

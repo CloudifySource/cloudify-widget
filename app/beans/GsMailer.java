@@ -8,8 +8,9 @@
 
 package beans;
 
-import beans.config.Conf;
-import beans.config.SmtpConf;
+import java.util.Collection;
+import java.util.LinkedList;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
@@ -18,13 +19,12 @@ import org.apache.commons.mail.MultiPartEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
+
 import play.Application;
 import play.api.Plugin;
 import play.libs.F;
 import server.ApplicationContext;
-
-import java.util.Collection;
-import java.util.LinkedList;
+import beans.config.SmtpConf;
 
 /**
  * This is a GigaSpaces mailer plugin implementation for play 2.0.

@@ -8,11 +8,11 @@
 
 package server;
 
-import org.codehaus.jackson.annotate.JacksonAnnotation;
-import org.codehaus.jackson.annotate.JsonProperty;
-import play.libs.Json;
-
 import java.util.Map;
+
+import org.codehaus.jackson.annotate.JsonProperty;
+
+import play.libs.Json;
 
 /**
  * User: guym
