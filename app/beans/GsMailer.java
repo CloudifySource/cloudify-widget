@@ -55,7 +55,7 @@ public class GsMailer implements Plugin {
 
             logger.info( "starting... " );
             mockMailer = new GsMockMailer();
-            logger.info( "enabled " + enabled() );
+            logger.info( "enabled {}", enabled() );
         } catch ( RuntimeException e ) {
             System.out.println( "e = " + e );
         }
@@ -295,7 +295,7 @@ public class GsMailer implements Plugin {
                     break;
             }
             }catch(Exception e){
-                logger.error( String.format( "unable to apply action on mailer %s", mailer ),e );
+                logger.error( String.format( "unable to apply action on mailer {}", mailer ),e );
             }
             return null;
         }
@@ -384,7 +384,7 @@ public class GsMailer implements Plugin {
         @Override
         public void send( GsMailConfiguration mailDetails )
         {
-            logger.info( "sending email : " + mailDetails.toString() );
+            logger.info( "sending email : {}" , mailDetails.toString() );
         }
     }
 

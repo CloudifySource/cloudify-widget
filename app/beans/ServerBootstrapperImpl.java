@@ -124,7 +124,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	
 	private ServerNode createServerNode() throws RunNodesException, TimeoutException
 	{
-		logger.info(String.format("Starting to create new Server [imageId=%s, flavorId=%s]", conf.server.bootstrap.imageId, conf.server.bootstrap.flavorId ));
+		logger.info( "Starting to create new Server [imageId={}, flavorId={}]", conf.server.bootstrap.imageId, conf.server.bootstrap.flavorId );
 
 		ServerApi serverApi = _nova.getApi().getServerApiForZone(conf.server.bootstrap.zoneName);
 		
@@ -138,13 +138,13 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
 		ServerNode serverNode = new ServerNode( server );
 		
-		logger.info("Server created, wait 10 seconds before starting to bootstrap machine: " +  serverNode.getPublicIP() );
+		logger.info("Server created, wait 10 seconds before starting to bootstrap machine: {}" ,  serverNode.getPublicIP() );
 		Utils.threadSleep(10000); // need for a network interfaces initialization
 		
 		// bootstrap machine: firewall, jvm, start cloudify
 		bootstrapMachine( serverNode );
 		
-		logger.info("Server created. " +  server.getAddresses() );
+		logger.info("Server created.{} " , server.getAddresses() );
 		
 		return serverNode;
 	}
@@ -170,7 +170,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		ServerApi serverApi = _nova.getApi().getServerApiForZone( conf.server.bootstrap.zoneName );
 		serverApi.delete(serverId);
 
-		logger.info("Server id: " + serverId + " was deleted.");
+		logger.info("Server id: {} was deleted.", serverId);
 	}
 	
 	
@@ -193,7 +193,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
 		while (totalSeconds < timeoutSeconds)
 		{
-			logger.info("Waiting for a server activation... Left timeout: " + (timeoutSeconds - totalSeconds) + " sec");
+			logger.info("Waiting for a server activation... Left timeout: {} sec", timeoutSeconds - totalSeconds);
 
 			Server server = serverApi.get(serverId);
 
@@ -215,14 +215,15 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	{
 		try
 		{
-			logger.info("Starting bootstrapping for server: " +  server.getPublicIP() );
+			logger.info("Starting bootstrapping for server:{} " , server.getPublicIP() );
 
 			String script = FileUtils.readFileToString( conf.server.bootstrap.script );
 			ExecResponse response = runScriptOnNode( conf, server.getPublicIP(), script );
 			
-			logger.info("Bootstrap for server: " +  server.getPublicIP() +
-					" finished successfully successfully. ExitStatus: " + response.getExitStatus() + 
-					"\nOutput: " + response.getOutput() );
+			logger.info("Bootstrap for server: {} finished successfully successfully. " +
+                    "ExitStatus: {} \nOutput:  {}", new Object[]{server.getPublicIP(),
+                    response.getExitStatus(),
+                    response.getOutput()} );
 		}catch(Exception ex)
 		{
 			throw new ServerException("Failed to bootstrap cloudify machine: " + server.getPublicIP(), ex);
@@ -232,7 +233,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	static public ExecResponse runScriptOnNode( Conf conf, String serverIP, String script)
 			throws NumberFormatException, IOException
 	{
-		logger.info("Run ssh on server: " + serverIP + " script: " + script);
+		logger.info("Run ssh on server: {} script: {}" , serverIP, script );
         Injector i = Guice.createInjector(new SshjSshClientModule(), new NullLoggingModule());
 		SshClient.Factory factory = i.getInstance(SshClient.Factory.class);
 		SshClient sshConnection = factory.create(HostAndPort.fromParts(serverIP, conf.server.bootstrap.ssh.port ),

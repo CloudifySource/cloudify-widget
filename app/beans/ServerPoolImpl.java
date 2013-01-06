@@ -53,9 +53,10 @@ public class ServerPoolImpl implements ServerPool
     private Conf conf;
 
 
-	private void init()
+	@Override
+    public void init()
 	{
-		logger.info( String.format( "Started to initialize ServerPool, cold-init=%s", conf.server.pool.coldInit ) );
+		logger.info( "Started to initialize ServerPool, cold-init={}", conf.server.pool.coldInit );
 		
 		// get all available running servers
 		List<Server> serverList = serverBootstrapper.getServerList();
@@ -75,22 +76,23 @@ public class ServerPoolImpl implements ServerPool
 			// if null this server wasn't found in our DB or server expired - we terminate it
 			if ( server == null || server.isExpired() || conf.server.pool.coldInit )
 			{
-				logger.info( String.format( "ServerId: %s expired or not found in server-pool, address: %s", srv.getId(), srv.getAddresses() ) );
-				serverBootstrapper.destroyServer(srv.getId());
+				logger.info( "ServerId: {} expired or not found in server-pool, address: {}", srv.getId(), srv.getAddresses()  );
+				serverBootstrapper.destroyServer( srv.getId() );
 				iter.remove();
 			}
 			else
 			{
 				if ( server.isBusy() )
 				{
-				   logger.info( String.format( "Found a busy server, leave it: %s", srv ) );
+				   logger.info( "Found a busy server, leave it: {}", srv );
 				   iter.remove();
 				      
-				   if ( server.isTimeLimited() )
+				   if ( server.isTimeLimited() )  {
 				     expiredServerCollector.scheduleToDestroy(server);
+                   }
 				}
 				else
-				   logger.info( String.format( "Found a free bootstrapped server, add to a server pool: %s", srv ) );
+				   logger.info( "Found a free bootstrapped server, add to a server pool: {}", srv );
 			}
 		}// for
 
@@ -113,7 +115,7 @@ public class ServerPoolImpl implements ServerPool
 			
 			if ( !isFound )
 			{
-				logger.info("Delete orphans server from a server pool " + node);
+				logger.info("Delete orphans server from a server pool {}" , node);
 				node.delete();
 			}
 		}
@@ -123,7 +125,7 @@ public class ServerPoolImpl implements ServerPool
 		{
 			int serversToInit = conf.server.pool.minNode - serverList.size();
 			
-			logger.info( "ServerPool starting to initialize " + serversToInit + " servers..." );
+			logger.info( "ServerPool starting to initialize {} servers...", serversToInit );
 			
 			List<ServerNode> servers = serverBootstrapper.createServers(serversToInit);
 
@@ -166,7 +168,7 @@ public class ServerPoolImpl implements ServerPool
 	{
 		if ( ServerNode.count() >= conf.server.pool.maxNodes )
 		{
-			logger.info("Server-pool has reached maximum capacity: " + conf.server.pool.maxNodes);
+			logger.info("Server-pool has reached maximum capacity: {}" , conf.server.pool.maxNodes);
 			return;
 		}
 
@@ -176,7 +178,7 @@ public class ServerPoolImpl implements ServerPool
 			{
 				try
 				{
-					List<ServerNode> servers = serverBootstrapper.createServers(1);
+					List<ServerNode> servers = serverBootstrapper.createServers( 1 );
 					
 					for( ServerNode srv :  servers )
 						srv.save();

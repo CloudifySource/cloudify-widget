@@ -26,6 +26,6 @@ public class ExpireServersCollectorMock implements ExpiredServersCollector
     private static Logger logger = LoggerFactory.getLogger(ExpireServersCollectorMock.class);
 
     public void scheduleToDestroy(ServerNode server) {
-        logger.info("schedule destroy for : " + server.toDebugString() );
+        logger.info("schedule destroy for : {}", server.toDebugString() );
     }
 }

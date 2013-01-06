@@ -42,7 +42,7 @@ $(function () {
       root_path: widget["@recipeRootPath"],
       launches: widget["@launches"],
       enabled: widget["@enabled"],
-      domain: document.domain,
+      host: window.location.host,
       instance_count: (widget.instances ? widget.instances.length : 0)
     });
 
@@ -164,7 +164,6 @@ $(function () {
       $("#user_name_column").show();
   }
 
-  $(".info-icon" ).tooltip();
   for (var key in field_tips) {
     if (field_tips[key]) {
       $("#" + key).after($("<i class='info-icon' id='" + key +"_info'></i>"));

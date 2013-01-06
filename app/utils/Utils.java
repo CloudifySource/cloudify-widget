@@ -82,7 +82,7 @@ public class Utils
             b.append( ']' );
             return b.toString();
         } catch ( Exception e ) {
-            logger.warn( "unable to print object : " + obj.toString() );
+            logger.warn( "unable to print object : {}" , obj.toString() );
         }
         return "N/A";
     }
@@ -108,11 +108,11 @@ public class Utils
 				URL recipeURL = new URL(recUrl);
 				File recipeLocalURL = new File(recDir, new File(recipeURL.getFile()).getName());
 				
-				logger.info("Downloading recipe: " + recUrl + " to "  + recipeLocalURL);
+				logger.info("Downloading recipe: {} tp {}",  recUrl, recipeLocalURL);
 				
 				FileUtils.copyURLToFile(recipeURL, recipeLocalURL );
 
-				logger.info("Starting to extract recipe to: " + recipeLocalURL);
+				logger.info("Starting to extract recipe to: {}" , recipeLocalURL);
 
 				ZipUtils.unzipArchive( recipeLocalURL, recDir );
 				
@@ -232,6 +232,10 @@ public class Utils
 		  
 		  return newList;
 	  }
+
+    public static File getFileByRelativePath( String relativePath ){
+        return Play.application().getFile( relativePath );
+    }
 
     public static long parseTimeToMillis( String timeExpression ){
         return Time.parseDuration( timeExpression ) * 1000 ;

@@ -33,7 +33,7 @@ public class MailSenderImpl implements MailSender {
     @Override
     public void resetPasswordMail( User user ){
 
-        logger.info( "user %s requested password reset", user.toDebugString() );
+        logger.info( "user {} requested password reset", user.toDebugString() );
 //        String link = routes.WidgetAdmin.getAllServers();
 
 

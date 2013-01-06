@@ -17,7 +17,7 @@
 
     <bean id="mailSender" class="beans.MailSenderImpl"/>
 
-    <bean id="serverPool" class="beans.ServerPoolImpl" init-method="init"/>
+    <bean id="serverPool" class="beans.ServerPoolImpl"/>
     <bean id="widgetServer" class="beans.WidgetServerImpl"/>
 
     <bean id="confBean" class="beans.config.ConfigBean"/>

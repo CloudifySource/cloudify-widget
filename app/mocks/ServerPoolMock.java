@@ -25,6 +25,12 @@ public class ServerPoolMock implements ServerPool
 {
     private static Logger logger = LoggerFactory.getLogger( ServerPoolMock.class );
 
+    @Override
+    public void init()
+    {
+
+    }
+
     public ServerNode get()
     {
         logger.info( "getting server node" );
@@ -33,6 +39,6 @@ public class ServerPoolMock implements ServerPool
 
     public void destroy( String serverId )
     {
-        logger.info( "destroying : %s " , serverId );
+        logger.info( "destroying : {} " , serverId );
     }
 }

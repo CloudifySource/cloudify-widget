@@ -1,8 +1,6 @@
-
 #main {
   margin: 20px;
   &.container{ width: 450px; margin: 15px auto; }
-  .controls { .tooltip { line-height:14px; }}
 }
 
 #new_widget_modal form {
@@ -64,25 +62,6 @@ td.action_col {
 .summary li:last-child {border:none;}
 .summary a {display:block; font-size:1.2em; line-height:1.4em; text-transform:uppercase; color:#000;}
 .summary .count {display:block; font-size:1.75em; font-weight:bold;}
-
-.info-icon {
-  margin-left: 10px;
-  background-image: url("/public/admin/img/icon-help.png");
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  margin-top: 1px;
-  *margin-right:.3em;
-  line-height: 14px;
-  vertical-align: text-top;
-  background-image: url("/public/admin/img/icon-help.png");
-  background-repeat: no-repeat;
-  background-position-y: -20px;
-}
-
-.info-icon:hover {
-  background-position-y: 0px;
-}
 
 .required_mark {
   color: red;

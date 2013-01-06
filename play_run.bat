@@ -6,4 +6,4 @@ rem such as DB details and what not.
 rem the "dev" folder is ignored by GIT, so fear not to commit it by mistake.
 rem if you want to debug, simply run "play_run.bat debug".
 
-play %* -Dconfig.file=conf/dev/me.conf run
+play %* -Dconfig.file=conf/dev/me.conf -Dlogger.file=conf/logger.xml run

@@ -29,6 +29,7 @@ import models.WidgetInstance;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.data.validation.Constraints;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -49,24 +50,29 @@ import static utils.RestUtils.*;
  */
 public class WidgetAdmin extends Controller
 {
-	/**
+
+    private static Logger logger = LoggerFactory.getLogger( WidgetAdmin.class );
+	/*
 	 * Creates new account.
-	 * 
-	 * @param email
-	 * @param password
-	 * @return
 	 */
-	public static Result signUp( String email, String password, String firstname, String lastname )
+	public static Result signUp( String email, String passwordConfirmation, String password, String firstname, String lastname )
 	{
-		try
-		{
-			User.Session session = User.newUser( firstname, lastname, email, password).getSession();
-			return RestUtils.resultAsJson( session );
-		}catch( ServerException ex )
-		{
-			return resultErrorAsJson(ex.getMessage());
-		}
-	}
+        try {
+            Constraints.EmailValidator ev =  new Constraints.EmailValidator();
+            if ( StringUtils.isEmpty( email ) || !ev.isValid( email ) ){
+                new HeaderMessage().setError( "Email is incorrect" ).apply( response().getHeaders() );
+                return internalServerError(  );
+            }
+            if ( !validatePassword( password, passwordConfirmation, email ) ) {
+                return internalServerError();
+            }
+
+            User.Session session = User.newUser( firstname, lastname, email, password ).getSession();
+            return RestUtils.resultAsJson( session );
+        } catch ( ServerException ex ) {
+            return resultErrorAsJson( ex.getMessage() );
+        }
+    }
 
     public static Result logout(){
         response().discardCookies( "authToken" );
@@ -109,9 +115,16 @@ public class WidgetAdmin extends Controller
     }
 
     public static Result postResetPassword( String email, String h ){
+        logger.info( "user {} requested password reset", email );
         if ( !StringUtils.isEmpty( h ) ){
             return badRequest(  ); // this is a bot.. lets block it.
         }
+
+        if ( StringUtils.isEmpty( email ) || !(new Constraints.EmailValidator().isValid( email )) ){
+            new HeaderMessage().setError( "Invalid email" ).apply( response().getHeaders() );
+            return badRequest(  );
+        }
+
         User user = User.find.where(  ).eq( "email",email ).findUnique();
         if ( user == null ){
             return ok(  ); // do not notify if user does not exist. this is a security breach..
@@ -142,6 +155,17 @@ public class WidgetAdmin extends Controller
     }
 
 
+    public static Result checkPasswordStrength( String password, String email ){
+        if ( !StringUtils.isEmpty( email  ) && new Constraints.EmailValidator().isValid( email )){
+            String result = isPasswordStrongEnough( password, email );
+            if ( result != null ){
+                new HeaderMessage().setError( result ).apply( response().getHeaders() );
+                return internalServerError(  );
+            }
+            return ok(  );
+        }
+        return ok(  );
+    }
 
     private static String isPasswordStrongEnough( String password, String email ){
         if ( StringUtils.length( password ) < 8 ){
@@ -162,7 +186,7 @@ public class WidgetAdmin extends Controller
             return "Too many repeating letters";
         }
 
-        if ( StringUtils.getLevenshteinDistance( password, email.replaceAll( "@","" ).replaceAll( "\\.","" ) ) > 5 ){
+        if ( StringUtils.getLevenshteinDistance( password, email.split( "@" )[0] ) < 5 || StringUtils.getLevenshteinDistance( password, email.split( "@" )[1] ) < 5 ){
             return "Password similar to email";
         }
 
@@ -178,6 +202,27 @@ public class WidgetAdmin extends Controller
         return ok( passwordWeakReason );
     }
 
+    /**
+     *
+     * @param newPassword - the password user chose
+     * @param confirmPassword - the confirmed password
+     * @param email - user's email. used for checking similarity to password. passwords that are similar to email are considered weak.
+     * @return true iff password is considered strong enough according to our policy.
+     */
+    private static boolean validatePassword( String newPassword, String confirmPassword, String email )
+    {
+        if ( !StringUtils.equals( newPassword, confirmPassword ) ) {
+            new HeaderMessage().setError( "Passwords do not match" ).apply( response().getHeaders() );
+            return false;
+        }
+
+        String passwordWeakReason = isPasswordStrongEnough( newPassword, email );
+        if ( passwordWeakReason != null ) {
+            new HeaderMessage().setError( passwordWeakReason ).apply( response().getHeaders() );
+            return false;
+        }
+        return true;
+    }
     public static Result postChangePassword( String authToken, String oldPassword, String newPassword, String confirmPassword ){
         User user = User.validateAuthToken( authToken );
         if ( !user.comparePassword( oldPassword )){
@@ -185,17 +230,10 @@ public class WidgetAdmin extends Controller
             return internalServerError();
         }
 
-        if ( !StringUtils.equals( newPassword, confirmPassword )){
-            new HeaderMessage().setError( "Passwords do not match" ).apply( response().getHeaders() );
-            response().getHeaders().put("message", "Passwords do not match");
+        if ( !validatePassword( newPassword, confirmPassword, user.getEmail() ) ){
             return internalServerError(  );
         }
 
-        String passwordWeakReason = isPasswordStrongEnough( newPassword, user.getEmail() );
-        if ( passwordWeakReason != null ){
-                    new HeaderMessage().setError( passwordWeakReason ).apply( response().getHeaders() );
-                    return internalServerError(  );
-        }
 
         user.encryptAndSetPassword( newPassword );
         user.save();

@@ -63,7 +63,7 @@ $(function () {
 
         if (data.instance["@instanceId"]) {
           $.cookie("instanceId" + origin_page_url, data.instance["@instanceId"]);
-          $.cookie("publicIP" + origin_page_url, data.instance["@publicIP"])
+          $.cookie("publicIP" + origin_page_url, data.instance["@publicIP"]);
           $("#time_left").show();
           set_status_update_timer();
 
@@ -76,8 +76,9 @@ $(function () {
   }
 
   function stop_instance_btn_handler() {
-    if (!confirm("Are you sure you want to stop the instance?"))
-      return
+    if (!confirm("Are you sure you want to stop the instance?")) {
+      return;
+    }
     $("#start_btn,#stop_btn").toggle();
     if (instanceId()) {
       $.post("/widget/"+ instanceId() + "/stop?apiKey=" + params["apiKey"], {}, function (data) {
