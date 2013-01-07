@@ -1,0 +1,8 @@
+@(widget:Widget, host : String)
+@import tags._
+
+@context.set("body"){
+@embedCode.render( widget.getApiKey(), widget.getTitle(), widget.getYoutubeVideoUrl(), host)
+}
+
+@dashboardTemplate()

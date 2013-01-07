@@ -1,16 +1,6 @@
-import models.User;
+import static org.fest.assertions.Assertions.assertThat;
+
 import org.junit.Test;
-
-
-import org.junit.*;
-
-import play.Play;
-import play.mvc.*;
-import play.test.*;
-import play.libs.F.*;
-
-import static play.test.Helpers.*;
-import static org.fest.assertions.Assertions.*;
 
 /**
  * User: guym

@@ -18,3 +18,4 @@ logFile.log
 /recipes
 /gigaspaces-cloudify-2.2.0-ga
 /.sass-cache
+/.idea_modules
