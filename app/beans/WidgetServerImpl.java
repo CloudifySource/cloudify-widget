@@ -77,13 +77,13 @@ public class WidgetServerImpl implements WidgetServer
 	public WidgetInstance deploy( String apiKey )
 	{
 		// don't allow for 30 seconds to start the widget again
-		Long timeLeft = (Long)Cache.get(Controller.request().remoteAddress());
+		Long timeLeft = (Long)Cache.get(Controller.request().remoteAddress()); // todo : move this block of code to controller. too play oriented.
 		if ( timeLeft != null )
         {
 			throw new ServerException( Messages.get( "please.wait.x.sec", (timeLeft - System.currentTimeMillis()) / 1000) );
         }
 
-		Widget widget = Widget.getWidget( apiKey );
+		Widget widget = Widget.getWidget( apiKey ); // todo : get user to here somehow and use that signature.
 		if ( !widget.isEnabled() )
         {
 			throw new ServerException( Messages.get( "widget.disabled.by.administrator" ) );

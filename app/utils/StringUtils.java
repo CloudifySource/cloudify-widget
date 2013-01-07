@@ -18,4 +18,9 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     public static boolean isEmptyOrSpaces( String str ){
         return str == null || str.trim().isEmpty();
     }
+
+    public static String dos2Unix( String str ){
+        return replace( str, "\r\n", "\n");
+    }
+
 }

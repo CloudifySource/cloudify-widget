@@ -145,7 +145,7 @@ public class ServerPoolImpl implements ServerPool
 			
 			// schedule to destroy after time expiration 
 			// TODO when unlimited server will support uncomment this line if ( freeServer.isTimeLimited() )
-			ApplicationContext.get().getExpiredServersCollector().scheduleToDestroy(freeServer);
+			expiredServerCollector.scheduleToDestroy(freeServer);
 		}
 
 		addNewServerToPool();
