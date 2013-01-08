@@ -43,7 +43,15 @@ public class Global extends GlobalSettings
         // initialize the server pool.
         // letting the bean do it is incorrect..
         // TODO : this should open another thread.
-        ApplicationContext.get().getServerPool().init();
+        new Thread( new Runnable() { // guy - lets use this for now to fix #33
+            @Override
+            public void run()
+            {
+                ApplicationContext.get().getServerPool().init();
+            }
+        }).start();
+
+
 
         // create Admin user if not exists
 		if ( User.find.where().eq("admin", Boolean.TRUE ).findRowCount() <= 0 )

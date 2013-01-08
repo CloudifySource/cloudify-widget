@@ -48,7 +48,7 @@ public class Conf {
 
         public long deployWatchDogProcessTimeoutMillis = Utils.parseTimeToMillis( "2mn" );
 
-        public File deployScript;
+        public File deployScript=Utils.getFileByRelativePath( "/bin/deployer.sh" );
 
         public String removeOutputLines = "";
 

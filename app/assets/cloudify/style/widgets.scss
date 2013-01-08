@@ -72,6 +72,24 @@ td.action_col {
   max-height: 450px;
 }
 
+@media all and (min-height: 699px) {
+  .modal-body {
+    max-height: 500px;
+  }
+}
+
+@media all and (max-height: 699px) and ( min-height:675px) {
+  .modal-body {
+    max-height: 500px;
+  }
+
+  .modal.fade.in {
+    top: 40%;
+  }
+}
+
+
 .code {
   cursor: text !important;
 }
+

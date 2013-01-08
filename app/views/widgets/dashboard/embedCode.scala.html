@@ -1,3 +1,3 @@
-@(apiKey:String, title:String, videoUrl:String, domain:String)
+@(apiKey:String, title:String, videoUrl:String, host:String)
 
-<script type="text/javascript" id="cloudify-widget" data-api-key="@apiKey" data-title="@title" data-video_url="@videoUrl" src="http://@{domain}/js/get_widget.js"></script>
+<script type="text/javascript" id="cloudify-widget" data-api-key="@apiKey" data-title="@title" data-host="@host" data-video_url="@videoUrl" src="http://@{host}/js/get_widget.js"></script>

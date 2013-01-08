@@ -61,6 +61,17 @@ public class ServerNode
 	
 	@XStreamAsAttribute
 	private Boolean busy;
+
+    // todo : ServerNode is not bound to our configuration. It can be anywhere in the cloud.
+    // RemoteNodeDetails remoteNodeDetails;
+
+//    private String user="ENTER_USER_HERE"
+//    private String tenant="ENTER_TENANT_NAME_HERE"
+//    private String apiKey="ENTER_API_KEY_HERE"
+//    private String keyFile="ENTER_KEY_FILE_HERE"
+//    private String keyPair="ENTER_KEY_PAIR_HERE"
+//    private String securityGroup="ENTER_SECURITY_GROUP_HERE"
+
 	
 	public static Finder<Long,ServerNode> find = new Finder<Long,ServerNode>(Long.class, ServerNode.class); 
 

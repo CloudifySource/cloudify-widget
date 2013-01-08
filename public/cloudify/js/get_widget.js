@@ -4,7 +4,7 @@ function cloudifyWidgetInitialization(){
     function cloudifyWidgetOnLoadHandler(){
         var element = document.getElementById("cloudify-widget");
         var api_key = element.dataset["apiKey"];
-        var host = element.dataset["host"];
+        var host = element.dataset["host"] || "launch.cloudifysource.org";  // backward compatibility
         var title = element.dataset["title"];
         var video_url = element.dataset["video_url"];
 
