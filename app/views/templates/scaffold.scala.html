@@ -1,5 +1,5 @@
 @import tags._
- <!DOCTYPE html itemscope itemtype="http://schema.org/Product">
+ <!DOCTYPE html>
 <!--
   ~ Copyright (c) 2012 GigaSpaces Technologies Ltd. All rights reserved
   ~ <p/>
@@ -14,7 +14,7 @@
    all templates should inherit this one unless some other
 *@
 @args() =@{play.mvc.Http.Context.current().args}
-<html>
+<html itemscope itemtype="http://schema.org/Product">
 <head>
     <title>@context.get("title")</title>
 
