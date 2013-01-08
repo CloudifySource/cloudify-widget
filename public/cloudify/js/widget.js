@@ -11,6 +11,9 @@ $(function () {
     return params;
   }
 
+  var params = get_params();
+  var origin_page_url = params["origin_page_url"];
+
   function instanceId() {
     return $.cookie("instanceId" + origin_page_url);
   }
@@ -102,7 +105,6 @@ $(function () {
     clearInterval(window.status_update_timer);
   }
 
-    var origin_page_url = params["origin_page_url"];
 
   function set_cloudify_dashboard_link(custom_link) {
     $("#links").show();
@@ -114,7 +116,7 @@ $(function () {
       $("#links").append($(custom_link));
   }
 
-  var params = get_params();
+
   var apiKey = params["apiKey"];
   var shareUrl= encodeURI("http://launch.cloudifysource.org/admin/signin");
 
