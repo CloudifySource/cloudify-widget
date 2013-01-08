@@ -1,5 +1,7 @@
 #!/bin/sh
 # install maven
+id=$1
+
 cd /root
 wget http://apache.spd.co.il/maven/maven-3/3.0.4/binaries/apache-maven-3.0.4-bin.tar.gz
 tar xvf apache-maven-3.0.4-bin.tar.gz 
@@ -33,4 +35,4 @@ mvn test -U -X
 
 
 #rebuild the server
-hpcloud servers:rebuild 460711
+hpcloud servers:rebuild $id
