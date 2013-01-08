@@ -10,7 +10,7 @@ export M2=$M2_HOME/bin
 export PATH=$M2:$PATH
 
 # install firefox
-yum intall -y firefox
+yum install -y firefox
 
 #install X server
 yum install -y xorg-x11-server-Xvfb
@@ -24,15 +24,5 @@ gem install hpcloud-1.4.0.gem
 
 #start the widget site
 cd /root/play-2.0.4/cloudify-widget
-./play_run.sh &
-
-url=http://localhost:9000
-while ! wget --spider $url 2>&1 | grep --quiet "200 OK"; do sleep 1; echo waiting for site...; done;
-	
-#start the tests
-cd /root/play-2.0.4/cloudify-widget/test
-mvn test -U -X
-
-
-#rebuild the server
-hpcloud servers:rebuild $id
+sed -i "s/466999/$id/g" conf/cloudify.conf
+play $* -Dconfig.file=conf/prod.conf run &
