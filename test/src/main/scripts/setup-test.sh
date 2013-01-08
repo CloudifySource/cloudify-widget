@@ -25,4 +25,3 @@ gem install hpcloud-1.4.0.gem
 #start the widget site
 cd /root/play-2.0.4/cloudify-widget
 sed -i "s/466999/$id/g" conf/cloudify.conf
-play $* -Dconfig.file=conf/prod.conf run &
