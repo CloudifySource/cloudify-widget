@@ -52,12 +52,15 @@ public class ApplicationContext
     private static ApplicationContext instance;
 
     public static ApplicationContext get(){
+        if ( instance == null ){ // guy - in case of null, we want to show Spring Exception.. so lets try to reinitialize.
+            instance=(ApplicationContext) Spring.getBean("applicationContext");
+        }
         return instance;
     }
 
     @PostConstruct
     public void init(){
-        instance = (ApplicationContext) Spring.getBean( "applicationContext" );
+        instance = (ApplicationContext) Spring.getBean("applicationContext");
     }
 
 
