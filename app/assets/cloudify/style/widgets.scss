@@ -1,6 +1,39 @@
 #main {
   margin: 20px;
-  &.container{ width: 450px; margin: 15px auto; }
+  &.container {
+    width: 450px;
+    margin: 15px auto;
+  }
+  &.widgets-dashboard {
+
+    #summary, #user_name_column{ display:none };
+
+    &.admin-view{
+      #summary, #user_name_column{ display:block };
+    }
+    #welcome_window {
+      display: none;
+    }
+
+    &.empty-list {
+      #welcome_window {
+        display: block;
+      }
+      #search_panel, #widgets_panel, #summary {
+        display: none;
+      }
+    }
+
+    .enabled-widget {
+      .enable_widget_btn, .disabled_marker {
+        display: none;
+      }
+    }
+    .disabled-widget {
+      .disable_widget_btn, .instances_btn{display:none;}
+    }
+
+  }
 }
 
 #new_widget_modal form {
@@ -39,10 +72,10 @@ td.action_col {
 }
 
 .summary {
-    display:table;
-    width:100%;
-    padding:0;
-    margin:0 0 20px 0;
+  display: table;
+  width: 100%;
+  padding: 0;
+  margin: 0 0 20px 0;
   ul {
     margin: 0;
     padding: 0;
@@ -54,14 +87,30 @@ td.action_col {
     padding: 19px;
     display: table-cell;
     border-right: 1px solid #eee;
-    &:last-child{ border:none }
+    &:last-child {
+      border: none
+    }
   }
 }
 
 .summary li
-.summary li:last-child {border:none;}
-.summary a {display:block; font-size:1.2em; line-height:1.4em; text-transform:uppercase; color:#000;}
-.summary .count {display:block; font-size:1.75em; font-weight:bold;}
+.summary li:last-child {
+  border: none;
+}
+
+.summary a {
+  display: block;
+  font-size: 1.2em;
+  line-height: 1.4em;
+  text-transform: uppercase;
+  color: #000;
+}
+
+.summary .count {
+  display: block;
+  font-size: 1.75em;
+  font-weight: bold;
+}
 
 .required_mark {
   color: red;
@@ -78,7 +127,7 @@ td.action_col {
   }
 }
 
-@media all and (max-height: 699px) and ( min-height:675px) {
+@media all and (max-height: 699px) and (min-height: 675px) {
   .modal-body {
     max-height: 500px;
   }
@@ -87,7 +136,6 @@ td.action_col {
     top: 40%;
   }
 }
-
 
 .code {
   cursor: text !important;

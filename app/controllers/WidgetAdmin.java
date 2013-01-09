@@ -26,10 +26,12 @@ import models.Summary;
 import models.User;
 import models.Widget;
 import models.WidgetInstance;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.validation.Constraints;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -272,14 +274,36 @@ public class WidgetAdmin extends Controller
 	}
 
 
-	public static Result createNewWidget( String authToken,  String productName, String productVersion,
+	public static Result createNewWidget( String widgetId, String authToken,  String productName, String productVersion,
 										  String title, String youtubeVideoUrl, String providerURL,
 										  String recipeURL, String consolename, String consoleurl, String rootpath )
 	{
-		User user = User.validateAuthToken(authToken);
-		Widget widget = user.createNewWidget( productName, productVersion, title, youtubeVideoUrl, providerURL, recipeURL, consolename, consoleurl, rootpath );
-		
-		return resultAsJson(widget);
+        User user = User.validateAuthToken(authToken);
+        Widget widget = null;
+        if ( !NumberUtils.isNumber( widgetId ) ){
+		    widget = user.createNewWidget( productName, productVersion, title, youtubeVideoUrl, providerURL, recipeURL, consolename, consoleurl, rootpath );
+        }else{
+            Long widgetIdLong = Long.parseLong( widgetId );
+            widget = Widget.findByUserAndId( user, widgetIdLong );
+            if ( widget == null ){
+                new HeaderMessage().setError( "User is not allowed to edit this widget" ).apply( response().getHeaders() );
+                return badRequest(  );
+            }
+            widget.setProductName( productName );
+            widget.setProductVersion( productVersion );
+            widget.setTitle( title );
+            widget.setYoutubeVideoUrl( youtubeVideoUrl );
+            widget.setProviderURL( providerURL );
+            widget.setRecipeURL( recipeURL );
+            widget.setConsoleName( consolename );
+            widget.setConsoleURL( consoleurl );
+            widget.setRecipeRootPath( rootpath );
+            widget.save(  );
+        }
+
+        logger.info( "edited widget : " + widget.toString() );
+        return ok( Json.toJson(widget) );
+//		return resultAsJson(widget);
 	}
 
 	
@@ -289,13 +313,14 @@ public class WidgetAdmin extends Controller
 		List<Widget> list = null;
 
         if ( user.getSession().isAdmin() )   {
-            list = Utils.workaround( Widget.find.all() );
+            list = Widget.find.all(); // Utils.workaround( Widget.find.all() );
+//            list = Utils.workaround( Widget.find.all() );
         }
         else {
-            list = Utils.workaround( user.getWidgets() );
+            list = user.getWidgets(); Utils.workaround( user.getWidgets() );
         }
 
-        return resultAsJson(list);
+        return ok( Json.toJson(list) );
 	}
 	
 	

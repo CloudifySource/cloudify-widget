@@ -27,7 +27,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 
+import com.avaje.ebean.Expr;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.springframework.expression.spel.ExpressionState;
 import play.db.ebean.Model;
 import play.i18n.Messages;
 import server.exceptions.ServerException;
@@ -52,49 +55,21 @@ public class Widget
 	extends Model
 {
 	@Id
-	@XStreamAsAttribute
 	private Long id;
-
-	@XStreamAsAttribute
 	private String productName;
-
-	@XStreamAsAttribute
 	private String providerURL;
-
-	@XStreamAsAttribute
 	private String productVersion;
-	
-	@XStreamAsAttribute
 	private String title;
-	
-	@XStreamAsAttribute
 	private String youtubeVideoUrl;
-
-	@XStreamAsAttribute
 	private String recipeURL;
-	
-	@XStreamAsAttribute
 	private Boolean allowAnonymous;
-
-	@XStreamAsAttribute
 	private String apiKey;
-
-	@XStreamAsAttribute
 	private Integer launches;
-	
-	@XStreamAsAttribute
 	private Boolean enabled;
-	
-	@XStreamAsAttribute
 	private String consoleName;
-	
-	@XStreamAsAttribute
 	private String consoleURL;
-
-    @XStreamAsAttribute
     private String recipeRootPath;
-
-    @XStreamOmitField
+    @JsonIgnore
     @ManyToOne( optional = false )
     private User user;
 
@@ -102,9 +77,12 @@ public class Widget
 	@OneToMany(cascade=CascadeType.ALL) 
 	private List<WidgetInstance> instances;
 
-	public static Finder<Long,Widget> find = new Finder<Long,Widget>(Long.class, Widget.class); 
+	public static Finder<Long,Widget> find = new Finder<Long,Widget>(Long.class, Widget.class);
 
-	/** This class serves as status of the widget instance  */
+
+
+
+    /** This class serves as status of the widget instance  */
 	@XStreamAlias("status")
 	final static public class Status
 	{
@@ -178,6 +156,11 @@ public class Widget
         return widget;
     }
 
+
+    public static Widget findByUserAndId( User user, Long widgetId )
+    {
+        return find.where( ).eq( "user", user ).eq( "id",widgetId ).findUnique();
+    }
     /** @return the widget by apiKey or null  */
     // guy - NOTE : we must always add "user" to the mix.. otherwise we never verify the user really owns the widget.
 	static public Widget getWidgetByApiKey( User user, String apiKey )
@@ -240,7 +223,22 @@ public class Widget
 		return launches;
 	}
 
-	public void setLaunches(int launches)
+    public void setConsoleName( String consoleName )
+    {
+        this.consoleName = consoleName;
+    }
+
+    public void setConsoleURL( String consoleURL )
+    {
+        this.consoleURL = consoleURL;
+    }
+
+    public void setRecipeRootPath( String recipeRootPath )
+    {
+        this.recipeRootPath = recipeRootPath;
+    }
+
+    public void setLaunches(int launches)
 	{
 		this.launches = launches;
 	}
