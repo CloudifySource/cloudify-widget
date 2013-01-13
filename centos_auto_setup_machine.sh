@@ -54,9 +54,13 @@ ln -s ~/play-2.0.4/play /usr/bin/play
 # install nginx
 cp cloudify-widget/conf/nginx/install.conf /etc/yum.repos.d/nginx.repo
 yum -y install nginx
+cp cloudify-widget/conf/nginx/nginx.conf /etc/nginx/
 
 # copy nginx configuration while sed-ing the domain names
-sed 's/__domain_name__/$SITE_DOMAIN/ __staging_name__/$SITE_STAGING_DOMAIN' cloudify-widget/conf/nginx/site.conf > /etc/nginx/sites-availabe/$SITE_DOMAIN
+mkdir -p /etc/nginx/sites-available
+mkdir -p /etc/nginx/sites-enabled
+sed 's/__domain_name__/$SITE_DOMAIN/ __staging_name__/$SITE_STAGING_DOMAIN' cloudify-widget/conf/nginx/site.conf > /etc/nginx/sites-available/$SITE_DOMAIN
+ln -s /etc/nginx/sites-enabled/$SITE_DOMAIN /etc/nginx/sites-available/$SITE_DOMAIN
 
 # create path /var/www/cloudifyWidget/public/error_pages
 mkdir -p /var/www/cloudifyWidget/public/error_pages
