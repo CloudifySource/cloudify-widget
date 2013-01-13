@@ -2,7 +2,6 @@ package org.cloudifysource.widget.test;
 
 
 import com.google.common.base.Predicate;
-import org.cloudify.cloudifysource.widget.test.Utils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.FluentWait;
