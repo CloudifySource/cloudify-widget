@@ -33,6 +33,8 @@ import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipException;
 
 /**
@@ -85,6 +87,10 @@ public class Utils
             logger.warn( "unable to print object : {}" , obj.toString() );
         }
         return "N/A";
+    }
+    
+    public static String getCloudifyPath() {
+    	return null;
     }
 
 
@@ -155,7 +161,7 @@ public class Utils
 		  String[] splitStr = content.split( regex );
 		  return Arrays.asList( splitStr );
 	  }
-
+	  
     public static void addAllTrimmed( Collection<String> result, String[] values ){
         if ( !CollectionUtils.isEmpty( values )){
             for ( String value : values ) {
@@ -320,6 +326,54 @@ public class Utils
         Http.Context.current.set(new Http.Context(request, new HashMap <String, String>(),
         new HashMap<String, String>()));
     }
+    
+	public static String extractIpFromBootstrapOutput(String output) {
+
+		String restUrlRegex= "Rest service is available at: (http[s]*://(.*):8100)";
+		Pattern restPattern = Pattern.compile(restUrlRegex);
+		Matcher restMatcher = restPattern.matcher(output);
+		if (!restMatcher.find()) {
+			return null;
+		}
+		String restUrl = restMatcher.group(1);
+		return restUrl.substring(restUrl.lastIndexOf("//"), restUrl.lastIndexOf(':'));
+	}
+	
+	public static File createCloudFolder() throws IOException {
+		File cloudifyEscFolder = new File("D:/GigaSpaces/gigaspaces-cloudify-2.5.0-m5/tools/cli/plugins/esc/");
+		
+		//copy the content of hp configuration files to a new folder
+		File destFolder = new File(cloudifyEscFolder, "hp" + System.currentTimeMillis());
+		FileUtils.copyDirectory(new File(cloudifyEscFolder, "hp"), destFolder);
+		
+		List<String> cloudProperties = new ArrayList<String>();
+		cloudProperties.add("user=" + '"' + "user" + '"');
+		cloudProperties.add("tenant=" + '"' + "tenant" + '"');
+		cloudProperties.add("apiKey=" + '"' + "apiKey" + '"');
+		cloudProperties.add("keyFile=" + '"' + "KeyFile.pem" + '"');
+		cloudProperties.add("keyPair=" + '"' + "keyPair" + '"');
+		cloudProperties.add("securityGroup=" + '"' + "default" + '"');
+		cloudProperties.add("hardwareId=" + '"' + "" + '"');
+		cloudProperties.add("linuxImageId=" + '"' + "" + '"');
+		
+		//create new props file and init with custom credentials. 
+		File newPropertiesFile = new File(destFolder, "hp-cloud.properties.new");
+		newPropertiesFile.createNewFile();
+		FileUtils.writeLines(newPropertiesFile, cloudProperties);
+		
+		//delete old props file
+		File propertiesFile = new File(destFolder, "hp-cloud.properties");
+		if (propertiesFile.exists()) {
+			propertiesFile.delete();
+		}
+		
+		//rename new props file.
+		if (!newPropertiesFile.renameTo(propertiesFile)){
+			throw new ServerException("Failed creating custom cloud folder.");
+		}
+		
+		return destFolder;
+	}
 
     public static String requestToString( Http.RequestHeader requestHeader )
     {

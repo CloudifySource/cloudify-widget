@@ -75,6 +75,9 @@ public class ServerNode
 	
 	public static Finder<Long,ServerNode> find = new Finder<Long,ServerNode>(Long.class, ServerNode.class); 
 
+	public ServerNode( ) {
+		
+	} 
 	
 	public ServerNode( Server srv )
 	{
@@ -98,6 +101,10 @@ public class ServerNode
 	public String getPublicIP()
 	{
 		return publicIP;
+	}
+	
+	public void setPublicIP(String publicIP) {
+		this.publicIP = publicIP;
 	}
 	
 	/** return <code>true</code> if this server has an expiration time to destroy */
