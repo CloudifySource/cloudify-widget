@@ -1,4 +1,4 @@
-package org.cloudify.cloudifysource.widget.test;
+package org.cloudifysource.widget.test;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -22,7 +22,7 @@ public class Utils {
         Map<String, String> configuration = new HashMap<String, String>();
         File configurationFile = new File(System.getProperty("user.dir") + "/../conf/dev/me.conf");
         if(!configurationFile.exists()){
-            configurationFile = new File(System.getProperty("user.dir") + "/../conf/application.conf");
+            configurationFile = new File(System.getProperty("user.dir") + "/../conf/prod.conf");
         }
         String s;
         try {
