@@ -47,6 +47,8 @@ public class Conf {
     public static class CloudifyConfiguration{
 
         public long deployWatchDogProcessTimeoutMillis = Utils.parseTimeToMillis( "2mn" );
+        
+        public long bootstrapCloudWatchDogProcessTimeoutMillis = Utils.parseTimeToMillis( "2mn" );
 
         public File deployScript;
 

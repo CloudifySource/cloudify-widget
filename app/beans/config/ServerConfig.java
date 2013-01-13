@@ -44,6 +44,7 @@ public class ServerConfig {
         public String username="<tenant>:<user>";
         public String cloudProvider="hpcloud-compute";
         public File script;
+        public File remoteBootstrap = Utils.getFileByRelativePath("/bin/remote_bootstrap.sh");
     }
 
     public static class SshConfiguration{

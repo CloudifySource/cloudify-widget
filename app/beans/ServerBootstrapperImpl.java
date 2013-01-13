@@ -15,6 +15,7 @@
  *******************************************************************************/
 package beans;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,7 +26,14 @@ import javax.inject.Inject;
 
 import models.ServerNode;
 
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecuteResultHandler;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
@@ -85,7 +93,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     public List<ServerNode> createServers( int numOfServers )
 	{
 		List<ServerNode> servers = new ArrayList<ServerNode>();
-
+		
 		for( int i=0; i< numOfServers; i++ )
 		{
 			ServerNode srvNode = null;
@@ -125,9 +133,8 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	private ServerNode createServerNode() throws RunNodesException, TimeoutException
 	{
 		logger.info( "Starting to create new Server [imageId={}, flavorId={}]", conf.server.bootstrap.imageId, conf.server.bootstrap.flavorId );
-
-		ServerApi serverApi = _nova.getApi().getServerApiForZone(conf.server.bootstrap.zoneName);
 		
+		ServerApi serverApi = _nova.getApi().getServerApiForZone(conf.server.bootstrap.zoneName);
 		CreateServerOptions serverOpts = new CreateServerOptions();
 		serverOpts.keyPairName( conf.server.bootstrap.keyPair );
 		serverOpts.securityGroupNames( conf.server.bootstrap.securityGroup );
@@ -149,7 +156,46 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		return serverNode;
 	}
 
-	
+	public ServerNode bootstrapCloud(/*CloudDetails details*/) 
+			throws ExecuteException, IOException, InterruptedException {
+		
+		File cloudFolder = Utils.createCloudFolder();
+		
+		//Command line for bootstrapping remote cloud.
+		CommandLine cmdLine = new CommandLine(conf.server.bootstrap.remoteBootstrap.getAbsoluteFile());
+		cmdLine.addArgument(cloudFolder.getName());
+		
+		logger.info("Executing command line: " + cmdLine);
+		
+		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+		ExecuteWatchdog watchdog = new ExecuteWatchdog(conf.cloudify.bootstrapCloudWatchDogProcessTimeoutMillis);
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+		
+		DefaultExecutor defaultExecutor  = new DefaultExecutor();
+		defaultExecutor.setStreamHandler(streamHandler);
+		defaultExecutor.setExitValue(1);
+		defaultExecutor.setWatchdog(watchdog);
+		defaultExecutor.execute(cmdLine, resultHandler);
+		resultHandler.waitFor();
+		
+		cloudFolder.delete();
+		
+		if (resultHandler.getException() != null) {
+			logger.info("Command execution ended with errors: " + outputStream.toString());
+			throw new ServerException("Failed to bootstrap cloudify machine: " 
+							+ outputStream.toString(), resultHandler.getException());
+		}
+		
+		//TODO[adaml]: add all user credentials to the server node.
+		ServerNode serverNode = new ServerNode();
+		String publicIp = Utils.extractIpFromBootstrapOutput(outputStream.toString());
+		serverNode.setPublicIP(publicIp);
+
+		return serverNode;
+		
+	}
+
 	public List<Server> getServerList()
 	{
 		ServerApi serverApi = _nova.getApi().getServerApiForZone( conf.server.bootstrap.zoneName );
