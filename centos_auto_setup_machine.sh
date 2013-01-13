@@ -51,6 +51,19 @@ echo "127.0.0.1 `hostname`" >> /etc/hosts
 ln -s ~/play-2.0.4/play /usr/bin/play
 
 
+# install nginx
+cp cloudify-widget/conf/nginx/install.conf /etc/yum.repos.d/nginx.repo
+yum -y install nginx
+
+# copy nginx configuration while sed-ing the domain names
+sed 's/__domain_name__/$SITE_DOMAIN/ __staging_name__/$SITE_STAGING_DOMAIN' cloudify-widget/conf/nginx/site.conf > /etc/nginx/sites-availabe/$SITE_DOMAIN
+
+# create path /var/www/cloudifyWidget/public/error_pages
+mkdir -p /var/www/cloudifyWidget/public/error_pages
+
+# copy content from public error_pages to that path
+cp -R cloudify-widget/public/errors_pages /var/www/cloudifyWidget/public/error_pages
+
 
 
 
