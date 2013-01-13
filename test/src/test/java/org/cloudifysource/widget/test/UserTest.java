@@ -20,14 +20,13 @@ import java.util.concurrent.TimeUnit;
 @Test(suiteName = "users")
 public class UserTest extends AbstractCloudifyWidgetTest {
 
-    public static final String HOST = Utils.getHost();
-    public static final String PASSWORD = "testTest1";
-    public static final String EMAIL = "test@test.com";
+
 
     @Override
     @BeforeSuite
     public void before(){
         super.before();
+        Utils.dropWidget("test");
         Utils.dropUser("test");
 
     }
@@ -47,15 +46,11 @@ public class UserTest extends AbstractCloudifyWidgetTest {
     @Test(dependsOnMethods = "logoutTest")
     public void loginTest(){
         webDriver.get(HOST);
-        login(PASSWORD);
+        login(EMAIL, PASSWORD);
         assertUserIsLoggedIn();
     }
 
-    private void login(String password) {
-        webDriver.findElement(By.name("email")).sendKeys(EMAIL);
-        webDriver.findElement(By.name("password")).sendKeys(password);
-        webDriver.findElement(By.className("btn-primary")).click();
-    }
+
 
 
     private void assertUserIsLoggedIn() {
@@ -79,24 +74,9 @@ public class UserTest extends AbstractCloudifyWidgetTest {
         waitForElement(By.className("login-form"));
     }
 
-    private void logout() {
-        webDriver.findElement(By.id("logout")).click();
-    }
 
-    private void waitForElement(final By by) {
-        FluentWait<By> fw = new FluentWait<By>(by);
-        fw.withTimeout(30, TimeUnit.SECONDS);
-        fw.until(new Predicate<By>(){
-            @Override
-            public boolean apply(By input) {
-                try{
-                    return webDriver.findElement(by).isDisplayed();
-                }catch(NoSuchElementException e){
-                    return false;
-                }
-            }
-        });
-    }
+
+
 
     @Test(groups = "endSession", dependsOnMethods = "loginTest")
     public void changePasswordTest(){
@@ -109,7 +89,7 @@ public class UserTest extends AbstractCloudifyWidgetTest {
         webDriver.findElement(By.className("btn-primary")).click();
         waitForElement(By.className("alert-success"));
         logout();
-        login(newPassword);
+        login(EMAIL, newPassword);
         assertUserIsLoggedIn();
     }
 }
