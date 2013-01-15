@@ -15,14 +15,14 @@ public class UserTest extends AbstractCloudifyWidgetTest {
     private static Logger logger = LoggerFactory.getLogger(UserTest.class);
 
 
-    //@Test
+    @Test
     public void subscribeTest(){
         logger.info("starting subscribe test");
         assertUserIsLoggedIn();
     }
 
 
-    //@Test
+    @Test
     public void logoutLoginTest(){
         logger.info("starting logout / login test");
         logout();
@@ -31,7 +31,7 @@ public class UserTest extends AbstractCloudifyWidgetTest {
         assertUserIsLoggedIn();
     }
 
-    //@Test
+    @Test
     public void changePasswordTest(){
         logger.info("starting change password test");
         String newPassword = PASSWORD + 2;

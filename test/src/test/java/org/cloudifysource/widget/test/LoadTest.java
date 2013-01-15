@@ -1,5 +1,6 @@
 package org.cloudifysource.widget.test;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.slf4j.Logger;
@@ -7,11 +8,9 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Created with IntelliJ IDEA.
  * User: sagib
  * Date: 13/01/13
  * Time: 15:41
- * To change this template use File | Settings | File Templates.
  */
 public class LoadTest extends AbstractCloudifyWidgetTest{
     private final int N = 30;
@@ -20,15 +19,21 @@ public class LoadTest extends AbstractCloudifyWidgetTest{
     @Test
     public void loadTest(){
         logger.info("running test on [{}]", context().getTestConf().getHost());
-        String apiKey = createWidget();
-        logger.info("get Api key: " + apiKey);
         for (int i = 0; i < N; i++){
+            login(EMAIL,PASSWORD);
+            assertUserIsLoggedIn();
+            String apiKey = createWidget();
+            logger.info("got Api key: " + apiKey);
+            webDriver.switchTo().frame( webDriver.findElement(By.cssSelector("iframe")));
             webDriver.get(Utils.getHost() + "/widget/previewWidget?apiKey=" + apiKey);
             By startBtn = By.id("start_btn");
-           // waitForElement(startBtn);
-            //webDriver.findElement(startBtn).click();
-            dropSession();
-            //Assert.assertThat("widget deployed");
+            waitForElement(startBtn);
+            webDriver.findElement(startBtn).click();
+            By stopBtn = By.id("stop_btn");
+            waitForElement(startBtn);
+            Assert.assertTrue("stop button is no enabled", webDriver.findElement(stopBtn).isDisplayed());
+            logout();
+            assertLoggedOut();
         }
 
 

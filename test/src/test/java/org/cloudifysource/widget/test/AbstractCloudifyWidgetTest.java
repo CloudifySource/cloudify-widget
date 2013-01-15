@@ -151,10 +151,8 @@ public class AbstractCloudifyWidgetTest {
     protected void assertLoggedOut() {
         webDriver.get(HOST);
         logger.info("driver at " + webDriver.getCurrentUrl() + " asserting logged out");
-        By loginFormBy = By.className("login-form");
-        waitForElement(loginFormBy);
-        WebElement loginForm = webDriver.findElement(loginFormBy);
-        Assert.notNull(loginForm, "didn't get login form after logout");
+        Assert.isNull(webDriver.manage().getCookieNamed("authToken"), "authToken cookie is still defined");
+        Assert.isNull(webDriver.manage().getCookieNamed("PLAY_SESSION"), "PLAY_SESSION cookie is still defined");
     }
 
     protected String changePassword(String password, String newPassword) {
