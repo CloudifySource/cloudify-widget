@@ -77,6 +77,7 @@ public class WidgetAdmin extends Controller
     }
 
     public static Result logout(){
+        session().clear();
         response().discardCookies( "authToken" );
         return redirect( routes.WidgetAdmin.index() );
     }

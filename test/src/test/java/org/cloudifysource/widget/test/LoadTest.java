@@ -1,9 +1,10 @@
 package org.cloudifysource.widget.test;
 
+import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.testng.annotations.BeforeSuite;
-import org.testng.annotations.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,24 +15,19 @@ import org.testng.annotations.Test;
  */
 public class LoadTest extends AbstractCloudifyWidgetTest{
     private final int N = 30;
+    private static Logger logger = LoggerFactory.getLogger(LoadTest.class);
 
-    @Override
-    @BeforeSuite
-    public void before(){
-        super.before();
-        Utils.dropWidget("test");
-    }
-
-    @Test(dependsOnGroups = "subscribe")
+    @Test
     public void loadTest(){
-        login(EMAIL,PASSWORD);
+        logger.info("running test on [{}]", context().getTestConf().getHost());
         String apiKey = createWidget();
+        logger.info("get Api key: " + apiKey);
         for (int i = 0; i < N; i++){
             webDriver.get(Utils.getHost() + "/widget/previewWidget?apiKey=" + apiKey);
             By startBtn = By.id("start_btn");
-            waitForElement(startBtn);
-            webDriver.findElement(startBtn).click();
-            ((JavascriptExecutor)webDriver).executeScript("$.cookie(\"authToken\", null)");
+           // waitForElement(startBtn);
+            //webDriver.findElement(startBtn).click();
+            dropSession();
             //Assert.assertThat("widget deployed");
         }
 
@@ -48,10 +44,10 @@ public class LoadTest extends AbstractCloudifyWidgetTest{
         By rootpath = By.id("rootpath");
         waitForElement(productName);
         waitForElement(rootpath);
-        webDriver.findElement(productName).sendKeys("test");
-        webDriver.findElement(By.id("productVersion")).sendKeys("test");
-        webDriver.findElement(By.id("title")).sendKeys("test");
-        webDriver.findElement(By.id("providerURL")).sendKeys("test.com");
+        webDriver.findElement(productName).sendKeys(NAME);
+        webDriver.findElement(By.id("productVersion")).sendKeys(NAME);
+        webDriver.findElement(By.id("title")).sendKeys(NAME);
+        webDriver.findElement(By.id("providerURL")).sendKeys(NAME + ".com");
         webDriver.findElement(rootpath).sendKeys("tomcat/");
         webDriver.findElement(By.id("recipeURL")).sendKeys("http://dl.dropbox.com/u/8720454/tomcat.zip");
         webDriver.findElement(By.xpath("/html/body/div[@id='new_widget_modal']/form[@id='new_widget_form']/div[@class='modal-footer']/input[@class='btn btn-primary']")).click();
