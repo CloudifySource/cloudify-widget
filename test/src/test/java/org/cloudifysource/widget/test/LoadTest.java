@@ -19,13 +19,15 @@ public class LoadTest extends AbstractCloudifyWidgetTest{
     @Test
     public void loadTest(){
         logger.info("running test on [{}]", context().getTestConf().getHost());
+        String apiKey = createWidget();
+        logger.info("got Api key: " + apiKey);
         for (int i = 0; i < N; i++){
-            login(EMAIL,PASSWORD);
+            if(i != 0) {
+                login(EMAIL,PASSWORD);
+            }
             assertUserIsLoggedIn();
-            String apiKey = createWidget();
-            logger.info("got Api key: " + apiKey);
+            webDriver.get(HOST + "/widget/previewWidget?apiKey=" + apiKey);
             webDriver.switchTo().frame( webDriver.findElement(By.cssSelector("iframe")));
-            webDriver.get(Utils.getHost() + "/widget/previewWidget?apiKey=" + apiKey);
             By startBtn = By.id("start_btn");
             waitForElement(startBtn);
             webDriver.findElement(startBtn).click();
@@ -35,8 +37,6 @@ public class LoadTest extends AbstractCloudifyWidgetTest{
             logout();
             assertLoggedOut();
         }
-
-
     }
 
 
@@ -59,6 +59,5 @@ public class LoadTest extends AbstractCloudifyWidgetTest{
         By widget = By.className("enabled-widget");
         waitForElement(widget);
         return webDriver.findElement(widget).getAttribute("data-api_key");
-
     }
 }
