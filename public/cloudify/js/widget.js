@@ -46,7 +46,7 @@ $(function () {
   }
 
   function stop_instance() {
-    write_log("Test drive successfully completed! <br/><a href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.", "important");
+    write_log("Test drive successfully completed! <br/><a class='download_link' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.", "important");
     $("#time_left").hide();
     $("#links").hide();
     $.removeCookie("instanceId" + origin_page_url);
@@ -145,10 +145,22 @@ $(function () {
     $("#advanced").toggle();
   });
 
+    $(".download_link" ).live("click",function(){
+        mixpanel.track("Download Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url});
+    });
+
+    $(".documentation_link" ).live("click",function(){
+        mixpanel.track("Documentation Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url});
+    });
+
   $(".share_link").click(function (e) {
     e.preventDefault();
     var leftvar = (screen.width-600)/2;
     var topvar = (screen.height-600)/2;
+
+    mixpanel.track("Social Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url, 'button': $(this ).attr("id")});
+
     window.open($(e.target).parents("a").attr("href"), '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600,left='+ leftvar +',top=' + topvar);
+
   });
 });
