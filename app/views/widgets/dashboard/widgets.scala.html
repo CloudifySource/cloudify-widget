@@ -74,8 +74,8 @@
                <td><a href="${url}">${url}</a></td>
                <td>${title}</td>
                <td>
-                 {{if videoUrl}}
-                   <a href="${videoUrl}" target="_blank">View</a>
+                 {{if youtubeVideoUrl}}
+                   <a href="${youtubeVideoUrl}" target="_blank">View</a>
                  {{else}}
                    N/A
                  {{/if}}
@@ -133,7 +133,7 @@
                      <h3 id="widget_${id}_get_embed_label">Embed Code</h3>
                    </div>
                    <div class="modal-body">
-                     <textarea autofocus readonly class="code">@views.html.widgets.dashboard.embedCode( "${apiKey}", "${title}","${videoUrl}","${host}" ).toString()</textarea>
+                     <textarea autofocus readonly class="code">@views.html.widgets.dashboard.embedCode( "${apiKey}", "${title}","${youtubeVideoUrl}","${host}" ).toString()</textarea>
                    </div>
                  </div>
                </td>
