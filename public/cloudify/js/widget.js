@@ -117,15 +117,18 @@ $(function () {
   }
 
 
+    $("#title").text(decodeURIComponent(params["title"]));
+
   var apiKey = params["apiKey"];
   var shareUrl= encodeURI("http://launch.cloudifysource.org/admin/signin");
 
   var msg =  encodeURI("Launch on the cloud in a single click using the Cloudify widget");
+    var twitterMsg = encodeURIComponent( $("#title" ).text() + " on any cloud with a single click with #cloudifysource");
   $("#facebook_share_link").attr("href", "http://www.facebook.com/sharer/sharer.php?u=" + shareUrl);
   $("#google_plus_share_link").attr("href", "https://plus.google.com/share?url=" + shareUrl);
-  $("#twitter_share_link").attr("href", "https://twitter.com/share?url=" + shareUrl + "&text=" + msg);
+  $("#twitter_share_link").attr("href", "https://twitter.com/share?url=" + encodeURIComponent(origin_page_url) + "&text=" + twitterMsg);
 
-  $("#title").text(decodeURIComponent(params["title"]));
+
 
   if (params["video_url"]) {
     $("#video_container").append($("<iframe id='youtube_iframe' width='270' height='160' frameborder='0' allowfullscreen></iframe>"))
