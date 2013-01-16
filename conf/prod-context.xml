@@ -17,6 +17,8 @@
 
     <bean id="mailSender" class="beans.MailSenderImpl"/>
 
+    <bean id="eventMonitor" class="beans.EventMonitorMixpanel" p:apiKey="#{conf.mixpanelApiKey}" init-method="init"/>
+
     <bean id="serverPool" class="beans.ServerPoolImpl"/>
     <bean id="widgetServer" class="beans.WidgetServerImpl"/>
 

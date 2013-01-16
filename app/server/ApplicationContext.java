@@ -47,6 +47,7 @@ public class ApplicationContext
     @Inject private ExpiredServersCollector expiredServersCollector;
     @Inject private MailSender mailSender;
     @Inject private HmacImpl hmac;
+    @Inject private EventMonitor eventMonitor;
     @Inject private Conf conf;
 
     private static ApplicationContext instance;
@@ -149,5 +150,15 @@ public class ApplicationContext
     public void setConf( Conf conf )
     {
         this.conf = conf;
+    }
+
+    public EventMonitor getEventMonitor()
+    {
+        return eventMonitor;
+    }
+
+    public void setEventMonitor( EventMonitor eventMonitor )
+    {
+        this.eventMonitor = eventMonitor;
     }
 }

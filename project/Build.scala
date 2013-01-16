@@ -21,7 +21,8 @@ object ApplicationBuild extends Build {
       "play" % "spring_2.9.1" % "2.0"  ,
       "mysql" % "mysql-connector-java" % "5.1.18"  ,
       "commons-lang" % "commons-lang" % "2.3",
-      "com.typesafe" %% "play-plugins-mailer" % "2.0.4"
+      "com.typesafe" %% "play-plugins-mailer" % "2.0.4",
+      "com.mixpanel" % "mixpanel-java" % "1.0.1"
 
 
     )

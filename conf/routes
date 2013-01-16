@@ -6,8 +6,8 @@ GET     /exportSchema                   controllers.Application.generateDDL
 GET     /javascriptRoutes               controllers.Application.javascriptRoutes
 
 # Widget
-POST     /widget/start		     	    controllers.Application.start( apiKey: String, hpcsKey ?= "", hpcsSecretKey ?= "" ) 
-POST     /widget/:instanceId/stop		controllers.Application.stop( apiKey: String, instanceId: String  ) 
+POST     /widget/start		     	    controllers.Application.start( apiKey: String, hpcsKey:String ?= "", hpcsSecretKey:String ?= "" )
+POST     /widget/:instanceId/stop		controllers.Application.stop( apiKey: String, instanceId: String)
 GET      /widget/:instanceId/status   	controllers.Application.getWidgetStatus( apiKey: String, instanceId: String )
 
 

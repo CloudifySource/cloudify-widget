@@ -15,6 +15,7 @@
  *******************************************************************************/
 package controllers;
 
+import beans.events.Events;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.config.ServerConfig;
@@ -25,9 +26,11 @@ import models.Widget;
 import models.WidgetInstance;
 import play.Play;
 import play.Routes;
+import play.i18n.Messages;
 import play.mvc.Controller;
 import play.mvc.Result;
 import server.ApplicationContext;
+import server.HeaderMessage;
 import server.exceptions.ServerException;
 
 import static utils.RestUtils.*;
@@ -46,6 +49,12 @@ public class Application extends Controller
 	{
 		try
 		{
+            Widget widget = Widget.getWidget( apiKey );
+            if ( widget == null || !widget.isEnabled()){
+                new HeaderMessage().setError( Messages.get("widget.disabled.by.administrator") ).apply( response().getHeaders() );
+                return badRequest(  );
+            }
+            ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ) );
 			WidgetInstance wi = ApplicationContext.get().getWidgetServer().deploy(apiKey);
 			return resultAsJson(wi);
 		}catch(ServerException ex)
@@ -57,7 +66,13 @@ public class Application extends Controller
 	
 	public static Result stop( String apiKey, String instanceId )
 	{
-		ApplicationContext.get().getWidgetServer().undeploy(instanceId);
+        Widget widget = Widget.getWidget( apiKey );
+        if ( widget != null ){
+            ApplicationContext.get().getEventMonitor().eventFired( new Events.StopWidget( request().remoteAddress(), widget ) );
+        }
+        if ( instanceId != null ){
+            ApplicationContext.get().getWidgetServer().undeploy(instanceId);
+        }
 
 		return ok(OK_STATUS).as("application/json");
 	}

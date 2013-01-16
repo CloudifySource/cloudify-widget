@@ -19,7 +19,7 @@ $(function () {
   }
 
   function write_log(message, class_name) {
-    $("#log").append($("<li/>", {text: message}).addClass(class_name));
+    $("#log").append($("<li/>", {html: message}).addClass(class_name));
     $("#log").scrollTop($("#log")[0].scrollHeight);
   }
 
@@ -46,7 +46,7 @@ $(function () {
   }
 
   function stop_instance() {
-    write_log("Server has stopped", "important");
+    write_log("Test drive successfully completed! <br/><a href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.", "important");
     $("#time_left").hide();
     $("#links").hide();
     $.removeCookie("instanceId" + origin_page_url);

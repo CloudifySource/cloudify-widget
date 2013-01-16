@@ -30,6 +30,8 @@ public class Conf {
 
     public CloudifyConfiguration cloudify = new CloudifyConfiguration();
 
+    public String mixpanelApiKey = null;
+
 
     public static class SettingsConfig{
         @Config( ignoreNullValues = true )
