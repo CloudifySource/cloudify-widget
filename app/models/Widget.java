@@ -67,7 +67,9 @@ public class Widget
 	private String apiKey;
 	private Integer launches;
 	private Boolean enabled;
+    @JsonProperty(value="consolename")
 	private String consoleName;
+    @JsonProperty(value="consoleurl")
 	private String consoleURL;
     @JsonProperty( value="rootpath")
     private String recipeRootPath;
