@@ -110,4 +110,15 @@ public class Utils {
     public static String getHost() {
         return "localhost:9000";
     }
+
+    public static boolean dropWidget(String name) {
+        Map<String, String> dbConfiguration = getConfiguration();
+        try{
+            return runSQLExecute("DELETE FROM " + dbConfiguration.get("schema") + "." + "widget_instance", dbConfiguration)
+                    && runSQLExecute("DELETE FROM " + dbConfiguration.get("schema") + "." + "widget WHERE title='" + name + "'", dbConfiguration)
+                    ;
+        }catch(Exception e){
+            throw new RuntimeException(e);
+        }
+    }
 }

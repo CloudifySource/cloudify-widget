@@ -9,7 +9,8 @@
     #summary, #user_name_column{ display:none };
 
     &.admin-view{
-      #summary, #user_name_column{ display:block };
+      #summary { display:table };
+      #user_name_column{ display:block };
     }
     #welcome_window {
       display: none;
