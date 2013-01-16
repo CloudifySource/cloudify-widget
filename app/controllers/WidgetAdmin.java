@@ -360,8 +360,13 @@ public class WidgetAdmin extends Controller
 
     private static Widget getWidgetSafely( String authToken, String apiKey )
     {
+
         User user = User.validateAuthToken(authToken);
-        return Widget.getWidgetByApiKey( user, apiKey );
+        if ( user.isAdmin() ){
+             return Widget.getWidget( apiKey );
+        }else{
+            return Widget.getWidgetByApiKey( user, apiKey );
+        }
     }
 
 

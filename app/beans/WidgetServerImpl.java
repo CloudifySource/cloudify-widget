@@ -57,6 +57,9 @@ public class WidgetServerImpl implements WidgetServer
     private ServerPool serverPool;
 
     @Inject
+    private MailSender mailSender;
+
+    @Inject
     private Conf conf;
 
     @Inject
@@ -100,6 +103,7 @@ public class WidgetServerImpl implements WidgetServer
 
 		ServerNode server = serverPool.get();
 		if ( server == null ){
+            mailSender.sendPoolIsEmptyMail();
 			throw new ServerException(Messages.get("no.available.servers"));
         }
 		
