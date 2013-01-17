@@ -15,27 +15,28 @@
  *******************************************************************************/
 package beans;
 
-import beans.config.Conf;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Hashtable;
 
+import javax.inject.Inject;
+
 import models.ServerNode;
+
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
-
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import play.i18n.Messages;
 import server.DeployManager;
 import server.ProcExecutor;
 import server.exceptions.ServerException;
-
-import javax.inject.Inject;
+import beans.config.Conf;
 
 /**
  * This class deploys a recipe file vi cloudify non-interactive CLI. 
@@ -104,10 +105,11 @@ public class DeployManagerImpl implements DeployManager
 	{
 		RecipeType recipeType = getRecipeType( recipe );
 		logger.info( "Deploying: [ServerIP={}] [recipe={}] [type={}]", new Object[]{server.getPublicIP(), recipe, recipeType.name()} );
-
+		String recipePath = FilenameUtils.separatorsToSystem(recipe.getPath());
+		
 		CommandLine cmdLine = new CommandLine( conf.cloudify.deployScript );
 		cmdLine.addArgument(server.getPublicIP());
-		cmdLine.addArgument(recipe.getPath());
+		cmdLine.addArgument(recipePath);
 		cmdLine.addArgument(recipeType.getCmdParam());
 		
 		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
@@ -140,7 +142,6 @@ public class DeployManagerImpl implements DeployManager
 			throw new ServerException("Failed to execute process.", e);
 		}
 	}
-	
 	
    /** 
 	* @return recipe type Application or Service by recipe directory.

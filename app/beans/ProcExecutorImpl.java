@@ -15,18 +15,19 @@
  *******************************************************************************/
 package beans;
 
-import models.ServerNode;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.PumpStreamHandler;
-
-import server.DeployManager;
-import server.ProcExecutor;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
+
+import models.ServerNode;
+
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.PumpStreamHandler;
+
+import server.DeployManager;
+import server.ProcExecutor;
 
 
 /**
@@ -43,17 +44,23 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
     private String privateIP;  // todo : change case to Ip
     private File recipe;
     private String[] args;
-    private long expirationTime;
+    private Long expirationTime;
     private ProcessStreamHandler procHandler;
 
     final static class ProcessStreamHandler extends PumpStreamHandler
 	 {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
+		
 		@Override
 		protected void createProcessOutputPump(InputStream is, OutputStream os)
 		{
-			super.createProcessOutputPump(is, baos);
+			super.createProcessOutputPump(is, System.out);
+		}
+		
+		@Override
+		protected void createProcessErrorPump(InputStream is, OutputStream os)
+		{
+			super.createProcessErrorPump(is, baos);
 		}
 
 		public String getOutput()

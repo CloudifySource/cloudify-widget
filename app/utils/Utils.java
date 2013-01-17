@@ -15,27 +15,44 @@
  *******************************************************************************/
 package utils;
 
-import models.Widget;
-import models.WidgetInstance;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import play.Play;
-import play.i18n.Lang;
-import play.libs.Time;
-import play.mvc.Http;
-import server.exceptions.ServerException;
-
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipException;
+
+import models.Widget;
+import models.WidgetInstance;
+
+import org.apache.commons.io.FileUtils;
+import org.jclouds.ContextBuilder;
+import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.openstack.nova.v2_0.NovaApi;
+import org.jclouds.openstack.nova.v2_0.NovaAsyncApi;
+import org.jclouds.openstack.nova.v2_0.domain.KeyPair;
+import org.jclouds.openstack.nova.v2_0.extensions.KeyPairApi;
+import org.jclouds.rest.RestContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import play.Play;
+import play.i18n.Lang;
+import play.libs.Time;
+import play.mvc.Http;
+import server.exceptions.ServerException;
+import beans.config.ServerConfig.CloudBootstrapConfiguration;
 
 /**
  * This class provides different static utility methods.
@@ -92,6 +109,117 @@ public class Utils
     public static String getCloudifyPath() {
     	return null;
     }
+    
+    // creates a new pem file for a given hp cloud account.
+	private static File createPemFile(CloudBootstrapConfiguration cloudConf, String userName, String apiKey) {
+		ComputeServiceContext context = null;
+		try {
+			Properties overrides = new Properties();
+			overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
+			context = ContextBuilder.newBuilder( cloudConf.cloudProvider )
+					.credentials( userName, apiKey )
+					.overrides(overrides)
+					.buildView(ComputeServiceContext.class);
+ 
+			// use jClouds to create a new pem file.
+			RestContext<NovaApi, NovaAsyncApi> novaClient = context.unwrap();
+			NovaApi api = novaClient.getApi();
+			KeyPairApi keyPairApi = api.getKeyPairExtensionForZone( cloudConf.zoneName ).get();
+			KeyPair keyPair = keyPairApi.create( cloudConf.keyPairName + getTempSuffix()); 
+
+			File pemFile = new File(System.getProperty("java.io.tmpdir"), keyPair.getName());
+			pemFile.createNewFile();
+			FileUtils.writeStringToFile(pemFile, keyPair.getPrivateKey());
+			return pemFile;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			if (context != null) 
+				context.close();
+		}
+	}
+
+	private static String getTempSuffix() {
+		String currTime = Long.toString(System.currentTimeMillis());
+		return currTime.substring(currTime.length() - 4);
+	}
+	
+	public static String getCloudPrivateKey(File cloudFolder,
+			final CloudBootstrapConfiguration cloudBootstrapConfig) throws IOException {
+		File pemFile = getPemFile(cloudFolder, cloudBootstrapConfig);
+		if (pemFile == null) {
+			return null;
+		}
+		return FileUtils.readFileToString(pemFile);
+	}
+
+	private static File getPemFile(File cloudFolder,
+			final CloudBootstrapConfiguration cloudBootstrapConfig) {
+		File uploadDir = new File(cloudFolder, cloudBootstrapConfig.cloudifyHpUploadDirName);
+		File[] filesList = uploadDir.listFiles(new FilenameFilter() {
+			
+			@Override
+			public boolean accept(File dir, String name) {
+				
+				return name.startsWith(cloudBootstrapConfig.keyPairName)
+						&& name.endsWith( "pem" );
+			}
+		});
+		
+		if ( filesList.length == 0 || filesList.length > 1) {
+			return null;
+		}
+		return filesList[0];
+	}
+	
+	/**
+	 * Creates a cloud folder containing all necessary credentials for bootstrapping to the HP cloud.
+	 * @param cloudConf
+	 * @return
+	 * @throws IOException
+	 */
+	public static File createCloudFolder(CloudBootstrapConfiguration cloudConf, String userName, String apiKey) throws IOException {
+		File cloudifyEscFolder = new File("D:/GigaSpaces/gigaspaces-cloudify-2.3.0-ga/tools/cli/plugins/esc/");
+		
+		//copy the content of hp configuration files to a new folder
+		File destFolder = new File(cloudifyEscFolder, cloudConf.cloudName + getTempSuffix()); 
+		FileUtils.copyDirectory(new File(cloudifyEscFolder, cloudConf.cloudName), destFolder); 
+		
+		// create new pem file using new credentials.
+		File pemFolder = new File(destFolder, cloudConf.cloudifyHpUploadDirName);
+		File newPemFile = createPemFile(cloudConf, userName, apiKey);
+		FileUtils.copyFile(newPemFile, new File(pemFolder, newPemFile.getName() +".pem"), true);//
+		
+		String[] userAndTenant = userName.split(":"); 
+		List<String> cloudProperties = new ArrayList<String>();
+		cloudProperties.add("tenant=" + '"' + userAndTenant[0] + '"');
+		cloudProperties.add("user=" + '"' + userAndTenant[1] + '"');
+		cloudProperties.add("apiKey=" + '"' + apiKey + '"');
+		cloudProperties.add("keyFile=" + '"' + newPemFile.getName() +".pem" + '"');
+		cloudProperties.add("keyPair=" + '"' + newPemFile.getName() + '"');
+		cloudProperties.add("securityGroup=" + '"' + cloudConf.securityGroup + '"');
+		cloudProperties.add("hardwareId=" + '"' + cloudConf.hardwareId + '"');
+		cloudProperties.add("linuxImageId=" + '"' + cloudConf.linuxImageId + '"');
+		
+		//create new props file and init with custom credentials. 
+		File newPropertiesFile = new File(destFolder, cloudConf.cloudPropertiesFileName + ".new" );
+		newPropertiesFile.createNewFile();
+		FileUtils.writeLines(newPropertiesFile, cloudProperties);
+		
+		//delete old props file
+		File propertiesFile = new File(destFolder, cloudConf.cloudPropertiesFileName );
+		if (propertiesFile.exists()) {
+			propertiesFile.delete();
+		}
+		
+		//rename new props file.
+		if (!newPropertiesFile.renameTo(propertiesFile)){
+			throw new ServerException("Failed creating custom cloud folder." +
+					" Failed renaming custom cloud properties file.");
+		}
+		return destFolder;
+	}
 
 
     /**
@@ -336,45 +464,9 @@ public class Utils
 			return null;
 		}
 		String restUrl = restMatcher.group(1);
-		return restUrl.substring(restUrl.lastIndexOf("//"), restUrl.lastIndexOf(':'));
+		return restUrl.substring(restUrl.indexOf("//") + 2, restUrl.lastIndexOf(':'));
 	}
 	
-	public static File createCloudFolder() throws IOException {
-		File cloudifyEscFolder = new File("D:/GigaSpaces/gigaspaces-cloudify-2.5.0-m5/tools/cli/plugins/esc/");
-		
-		//copy the content of hp configuration files to a new folder
-		File destFolder = new File(cloudifyEscFolder, "hp" + System.currentTimeMillis());
-		FileUtils.copyDirectory(new File(cloudifyEscFolder, "hp"), destFolder);
-		
-		List<String> cloudProperties = new ArrayList<String>();
-		cloudProperties.add("user=" + '"' + "user" + '"');
-		cloudProperties.add("tenant=" + '"' + "tenant" + '"');
-		cloudProperties.add("apiKey=" + '"' + "apiKey" + '"');
-		cloudProperties.add("keyFile=" + '"' + "KeyFile.pem" + '"');
-		cloudProperties.add("keyPair=" + '"' + "keyPair" + '"');
-		cloudProperties.add("securityGroup=" + '"' + "default" + '"');
-		cloudProperties.add("hardwareId=" + '"' + "" + '"');
-		cloudProperties.add("linuxImageId=" + '"' + "" + '"');
-		
-		//create new props file and init with custom credentials. 
-		File newPropertiesFile = new File(destFolder, "hp-cloud.properties.new");
-		newPropertiesFile.createNewFile();
-		FileUtils.writeLines(newPropertiesFile, cloudProperties);
-		
-		//delete old props file
-		File propertiesFile = new File(destFolder, "hp-cloud.properties");
-		if (propertiesFile.exists()) {
-			propertiesFile.delete();
-		}
-		
-		//rename new props file.
-		if (!newPropertiesFile.renameTo(propertiesFile)){
-			throw new ServerException("Failed creating custom cloud folder.");
-		}
-		
-		return destFolder;
-	}
-
     public static String requestToString( Http.RequestHeader requestHeader )
     {
 //        StringBuilder sb = new StringBuilder(  );
@@ -390,5 +482,4 @@ public class Utils
         }
         return "N/A";
     }
-
 }

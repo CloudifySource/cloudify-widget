@@ -41,44 +41,42 @@ import utils.Utils;
 @SuppressWarnings("serial")
 @XStreamAlias("server")
 public class ServerNode
-	extends Model
+extends Model
 {
 	@Id
 	@XStreamOmitField
 	private Long id;
-	
+
 	@XStreamAsAttribute
 	private String serverId;
-	
+
 	@XStreamAsAttribute
 	private Long expirationTime;
-	
+
 	@XStreamAsAttribute
 	private String publicIP;  // todo : change case to Ip
-	
+
 	@XStreamAsAttribute
 	private String privateIP;  // todo : change case to Ip
-	
+
 	@XStreamAsAttribute
 	private Boolean busy;
 
-    // todo : ServerNode is not bound to our configuration. It can be anywhere in the cloud.
-    // RemoteNodeDetails remoteNodeDetails;
+	@XStreamAsAttribute
+	private String privateKey;
 
-//    private String user="ENTER_USER_HERE"
-//    private String tenant="ENTER_TENANT_NAME_HERE"
-//    private String apiKey="ENTER_API_KEY_HERE"
-//    private String keyFile="ENTER_KEY_FILE_HERE"
-//    private String keyPair="ENTER_KEY_PAIR_HERE"
-//    private String securityGroup="ENTER_SECURITY_GROUP_HERE"
+	@XStreamAsAttribute
+	private String userName;
 
-	
+	@XStreamAsAttribute
+	private String apiKey;
+
 	public static Finder<Long,ServerNode> find = new Finder<Long,ServerNode>(Long.class, ServerNode.class); 
 
 	public ServerNode( ) {
-		
+
 	} 
-	
+
 	public ServerNode( Server srv )
 	{
 		this.serverId  = srv.getId();
@@ -92,7 +90,7 @@ public class ServerNode
 	{
 		return serverId;
 	}
-	
+
 	public String getPrivateIP()
 	{
 		return privateIP;
@@ -102,34 +100,34 @@ public class ServerNode
 	{
 		return publicIP;
 	}
-	
+
 	public void setPublicIP(String publicIP) {
 		this.publicIP = publicIP;
 	}
-	
+
 	/** return <code>true</code> if this server has an expiration time to destroy */
 	public boolean isTimeLimited()
 	{
 		return expirationTime != Long.MAX_VALUE;
 	}
-	
-	public long getExpirationTime()
+
+	public Long getExpirationTime()
 	{
 		return expirationTime;
 	}
-	
+
 	public void setExpirationTime(Long expirationTime)
 	{
 		this.expirationTime = expirationTime;
 		save();
 	}
-	
+
 	public long getElapsedTime()
 	{
 		// server never expires
 		if ( !isTimeLimited() )
 			return Long.MAX_VALUE;
-		
+
 		long elapsedTime = expirationTime - System.currentTimeMillis();
 		if ( elapsedTime <=0 )
 			return 0;
@@ -139,25 +137,25 @@ public class ServerNode
 
 	public boolean isExpired()
 	{
-	    return getElapsedTime() < 0;
+		return getElapsedTime() < 0;
 	}
-	
+
 	public boolean isBusy()
 	{
 		return busy;
 	}
-	
+
 	public void setBusy( boolean isBusy )
 	{
 		this.busy = isBusy;
 		save();
 	}
-	
+
 	static public int count()
 	{
 		return find.findRowCount();
 	}
-	
+
 	static public List<ServerNode> all()
 	{
 		return find.all();
@@ -167,12 +165,12 @@ public class ServerNode
 	{
 		return ServerNode.find.where().eq("busy", "false").setMaxRows(1).findUnique();
 	}
-	
+
 	static public ServerNode getServerNode( String serverId )
 	{
 		return ServerNode.find.where().eq("serverId", serverId).findUnique();
 	}
-	
+
 	static public void deleteServer( String serverId )
 	{
 		ServerNode server = find.where().eq("serverId", serverId).findUnique();
@@ -180,12 +178,36 @@ public class ServerNode
 			server.delete();
 	}
 
-    public String toDebugString() {
-        return String.format("ServerNode{id='%s\', serverId='%s\', expirationTime=%d, publicIP='%s\', privateIP='%s\', busy=%s}", id, serverId, expirationTime, publicIP, privateIP, busy);
-    }
-   @Override
+	public String toDebugString() {
+		return String.format("ServerNode{id='%s\', serverId='%s\', expirationTime=%d, publicIP='%s\', privateIP='%s\', busy=%s}", id, serverId, expirationTime, publicIP, privateIP, busy);
+	}
+	@Override
 	public String toString()
 	{
 		return Utils.reflectedToString(this);
+	}
+
+	public String getPrivateKey() {
+		return privateKey;
+	}
+
+	public void setPrivateKey(final String privateKey) {
+		this.privateKey = privateKey;
+	}
+
+	public String getApiKey() {
+		return apiKey;
+	}
+
+	public void setApiKey(final String apiKey) {
+		this.apiKey = apiKey;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(final String userName) {
+		this.userName = userName;
 	}
 }

@@ -43,4 +43,6 @@ public interface ServerBootstrapper
     public void destroyServer(String serverId);
 
     public void close();
+    
+    public ServerNode bootstrapCloud(String user, String pass); 
 }

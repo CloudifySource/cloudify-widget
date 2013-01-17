@@ -14,6 +14,8 @@ public class ServerConfig {
     public PoolConfiguration pool = new PoolConfiguration();
 
     public BootstrapConfiguration bootstrap = new BootstrapConfiguration();
+    
+    public CloudBootstrapConfiguration cloudBootstrap = new CloudBootstrapConfiguration();
 
     public DefaultAdmin admin = new DefaultAdmin();
 
@@ -44,7 +46,20 @@ public class ServerConfig {
         public String username="<tenant>:<user>";
         public String cloudProvider="hpcloud-compute";
         public File script;
+    }
+    
+    // cloud bootstrap configuration.
+    public static class CloudBootstrapConfiguration {
+    	public String cloudName = "hp";
         public File remoteBootstrap = Utils.getFileByRelativePath("/bin/remote_bootstrap.sh");
+        public String keyPairName = "cloudify";
+        public String cloudifyHpUploadDirName = "upload";
+        public String cloudPropertiesFileName = "hp-cloud.properties";
+        public String zoneName = "az-2.region-a.geo-1";
+        public String hardwareId = zoneName + "/102";
+        public String linuxImageId = zoneName + "/221";
+        public String securityGroup = "default";
+        public String cloudProvider = "hpcloud-compute";
     }
 
     public static class SshConfiguration{
