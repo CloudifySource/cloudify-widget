@@ -42,8 +42,9 @@ GET      /server/headers            	controllers.WidgetAdmin.headers
 # Map static resources from the /public folder to the /assets URL path
 GET     /recipes/*file      	   		controllers.Assets.at(path="/public/recipes", file)
 GET     /public/*file  		     	    controllers.Assets.at(path="/public/cloudify", file)
-GET     /*file        		     	    controllers.Assets.at(path="/public/cloudify", file)
 GET     /assets/*file             	    controllers.Assets.at(path="/public", file)
+GET     /d                              controllers.Assets.at(path="/public/cloudify/", file="demo.html")
+GET     /*file        		     	    controllers.Assets.at(path="/public/cloudify", file)
 
 
 
