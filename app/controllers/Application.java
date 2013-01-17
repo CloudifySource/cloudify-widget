@@ -62,7 +62,7 @@ public class Application extends Controller
                 new HeaderMessage().setError( Messages.get("widget.disabled.by.administrator") ).apply( response().getHeaders() );
                 return badRequest(  );
             }
-			ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget )
+			ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ));
 			WidgetInstance wi = null;
 			//TODO[adaml]: add proper input validation response
 			if ( isValidInput(hpcsKey, hpcsSecretKey) ){
