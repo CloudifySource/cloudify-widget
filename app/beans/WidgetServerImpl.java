@@ -95,6 +95,7 @@ public class WidgetServerImpl implements WidgetServer
 
 		ServerNode server = serverPool.get();
 		if ( server == null ){
+			mailSender.sendPoolIsEmptyMail();
 			throw new ServerException(Messages.get("no.available.servers"));
         }
 		return deploy(widget, server);
@@ -113,12 +114,6 @@ public class WidgetServerImpl implements WidgetServer
         }
         logger.info("Deploying an instance for recipe at : [{}] ", recipeDir );
 
-		ServerNode server = serverPool.get();
-		if ( server == null ){
-            mailSender.sendPoolIsEmptyMail();
-			throw new ServerException(Messages.get("no.available.servers"));
-        }
-		
 		widget.countLaunch();
 		
 		String instanceId = deployManager.fork(server, recipeDir).getId();

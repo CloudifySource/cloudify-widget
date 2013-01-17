@@ -26,19 +26,15 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-
-import com.avaje.ebean.Expr;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.springframework.expression.spel.ExpressionState;
+
 import play.db.ebean.Model;
 import play.i18n.Messages;
 import server.exceptions.ServerException;
 import utils.Utils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 import controllers.WidgetAdmin;
 
