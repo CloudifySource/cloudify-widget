@@ -19,6 +19,12 @@ body {
   background-image: url("/img/pause_button.png");
 }
 
+.beta-ribbon{
+  float: right;
+  margin-top: -6px;
+  margin-right: -6px;
+}
+
 .button:hover {
   cursor: pointer;
 }
@@ -54,6 +60,7 @@ body {
 #log li.important {
   font-size: 16px;
   font-weight: bold;
+  a{ color:#F09927;}
 }
 
 #title {

@@ -74,13 +74,13 @@ public class ServerPoolImpl implements ServerPool
 			ServerNode server = ServerNode.getServerNode(srv.getId());
 			
 			// if null this server wasn't found in our DB or server expired - we terminate it
-			if ( server == null || server.isExpired() || conf.server.pool.coldInit )
-			{
-				logger.info( "ServerId: {} expired or not found in server-pool, address: {}", srv.getId(), srv.getAddresses()  );
-				serverBootstrapper.destroyServer( srv.getId() );
-				iter.remove();
-			}
-			else
+//			if ( server == null || server.isExpired() || conf.server.pool.coldInit )
+//			{
+//				logger.info( "ServerId: {} expired or not found in server-pool, address: {}", srv.getId(), srv.getAddresses()  );
+//				serverBootstrapper.destroyServer( srv.getId() );
+//				iter.remove();
+//			}
+			if ( server!= null )
 			{
 				if ( server.isBusy() )
 				{
@@ -145,7 +145,7 @@ public class ServerPoolImpl implements ServerPool
 			
 			// schedule to destroy after time expiration 
 			// TODO when unlimited server will support uncomment this line if ( freeServer.isTimeLimited() )
-			ApplicationContext.get().getExpiredServersCollector().scheduleToDestroy(freeServer);
+			expiredServerCollector.scheduleToDestroy(freeServer);
 		}
 
 		addNewServerToPool();
@@ -156,8 +156,9 @@ public class ServerPoolImpl implements ServerPool
 	public void destroy(String serverId)
 	{
 		// when we move to Quarz just unregister from Cron
-		if ( ServerNode.getServerNode( serverId ) != null )
+		if ( ServerNode.getServerNode( serverId ) != null ){
 			addNewServerToPool();
+        }
 
 		WidgetInstance.deleteByInstanceId(serverId);
 		ServerNode.deleteServer( serverId );

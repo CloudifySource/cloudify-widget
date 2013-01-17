@@ -1,12 +1,48 @@
 <!DOCTYPE HTML>
+<!--
+  ~ Copyright (c) 2013 GigaSpaces Technologies Ltd. All rights reserved
+  ~ <p/>
+  ~ The software source code is proprietary and confidential information of GigaSpaces.
+  ~ You may use the software source code solely under the terms and limitations of
+  ~ the license agreement granted to you by GigaSpaces.
+  -->
+
 <html>
 <head>
     <title>Test Page For Cloudify Widget</title>
     <style type="text/css">
         body{
             font-family:arial,serif;
-            text-align:center;
-            background-color:#BABABA;
+            padding:0; margin:0;
+            background: url('/public/img/demo/bgTopX.png') repeat-x;
+
+        }
+
+        .content{
+            padding: 145px 10px 10px;
+            margin: auto;
+            width: 1015px;
+        }
+
+        .recipe{
+            margin: auto;
+            width:600px;
+        }
+
+        .container{
+            background: url('/public/img/demo/background.png') no-repeat;
+            width:1600px;
+            margin-left:auto;
+            margin-right:auto;
+        }
+
+        iframe{
+            width:600px;
+            height:473px;
+            border:none;
+            overflow:hidden;
+            padding:0;
+            margin:0;
         }
         .logo{
             width:350px;
@@ -16,13 +52,21 @@
 </head>
 <body>
 <div>
-    <img src="/img/logo.gif" alt="Gigaspaces Logo" title="Gigaspaces" class="logo"/><br/>
-    <p>
-        This is a demo page for testing the widget.<br/>
-    </p>
 
-    <script type="text/javascript" id="cloudify-widget" data-api-key="11dc02f8-15d0-4490-b7a4-dd923b8ff98a"
-            data-title="Launch MongoDB" src="http://launch.cloudifysource.org/js/get_widget.js"></script>
+    <div class="container">
+        <div class="content">
+            <div class="recipe">
+                <!--<script type="text/javascript" id="cloudify-widget" data-api-key="d169ae2a-9f88-4c2b-8e63-e53be556d78a" data-title="this is my very long title for testing the widget HTML layout" data-host="dev.cloudifysource.org" data-video_url="" src="http://dev.cloudifysource.org/js/get_widget.js"></script><br/>-->
+                <!--<iframe src="/public/demos/mongodb.html"></iframe><br/>-->
+                <iframe src="/public/demos/petclinic.html"></iframe><br/>
+
+            </div>
+            <!--<div class="recipe">-->
+            <!--<iframe src="/public/demos/petclinic.html"></iframe>-->
+            <!--</div>-->
+        </div>
+    </div>
+
 
 </div>
 </body>

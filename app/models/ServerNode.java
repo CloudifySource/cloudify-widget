@@ -54,10 +54,10 @@ extends Model
 	private Long expirationTime;
 
 	@XStreamAsAttribute
-	private String publicIP;
+	private String publicIP;  // todo : change case to Ip
 
 	@XStreamAsAttribute
-	private String privateIP;
+	private String privateIP;  // todo : change case to Ip
 
 	@XStreamAsAttribute
 	private Boolean busy;

@@ -8,5 +8,7 @@ import models.User;
  * Time: 11:27 AM
  */
 public interface MailSender {
-    void resetPasswordMail( User user );
+    public void resetPasswordMail( User user );
+
+    public void sendPoolIsEmptyMail();
 }

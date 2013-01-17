@@ -47,17 +47,21 @@ public class ApplicationContext
     @Inject private ExpiredServersCollector expiredServersCollector;
     @Inject private MailSender mailSender;
     @Inject private HmacImpl hmac;
+    @Inject private EventMonitor eventMonitor;
     @Inject private Conf conf;
 
     private static ApplicationContext instance;
 
     public static ApplicationContext get(){
+        if ( instance == null ){ // guy - in case of null, we want to show Spring Exception.. so lets try to reinitialize.
+            instance=(ApplicationContext) Spring.getBean("applicationContext");
+        }
         return instance;
     }
 
     @PostConstruct
     public void init(){
-        instance = (ApplicationContext) Spring.getBean( "applicationContext" );
+        instance = (ApplicationContext) Spring.getBean("applicationContext");
     }
 
 
@@ -146,5 +150,15 @@ public class ApplicationContext
     public void setConf( Conf conf )
     {
         this.conf = conf;
+    }
+
+    public EventMonitor getEventMonitor()
+    {
+        return eventMonitor;
+    }
+
+    public void setEventMonitor( EventMonitor eventMonitor )
+    {
+        this.eventMonitor = eventMonitor;
     }
 }

@@ -31,6 +31,24 @@ public class MailSenderImpl implements MailSender {
     private static Logger logger = LoggerFactory.getLogger( MailSenderImpl.class );
 
     @Override
+    public void sendPoolIsEmptyMail()
+    {
+        try{
+            logger.info( "sending email for empty pool" );
+            ApplicationContext.get().getMailer().send( new GsMailConfiguration()
+                    .setSubject( "Important : pool is empty" )
+                    .setBodyText( "pool is empty" )
+                    .addRecipient( GsMailer.RecipientType.TO, "widget@cloudifysource.org", "Cloudify Widget Team")
+                    .setFrom( conf.smtp.user, conf.mailer.name )
+                    .setReplyTo( conf.mailer )
+
+            );
+        }catch(RuntimeException e){
+            logger.error( "error sending pool is empty email",e );
+        }
+    }
+
+    @Override
     public void resetPasswordMail( User user ){
 
         logger.info( "user {} requested password reset", user.toDebugString() );

@@ -1,9 +1,6 @@
-import java.util.ArrayList;
-
+import beans.config.Conf;
 import models.User;
-
 import org.slf4j.LoggerFactory;
-
 import play.Application;
 import play.GlobalSettings;
 import play.api.mvc.Results;
@@ -18,8 +15,6 @@ import server.ApplicationContext;
 import server.exceptions.ExceptionResponse;
 import server.exceptions.ExceptionResponseDetails;
 import utils.Utils;
-import beans.config.Conf;
-
 
 import java.util.ArrayList;
 
@@ -43,7 +38,15 @@ public class Global extends GlobalSettings
         // initialize the server pool.
         // letting the bean do it is incorrect..
         // TODO : this should open another thread.
-        ApplicationContext.get().getServerPool().init();
+        new Thread( new Runnable() { // guy - lets use this for now to fix #33
+            @Override
+            public void run()
+            {
+                ApplicationContext.get().getServerPool().init();
+            }
+        }).start();
+
+
 
         // create Admin user if not exists
 		if ( User.find.where().eq("admin", Boolean.TRUE ).findRowCount() <= 0 )

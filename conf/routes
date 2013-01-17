@@ -6,8 +6,8 @@ GET     /exportSchema                   controllers.Application.generateDDL
 GET     /javascriptRoutes               controllers.Application.javascriptRoutes
 
 # Widget
-POST     /widget/start		     	    controllers.Application.start( apiKey: String, hpcsKey ?= "", hpcsSecretKey ?= "" ) 
-POST     /widget/:instanceId/stop		controllers.Application.stop( apiKey: String, instanceId: String  ) 
+POST     /widget/start		     	    controllers.Application.start( apiKey: String, hpcsKey:String ?= "", hpcsSecretKey:String ?= "" )
+POST     /widget/:instanceId/stop		controllers.Application.stop( apiKey: String, instanceId: String)
 GET      /widget/:instanceId/status   	controllers.Application.getWidgetStatus( apiKey: String, instanceId: String )
 
 
@@ -30,7 +30,7 @@ POST     /widget/:instanceId/shutdown	controllers.WidgetAdmin.shutdownInstance( 
 POST     /widget/disable				controllers.WidgetAdmin.disableWidget( authToken: String, apiKey: String )
 POST     /widget/enable 				controllers.WidgetAdmin.enableWidget( authToken: String, apiKey: String )
 GET      /user/list	   					controllers.WidgetAdmin.getAllUsers( authToken: String )
-POST     /widget/new              	    controllers.WidgetAdmin.createNewWidget(authToken: String, productName: String, productVersion: String, title: String, youtubeVideoUrl: String, providerURL: String, recipeURL: String, consolename: String, consoleurl: String, rootpath:String )
+POST     /widget/new              	    controllers.WidgetAdmin.createNewWidget( widgetId:String ?= null, authToken: String, productName: String, productVersion: String, title: String, youtubeVideoUrl: String, providerURL: String, recipeURL: String, consolename: String, consoleurl: String, rootpath:String )
 GET      /widget/list 					controllers.WidgetAdmin.getAllWidgets( authToken: String )
 POST    /widget/delete                  controllers.WidgetAdmin.deleteWidget( authToken:String, apiKey:String )
 GET     /widget/previewWidget           controllers.WidgetAdmin.previewWidget( apiKey:String )
@@ -42,8 +42,9 @@ GET      /server/headers            	controllers.WidgetAdmin.headers
 # Map static resources from the /public folder to the /assets URL path
 GET     /recipes/*file      	   		controllers.Assets.at(path="/public/recipes", file)
 GET     /public/*file  		     	    controllers.Assets.at(path="/public/cloudify", file)
-GET     /*file        		     	    controllers.Assets.at(path="/public/cloudify", file)
 GET     /assets/*file             	    controllers.Assets.at(path="/public", file)
+GET     /d                              controllers.Assets.at(path="/public/cloudify/", file="demo.html")
+GET     /*file        		     	    controllers.Assets.at(path="/public/cloudify", file)
 
 
 

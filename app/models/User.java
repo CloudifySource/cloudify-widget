@@ -81,7 +81,11 @@ public class User
 		{
 			return expires;
 		}
-		
+
+        public boolean getAdmin(){ // for JSON libraries
+            return BooleanUtils.isTrue( admin );
+        }
+
 		public boolean isAdmin()
 		{
 			return BooleanUtils.isTrue( admin );

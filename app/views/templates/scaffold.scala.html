@@ -14,12 +14,13 @@
    all templates should inherit this one unless some other
 *@
 @args() =@{play.mvc.Http.Context.current().args}
-<html>
+<html itemscope itemtype="http://schema.org/Product">
 <head>
     <title>@context.get("title")</title>
 
     <script src="@routes.Application.javascriptRoutes()" type="text/javascript"></script>
     <script src="/public/js/jquery.min.js"></script>
+    <script src="/public/js/jquery-ui.custom.min.js"></script>
     <script src="/public/js/jquery.tmpl.min.js"></script>
     <script src="/public/js/jquery.quicksearch.js"></script>
     <script src="/public/js/jquery.formparams.min.js"></script>
@@ -31,6 +32,14 @@
     <link href="/public/style/scaffold.css" rel="stylesheet">
 
     <script src="/public/js/scaffold.js"></script>
+    <meta property="og:title" content="Cloudify-Widget"/>
+    <meta property="og:image" content="/img/cloudify_icon.png"/>
+    <meta property="og:description" content="Launch on the cloud in a single click using the Cloudify widget"/>
+    <meta name="description" content="Launch on the cloud in a single click using the Cloudify widget"/>
+    <meta name="keywords" content="cloudify,gigaspaces,hp,cloud,widget"/>
+    <meta itemprop="name" content="Cloudify-Widget">
+    <meta itemprop="description" content="Launch on the cloud in a single click using the Cloudify widget">
+    <meta itemprop="image" content="/img/cloudify_icon.png">
     @context.get("head")
 
 </head>

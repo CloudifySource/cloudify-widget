@@ -11,12 +11,15 @@ $(function () {
     return params;
   }
 
+  var params = get_params();
+  var origin_page_url = params["origin_page_url"];
+
   function instanceId() {
     return $.cookie("instanceId" + origin_page_url);
   }
 
   function write_log(message, class_name) {
-    $("#log").append($("<li/>", {text: message}).addClass(class_name));
+    $("#log").append($("<li/>", {html: message}).addClass(class_name));
     $("#log").scrollTop($("#log")[0].scrollHeight);
   }
 
@@ -43,7 +46,7 @@ $(function () {
   }
 
   function stop_instance() {
-    write_log("Server has stopped", "important");
+    write_log("Test drive successfully completed! <br/><a class='download_link' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.", "important");
     $("#time_left").hide();
     $("#links").hide();
     $.removeCookie("instanceId" + origin_page_url);
@@ -103,6 +106,7 @@ $(function () {
     clearInterval(window.status_update_timer);
   }
 
+
   function set_cloudify_dashboard_link(custom_link) {
     $("#links").show();
     $("#cloudify_dashboard_link").attr("href", "http://" + $.cookie("publicIP" + origin_page_url) + ":8099/");
@@ -113,15 +117,19 @@ $(function () {
       $("#links").append($(custom_link));
   }
 
-  var params = get_params();
-  var apiKey = params["apiKey"];
-  var origin_page_url = params["origin_page_url"];
-  var msg =  encodeURI("Launch on the cloud in a single click using the Cloudify widget");
-  $("#facebook_share_link").attr("href", "http://www.facebook.com/sharer/sharer.php?u=" + encodeURI(origin_page_url));
-  $("#google_plus_share_link").attr("href", "https://plus.google.com/share?url=" + encodeURI(origin_page_url));
-  $("#twitter_share_link").attr("href", "https://twitter.com/share?url=" + encodeURI(origin_page_url) + "&text=" + msg);
 
-  $("#title").text(decodeURIComponent(params["title"]));
+    $("#title").text(decodeURIComponent(params["title"]));
+
+  var apiKey = params["apiKey"];
+  var shareUrl= encodeURI("http://launch.cloudifysource.org/admin/signin");
+
+  var msg =  encodeURI("Launch on the cloud in a single click using the Cloudify widget");
+    var twitterMsg = encodeURIComponent( $("#title" ).text() + " on any cloud with a single click with #cloudifysource");
+  $("#facebook_share_link").attr("href", "http://www.facebook.com/sharer/sharer.php?u=" + shareUrl);
+  $("#google_plus_share_link").attr("href", "https://plus.google.com/share?url=" + shareUrl);
+  $("#twitter_share_link").attr("href", "https://twitter.com/share?url=" + encodeURIComponent(origin_page_url) + "&text=" + twitterMsg);
+
+
 
   if (params["video_url"]) {
     $("#video_container").append($("<iframe id='youtube_iframe' width='270' height='160' frameborder='0' allowfullscreen></iframe>"))
@@ -141,10 +149,22 @@ $(function () {
     $("#advanced").toggle();
   });
 
+    $(".download_link" ).live("click",function(){
+        mixpanel.track("Download Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url});
+    });
+
+    $(".documentation_link" ).live("click",function(){
+        mixpanel.track("Documentation Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url});
+    });
+
   $(".share_link").click(function (e) {
     e.preventDefault();
     var leftvar = (screen.width-600)/2;
     var topvar = (screen.height-600)/2;
+
+    mixpanel.track("Social Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url, 'button': $(this ).attr("id")});
+
     window.open($(e.target).parents("a").attr("href"), '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600,left='+ leftvar +',top=' + topvar);
+
   });
 });

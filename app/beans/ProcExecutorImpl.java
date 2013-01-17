@@ -40,8 +40,8 @@ import server.ProcExecutor;
 public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor 
 {
     private String id;
-    private String publicIP;
-    private String privateIP;
+    private String publicIP; // todo : change case to Ip
+    private String privateIP;  // todo : change case to Ip
     private File recipe;
     private String[] args;
     private Long expirationTime;

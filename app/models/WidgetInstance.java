@@ -52,7 +52,7 @@ public class WidgetInstance
 	private Boolean anonymouse = false;
 	
 	@XStreamAsAttribute
-	private String publicIP;
+	private String publicIP;  // todo : change case to Ip
 	
 	@XStreamAlias("link")
 	private ConsoleLink link;

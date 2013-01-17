@@ -10,8 +10,8 @@
 }
 
 @context.set("body"){
-    <div id="main">
-        <div class="hero-unit" id="welcome_window" style="display:none;">
+    <div id="main" class="widgets-dashboard">
+        <div class="hero-unit" id="welcome_window">
             <h1>Welcome to the Cloudify Widget Dashboard!</h1>
             <p>We are thrilled to have you on board. This dashboard helps you to create a new Widget, embed the widget into your website and then monitor and administrate the running widget instances.</p>
             <p>
@@ -21,7 +21,7 @@
             </p>
         </div>
 
-        <div class="row" id="search_panel" style="display:none;">
+        <div class="row" id="search_panel">
             <div class="span1">
                 <form class="form-search">
                     <input id="search" type="text" placeholder="Filter widgets" class="input-medium search-query">
@@ -34,16 +34,16 @@
             </div>
         </div>
 
-        <div id="summary" style="display:none;" class="well summary">
+        <div id="summary" class="well summary">
             <ul>
             </ul>
         </div>
 
-        <div id="widgets_panel" style="display:none;">
+        <div id="widgets_panel">
             <table class="table table-bordered table-striped">
                 <thead class="list_head">
                     <tr>
-                        <th id="user_name_column" style="display:none;">User name</th>
+                        <th id="user_name_column">User name</th>
                         <th>Product name</th>
                         <th>Product version</th>
                         <th>Provider URL</th>
@@ -65,24 +65,24 @@
 
 
     <script id="widget_record" type="text/x-jquery-tmpl">
-             <tr class="widget" data-api_key="${api_key}" id="widget_${id}">
+             <tr class="widget {{if enabled}} enabled-widget {{else}} disabled-widget {{/if}}" data-widget_id="${id}" data-api_key="${apiKey}" id="widget_${id}">
                {{if admin}}
-                 <td>${user_name}</td>
+                 <td>${userName}</td>
                {{/if}}
-               <td>${product_name}</td>
-               <td>${product_version}</td>
+               <td>${productName}</td>
+               <td>${productVersion}</td>
                <td><a href="${url}">${url}</a></td>
                <td>${title}</td>
                <td>
-                 {{if video_url}}
-                   <a href="${video_url}" target="_blank">View</a>
+                 {{if youtubeVideoUrl}}
+                   <a href="${youtubeVideoUrl}" target="_blank">View</a>
                  {{else}}
                    N/A
                  {{/if}}
                </td>
-               <td><a href="${recipe_url}">Download</a></td>
+               <td><a href="${recipeUrl}">Download</a></td>
                <td><span class="badge">${launches}</span></td>
-               <td>${api_key}</td>
+               <td>${apiKey}</td>
                <td class="action_col">
                  <div class="btn-group">
                    <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
@@ -91,21 +91,22 @@
                    </a>
                    <ul class="dropdown-menu">
                      <li><a class="regenerate_key_btn" href="#">Regenerate Key</a></li>
-                     <li><a class="disable_widget_btn" style="display:none;" href="#">Disable</a></li>
-                     <li><a class="enable_widget_btn" style="display:none;" href="#">Enable</a></li>
-                     <li><a class="delete_widget_btn"  href="javascript:void(0)">Delete</a> </li>
+                     <li><a class="disable_widget_btn" href="#">Disable</a></li>
+                     <li><a class="enable_widget_btn" href="#">Enable</a></li>
+                     <li><a class="delete_widget_btn" href="javascript:void(0)">Delete</a> </li>
+                     <li><a class="edit_widget_btn"  href="javascript:void(0)">Edit</a> </li>
                      <li><a href="#widget_${id}_get_embed_modal" data-toggle="modal">Get Embed Code</a></li>
-                     <li><a class="preview_widget_btn" href="/widget/previewWidget?apiKey=${api_key}" target="_blank">Show Preview</a> </li>
+                     <li><a class="preview_widget_btn" href="/widget/previewWidget?apiKey=${apiKey}" target="_blank">Show Preview</a> </li>
                    </ul>
                  </div>
                </td>
                <td class="instances_col">
-                 <span class="label label-important disabled_marker" style="display:none">Disabled</span>
-                 <span class="label label-success instances_btn" style="display:none"><a data-toggle="modal" href="#widget_${id}_instances_modal">View Instances</a></span>
-                 <div id="widget_${id}_instances_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="widget_${id}_instances_label" aria-hidden="true">
+                 <span class="label label-important disabled_marker" >Disabled</span>
+                 <span class="label label-success instances_btn"><a data-toggle="modal" href="#widget_${id}_instances_modal">View Instances</a></span>
+                 <div id="widget_${id}_instances_modal" class="modal-window modal hide fade" tabindex="-1" role="dialog" aria-labelledby="widget_${id}_instances_label" aria-hidden="true">
                    <div class="modal-header">
                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                     <h3 id="widget_${id}_instances_label">${instance_count} Running instances</h3>
+                     <h3 id="widget_${id}_instances_label">${instanceCount} Running instances</h3>
                    </div>
                    <div class="modal-body">
                      <form class="form-search pull-left">
@@ -126,13 +127,13 @@
                      </table>
                    </div>
                  </div>
-                 <div id="widget_${id}_get_embed_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="widget_${id}_get_embed_label" aria-hidden="true">
+                 <div id="widget_${id}_get_embed_modal" class="modal-window modal hide fade" tabindex="-1" role="dialog" aria-labelledby="widget_${id}_get_embed_label" aria-hidden="true">
                    <div class="modal-header">
                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                      <h3 id="widget_${id}_get_embed_label">Embed Code</h3>
                    </div>
                    <div class="modal-body">
-                     <textarea autofocus readonly class="code">@views.html.widgets.dashboard.embedCode( "${api_key}", "${title}","${video_url}","${domain}" )</textarea>
+                     <textarea autofocus readonly class="code">@views.html.widgets.dashboard.embedCode( "${apiKey}", "${title}","${youtubeVideoUrl}","${host}" ).toString()</textarea>
                    </div>
                  </div>
                </td>
@@ -140,17 +141,17 @@
    </script>
 
     <script id="widget_instance_tmpl" type="text/x-jquery-tmpl">
-        <tr class="instance" data-instance_id="${instance_id}">
-          <td>${instance_id}</td>
-          <td>${anonymouse}</td>
-          <td>${public_ip}</td>
+        <tr class="instance" data-instance_id="${instanceId}">
+          <td>${instanceId}</td>
+          <td>${anonymous}</td>
+          <td>${publicIP}</td> @* todo : change case to Ip *@
           <td><a href="#" class="btn btn-danger shutdown_instance btn-small">Shutdown</a></td>
         </tr>
   </script>
 
 
 
-<div id="new_widget_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="create_widget_form_label" aria-hidden="true">
+<div id="new_widget_modal" class="modal-window modal hide fade" tabindex="-1" role="dialog" aria-labelledby="create_widget_form_label" aria-hidden="true">
       <form id="new_widget_form" class="form-horizontal">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -158,7 +159,7 @@
         </div>
         <div class="modal-body">
           <fieldset>
-
+              <input type="hidden" id="widgetId" name="widgetId" value=""/>
               @field("productName", "Product Name", required =true )
               @field("productVersion", "Product Version", required = true )
               @field("title", "Title", required =true )
@@ -168,7 +169,6 @@
               @field("consolename", "Console Link Title", required =false )
               @field("consoleurl", "Console Link URL", required =false )
               @field("rootpath", "Recipe Root Path", required =false )
-
             <div class="control-group">
               <div class="control-label">
                 <abbr style="color:red">*</abbr> Mandatory fields

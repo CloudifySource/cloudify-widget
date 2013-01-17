@@ -15,5 +15,7 @@ dist
 .DS_Store
 conf/dev
 logFile.log
-.sass-cache/
+/recipes
+/gigaspaces-cloudify-2.2.0-ga
+/.sass-cache
 /.idea_modules

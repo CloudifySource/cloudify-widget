@@ -45,11 +45,30 @@ bin/migrate_db.sh create
 #find which is the latest version of DB
 # ll all the files, remove "create" script, remove extension, sort in descending order and output first line.
 db_version=`ls conf/evolutions/default -1 | grep -v create |  sed -e 's/\.[a-zA-Z]*$//' | sort -r | head -1`
-playbin/migrate_db.sh $db_version
+bin/migrate_db.sh $db_version
 
 echo "127.0.0.1 `hostname`" >> /etc/hosts
 ln -s ~/play-2.0.4/play /usr/bin/play
 
+
+# install nginx
+cp cloudify-widget/conf/nginx/install.conf /etc/yum.repos.d/nginx.repo
+yum -y install nginx
+mv /etc/nginx/nginx.conf /etc/nginx/nginx_conf_backup
+cp  cloudify-widget/conf/nginx/nginx.conf /etc/nginx/
+
+# copy nginx configuration while sed-ing the domain names
+mkdir -p /var/log/nginx/$SITE_DOMAIN
+mkdir -p /etc/nginx/sites-available
+mkdir -p /etc/nginx/sites-enabled
+cat cloudify-widget/conf/nginx/site.conf  | sed 's/__domain_name__/'"$SITE_DOMAIN"'/' | sed 's/__staging_name__/'"$SITE_STAGING_DOMAIN"'/' > /etc/nginx/sites-available/$SITE_DOMAIN
+ln -s  /etc/nginx/sites-available/$SITE_DOMAIN /etc/nginx/sites-enabled/$SITE_DOMAIN
+
+# create path /var/www/cloudifyWidget/public/error_pages
+mkdir -p /var/www/cloudifyWidget/public/error_pages
+
+# copy content from public error_pages to that path
+cp -R cloudify-widget/public/error_pages /var/www/cloudifyWidget/public
 
 
 

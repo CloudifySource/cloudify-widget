@@ -30,6 +30,8 @@ public class Conf {
 
     public CloudifyConfiguration cloudify = new CloudifyConfiguration();
 
+    public String mixpanelApiKey = null;
+
 
     public static class SettingsConfig{
         @Config( ignoreNullValues = true )
@@ -50,7 +52,7 @@ public class Conf {
         
         public long bootstrapCloudWatchDogProcessTimeoutMillis = Utils.parseTimeToMillis( "2mn" );
 
-        public File deployScript;
+        public File deployScript=Utils.getFileByRelativePath( "/bin/deployer.sh" );
 
         public String removeOutputLines = "";
 
