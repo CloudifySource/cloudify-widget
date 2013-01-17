@@ -54,7 +54,8 @@ $(function () {
   function start_instance_btn_handler() {
     $("#start_btn,#stop_btn").toggle();
     if (!instanceId()) {
-      $.post("/widget/start?apiKey=" + params["apiKey"], {}, function(data, textStatus, jqXHR) {
+    	var playData = { apiKey : params["apiKey"], "hpcsKey" : $("#advanced [name=hpcs_key]").val(), "hpcsSecretKey":$("#advanced [name=hpcs_secret_key]").val() }
+      $.post("/widget/start?" + $.param(playData), {}, function(data, textStatus, jqXHR) {
         if (data.status == "error") {
           $("#start_btn,#stop_btn").toggle();
           write_log(data.message, "error");

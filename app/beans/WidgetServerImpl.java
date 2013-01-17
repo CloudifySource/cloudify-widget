@@ -88,8 +88,20 @@ public class WidgetServerImpl implements WidgetServer
         {
 			throw new ServerException( Messages.get( "widget.disabled.by.administrator" ) );
         }
-			
-		File unzippedDir = Utils.downloadAndUnzip( widget.getRecipeURL(), apiKey );
+		
+
+		ServerNode server = serverPool.get();
+		if ( server == null ){
+			throw new ServerException(Messages.get("no.available.servers"));
+        }
+		return deploy(widget, server);
+	}
+	
+	
+	public WidgetInstance deploy( Widget widget, ServerNode server )
+	{
+		
+		File unzippedDir = Utils.downloadAndUnzip( widget.getRecipeURL(), widget.getApiKey() );
 
 
         File recipeDir = unzippedDir;
@@ -97,19 +109,13 @@ public class WidgetServerImpl implements WidgetServer
             recipeDir = new File( unzippedDir, widget.getRecipeRootPath() );
         }
         logger.info("Deploying an instance for recipe at : [{}] ", recipeDir );
-
-		ServerNode server = serverPool.get();
-		if ( server == null ){
-			throw new ServerException(Messages.get("no.available.servers"));
-        }
-		
+        
 		widget.countLaunch();
 		
 		String instanceId = deployManager.fork(server, recipeDir).getId();
 		
 		return widget.addWidgetInstance( instanceId, server.getPublicIP() );
 	}
-	
 	
 	public void undeploy( String instanceId )
 	{

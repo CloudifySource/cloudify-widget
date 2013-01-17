@@ -16,6 +16,7 @@
 
 package server;
 
+import models.ServerNode;
 import models.Widget;
 import models.WidgetInstance;
 
@@ -26,4 +27,6 @@ public interface WidgetServer
     public void undeploy(String instanceId);
 
     public Widget.Status getWidgetStatus(String instanceId);
+    
+    public WidgetInstance deploy( Widget widget, ServerNode server );
 }

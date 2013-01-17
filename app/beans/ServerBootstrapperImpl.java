@@ -29,11 +29,9 @@ import models.ServerNode;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
-import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.lang.StringUtils;
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
@@ -59,6 +57,7 @@ import server.DeployManager;
 import server.ServerBootstrapper;
 import server.exceptions.ServerException;
 import utils.Utils;
+import beans.ProcExecutorImpl.ProcessStreamHandler;
 import beans.config.Conf;
 
 import com.google.common.collect.FluentIterable;
@@ -155,47 +154,65 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		
 		return serverNode;
 	}
+	
 
-	public ServerNode bootstrapCloud(/*CloudDetails details*/) 
-			throws ExecuteException, IOException, InterruptedException {
-		
-		File cloudFolder = Utils.createCloudFolder();
-		
-		//Command line for bootstrapping remote cloud.
-		CommandLine cmdLine = new CommandLine(conf.server.bootstrap.remoteBootstrap.getAbsoluteFile());
-		cmdLine.addArgument(cloudFolder.getName());
-		
-		logger.info("Executing command line: " + cmdLine);
-		
-		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-		ExecuteWatchdog watchdog = new ExecuteWatchdog(conf.cloudify.bootstrapCloudWatchDogProcessTimeoutMillis);
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
-		
-		DefaultExecutor defaultExecutor  = new DefaultExecutor();
-		defaultExecutor.setStreamHandler(streamHandler);
-		defaultExecutor.setExitValue(1);
-		defaultExecutor.setWatchdog(watchdog);
-		defaultExecutor.execute(cmdLine, resultHandler);
-		resultHandler.waitFor();
-		
-		cloudFolder.delete();
-		
-		if (resultHandler.getException() != null) {
-			logger.info("Command execution ended with errors: " + outputStream.toString());
-			throw new ServerException("Failed to bootstrap cloudify machine: " 
-							+ outputStream.toString(), resultHandler.getException());
+	@Override
+	public ServerNode bootstrapCloud(String userName, String apiKey)  {
+		File cloudFolder = null;
+		try{
+			logger.info("Creating cloud folder with specific user credentials. User: " + userName + ", api key: " + apiKey);
+			cloudFolder = Utils.createCloudFolder(conf.server.cloudBootstrap, userName, apiKey);
+
+			//Command line for bootstrapping remote cloud.
+			CommandLine cmdLine = new CommandLine(conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile());
+			cmdLine.addArgument(cloudFolder.getName());
+
+			logger.info("Executing command line: " + cmdLine);
+			DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+			ExecuteWatchdog watchdog = new ExecuteWatchdog(conf.cloudify.bootstrapCloudWatchDogProcessTimeoutMillis);
+			ProcessStreamHandler streamHandler = new ProcessStreamHandler();
+			
+			DefaultExecutor defaultExecutor  = new DefaultExecutor();
+			defaultExecutor.setStreamHandler(streamHandler);
+			defaultExecutor.setExitValue(0);
+			defaultExecutor.setWatchdog(watchdog);
+			defaultExecutor.execute(cmdLine, resultHandler);
+			resultHandler.waitFor();
+			
+			//TODO[adaml]: the logger on cloudify directs valid output to the error stream.
+			if (resultHandler.getException() != null) {
+				logger.info("Command execution ended with errors: " + streamHandler.getOutput());
+				throw new RuntimeException("Failed to bootstrap cloudify machine: " 
+						+ streamHandler.getOutput(), resultHandler.getException());
+			}
+			
+			ServerNode serverNode = new ServerNode();
+			String publicIp = Utils.extractIpFromBootstrapOutput(streamHandler.getOutput());
+			if (StringUtils.isEmpty(publicIp)) {
+				throw new RuntimeException( "Bootstrap failed. No IP address found in bootstrap output." 
+						+ streamHandler.getOutput(), resultHandler.getException() );
+			}
+			serverNode.setPublicIP(publicIp);
+			String privateKey = Utils.getCloudPrivateKey(cloudFolder, conf.server.cloudBootstrap);
+			if (StringUtils.isEmpty(privateKey)) {
+				throw new RuntimeException( "Bootstrap failed. No pem file found in cloud directory." );
+			}
+			
+			logger.info("Bootstrap cloud command ended successfully");
+			
+			serverNode.setPrivateKey(privateKey);
+			serverNode.setApiKey(apiKey);
+			serverNode.setUserName(userName);
+
+			return serverNode;
+		} catch(Exception e) { 
+			throw new RuntimeException("Unable to bootstrap cloud", e);
+		} finally {
+			if (cloudFolder != null)
+				FileUtils.deleteQuietly(cloudFolder);
 		}
-		
-		//TODO[adaml]: add all user credentials to the server node.
-		ServerNode serverNode = new ServerNode();
-		String publicIp = Utils.extractIpFromBootstrapOutput(outputStream.toString());
-		serverNode.setPublicIP(publicIp);
-
-		return serverNode;
-		
 	}
-
+	
 	public List<Server> getServerList()
 	{
 		ServerApi serverApi = _nova.getApi().getServerApiForZone( conf.server.bootstrap.zoneName );
