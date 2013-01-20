@@ -23,3 +23,7 @@ git pull
 if [ "$?" -ne "0" ]; then
     echo "problems with git pull, run git status to see the problem"
 fi
+
+# I know we can commit the files with the correct mode, cannot rely on this in production.
+echo "changing mode for sh files"
+chmod 755 $WIDGET_HOME/*.sh

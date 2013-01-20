@@ -26,7 +26,7 @@ start() {
 # Restart the service FOO
 stop() {
 #        initlog -c "echo -n Stopping Widget server: "
-        killproc -f $pidfile
+        killproc -p $pidfile
         echo
 }
 ### main logic ###
