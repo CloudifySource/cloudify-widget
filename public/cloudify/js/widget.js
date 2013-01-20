@@ -55,7 +55,7 @@ $(function () {
         };
 
 
-        function generateFieldFunction( key ){ return function( val ){ return get_or_set(key,val) };}
+        function generateFieldFunction( key ){ return function( val ){ return get_or_set.call(this,key,val) };}
         this.instanceId = generateFieldFunction("instanceId");
         this.publicIp = generateFieldFunction("publicIp");
         this.customLink = generateFieldFunction("publicIp");
