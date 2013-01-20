@@ -90,7 +90,7 @@ $(function () {
 
     function setTimeoutForUpdateStatus()
     {
-        setTimeout( update_status, 1000 );
+        setTimeout( update_status, 10000 );
     }
 
     function handleUpdateStatusSuccess( data )
