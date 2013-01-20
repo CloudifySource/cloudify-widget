@@ -5,6 +5,9 @@ if [ "$?" -ne "0" ]; then       # we need to consider using hard reset here inst
     echo "problems with git pull, run git status to see the problem"
 fi
 
+# note: this script does not need an update. it is edited on production and never committed to CVS.
+. /etc/sysconfig/play
+
 # assume with are in "cloudify-widget" folder
 echo "copying error pages"
 # copy content from public error_pages to that path
