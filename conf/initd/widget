@@ -1,0 +1,51 @@
+#!/bin/bash
+#
+# chkconfig: 35 90 12
+# description: Foo server
+#
+# Get function from functions library
+
+. /etc/init.d/functions
+
+if [ -f /etc/sysconfig/play ]; then
+    . /etc/sysconfig/play
+fi
+
+prog=cloudify-widget
+pidfile=${PIDFILE-$WIDGET_HOME/RUNNING_PID}
+
+
+# Start the service FOO
+start() {
+#        initlog -c "echo -n Starting Widget server: "
+        cd $WIDGET_HOME
+        ./play_start.sh
+        success $"Widget server startup"
+        echo
+}
+# Restart the service FOO
+stop() {
+#        initlog -c "echo -n Stopping Widget server: "
+        killproc -f $pidfile
+        echo
+}
+### main logic ###
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  status)
+        status -p ${pidfile}
+        ;;
+  restart|reload|condrestart)
+        stop
+        start
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart|reload|status}"
+        exit 1
+esac
+exit 0

@@ -1,0 +1,5 @@
+check process mysqld with pidfile __monit_pidfile__
+start program = "/etc/init.d/widget start"
+stop program = "/etc/init.d/widget stop"
+if failed host 127.0.0.1 port 9000 then restart
+if 5 restarts within 5 cycles then timeout

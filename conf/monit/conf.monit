@@ -1,0 +1,9 @@
+set daemon 60
+set logfile /var/log/monit.log
+set mailserver localhost
+set mail-format { from: __monit_from__
+subject: $SERVICE $EVENT at $DATE
+message: Monit $ACTION $SERVICE at $DATE on $HOST: $DESCRIPTION.
+}
+set alert __monit_to__
+include /etc/monit.d/*

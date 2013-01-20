@@ -1,1 +1,1 @@
-play -Dconfig.file=conf/prod.conf start
+nohup play -Dconfig.file=conf/prod.conf start &

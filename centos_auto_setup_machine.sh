@@ -41,12 +41,8 @@ mysql -u $DB_ADMIN -e "DROP USER ''@'localhost';"
 mysql -u $DB_ADMIN -p$DB_ADMIN_PASSWORD  -e  "DROP USER ''@'localhost.localdomain';"
 mysql -u $DB_ADMIN -e "DROP USER ''@'localhost.localdomain';"
 
+echo "creating DB scheme"
 bin/migrate_db.sh create
-#find which is the latest version of DB
-# ll all the files, remove "create" script, remove extension, sort in descending order and output first line.
-db_version=`ls conf/evolutions/default -1 | grep -v create |  sed -e 's/\.[a-zA-Z]*$//' | sort -r | head -1`
-bin/migrate_db.sh $db_version
-
 echo "127.0.0.1 `hostname`" >> /etc/hosts
 ln -s ~/play-2.0.4/play /usr/bin/play
 
@@ -67,8 +63,19 @@ ln -s  /etc/nginx/sites-available/$SITE_DOMAIN /etc/nginx/sites-enabled/$SITE_DO
 # create path /var/www/cloudifyWidget/public/error_pages
 mkdir -p /var/www/cloudifyWidget/public/error_pages
 
-# copy content from public error_pages to that path
-cp -R cloudify-widget/public/error_pages /var/www/cloudifyWidget/public
+cd cloudify-widget
+echo "intalling monit"
+\cp -Rf conf/monit/repo  /etc/yum.repos.d/epel.repo
+yum -y install monit
+chkconfig --levels 235 monit on
+cat conf/monit/conf.monit | sed 's/__monit_from__/'"$MONIT_FROM"'/' | sed 's/__monit_to__/'"$MONIT_SET_ALERT"'/' > /etc/monit.conf
+mv conf/monit/mysql.monit /etc/monit.d/mysqld
+MONIT_PIDFILE=$WIDGET_HOME/RUNNING_PID
+cat conf/monit/widget.monit | sed 's/__monit_pidfile__/'"$MONIT_PIDFILE"'/' > /etc/monit.d/widget
+
+echo "upgrading system"
+upgrade_server
+
 
 
 
