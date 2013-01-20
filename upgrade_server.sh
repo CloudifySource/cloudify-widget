@@ -8,6 +8,12 @@ fi
 # note: this script does not need an update. it is edited on production and never committed to CVS.
 . /etc/sysconfig/play
 
+
+# I know we can commit the files with the correct mode, cannot rely on this in production.
+echo "changing mode for sh files"
+chmod 755 $WIDGET_HOME/*.sh
+chmod 755 $WIDGET_HOME/bin/*.sh
+
 # assume with are in "cloudify-widget" folder
 echo "copying error pages"
 # copy content from public error_pages to that path
@@ -25,8 +31,3 @@ chmod 755 /etc/init.d/widget
 
 echo "upgrading monit configurations"
 cat conf/monit/widget.monit | sed 's/__monit_pidfile__/'"$MONIT_PIDFILE"'/' > /etc/monit.d/widget
-
-
-# I know we can commit the files with the correct mode, cannot rely on this in production.
-echo "changing mode for sh files"
-chmod 755 $WIDGET_HOME/*.sh
