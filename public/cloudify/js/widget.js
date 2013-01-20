@@ -196,7 +196,7 @@ $(function () {
 
 
   if (params["video_url"]) {
-    $("#video_container").append($("<iframe id='youtube_iframe' width='270' height='160' frameborder='0' allowfullscreen></iframe>"))
+    $("#video_container").append($("<iframe id='youtube_iframe' width='270' height='160' frameborder='0' allowfullscreen></iframe>"));
     $("#youtube_iframe").attr("src", decodeURIComponent(params["video_url"]));
   }
 
@@ -213,13 +213,16 @@ $(function () {
     $("#advanced").toggle();
   });
 
-    $(".download_link" ).live("click",function(){
-        mixpanel.track("Download Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url});
-    });
 
-    $(".documentation_link" ).live("click",function(){
-        mixpanel.track("Documentation Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url});
-    });
+        $(".download_link" ).live("click",function(){
+            mixpanel.track("Download Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url});
+        });
+
+        $(".documentation_link" ).live("click",function(){
+            mixpanel.track("Documentation Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url});
+        });
+
+        mixpanel.track("Widget Impression");
 
   $(".share_link").click(function (e) {
     e.preventDefault();

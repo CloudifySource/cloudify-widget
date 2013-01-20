@@ -37,6 +37,7 @@ GET     /widget/previewWidget           controllers.WidgetAdmin.previewWidget( a
 GET      /widget/summary 				controllers.WidgetAdmin.summary( authToken: String )
 GET      /server/list 					controllers.WidgetAdmin.getAllServers
 GET      /server/headers            	controllers.WidgetAdmin.headers
+GET     /widget/widget                  controllers.WidgetAdmin.getWidget
 
 
 # Map static resources from the /public folder to the /assets URL path

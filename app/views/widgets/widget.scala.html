@@ -1,0 +1,49 @@
+@(mixpanelKey:String)
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Widget</title>
+    <link rel="stylesheet" type="text/css" href="/style/widget.css">
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.cookie.js"></script>
+    <script src="/js/widget.js"></script>
+    @if(mixpanelKey != null){
+      <!-- start Mixpanel --><script type="text/javascript">(function(e,b){if(!b.__SV){var a,f,i,g;window.mixpanel=b;a=e.createElement("script");a.type="text/javascript";a.async=!0;a.src=("https:"===e.location.protocol?"https:":"http:")+'//cdn.mxpnl.com/libs/mixpanel-2.2.min.js';f=e.getElementsByTagName("script")[0];f.parentNode.insertBefore(a,f);b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==
+      typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,
+      e,d])};b.__SV=1.2}})(document,window.mixpanel||[]);
+      mixpanel.init("@mixpanelKey");</script><!-- end Mixpanel -->
+    }else{
+        <script>mixpanel = { track:function(){} }</script>
+    }
+  </head>
+  <body>
+    <img src="/img/beta.png" class="beta-ribbon"/>
+    <span id="title"></span>
+    <a herf="#" id="start_btn" class="button"></a>
+    <a herf="#" id="stop_btn" class="button" style="display:none;"></a>
+    <ul id="log"></ul>
+    <ul id="links" style="display:none;">
+      <li><a id="cloudify_dashboard_link" href="#" target="_blank">Cloudify Dashboard</a></li>
+    </ul>
+    <span id="time_left" style="display:none;">Time left: <span id="time_left_counter"></span></span>
+    <div id="video_container"></div>
+    <a id="show_advanced" href="#"><img src="/img/widget_advanced_collapsed.png"></a>
+    <div id="advanced" style="display:none;">
+      <a id="hide_advanced" href="#"><img src="/img/widget_advanced_head.png"></a>
+      <form>
+        <input name="hpcs_key" placeholder="HPCS Key" disabled>
+        <input name="hpcs_secret_key" placeholder="HPCS Secret Key" disabled>
+      </form>
+    </div>
+    <div id="footer">
+      Powered by: <a href="http://hpcloud.com" target="_blank"><img class="brand_btns" src="/img/hp_cloud_icon.png"></a>
+      <a href="http://cloudifysource.org" target="_blank"><img class="brand_btns" src="/img/cloudify_icon.png"></a>
+      <a herf="#" id="patent_pending">&nbsp;&nbsp;(Patent Pending)</a>
+      <div class="put_left">
+        <a class="share_link" id="facebook_share_link"  href="#"><img src="/img/share_facebook.png"></a>
+        <a class="share_link" id="google_plus_share_link" href="#"><img src="/img/share_google.png"></a>
+        <a class="share_link" id="twitter_share_link" href="#"><img src="/img/share_twitter.png"></a>
+      </div>
+    </div>
+  </body>
+</html>
