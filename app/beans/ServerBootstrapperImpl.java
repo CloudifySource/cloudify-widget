@@ -56,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import server.DeployManager;
 import server.ServerBootstrapper;
 import server.exceptions.ServerException;
+import utils.CloudifyUtils;
 import utils.Utils;
 import beans.ProcExecutorImpl.ProcessStreamHandler;
 import beans.config.Conf;
@@ -165,7 +166,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		File cloudFolder = null;
 		try{
 			logger.info("Creating cloud folder with specific user credentials. User: " + userName + ", api key: " + apiKey);
-			cloudFolder = Utils.createCloudFolder(conf.server.cloudBootstrap, userName, apiKey);
+			cloudFolder = CloudifyUtils.createCloudFolder(conf.server.cloudBootstrap, userName, apiKey);
 
 			//Command line for bootstrapping remote cloud.
 			CommandLine cmdLine = new CommandLine(conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile());
@@ -197,7 +198,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 						+ streamHandler.getOutput(), resultHandler.getException() );
 			}
 			serverNode.setPublicIP(publicIp);
-			String privateKey = Utils.getCloudPrivateKey(cloudFolder, conf.server.cloudBootstrap);
+			String privateKey = CloudifyUtils.getCloudPrivateKey(cloudFolder, conf.server.cloudBootstrap);
 			if (StringUtils.isEmpty(privateKey)) {
 				throw new RuntimeException( "Bootstrap failed. No pem file found in cloud directory." );
 			}
