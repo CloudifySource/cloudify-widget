@@ -99,9 +99,14 @@ public class Utils
 	public static String getCloudifyPath() {
 		return null;
 	}
-
-
-
+	
+	public static String getExecutableExt() {
+		if ( System.getProperty("os.name").startsWith("Windows") ) {
+			return ".bat";
+		} else {
+			return ".sh";
+		}
+	}
 
 	/**
 	 * Download the archived recipe from url, save file it to local directory and unzip it.

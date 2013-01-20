@@ -165,7 +165,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			cloudFolder = CloudifyUtils.createCloudFolder(conf.server.cloudBootstrap, userName, apiKey);
 
 			//Command line for bootstrapping remote cloud.
-			CommandLine cmdLine = new CommandLine(conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile());
+			CommandLine cmdLine = new CommandLine(conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile() + Utils.getExecutableExt());
 			cmdLine.addArgument(cloudFolder.getName());
 
 			logger.info("Executing command line: " + cmdLine);
