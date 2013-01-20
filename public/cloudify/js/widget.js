@@ -88,62 +88,80 @@ $(function () {
     $("#log").scrollTop($("#log")[0].scrollHeight);
   }
 
-  function update_status() {
-    $.get("/widget/"+ widgetState.instanceId() + "/status?apiKey=" + apiKey, {}, function (data, textStatus, jqXHR) {
-      if (data.status.state == "stopped") {
-        $("#start_btn,#stop_btn").toggle();
-        stop_instance();
-      } else if (data.status.state == "error") {
-        $("#start_btn,#stop_btn").toggle();
-        write_log(data.status.message, "error");
-        stop_instance();
-      } else {
-        if (window.log != data.status.output) {
-          $("#log").empty();
-          $.each(data.status.output, function(index, value) {
-            write_log(value);
-          });
-          window.log = data.status.output;
+    function setTimeoutForUpdateStatus()
+    {
+        setTimeout( update_status, 1000 );
+    }
+
+    function handleUpdateStatusSuccess( data )
+    {
+        if ( data.status.state == "stopped" ) {
+            $( "#start_btn,#stop_btn" ).toggle();
+            stop_instance();
+        } else if ( data.status.state == "error" ) {
+            $( "#start_btn,#stop_btn" ).toggle();
+            write_log( data.status.message, "error" );
+            stop_instance();
+        } else {
+            if ( window.log != data.status.output ) {
+                $( "#log" ).empty();
+                $.each( data.status.output, function ( index, value )
+                {
+                    write_log( value );
+                } );
+                window.log = data.status.output;
+            }
+            $( "#time_left_counter" ).text( data.status.timeleft + " minutes" );
+            setTimeoutForUpdateStatus();
         }
-        $("#time_left_counter").text(data.status.timeleft + " minutes");
-      }
+    }
+
+  function update_status() {
+    $.ajax({
+        type:'get',
+        url: "/widget/"+ widgetState.instanceId() + "/status?apiKey=" + apiKey,
+        success:function( data ){ handleUpdateStatusSuccess(data); },
+        error:function(){ setTimeoutForUpdateStatus() }
     });
   }
 
 
 
   function stop_instance() {
-    write_log("Test drive successfully completed! <br/><a class='download_link' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.", "important");
-    $("#time_left").hide();
-    $("#links").hide();
-    widgetState.remove( true );
-    remove_status_update_timer();
-  }
-
-  function start_instance_btn_handler() {
-    $("#start_btn,#stop_btn").toggle();
-    if (!widgetState.isValid()) {
-      $.post("/widget/start?apiKey=" + params["apiKey"], {}, function(data, textStatus, jqXHR) {
-        if (data.status == "error") {
-          $("#start_btn,#stop_btn").toggle();
-          write_log(data.message, "error");
-          return;
-        }
-
-        if (data.instance["@instanceId"]) {
-            widgetState.instanceId( data.instance["@instanceId"] ).publicIp(data.instance["@publicIP"] ).remove(false);
-          $("#time_left").show();
-          set_status_update_timer();
-
-          var link_info = data.instance.link;
-          var custom_link = "<li id='custom_link'><a href='" + link_info.url + "' target='_blank'>" + link_info.title + "</a></li>";
-          set_cloudify_dashboard_link(custom_link);
-        }
-      });
+    if( $("#log" ).find(".successfully_completed_msg" ).length == 0 ){ // make sure this appears only once.. we might be firing an Ajax request after the first stop.
+        write_log("Test drive successfully completed! <br/><a class='download_link successfully_completed_msg' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.", "important");
     }
+    $("#time_left, #links").hide();
+    widgetState.remove( true );
+
   }
 
-  function stop_instance_btn_handler() {
+    function start_instance_btn_handler()
+    {
+        $( "#start_btn,#stop_btn" ).toggle();
+        if ( !widgetState.isValid() ) {
+            $.post( "/widget/start?apiKey=" + params["apiKey"], {}, function ( data, textStatus, jqXHR )
+            {
+                if ( data.status == "error" ) {
+                    $( "#start_btn,#stop_btn" ).toggle();
+                    write_log( data.message, "error" );
+                    return;
+                }
+
+                if ( data.instance["@instanceId"] ) {
+                    widgetState.instanceId( data.instance["@instanceId"] ).publicIp( data.instance["@publicIP"] ).remove( false );
+                    $( "#time_left" ).show();
+                    setTimeoutForUpdateStatus();
+
+                    var link_info = data.instance.link;
+                    var custom_link = "<li id='custom_link'><a href='" + link_info.url + "' target='_blank'>" + link_info.title + "</a></li>";
+                    set_cloudify_dashboard_link( custom_link );
+                }
+            } );
+        }
+    }
+
+    function stop_instance_btn_handler() {
     if (!confirm("Are you sure you want to stop the instance?")) {
       return;
     }
@@ -160,15 +178,8 @@ $(function () {
     }
   }
 
-  function set_status_update_timer() {
-    var status_update_frequency = 3000; // refresh every 3 sec
-    window.status_update_timer = setInterval(update_status, status_update_frequency);
-    update_status();
-  }
 
-  function remove_status_update_timer() {
-    clearInterval(window.status_update_timer);
-  }
+
 
 
   function set_cloudify_dashboard_link(custom_link) {
@@ -203,7 +214,7 @@ $(function () {
   if (widgetState.instanceId()) {
     $("#start_btn,#stop_btn,#time_left").toggle();
     set_cloudify_dashboard_link( widgetState.customLink() );
-    set_status_update_timer();
+    setTimeoutForUpdateStatus();
   }
 
   $("#start_btn").click(start_instance_btn_handler);
