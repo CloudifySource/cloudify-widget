@@ -73,6 +73,15 @@ chkconfig --levels 235 monit on
 echo "upgrading system"
 upgrade_server
 
+echo "installing takipi"
+cd ~
+wget https://s3.amazonaws.com/app-takipi-com/deploy/linux/takipi-install
+chmod +x ./takipi-install
+./takipi-install
+TAKIPI_KEY=`cat /var/lib/takipi/work/service.key`
+echo "to see takipi information go to  https://app.takipi.com with ${TAKIPI_KEY}"
+cat /etc/sysconfig/play  | sed 's/__takipi_key__/'"$TAKIPI_KEY"'/' > /etc/sysconfig/play
+
 
 
 
