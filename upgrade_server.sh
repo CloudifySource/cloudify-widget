@@ -3,6 +3,7 @@ echo "pulling source from git repository"
 git pull
 if [ "$?" -ne "0" ]; then       # we need to consider using hard reset here instead of specifying there's a problem: git reset --hard
     echo "problems with git pull, run git status to see the problem"
+    exit 1
 fi
 
 # note: this script does not need an update. it is edited on production and never committed to CVS.
