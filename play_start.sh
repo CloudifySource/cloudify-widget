@@ -2,6 +2,6 @@
 
 if [ -f /var/lib/takipi/so/libTakipiAgent.so ]; then
     echo "adding takipi to java options"
-    _JAVA_OPTIONS="${_JAVA_OPTIONS} -agentpath:/var/lib/takipi/so/libTakipiAgent.so"
+    export _JAVA_OPTIONS="${_JAVA_OPTIONS} -agentpath:/var/lib/takipi/so/libTakipiAgent.so"
 fi
 nohup play -Dconfig.file=conf/prod.conf start &
