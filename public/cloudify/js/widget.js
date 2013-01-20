@@ -1,4 +1,7 @@
 $(function () {
+
+
+
   function get_params() {
     var params = [], hash;
     var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
@@ -14,9 +17,71 @@ $(function () {
   var params = get_params();
   var origin_page_url = params["origin_page_url"];
 
-  function instanceId() {
-    return $.cookie("instanceId" + origin_page_url);
-  }
+
+    var WidgetState = function(){
+
+        var cookieName = "widgetCookie" + origin_page_url;
+
+        function _get(){
+            try{
+                var cookieValue = JSON.parse( $.cookie(cookieName) );
+                return cookieValue == null ? {} : cookieValue; // never return null
+            }catch(e){ console.log(["error parsing cookie. deleting the cookie ",e]);$.cookie( cookieName,null ); return {}; }
+        }
+
+        function _set( obj ){
+            var newObj = $.extend(_get(), obj);
+            $.cookie( cookieName, JSON.stringify(newObj) );
+        }
+
+        function get_or_set( key, val )
+        {
+            if ( !val || typeof(val) == "undefined" ) {
+                return _get()[key];
+            } else {
+                var toSet={};
+                toSet[key]= val;
+                _set( toSet );
+                return this;
+            }
+        }
+
+
+        // should make sure cookie is not empty and not removed ( we support logical remove )
+        this.isValid = function ()
+        {
+            var currentCookie = _get();
+            return currentCookie != null && typeof(currentCookie) != "undefined" && !$.isEmptyObject( currentCookie ) && !currentCookie.removed
+        };
+
+
+        function generateFieldFunction( key ){ return function( val ){ get_or_set(key,val) };}
+        this.instanceId = generateFieldFunction("instanceId");
+        this.publicIp = generateFieldFunction("publicIp");
+        this.customLink = generateFieldFunction("publicIp");
+
+        this.remove = function ( remove )
+        {
+            _set( { removed: remove } ); // logic remove just in case removing the cookie does not work
+            if ( remove ) {  // try removing the cookie. see issue #40
+
+                try {
+                    $.removeCookie( cookieName );
+                    $.cookie( cookieName, null );
+                } catch ( e ) {
+                    console.log( ["error removing cookie", e] )
+                }
+                var currentCookie = _get();
+                if ( $.isEmptyObject( currentCookie ) ) {
+                    console.log( ["cookie is not removed for some reason, using logic delete instead"] )
+                }
+            }
+        }
+    };
+
+
+
+    var widgetState = new WidgetState();
 
   function write_log(message, class_name) {
     $("#log").append($("<li/>", {html: message}).addClass(class_name));
@@ -24,7 +89,7 @@ $(function () {
   }
 
   function update_status() {
-    $.get("/widget/"+ instanceId() + "/status?apiKey=" + apiKey, {}, function (data, textStatus, jqXHR) {
+    $.get("/widget/"+ widgetState.instanceId() + "/status?apiKey=" + apiKey, {}, function (data, textStatus, jqXHR) {
       if (data.status.state == "stopped") {
         $("#start_btn,#stop_btn").toggle();
         stop_instance();
@@ -45,18 +110,19 @@ $(function () {
     });
   }
 
+
+
   function stop_instance() {
     write_log("Test drive successfully completed! <br/><a class='download_link' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.", "important");
     $("#time_left").hide();
     $("#links").hide();
-    $.removeCookie("instanceId" + origin_page_url);
-    $.removeCookie("publicIP" + origin_page_url);
+    widgetState.remove();
     remove_status_update_timer();
   }
 
   function start_instance_btn_handler() {
     $("#start_btn,#stop_btn").toggle();
-    if (!instanceId()) {
+    if (!widgetState.isValid()) {
       $.post("/widget/start?apiKey=" + params["apiKey"], {}, function(data, textStatus, jqXHR) {
         if (data.status == "error") {
           $("#start_btn,#stop_btn").toggle();
@@ -65,8 +131,7 @@ $(function () {
         }
 
         if (data.instance["@instanceId"]) {
-          $.cookie("instanceId" + origin_page_url, data.instance["@instanceId"]);
-          $.cookie("publicIP" + origin_page_url, data.instance["@publicIP"]);
+            widgetState.instanceId( data.instance["@instanceId"] ).publicIp(data.instance["@publicIP"] ).remove(false);
           $("#time_left").show();
           set_status_update_timer();
 
@@ -83,8 +148,8 @@ $(function () {
       return;
     }
     $("#start_btn,#stop_btn").toggle();
-    if (instanceId()) {
-      $.post("/widget/"+ instanceId() + "/stop?apiKey=" + params["apiKey"], {}, function (data) {
+    if ( widgetState.instanceId()) {
+      $.post("/widget/"+ widgetState.instanceId() + "/stop?apiKey=" + params["apiKey"], {}, function (data) {
         if (data.status == "error") {
           $("#start_btn,#stop_btn").toggle();
           write_log(data.message, "error");
@@ -108,8 +173,8 @@ $(function () {
 
   function set_cloudify_dashboard_link(custom_link) {
     $("#links").show();
-    $("#cloudify_dashboard_link").attr("href", "http://" + $.cookie("publicIP" + origin_page_url) + ":8099/");
-    $.cookie("custom_link", custom_link);
+    $("#cloudify_dashboard_link").attr("href", "http://" + widgetState.publicIp() + ":8099/");
+      widgetState.customLink( custom_link );
     if ($("#custom_link").get(0))
       $("#custom_link").replaceWith(custom_link);
     else
@@ -135,9 +200,9 @@ $(function () {
     $("#youtube_iframe").attr("src", decodeURIComponent(params["video_url"]));
   }
 
-  if (instanceId()) {
+  if (widgetState.instanceId()) {
     $("#start_btn,#stop_btn,#time_left").toggle();
-    set_cloudify_dashboard_link($.cookie("custom_link"));
+    set_cloudify_dashboard_link( widgetState.customLink );
     set_status_update_timer();
   }
 
