@@ -49,8 +49,7 @@ $(function () {
     write_log("Test drive successfully completed! <br/><a class='download_link' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.", "important");
     $("#time_left").hide();
     $("#links").hide();
-    $.removeCookie("instanceId" + origin_page_url);
-    $.removeCookie("publicIP" + origin_page_url);
+    widgetState.remove( true );
     remove_status_update_timer();
   }
 
@@ -138,7 +137,7 @@ $(function () {
 
   if (instanceId()) {
     $("#start_btn,#stop_btn,#time_left").toggle();
-    set_cloudify_dashboard_link($.cookie("custom_link"));
+    set_cloudify_dashboard_link( widgetState.customLink() );
     set_status_update_timer();
   }
 
