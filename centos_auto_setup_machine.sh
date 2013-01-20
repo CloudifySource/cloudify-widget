@@ -1,4 +1,4 @@
-
+#! /bin/bash
 yum  -y install java-1.6.0-openjdk-devel
 export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk.x86_64
 
@@ -78,9 +78,29 @@ cd ~
 wget https://s3.amazonaws.com/app-takipi-com/deploy/linux/takipi-install
 chmod +x ./takipi-install
 ./takipi-install
-TAKIPI_KEY=`cat /var/lib/takipi/work/service.key`
+
+# The "setup" process assumes there are no JVM installed with Takipi on them.
+# However, if we are not setting up a new environment, but changing existing environment,
+# we need to follow these steps :
+# 1. install Takipi, then stop the daemon by running: /etc/takipi/takipi-stop
+# 2. open this file using a text editor (with root privileges): /var/lib/takipi/work/service.key
+# 3. paste old key
+# 4. restart daemon using: /etc/takipi/takipi-start
+# And proceed normally.
+
+
+#we already have a key?
+if [ "$TAKIPI_KEY" -ne "" ]; then
+    echo "reusing takipi key"
+    echo $TAKIPI_KEY > /var/lib/takipi/work/service.key
+else
+    echo "we do not have existing takipi key, lets use the new one"
+    TAKIPI_KEY=`cat /var/lib/takipi/work/service.key`
+    echo "\nTAKIPI_KEY=${TAKIPI_KEY}" > /etc/sysconfig/play
+fi
+
 echo "to see takipi information go to  https://app.takipi.com with ${TAKIPI_KEY}"
-cat /etc/sysconfig/play  | sed 's/__takipi_key__/'"$TAKIPI_KEY"'/' > /etc/sysconfig/play
+
 
 
 
