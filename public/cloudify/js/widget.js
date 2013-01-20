@@ -202,7 +202,7 @@ $(function () {
 
   if (widgetState.instanceId()) {
     $("#start_btn,#stop_btn,#time_left").toggle();
-    set_cloudify_dashboard_link( widgetState.customLink );
+    set_cloudify_dashboard_link( widgetState.customLink() );
     set_status_update_timer();
   }
 
