@@ -92,7 +92,9 @@ chmod +x ./takipi-install
 #we already have a key?
 if [ "$TAKIPI_KEY" -ne "" ]; then
     echo "reusing takipi key"
+    /etc/takipi/takipi-stop
     echo $TAKIPI_KEY > /var/lib/takipi/work/service.key
+    /etc/takipi/takipi-start
 else
     echo "we do not have existing takipi key, lets use the new one"
     TAKIPI_KEY=`cat /var/lib/takipi/work/service.key`
