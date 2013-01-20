@@ -116,7 +116,7 @@ $(function () {
     write_log("Test drive successfully completed! <br/><a class='download_link' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.", "important");
     $("#time_left").hide();
     $("#links").hide();
-    widgetState.remove();
+    widgetState.remove( true );
     remove_status_update_timer();
   }
 
