@@ -88,9 +88,10 @@ $(function () {
     $("#log").scrollTop($("#log")[0].scrollHeight);
   }
 
-    function setTimeoutForUpdateStatus()
+    function setTimeoutForUpdateStatus( myTimeout )
     {
-        setTimeout( update_status, 10000 );
+        myTimeout = ( typeof(myTimeout) == "undefined" || myTimeout == null ) ? 10000 : myTimeout;
+        setTimeout( update_status, myTimeout );
     }
 
     function handleUpdateStatusSuccess( data )
@@ -151,7 +152,7 @@ $(function () {
                 if ( data.instance["@instanceId"] ) {
                     widgetState.instanceId( data.instance["@instanceId"] ).publicIp( data.instance["@publicIP"] ).remove( false );
                     $( "#time_left" ).show();
-                    setTimeoutForUpdateStatus();
+                    setTimeoutForUpdateStatus( 1 );
 
                     var link_info = data.instance.link;
                     var custom_link = "<li id='custom_link'><a href='" + link_info.url + "' target='_blank'>" + link_info.title + "</a></li>";
@@ -214,7 +215,7 @@ $(function () {
   if (widgetState.instanceId()) {
     $("#start_btn,#stop_btn,#time_left").toggle();
     set_cloudify_dashboard_link( widgetState.customLink() );
-    setTimeoutForUpdateStatus();
+    setTimeoutForUpdateStatus( 1 );
   }
 
   $("#start_btn").click(start_instance_btn_handler);
