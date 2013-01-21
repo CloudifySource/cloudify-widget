@@ -105,8 +105,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			} catch (Exception e) 
 			{
 				// failed to boostrap machine, nothing todo - let destroy :(
-				if ( srvNode != null )
+				if ( srvNode != null ) {
 					destroyServer(srvNode.getId());
+                }
 					
 				logger.error("Failed to bootstrap machine. ", e);
 			}
@@ -118,6 +119,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     
 	public void destroyServer( String serverId )
 	{
+        logger.info("destroying server {}", serverId );
 	   deleteServer(serverId);
 	}
 
@@ -217,27 +219,13 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 				FileUtils.deleteQuietly(cloudFolder);
 		}
 	}
-	
-	public List<Server> getServerList()
-	{
-		ServerApi serverApi = _nova.getApi().getServerApiForZone( conf.server.bootstrap.zoneName );
-		
-		FluentIterable<? extends Server> serverIterator = serverApi.listInDetail().concat();   
-		
-		List<Server> serverList = new ArrayList<Server>();
-		for( Server srv : serverIterator )
-			serverList.add( srv );
 
-		return serverList;
-	}
-	
 	
 	private void deleteServer( String serverId )
 	{
 		deployManager.destroyExecutor(serverId);
 		ServerApi serverApi = _nova.getApi().getServerApiForZone( conf.server.bootstrap.zoneName );
 		serverApi.delete(serverId);
-
 		logger.info("Server id: {} was deleted.", serverId);
 	}
 	

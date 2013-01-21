@@ -28,25 +28,21 @@ public class ServerBootstrapperMock implements ServerBootstrapper
 {
     private static Logger logger = LoggerFactory.getLogger(ServerBootstrapperMock.class);
 
-    public List<Server> getServerList() {
-        logger.info("getting server list");
-        return null;
-    }
-
+    @Override
     public void destroyServer(String serverId) {
         logger.info("destroying server {}",serverId);
 
     }
-
+    @Override
     public List<ServerNode> createServers(int numOfServers) {
         logger.info("creating servers {}", numOfServers);
         return null;
     }
-
+    @Override
     public void close() {
         logger.info("closing");
     }
-    
+    @Override
     public ServerNode bootstrapCloud(String user, String pass){
     	logger.info("bootstrapping cloud with [user,pass] = [{},{}]", user, pass);
     	return null;

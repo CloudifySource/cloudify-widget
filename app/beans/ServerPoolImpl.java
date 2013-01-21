@@ -18,13 +18,13 @@ package beans;
 import java.util.List;
 
 import beans.config.Conf;
-import org.jclouds.openstack.nova.v2_0.domain.Server;
 
 import models.ServerNode;
 import models.WidgetInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import server.*;
+import utils.CollectionUtils;
 
 import javax.inject.Inject;
 
@@ -57,92 +57,41 @@ public class ServerPoolImpl implements ServerPool
     public void init()
 	{
 		logger.info( "Started to initialize ServerPool, cold-init={}", conf.server.pool.coldInit );
-		
 		// get all available running servers
-		List<Server> serverList = serverBootstrapper.getServerList();
-		for( java.util.Iterator<Server> iter = serverList.iterator(); iter.hasNext(); )
-		{
-			Server srv = iter.next();
-			
-			// ignore our server
-			if ( srv.getId().equals( conf.widget.serverId ) )
-			{
-				iter.remove();
-				continue;
-			}
-			
-			ServerNode server = ServerNode.getServerNode(srv.getId());
-			
-			// if null this server wasn't found in our DB or server expired - we terminate it
-//			if ( server == null || server.isExpired() || conf.server.pool.coldInit )
-//			{
-//				logger.info( "ServerId: {} expired or not found in server-pool, address: {}", srv.getId(), srv.getAddresses()  );
-//				serverBootstrapper.destroyServer( srv.getId() );
-//				iter.remove();
-//			}
-			if ( server!= null )
-			{
+        List<ServerNode> servers = ServerNode.all();
+        if ( !CollectionUtils.isEmpty( servers )){
+            for (ServerNode server : servers) {
 				if ( server.isBusy() )
 				{
-				   logger.info( "Found a busy server, leave it: {}", srv );
-				   iter.remove();
-				      
-				   if ( server.isTimeLimited() )  {
+
+                     logger.info( "Found a busy server, setting destruction: {}", server );
 				     expiredServerCollector.scheduleToDestroy(server);
-                   }
+
 				}
 				else
-				   logger.info( "Found a free bootstrapped server, add to a server pool: {}", srv );
+				   logger.info( "Found a free bootstrapped server, add to a server pool: {}", server );
 			}
 		}// for
 
-		
-		/* check whether in server-pool left some orphans servers,
-		 * it may happen if server-pool still keeps some server that already terminated 
-		 */
-		logger.info("Check whether in server-pool left some orphans servers...");
-		for( ServerNode node : ServerNode.all() )
-		{
-			boolean isFound = false;
-			for( Server activeServer : serverList  )
-			{
-				if ( activeServer.getId().equals(node.getId()) )
-				{
-					isFound = true;
-					break;
-				}
-			}
-			
-			if ( !isFound )
-			{
-				logger.info("Delete orphans server from a server pool {}" , node);
-				node.delete();
-			}
-		}
-		
 		// create new servers if need
-		if ( serverList.size() < conf.server.pool.minNode )
+		if ( CollectionUtils.size( servers )  < conf.server.pool.minNode )
 		{
-			int serversToInit = conf.server.pool.minNode - serverList.size();
-			
+			int serversToInit = conf.server.pool.minNode - CollectionUtils.size( servers );
 			logger.info( "ServerPool starting to initialize {} servers...", serversToInit );
-			
-			List<ServerNode> servers = serverBootstrapper.createServers(serversToInit);
+            addNewServerToPool( serversToInit );
 
-			// keep in DB as free servers
-			for( ServerNode srv :  servers )
-				srv.save();
 		}
 	}
 	
 	/** @return a ServerNode from the pool, otherwise <code>null</code> if no free server available */
-	synchronized public ServerNode get()
+    @Override
+	synchronized public ServerNode get( long lifeExpectancy )
 	{
 		ServerNode freeServer = ServerNode.getFreeServer();
 		if ( freeServer != null)
 		{
 			freeServer.setBusy(true);
-			
+			freeServer.setExpirationTime( lifeExpectancy + System.currentTimeMillis() );
 			// schedule to destroy after time expiration 
 			// TODO when unlimited server will support uncomment this line if ( freeServer.isTimeLimited() )
 			expiredServerCollector.scheduleToDestroy(freeServer);
@@ -155,6 +104,7 @@ public class ServerPoolImpl implements ServerPool
 	
 	public void destroy(String serverId)
 	{
+        logger.info("destroying server {}", serverId);
 		// when we move to Quarz just unregister from Cron
 		if ( ServerNode.getServerNode( serverId ) != null ){
 			addNewServerToPool();
@@ -164,15 +114,19 @@ public class ServerPoolImpl implements ServerPool
 		ServerNode.deleteServer( serverId );
         serverBootstrapper.destroyServer( serverId );
 	}
+
+    private void addNewServerToPool( int number ){
+        for (int i = 0; i < number; i++) {
+            addNewServerToPool();
+        }
+    }
+
+    private boolean isPoolSaturated(){
+        return ServerNode.count() >= conf.server.pool.maxNodes;
+    }
 	
 	void addNewServerToPool()
 	{
-		if ( ServerNode.count() >= conf.server.pool.maxNodes )
-		{
-			logger.info("Server-pool has reached maximum capacity: {}" , conf.server.pool.maxNodes);
-			return;
-		}
-
 		new Thread(new Runnable()
 		{
 			public void run()

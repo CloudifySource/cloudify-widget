@@ -93,7 +93,7 @@ public class WidgetServerImpl implements WidgetServer
         }
 		
 
-		ServerNode server = serverPool.get();
+		ServerNode server = serverPool.get( widget.getLifeExpectancy() );
 		if ( server == null ){
 			mailSender.sendPoolIsEmptyMail();
 			throw new ServerException(Messages.get("no.available.servers"));
