@@ -1,4 +1,6 @@
 function cloudifyWidgetInitialization(){
+
+
     function cloudifyWidgetOnLoadHandler(){
         var element = document.getElementById("cloudify-widget");
         var api_key = element.dataset["apiKey"];
@@ -12,7 +14,7 @@ function cloudifyWidgetInitialization(){
         element.parentNode.insertBefore(iframe, element.nextSibling);
 
         // todo : make protocol insensitive once we support HTTPS.
-        iframe.setAttribute("src", "http://" + host + "/widget/widget?" + params.join("&"));
+        iframe.setAttribute("src", "http://" + host + "/widget.html?" + params.join("&"));
         iframe.setAttribute("width", "600px");
         iframe.setAttribute("height", "463px");
         iframe.setAttribute("frameborder", "no");

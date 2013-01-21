@@ -57,10 +57,10 @@ public class Application extends Controller
 		try
 		{
 			logger.info("starting widget with [apiKey, hpcsKey, hpcsSecretKey] = [{},{},{}]", new Object[]{apiKey, hpcsKey, hpcsSecretKey} );
- 			Widget widget = Widget.getWidget( apiKey );
-           	if ( widget == null || !widget.isEnabled()){
-                	new HeaderMessage().setError( Messages.get("widget.disabled.by.administrator") ).apply( response().getHeaders() );
-	                return badRequest(  );
+			Widget widget = Widget.getWidget(apiKey);
+			if ( widget == null || !widget.isEnabled()){
+                new HeaderMessage().setError( Messages.get("widget.disabled.by.administrator") ).apply( response().getHeaders() );
+                return badRequest(  );
             }
 			ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ));
 			WidgetInstance wi = null;
@@ -68,10 +68,11 @@ public class Application extends Controller
 			if ( isValidInput(hpcsKey, hpcsSecretKey) ){
 				ServerNode server = ApplicationContext.get().getServerBootstrapper().bootstrapCloud( hpcsKey, hpcsSecretKey );
 //				server.save();
+
 				ApplicationContext.get().getWidgetServer().deploy(widget, server);
 				return ok();
 			}else{
-				wi = ApplicationContext.get().getWidgetServer().deploy(apiKey);
+				wi = ApplicationContext.get().getWidgetServer().deploy(apiKey); // todo : use widget instead of apiKey
 			}
 			return resultAsJson(wi);
 		}catch(ServerException ex)

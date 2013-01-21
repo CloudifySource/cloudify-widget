@@ -28,9 +28,6 @@ public class Conf {
     @Config(ignoreNullValues = true)
     public boolean sendErrorEmails = false;
 
-    @Config( playKey = "spring.context")
-    public String springContext = null;
-
     public CloudifyConfiguration cloudify = new CloudifyConfiguration();
 
     public String mixpanelApiKey = null;

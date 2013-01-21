@@ -44,11 +44,6 @@ import utils.RestUtils;
 
 import static utils.RestUtils.*;
 
-import views.html.common.linkExpired;
-import views.html.widgets.*;
-import views.html.widgets.admin.*;
-import views.html.widgets.dashboard.*;
-
 
 /**
  * Widget Admin controller.
@@ -59,11 +54,6 @@ public class WidgetAdmin extends Controller
 {
 
     private static Logger logger = LoggerFactory.getLogger( WidgetAdmin.class );
-
-    public static Result getWidget(){
-
-        return ok( widget.render( ApplicationContext.get().conf().mixpanelApiKey ) );
-    }
 	/*
 	 * Creates new account.
 	 */
@@ -118,13 +108,13 @@ public class WidgetAdmin extends Controller
         User user = User.findById( pi );
         // validate p
         if ( !ApplicationContext.get().getHmac().compare( p, user.getEmail(),  user.getId(), user.getPassword()  )){
-            return badRequest(  linkExpired.render() );
+            return badRequest(  views.html.common.linkExpired.render() );
         }
         // if p is valid lets reset the password
-        String newPasswordStr = StringUtils.substring( p, 0, 7 );
-        user.encryptAndSetPassword( newPasswordStr );
+        String newPassword = StringUtils.substring( p, 0, 7 );
+        user.encryptAndSetPassword( newPassword );
         user.save();
-        return ok( newPassword.render( newPasswordStr ) );
+        return ok( views.html.widgets.admin.newPassword.render( newPassword ) );
     }
 
     public static Result postResetPassword( String email, String h ){
@@ -150,21 +140,21 @@ public class WidgetAdmin extends Controller
 
 
     public static Result getAccountPage(){
-        return ok( account.render() );
+        return ok( views.html.widgets.dashboard.account.render() );
     }
 
     public static Result getWidgetsPage(){
-        return ok( widgets.render() );
+        return ok( views.html.widgets.dashboard.widgets.render() );
     }
     public static Result getSigninPage( String message ){
-        return ok( signin.render( message ));
+        return ok(views.html.widgets.admin.signin.render( message ));
     }
 
     public static Result getSignupPage(){
-        return ok( signup.render() );
+        return ok( views.html.widgets.admin.signup.render() );
     }
     public static Result getResetPasswordPage(){
-        return ok( resetPassword.render() );
+        return ok( views.html.widgets.admin.resetPassword.render() );
     }
 
 
@@ -415,7 +405,7 @@ public class WidgetAdmin extends Controller
     public static Result previewWidget( String apiKey ){
         String authToken = request().cookies().get("authToken").value();
         Widget widget = getWidgetSafely( authToken, apiKey );
-        return ok( previewWidget.render(widget, request().host()));
+        return ok(views.html.widgets.dashboard.previewWidget.render(widget, request().host()));
     }
 	
 	public static Result regenerateWidgetApiKey( String authToken, String apiKey )

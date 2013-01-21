@@ -124,15 +124,11 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	}
 
     public void init(){
-        String cloudProvider = conf.server.bootstrap.cloudProvider;
-        String username = conf.server.bootstrap.username;
-        String apiKey = conf.server.bootstrap.apiKey;
-        logger.info( "initializing bootstrapper with [cloudProvider, username, apiKey]=[{},{},{}]", new Object[]{cloudProvider, username, apiKey} );
-        ContextBuilder contextBuilder = ContextBuilder.newBuilder( cloudProvider );
-        contextBuilder.credentials( username, apiKey );
-        ComputeServiceContext context = contextBuilder.buildView( ComputeServiceContext.class );
-        _compute = context.getComputeService();
-        _nova = context.unwrap();
+        ComputeServiceContext context = ContextBuilder.newBuilder( conf.server.bootstrap.cloudProvider )
+        				.credentials( conf.server.bootstrap.username, conf.server.bootstrap.apiKey)
+        				.buildView(ComputeServiceContext.class);
+        		_compute = context.getComputeService();
+        		_nova = context.unwrap();
     }
 
 	

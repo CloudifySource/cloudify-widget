@@ -1,7 +1,4 @@
 $(function () {
-
-
-
   function get_params() {
     var params = [], hash;
     var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
@@ -17,6 +14,9 @@ $(function () {
   var params = get_params();
   var origin_page_url = params["origin_page_url"];
 
+  function instanceId() {
+    return $.cookie("instanceId" + origin_page_url);
+  }
 
     var WidgetState = function(){
 
@@ -123,10 +123,9 @@ $(function () {
         url: "/widget/"+ widgetState.instanceId() + "/status?apiKey=" + apiKey,
         success:function( data ){ handleUpdateStatusSuccess(data); },
         error:function(){ setTimeoutForUpdateStatus() }
+
     });
   }
-
-
 
   function stop_instance() {
     if( $("#log" ).find(".successfully_completed_msg" ).length == 0 ){ // make sure this appears only once.. we might be firing an Ajax request after the first stop.
@@ -168,8 +167,8 @@ $(function () {
       return;
     }
     $("#start_btn,#stop_btn").toggle();
-    if ( widgetState.instanceId()) {
-      $.post("/widget/"+ widgetState.instanceId() + "/stop?apiKey=" + params["apiKey"], {}, function (data) {
+    if (instanceId()) {
+      $.post("/widget/"+ instanceId() + "/stop?apiKey=" + params["apiKey"], {}, function (data) {
         if (data.status == "error") {
           $("#start_btn,#stop_btn").toggle();
           write_log(data.message, "error");
@@ -186,8 +185,8 @@ $(function () {
 
   function set_cloudify_dashboard_link(custom_link) {
     $("#links").show();
-    $("#cloudify_dashboard_link").attr("href", "http://" + widgetState.publicIp() + ":8099/");
-      widgetState.customLink( custom_link );
+    $("#cloudify_dashboard_link").attr("href", "http://" + $.cookie("publicIP" + origin_page_url) + ":8099/");
+    $.cookie("custom_link", custom_link);
     if ($("#custom_link").get(0))
       $("#custom_link").replaceWith(custom_link);
     else
@@ -209,11 +208,11 @@ $(function () {
 
 
   if (params["video_url"]) {
-    $("#video_container").append($("<iframe id='youtube_iframe' width='270' height='160' frameborder='0' allowfullscreen></iframe>"));
+    $("#video_container").append($("<iframe id='youtube_iframe' width='270' height='160' frameborder='0' allowfullscreen></iframe>"))
     $("#youtube_iframe").attr("src", decodeURIComponent(params["video_url"]));
   }
 
-  if (widgetState.instanceId()) {
+  if (instanceId()) {
     $("#start_btn,#stop_btn,#time_left").toggle();
     set_cloudify_dashboard_link( widgetState.customLink() );
     setTimeoutForUpdateStatus( 1 );
@@ -226,16 +225,13 @@ $(function () {
     $("#advanced").toggle();
   });
 
+    $(".download_link" ).live("click",function(){
+        mixpanel.track("Download Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url});
+    });
 
-        $(".download_link" ).live("click",function(){
-            mixpanel.track("Download Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url});
-        });
-
-        $(".documentation_link" ).live("click",function(){
-            mixpanel.track("Documentation Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url});
-        });
-
-        mixpanel.track("Widget Impression");
+    $(".documentation_link" ).live("click",function(){
+        mixpanel.track("Documentation Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url});
+    });
 
   $(".share_link").click(function (e) {
     e.preventDefault();
