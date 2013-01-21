@@ -38,8 +38,6 @@ public interface ServerBootstrapper
 {
     public List<ServerNode> createServers(int numOfServers);
 
-    public List<Server> getServerList();
-
     public void destroyServer(String serverId);
 
     public void close();

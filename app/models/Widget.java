@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -26,11 +27,13 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import beans.config.ServerConfig;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import play.db.ebean.Model;
 import play.i18n.Messages;
+import server.ApplicationContext;
 import server.exceptions.ServerException;
 import utils.Utils;
 
@@ -69,6 +72,8 @@ public class Widget
 	private String consoleURL;
     @JsonProperty( value="rootpath")
     private String recipeRootPath;
+
+    private long lifeExpectancy = 0;
     @JsonIgnore
     @ManyToOne( optional = false )
     private User user;
@@ -345,4 +350,17 @@ public class Widget
 	{
 		return Utils.reflectedToString(this);
 	}
+
+    public long getLifeExpectancy() {
+        // by default use configuration
+        return lifeExpectancy == 0 ? ApplicationContext.get().conf().server.pool.expirationTimeMillis : lifeExpectancy ;
+    }
+
+    public void setLifeExpectancy(long lifeExpectancy) {
+        ServerConfig.PoolConfiguration poolConf = ApplicationContext.get().conf().server.pool;
+        lifeExpectancy = Math.max( lifeExpectancy, poolConf.minExpiryTimeMillis );
+        lifeExpectancy = Math.min(lifeExpectancy, poolConf.maxExpirationTimeMillis);
+        this.lifeExpectancy = lifeExpectancy;
+    }
+
 }

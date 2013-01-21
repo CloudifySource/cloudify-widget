@@ -25,7 +25,7 @@ import models.ServerNode;
  */
 public interface ServerPool 
 {
-    public ServerNode get();
+    public ServerNode get( long lifeExpectancy );
 
     public void destroy( String serverId );
 

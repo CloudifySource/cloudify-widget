@@ -31,6 +31,10 @@ public class ServerConfig {
         public int maxNodes = 5;
         @Config( ignoreNullValues = true )
         public long expirationTimeMillis = Utils.parseTimeToMillis("60mn");
+        @Config( ignoreNullValues = true )
+        public long maxExpirationTimeMillis = Utils.parseTimeToMillis("30mn");
+        @Config( ignoreNullValues = true )
+        public long minExpiryTimeMillis = Utils.parseTimeToMillis("10mn");
 
     }
 

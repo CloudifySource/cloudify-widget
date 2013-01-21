@@ -15,21 +15,19 @@
  *******************************************************************************/
 package models;
 
-import java.util.List;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-
-import org.jclouds.openstack.nova.v2_0.domain.Address;
-import org.jclouds.openstack.nova.v2_0.domain.Server;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
-
+import org.jclouds.openstack.nova.v2_0.domain.Address;
+import org.jclouds.openstack.nova.v2_0.domain.Server;
 import play.db.ebean.Model;
 import utils.Utils;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * The ServerNode keeps all metadata of all created and available/busy servers.
@@ -80,10 +78,11 @@ extends Model
 	public ServerNode( Server srv )
 	{
 		this.serverId  = srv.getId();
-		this.privateIP = srv.getAddresses().get("private").toArray(new Address[0])[0].getAddr();
-		this.publicIP  = srv.getAddresses().get("private").toArray(new Address[0])[1].getAddr();
-		this.expirationTime = Long.MAX_VALUE;
-		busy = false;
+        Collection<Address> aPrivate = srv.getAddresses().get("private");
+        Address[] addresses = aPrivate.toArray(new Address[aPrivate.size()]);
+        this.privateIP = addresses[0].getAddr();
+		this.publicIP  = addresses[1].getAddr();
+		this.expirationTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis( 30 ); // default unless configured otherwise
 	}
 
 	public String getId()
@@ -105,12 +104,6 @@ extends Model
 		this.publicIP = publicIP;
 	}
 
-	/** return <code>true</code> if this server has an expiration time to destroy */
-	public boolean isTimeLimited()
-	{
-		return expirationTime != Long.MAX_VALUE;
-	}
-
 	public Long getExpirationTime()
 	{
 		return expirationTime;
@@ -124,15 +117,7 @@ extends Model
 
 	public long getElapsedTime()
 	{
-		// server never expires
-		if ( !isTimeLimited() )
-			return Long.MAX_VALUE;
-
-		long elapsedTime = expirationTime - System.currentTimeMillis();
-		if ( elapsedTime <=0 )
-			return 0;
-		else
-			return elapsedTime;
+        return Math.max(  expirationTime - System.currentTimeMillis(), 0 );
 	}
 
 	public boolean isExpired()
