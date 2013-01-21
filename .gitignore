@@ -19,3 +19,4 @@ logFile.log
 /gigaspaces-cloudify-2.2.0-ga
 /.sass-cache
 /.idea_modules
+/conf/bin

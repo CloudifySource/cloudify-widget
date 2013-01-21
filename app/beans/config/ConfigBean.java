@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.Configuration;
 import play.Play;
+import play.libs.Json;
 import play.libs.Time;
 
 import java.io.File;
@@ -63,6 +64,10 @@ public class ConfigBean {
     {
         Conf root = new Conf();
         injectConfiguration( root, Play.application().configuration() );
+        try{
+            logger.info( "getting configuration : {}" , Json.stringify( Json.toJson( root ) ));
+            logger.info( System.getProperty( "java.class.path" ) );
+        }catch(RuntimeException e){ }
         return root;
     }
 

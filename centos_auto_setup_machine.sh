@@ -1,4 +1,4 @@
-
+#! /bin/bash
 yum  -y install java-1.6.0-openjdk-devel
 export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk.x86_64
 
@@ -41,12 +41,8 @@ mysql -u $DB_ADMIN -e "DROP USER ''@'localhost';"
 mysql -u $DB_ADMIN -p$DB_ADMIN_PASSWORD  -e  "DROP USER ''@'localhost.localdomain';"
 mysql -u $DB_ADMIN -e "DROP USER ''@'localhost.localdomain';"
 
+echo "creating DB scheme"
 bin/migrate_db.sh create
-#find which is the latest version of DB
-# ll all the files, remove "create" script, remove extension, sort in descending order and output first line.
-db_version=`ls conf/evolutions/default -1 | grep -v create |  sed -e 's/\.[a-zA-Z]*$//' | sort -r | head -1`
-bin/migrate_db.sh $db_version
-
 echo "127.0.0.1 `hostname`" >> /etc/hosts
 ln -s ~/play-2.0.4/play /usr/bin/play
 
@@ -67,8 +63,47 @@ ln -s  /etc/nginx/sites-available/$SITE_DOMAIN /etc/nginx/sites-enabled/$SITE_DO
 # create path /var/www/cloudifyWidget/public/error_pages
 mkdir -p /var/www/cloudifyWidget/public/error_pages
 
-# copy content from public error_pages to that path
-cp -R cloudify-widget/public/error_pages /var/www/cloudifyWidget/public
+cd cloudify-widget
+echo "intalling monit"
+\cp -Rf conf/monit/repo  /etc/yum.repos.d/epel.repo
+yum -y install monit
+chkconfig --levels 235 monit on
+
+
+echo "upgrading system"
+upgrade_server
+
+echo "installing takipi"
+cd ~
+wget https://s3.amazonaws.com/app-takipi-com/deploy/linux/takipi-install
+chmod +x ./takipi-install
+./takipi-install
+
+# The "setup" process assumes there are no JVM installed with Takipi on them.
+# However, if we are not setting up a new environment, but changing existing environment,
+# we need to follow these steps :
+# 1. install Takipi, then stop the daemon by running: /etc/takipi/takipi-stop
+# 2. open this file using a text editor (with root privileges): /var/lib/takipi/work/service.key
+# 3. paste old key
+# 4. restart daemon using: /etc/takipi/takipi-start
+# And proceed normally.
+
+
+#we already have a key?
+if [ "$TAKIPI_KEY" -ne "" ]; then
+    echo "reusing takipi key"
+    /etc/takipi/takipi-stop
+    echo $TAKIPI_KEY > /var/lib/takipi/work/service.key
+    /etc/takipi/takipi-start
+else
+    echo "we do not have existing takipi key, lets use the new one"
+    TAKIPI_KEY=`cat /var/lib/takipi/work/service.key`
+    echo "\nTAKIPI_KEY=${TAKIPI_KEY}" > /etc/sysconfig/play
+fi
+
+echo "to see takipi information go to  https://app.takipi.com with ${TAKIPI_KEY}"
+
+
 
 
 
