@@ -19,8 +19,6 @@ public class Conf {
     // who is sending the mail?
     public GsMailer.Mailer mailer = new GsMailer.Mailer();
 
-    public WidgetConfiguration widget = new WidgetConfiguration();
-
     public ServerConfig server = new ServerConfig();
 
     public SettingsConfig settings = new SettingsConfig();
@@ -39,14 +37,6 @@ public class Conf {
     public static class SettingsConfig{
         @Config( ignoreNullValues = true )
         public boolean expireSession = false; // do not use the session expired mechanism.
-    }
-
-
-    public static class WidgetConfiguration{
-
-        public String serverId;
-
-        public long stopTimeoutMillis;
     }
 
     public static class CloudifyConfiguration{
