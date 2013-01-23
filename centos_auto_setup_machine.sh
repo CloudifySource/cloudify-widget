@@ -80,8 +80,9 @@ cp conf/nginx/nginx.conf /etc/nginx/
 mkdir -p /var/log/nginx/$SITE_DOMAIN
 mkdir -p /etc/nginx/sites-available
 mkdir -p /etc/nginx/sites-enabled
-cat conf/nginx/site.conf  | sed 's/__domain_name__/'"$SITE_DOMAIN"'/' | sed 's/__staging_name__/'"$SITE_STAGING_DOMAIN"'/' > /etc/nginx/sites-available/$SITE_DOMAIN
+cat conf/nginx/site.nginx  | sed 's/__domain_name__/'"$SITE_DOMAIN"'/' | sed 's/__staging_name__/'"$SITE_STAGING_DOMAIN"'/' > /etc/nginx/sites-available/$SITE_DOMAIN
 ln -s  /etc/nginx/sites-available/$SITE_DOMAIN /etc/nginx/sites-enabled/$SITE_DOMAIN
+service nginx restart
 
 echo "creating error pages"
 # create path /var/www/cloudifyWidget/public/error_pages
