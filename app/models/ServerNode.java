@@ -58,7 +58,7 @@ extends Model
 	private String privateIP;  // todo : change case to Ip
 
 	@XStreamAsAttribute
-	private Boolean busy;
+	private Boolean busy = false;
 
 	@XStreamAsAttribute
 	private String privateKey;
