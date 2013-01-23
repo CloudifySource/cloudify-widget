@@ -43,6 +43,7 @@ echo "copying sysconfig file"
 echo "copying configuration files"
 \cp -f ~/prod.conf cloudify-widget/conf
 \cp -f ~/hpcloud.pem cloudify-widget/bin
+ln -fs ~/$CLOUDIFY_FILE bin/cloudify-folder # create a symbolic link to cloudify home.
 chmod 755 cloudify-widget/*.sh
 chmod 755 cloudify-widget/bin/*.sh
 
