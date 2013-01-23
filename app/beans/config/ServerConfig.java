@@ -1,17 +1,18 @@
 package beans.config;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import org.apache.commons.lang3.StringUtils;
-import org.reflections.ReflectionUtils;
-import utils.Utils;
-
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.reflections.ReflectionUtils;
+
+import utils.Utils;
+
+import com.google.common.base.Predicate;
 
 /**
  * User: guym
@@ -134,6 +135,7 @@ public class ServerConfig {
         public String linuxImageId = zoneName + "/221";
         public String securityGroup = "default";
         public String cloudProvider = "hpcloud-compute";
+        public String cloudifyEscDirRelativePath = "tools/cli/plugins/esc/";
     }
 
     public static class SshConfiguration{

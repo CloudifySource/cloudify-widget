@@ -16,13 +16,14 @@
 
 package mocks;
 
+import java.util.List;
+
 import models.ServerNode;
-import org.jclouds.openstack.nova.v2_0.domain.Server;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import server.ServerBootstrapper;
 
-import java.util.List;
+import server.ServerBootstrapper;
 
 public class ServerBootstrapperMock implements ServerBootstrapper 
 {

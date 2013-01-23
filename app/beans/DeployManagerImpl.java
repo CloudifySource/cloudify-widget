@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import play.i18n.Messages;
+import server.ApplicationContext;
 import server.DeployManager;
 import server.ProcExecutor;
 import server.exceptions.ServerException;
@@ -122,7 +123,7 @@ public class DeployManagerImpl implements DeployManager
 
 		try
 		{
-			executor.execute(cmdLine, resultHandler);
+			executor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler);
 
 			logger.info("The process instanceId: {}", executor.getId());
 

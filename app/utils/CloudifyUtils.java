@@ -31,6 +31,7 @@ import org.jclouds.openstack.nova.v2_0.domain.KeyPair;
 import org.jclouds.openstack.nova.v2_0.extensions.KeyPairApi;
 import org.jclouds.rest.RestContext;
 
+import server.ApplicationContext;
 import server.exceptions.ServerException;
 import beans.config.ServerConfig.CloudBootstrapConfiguration;
 
@@ -52,8 +53,12 @@ public class CloudifyUtils {
 	 * 			A path to the newly created cloud folder.
 	 * @throws IOException
 	 */
-	public static File createCloudFolder(CloudBootstrapConfiguration cloudConf, String userName, String apiKey) throws IOException {
-		File cloudifyEscFolder = new File("D:/GigaSpaces/gigaspaces-cloudify-2.3.0-ga/tools/cli/plugins/esc/");
+	public static File createCloudFolder(String userName, String apiKey) throws IOException {
+		
+		CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
+		String cloudifyBuildFolder = ApplicationContext.get().conf().server.environment.getEnvironment()
+									.get("CLOUDIFY_HOME").toString();
+		File cloudifyEscFolder = new File(cloudifyBuildFolder, cloudConf.cloudifyEscDirRelativePath);
 
 		//copy the content of hp configuration files to a new folder
 		File destFolder = new File(cloudifyEscFolder, cloudConf.cloudName + getTempSuffix()); 
@@ -61,7 +66,7 @@ public class CloudifyUtils {
 
 		// create new pem file using new credentials.
 		File pemFolder = new File(destFolder, cloudConf.cloudifyHpUploadDirName);
-		File newPemFile = createPemFile(cloudConf, userName, apiKey);
+		File newPemFile = createPemFile(userName, apiKey);
 		FileUtils.copyFile(newPemFile, new File(pemFolder, newPemFile.getName() +".pem"), true);
 
 		int colonIndex = userName.indexOf(":");
@@ -105,9 +110,8 @@ public class CloudifyUtils {
 	 * 			The private key used for starting the remote machines
 	 * @throws IOException
 	 */
-	public static String getCloudPrivateKey(File cloudFolder,
-			final CloudBootstrapConfiguration cloudBootstrapConfig) throws IOException {
-		File pemFile = getPemFile(cloudFolder, cloudBootstrapConfig);
+	public static String getCloudPrivateKey(File cloudFolder) throws IOException {
+		File pemFile = getPemFile(cloudFolder);
 		if (pemFile == null) {
 			return null;
 		}
@@ -115,7 +119,8 @@ public class CloudifyUtils {
 	}
 	
 	// creates a new pem file for a given hp cloud account.
-	private static File createPemFile(CloudBootstrapConfiguration cloudConf, String userName, String apiKey) {
+	private static File createPemFile(String userName, String apiKey) {
+		CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
 		ComputeServiceContext context = null;
 		try {
 			Properties overrides = new Properties();
@@ -151,15 +156,15 @@ public class CloudifyUtils {
 
 
 
-	private static File getPemFile(File cloudFolder,
-			final CloudBootstrapConfiguration cloudBootstrapConfig) {
-		File uploadDir = new File(cloudFolder, cloudBootstrapConfig.cloudifyHpUploadDirName);
+	private static File getPemFile(File cloudFolder) {
+		final CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
+		File uploadDir = new File(cloudFolder, cloudConf.cloudifyHpUploadDirName);
 		File[] filesList = uploadDir.listFiles(new FilenameFilter() {
 
 			@Override
 			public boolean accept(File dir, String name) {
 
-				return name.startsWith(cloudBootstrapConfig.keyPairName)
+				return name.startsWith(cloudConf.keyPairName)
 						&& name.endsWith( "pem" );
 			}
 		});

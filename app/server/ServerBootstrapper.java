@@ -16,10 +16,9 @@
 
 package server;
 
-import models.ServerNode;
-import org.jclouds.openstack.nova.v2_0.domain.Server;
-
 import java.util.List;
+
+import models.ServerNode;
 
 /**
  * The main abstraction to bootstrap servers on a cloud.

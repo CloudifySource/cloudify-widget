@@ -53,6 +53,7 @@ import org.jclouds.util.Strings2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import server.ApplicationContext;
 import server.DeployManager;
 import server.ServerBootstrapper;
 import server.exceptions.ServerException;
@@ -61,7 +62,6 @@ import utils.Utils;
 import beans.ProcExecutorImpl.ProcessStreamHandler;
 import beans.config.Conf;
 
-import com.google.common.collect.FluentIterable;
 import com.google.common.net.HostAndPort;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -168,7 +168,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		File cloudFolder = null;
 		try{
 			logger.info("Creating cloud folder with specific user credentials. User: " + userName + ", api key: " + apiKey);
-			cloudFolder = CloudifyUtils.createCloudFolder(conf.server.cloudBootstrap, userName, apiKey);
+			cloudFolder = CloudifyUtils.createCloudFolder( userName, apiKey );
 
 			//Command line for bootstrapping remote cloud.
 			CommandLine cmdLine = new CommandLine(conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile() + Utils.getExecutableExt());
@@ -183,7 +183,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			defaultExecutor.setStreamHandler(streamHandler);
 			defaultExecutor.setExitValue(0);
 			defaultExecutor.setWatchdog(watchdog);
-			defaultExecutor.execute(cmdLine, resultHandler);
+			defaultExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment() , resultHandler);
 			resultHandler.waitFor();
 			
 			//TODO[adaml]: the logger on cloudify directs valid output to the error stream.
@@ -200,7 +200,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 						+ streamHandler.getOutput(), resultHandler.getException() );
 			}
 			serverNode.setPublicIP(publicIp);
-			String privateKey = CloudifyUtils.getCloudPrivateKey(cloudFolder, conf.server.cloudBootstrap);
+			String privateKey = CloudifyUtils.getCloudPrivateKey(cloudFolder);
 			if (StringUtils.isEmpty(privateKey)) {
 				throw new RuntimeException( "Bootstrap failed. No pem file found in cloud directory." );
 			}
