@@ -54,7 +54,7 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
 		@Override
 		protected void createProcessOutputPump(InputStream is, OutputStream os)
 		{
-			super.createProcessOutputPump(is, System.out);
+			super.createProcessOutputPump(is, baos);
 		}
 		
 		@Override
