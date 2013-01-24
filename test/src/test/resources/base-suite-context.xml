@@ -11,7 +11,7 @@
     <bean id="webDriver" class="org.openqa.selenium.WebDriver" factory-bean="webDriverBean" factory-method="getDriver"/>
     <bean id="testContext" class="org.cloudifysource.widget.beans.TestContext"/>
     <bean id="testConf" class="org.cloudifysource.widget.beans.TestConf"
-          p:host="http://test.cloudifysource.org:9000" p:numOfMachines="30"
+          p:host="http://localhost:9000" p:numOfMachines="30"
           p:service="tomcat" p:serviceUrlPostFix=":8080" p:providerOrAPI="hpcloud-compute"
           p:identity="#{systemProperties.identity}" p:credential="#{systemProperties.credential}" p:managementMachineId="#{systemProperties.id}" p:location="#{systemProperties.location}"/>
     <context:annotation-config />

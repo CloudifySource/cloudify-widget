@@ -31,7 +31,7 @@ public class LoadTest extends AbstractCloudifyWidgetTest{
     @Override
     @Before
     public void beforeMethod(){
-        jClouds.waitForMinMachines(1, 2 * 60 * 1000);
+        jClouds.waitForMinMachines(1, 5 * 60 * 1000);
     }
 
     @After
@@ -40,7 +40,7 @@ public class LoadTest extends AbstractCloudifyWidgetTest{
         jClouds.close();
     }
 
-    @Test(timeout = 90000)
+    @Test(timeout = 30 * 60 * 1000)
     public void loadTest() throws Exception{
         logger.info("running test on [{}]", context().getTestConf().getHost());
         String apiKey = createWidget();
