@@ -1,0 +1,1 @@
+alter table widget add column stopped tinyint(1) default 0;

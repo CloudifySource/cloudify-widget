@@ -15,19 +15,20 @@
  *******************************************************************************/
 package beans;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.concurrent.TimeUnit;
 
 import models.ServerNode;
 
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
 
+import play.cache.Cache;
 import server.DeployManager;
 import server.ProcExecutor;
+import server.ProcOutputStream;
+import server.WriteEventListener;
 
 
 /**
@@ -40,62 +41,52 @@ import server.ProcExecutor;
 public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor 
 {
     private String id;
-    private String publicIP; // todo : change case to Ip
-    private String privateIP;  // todo : change case to Ip
     private File recipe;
     private String[] args;
-    private Long expirationTime;
-    private ProcessStreamHandler procHandler;
 
     final static class ProcessStreamHandler extends PumpStreamHandler
 	 {
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		private WriteEventListener wel;
 		
+		public ProcessStreamHandler(WriteEventListener wel) { 
+			this.setWriteEventListener(wel);
+			
+		}
 		@Override
 		protected void createProcessOutputPump(InputStream is, OutputStream os)
 		{
-			super.createProcessOutputPump(is, baos);
+			ProcOutputStream procOutputStream = createOutputStream();
+			super.createProcessOutputPump(is, procOutputStream);
 		}
+		
 		
 		@Override
 		protected void createProcessErrorPump(InputStream is, OutputStream os)
 		{
-			super.createProcessErrorPump(is, baos);
+			ProcOutputStream procOutputStream = createOutputStream();
+			super.createProcessErrorPump(is, procOutputStream);
 		}
-
-		public String getOutput()
-		{
-			return baos.toString();
+		
+		public void setWriteEventListener(final WriteEventListener wel) {
+			this.wel = wel;
+		}
+		
+		private ProcOutputStream createOutputStream() {
+			ProcOutputStream procOutputStream = new ProcOutputStream();
+			procOutputStream.setProcEventListener(this.wel);
+			return procOutputStream;
 		}
 	 }
 
     public ProcExecutorImpl( ServerNode server, File recipe, String... args )
     {
-        this.id = server.getId();
+        this.setId(server.getId());
 
-        this.publicIP = server.getPublicIP();
-        this.privateIP = server.getPrivateIP();
         this.recipe = recipe;
         this.args = args;
-        this.expirationTime = server.getExpirationTime();
-
-        procHandler = new ProcessStreamHandler();
-        setStreamHandler( procHandler );
-    }
-
-    public String getId()
-    {
-        return id;
-    }
-
-    public String getPublicServerIP()
-    {
-        return publicIP;
-    }
-
-    public String getPrivateServerIP()
-    {
-        return privateIP;
+        this.id = server.getId();
+        
+        Cache.set( "output-" + server.getId(),  new StringBuilder());
     }
 
     public File getRecipe()
@@ -108,17 +99,25 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
         return args;
     }
 
-    public String getOutput()
-    {
-        return procHandler.getOutput();
-    }
+	@Override
+	public void setRecipe(File recipe) {
+		this.recipe = recipe;
+	}
 
-    public int getElapsedTimeMin()
+	@Override
+	public void setArgs(String... args) {
+		this.args = args;
+	}
+	
+	@Override
+    public String getId()
     {
-        long elapsedTime = expirationTime - System.currentTimeMillis();
-        if ( elapsedTime <= 0 )
-            return 0;
-        else
-            return ( int ) TimeUnit.MILLISECONDS.toMinutes( elapsedTime );
+        return id;
     }
+	
+	@Override
+	public void setId(String id) {
+		this.id = id;
+	}
+
 }

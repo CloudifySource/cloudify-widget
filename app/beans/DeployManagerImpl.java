@@ -18,7 +18,6 @@ package beans;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Hashtable;
 
 import javax.inject.Inject;
 
@@ -27,7 +26,6 @@ import models.ServerNode;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +35,7 @@ import server.ApplicationContext;
 import server.DeployManager;
 import server.ProcExecutor;
 import server.exceptions.ServerException;
+import beans.api.ExecutorFactory;
 import beans.config.Conf;
 
 /**
@@ -47,13 +46,16 @@ import beans.config.Conf;
  */
 public class DeployManagerImpl implements DeployManager
 {
-	// keep all widget instances key=instanceId, value=Executor
-	private Hashtable<String, ProcExecutor> _intancesTable = new Hashtable<String, ProcExecutor>();
 
     private static Logger logger = LoggerFactory.getLogger( DeployManagerImpl.class );
 
     @Inject
     private Conf conf;
+    
+    @Inject 
+    private ExecutorFactory executorFactory;
+    
+    
 
 
 	static enum RecipeType
@@ -91,16 +93,6 @@ public class DeployManagerImpl implements DeployManager
 			}
 		}
 	}
-	
-	public ProcExecutor getExecutor(String id)
-	{
-		return _intancesTable.get(id);
-	}
-	
-	public void destroyExecutor(String id)
-	{
-		_intancesTable.remove( id );
-	}
 
 	public ProcExecutor fork(ServerNode server, File recipe)
 	{
@@ -115,21 +107,13 @@ public class DeployManagerImpl implements DeployManager
 		
 		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 
-		ExecuteWatchdog watchdog = new ExecuteWatchdog( conf.cloudify.deployWatchDogProcessTimeoutMillis );
-		ProcExecutor executor = new ProcExecutorImpl(server, recipe);
-		
-		executor.setExitValue(1);
-		executor.setWatchdog(watchdog);
+		ProcExecutor executor = executorFactory.getDeployExecutor( server, recipe );
 
 		try
 		{
 			executor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler);
 
 			logger.info("The process instanceId: {}", executor.getId());
-
-			// keep the processID to pump an output stream
-			_intancesTable.put(executor.getId(), executor);
-
 			return executor;
 		} catch (ExecuteException e)
 		{

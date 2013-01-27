@@ -69,6 +69,9 @@ extends Model
 	@XStreamAsAttribute
 	private String apiKey;
 
+	@XStreamAsAttribute
+	private boolean stopped = false;
+	
 	public static Finder<Long,ServerNode> find = new Finder<Long,ServerNode>(Long.class, ServerNode.class); 
 
 	public ServerNode( ) {
@@ -194,5 +197,13 @@ extends Model
 
 	public void setUserName(final String userName) {
 		this.userName = userName;
+	}
+
+	public boolean isStopped() {
+		return stopped;
+	}
+
+	public void setStopped(final boolean stopped) {
+		this.stopped = stopped;
 	}
 }

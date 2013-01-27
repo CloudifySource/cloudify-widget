@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import play.Play;
+import play.cache.Cache;
 import play.i18n.Lang;
 import play.libs.Time;
 import play.mvc.Http;
@@ -367,5 +368,10 @@ public class Utils
 			return requestToString( context.request() );
 		}
 		return "N/A";
+	}
+	
+	public static String getCachedOutput(String serverNodeId) {
+		String output = ( (StringBuilder) Cache.get("output-" + serverNodeId )).toString();
+		return output;
 	}
 }
