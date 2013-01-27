@@ -25,7 +25,7 @@ import server.WriteEventListener;
  * @author adaml
  *
  */
-public class ProcExecutorEventListener implements WriteEventListener{
+public class ProcExecutorEventListener implements WriteEventListener {
 
 	private String serverNodeId;
 	
@@ -33,8 +33,12 @@ public class ProcExecutorEventListener implements WriteEventListener{
 	
 	private String keyFormat = "output-%s";
 
-	public ProcExecutorEventListener(String serverNodeId) {
+	public ProcExecutorEventListener( String serverNodeId ) {
 		this.serverNodeId = serverNodeId;
+	}
+	
+	public ProcExecutorEventListener( ) {
+		
 	}
 	
 	@Override

@@ -1,1 +1,1 @@
-alter table widget add column stopped tinyint(1) default 0;
+alter table server_node add column stopped tinyint(1) default 0;
