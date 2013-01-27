@@ -48,8 +48,6 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
 	 {
 		private WriteEventListener wel;
 		
-		public ProcessStreamHandler() { }
-		
 		public ProcessStreamHandler(WriteEventListener wel) { 
 			this.setWriteEventListener(wel);
 			
@@ -80,6 +78,8 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
 			return procOutputStream;
 		}
 	 }
+    
+    public ProcExecutorImpl() { }
 
     public ProcExecutorImpl( ServerNode server, File recipe, String... args )
     {
