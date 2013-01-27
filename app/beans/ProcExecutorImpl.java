@@ -48,10 +48,13 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
 	 {
 		private WriteEventListener wel;
 		
+		public ProcessStreamHandler() { }
+		
 		public ProcessStreamHandler(WriteEventListener wel) { 
 			this.setWriteEventListener(wel);
 			
 		}
+		
 		@Override
 		protected void createProcessOutputPump(InputStream is, OutputStream os)
 		{
