@@ -15,21 +15,17 @@
  *******************************************************************************/
 package controllers;
 
+import static utils.RestUtils.OK_STATUS;
+import static utils.RestUtils.resultAsJson;
+import static utils.RestUtils.resultErrorAsJson;
+import models.ServerNode;
+import models.Widget;
+import models.WidgetInstance;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import beans.events.Events;
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.config.dbplatform.MySqlPlatform;
-import com.avaje.ebeaninternal.api.SpiEbeanServer;
-import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
-
-import models.ServerNode;
-import models.Widget;
-import models.WidgetInstance;
 import play.Play;
 import play.Routes;
 import play.i18n.Messages;
@@ -38,8 +34,14 @@ import play.mvc.Result;
 import server.ApplicationContext;
 import server.HeaderMessage;
 import server.exceptions.ServerException;
+import beans.events.Events;
 
-import static utils.RestUtils.*;
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.config.ServerConfig;
+import com.avaje.ebean.config.dbplatform.MySqlPlatform;
+import com.avaje.ebeaninternal.api.SpiEbeanServer;
+import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 
 
 /**
@@ -54,11 +56,15 @@ public class Application extends Controller
     //              we should be able to decode it, verify user's ownership on the widget and go from there.
 	public static Result start( String apiKey, String hpcsKey, String hpcsSecretKey )
 	{
+		//TODO[guym]: add field isRemote to server_node table. 
 		try
 		{
+			Exception e = new Exception("here");
+			//Why is this being called twice?
+			System.out.println(e.getStackTrace());
 			logger.info("starting widget with [apiKey, hpcsKey, hpcsSecretKey] = [{},{},{}]", new Object[]{apiKey, hpcsKey, hpcsSecretKey} );
  			Widget widget = Widget.getWidget( apiKey );
-           	if ( widget == null || !widget.isEnabled()){
+           	if ( widget == null || !widget.isEnabled()) {
                 	new HeaderMessage().setError( Messages.get("widget.disabled.by.administrator") ).apply( response().getHeaders() );
 	                return badRequest(  );
             }
@@ -85,18 +91,23 @@ public class Application extends Controller
 				&& hpcsKey.contains(":") && !hpcsKey.startsWith(":") && !hpcsKey.endsWith(":");
 	}
 	
-	
 	public static Result stop( String apiKey, String instanceId )
 	{
-        Widget widget = Widget.getWidget( apiKey );
-        if ( widget != null ){
-            ApplicationContext.get().getEventMonitor().eventFired( new Events.StopWidget( request().remoteAddress(), widget ) );
-        }
-        if ( instanceId != null ){
-            ApplicationContext.get().getWidgetServer().undeploy(instanceId);
-        }
+		
+		ServerNode serverNode = ServerNode.find.byId(Long.parseLong(instanceId));
+		if (serverNode.isRemote()) {
+			return notFound();
+		}else {
+			Widget widget = Widget.getWidget( apiKey );
+			if ( widget != null ){
+				ApplicationContext.get().getEventMonitor().eventFired( new Events.StopWidget( request().remoteAddress(), widget ) );
+			}
+			if ( instanceId != null ){
+				ApplicationContext.get().getWidgetServer().undeploy(instanceId);
+			}
 
-		return ok(OK_STATUS).as("application/json");
+			return ok(OK_STATUS).as("application/json");
+		}
 	}
 	
 	public static Result getWidgetStatus( String apiKey, String instanceId )

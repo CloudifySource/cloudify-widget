@@ -20,6 +20,8 @@ import java.io.File;
 import models.ServerNode;
 
 import org.apache.commons.exec.ExecuteWatchdog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import play.modules.spring.Spring;
 import server.ApplicationContext;
@@ -36,8 +38,11 @@ import beans.api.ExecutorFactory;
  */
 public class ExecutorFactoryImpl implements ExecutorFactory {
 	
+	private static Logger logger = LoggerFactory.getLogger( ExecutorFactoryImpl.class );
+	
 	@Override
 	public ProcExecutor getBootstrapExecutor( String key ) {
+		logger.info("Creating bootstrap executor.");
 		
 		WriteEventListener writeEventListener = createWriteEventListener();
 		writeEventListener.setKey(key);
@@ -53,6 +58,7 @@ public class ExecutorFactoryImpl implements ExecutorFactory {
 
 	@Override
 	public ProcExecutor getDeployExecutor( ServerNode server, File recipe, String ... args ) {
+		logger.info("Creating deploy executor.");
 		
 		WriteEventListener writeEventListener = createWriteEventListener();
 		writeEventListener.setKey(server.getId());

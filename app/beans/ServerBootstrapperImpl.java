@@ -212,6 +212,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			serverNode.setPrivateKey(privateKey);
 			serverNode.setApiKey(apiKey);
 			serverNode.setUserName(userName);
+			serverNode.setRemote(true);
 
 			return serverNode;
 		} catch(Exception e) { 

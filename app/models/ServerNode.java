@@ -72,6 +72,9 @@ extends Model
 	@XStreamAsAttribute
 	private boolean stopped = false;
 	
+	@XStreamAsAttribute
+	private boolean remote = false;
+	
 	public static Finder<Long,ServerNode> find = new Finder<Long,ServerNode>(Long.class, ServerNode.class); 
 
 	public ServerNode( ) {
@@ -205,5 +208,13 @@ extends Model
 
 	public void setStopped(final boolean stopped) {
 		this.stopped = stopped;
+	}
+
+	public boolean isRemote() {
+		return remote;
+	}
+
+	public void setRemote(boolean remote) {
+		this.remote = remote;
 	}
 }
