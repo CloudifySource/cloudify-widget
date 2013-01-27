@@ -8,6 +8,7 @@
 
 
     <bean id="deployManager" class="beans.DeployManagerImpl"/>
+    <bean id="executorFactory" class="beans.ExecutorFactoryImpl"/>
 
 	<bean id="executorFactoryWriteEventListener" scope="prototype" class="beans.ProcExecutorEventListener"/>
 	<bean id="bootstrapExecutor" scope="prototype" class="beans.ProcExecutorImpl"/>

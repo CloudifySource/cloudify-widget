@@ -55,9 +55,6 @@ public class DeployManagerImpl implements DeployManager
     @Inject 
     private ExecutorFactory executorFactory;
     
-    
-
-
 	static enum RecipeType
 	{
 		APPLICATION, SERVICE;
