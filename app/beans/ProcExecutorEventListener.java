@@ -46,7 +46,7 @@ public class ProcExecutorEventListener implements WriteEventListener {
 		if (this.sb == null) { 
 			sb  = ( (StringBuilder) Cache.get( String.format( keyFormat, serverNodeId) ) );
 		}
-		sb.append((byte) b);
+		sb.append(Character.toChars(b));
 	}
 	
 	public void setKeyFormat( String keyFormat ){
