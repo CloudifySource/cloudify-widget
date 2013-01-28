@@ -22,6 +22,7 @@ import models.ServerNode;
 import models.Widget;
 import models.WidgetInstance;
 
+import org.apache.commons.lang.NumberUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,6 +121,9 @@ public class Application extends Controller
 	{
 		try
 		{
+            if (!NumberUtils.isNumber( instanceId )){
+                return badRequest();
+            }
             ServerNode serverNode = ServerNode.find.byId( Long.parseLong(instanceId) );
             if ( serverNode == null ){
                 throw new RuntimeException( Messages.get("server.was.terminated"));

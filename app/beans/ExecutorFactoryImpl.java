@@ -56,7 +56,7 @@ public class ExecutorFactoryImpl implements ExecutorFactory {
 	public ProcExecutor getDeployExecutor( ServerNode server ) {
 	
 		logger.info("Creating deploy executor.");
-		ProcessStreamHandler streamHandler = new ProcessStreamHandler(server.getId());
+		ProcessStreamHandler streamHandler = new ProcessStreamHandler(server.getNodeId());
 		
 		ExecuteWatchdog watchdog = new ExecuteWatchdog( ApplicationContext.get().conf().cloudify.bootstrapCloudWatchDogProcessTimeoutMillis );
 		ProcExecutor executor = (ProcExecutor) Spring.getBean( "deployExecutor" );
