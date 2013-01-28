@@ -15,9 +15,11 @@
  *******************************************************************************/
 package models;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
+import beans.Recipe;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import play.db.ebean.Model;
 import utils.Utils;
 
@@ -44,90 +46,116 @@ public class WidgetInstance
 	@Id
 	@XStreamOmitField
 	private Long id;
-	
-	@XStreamAsAttribute
-	private String instanceId;
-	
-	@XStreamAsAttribute
-	private Boolean anonymouse = false;
-	
-	@XStreamAsAttribute
-	private String publicIP;  // todo : change case to Ip
-	
-	@XStreamAlias("link")
-	private ConsoleLink link;
+
+    @JsonIgnore
+    @OneToOne( mappedBy = "widgetInstance" )
+    private ServerNode serverNode;
+
+
+    @Enumerated(EnumType.STRING)
+    private Recipe.Type recipeType;
+
+    @JsonIgnore
+    @ManyToOne
+    private Widget widget;
+
 	
 	public static Finder<Long,WidgetInstance> find = new Finder<Long,WidgetInstance>(Long.class, WidgetInstance.class); 
 
 	private static final String HOST_TOKEN = "$HOST";
 
-	final static private class ConsoleLink
+    final static public class ConsoleLink
 	{
-		String title;
-		String url;
-		
-		ConsoleLink( String title, String url )
-		{
-			this.title = title;
-			this.url = url;
-		}
-	}
-	
-	public WidgetInstance( String instanceId, String publicIP )
-	{
-		this( instanceId, publicIP, null, null );
-	}
-	
-	public WidgetInstance( String instanceId, String publicIP, String consoleName, String consoleUrl )
-	{
-		this.instanceId = instanceId;
-		this.publicIP = publicIP;
-		
-		String consoleLink = "http://" + publicIP;
-		if ( consoleUrl != null & consoleUrl.indexOf(HOST_TOKEN) != -1 )
-			consoleLink = consoleUrl.replace(HOST_TOKEN, publicIP);
-		
-		link = new ConsoleLink(consoleName, consoleLink);
-	}
-	
-	public boolean isAnonymouse()
-	{
-		return anonymouse;
-	}
+        @JsonProperty
+		public String title;
 
-	public void setAnonymouse(boolean anonymouse)
-	{
-		this.anonymouse = anonymouse;
-	}
+        @JsonProperty
+		public String url;
 
-	public String getPublicIP()
-	{
-		return publicIP;
-	}
 
-	public void setPublicIP(String publicIP)
-	{
-		this.publicIP = publicIP;
-	}
+        public ConsoleLink() {
+        }
+
+        public ConsoleLink setTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public ConsoleLink setUrl(String url) {
+            this.url = url;
+            return this;
+        }
+    }
+
 	
-	public String getInstanceId()
-	{
-		return instanceId;
-	}
+	public WidgetInstance( ) {	}
+	
+    public ConsoleLink getLink() {
+        if ( serverNode != null && widget != null ){
+            String consoleName = widget.getConsoleName();
+            String consoleURL = widget.getConsoleURL();
+            String publicIP = serverNode.getPublicIP();
+            return new ConsoleLink( ).setTitle(consoleName).setUrl(consoleURL.replace(HOST_TOKEN,publicIP));
+        }
+        return null;
+    }
 
-	public void setInstanceId(String instanceId)
-	{
-		this.instanceId = instanceId;
-	}
+
+    public static WidgetInstance findByInstanceId(String instanceId) {
+        return find.where().eq("instanceId", instanceId).findUnique();
+    }
 	
 	public static void deleteByInstanceId( String instanceId )
 	{
-		WidgetInstance widgetInstance = find.where().eq("instanceId", instanceId).findUnique();
+        WidgetInstance widgetInstance = findByInstanceId(instanceId);
 		if ( widgetInstance != null )
 			 widgetInstance.delete();
 	}
 
-	@Override
+    public Widget getWidget() {
+        return widget;
+    }
+
+    @JsonProperty("publicIP")
+    @Transient
+    public String getPublicIp(){
+        return serverNode != null ? serverNode.getPublicIP() : null;
+    }
+
+    // guy - this should hide the bug that instances are not connected to server nodes.
+    // we should reveal this internally and not concern the users.
+    @Transient
+    public boolean isCorrupted(){
+        return serverNode == null;
+    }
+
+    @JsonProperty("instanceId")
+    @Transient
+    public String getInstanceId(){
+        return serverNode != null ? serverNode.getNodeId() : null;
+    }
+
+    public void setServerNode(ServerNode serverNode) {
+        this.serverNode = serverNode;
+    }
+
+    public void setWidget(Widget widget) {
+        this.widget = widget;
+    }
+
+    public ServerNode getServerNode() {
+        return serverNode;
+    }
+
+    public Recipe.Type getRecipeType() {
+        return recipeType;
+    }
+
+    public void setRecipeType(Recipe.Type recipeType) {
+        this.recipeType = recipeType;
+    }
+
+    @Override
 	public String toString()
 	{
 		return Utils.reflectedToString(this);

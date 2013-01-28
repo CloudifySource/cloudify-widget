@@ -328,7 +328,7 @@ public class WidgetAdmin extends Controller
 //            list = Utils.workaround( Widget.find.all() );
         }
         else {
-            list = user.getWidgets(); Utils.workaround( user.getWidgets() );
+            list = user.getWidgets();
         }
 
         return ok( Json.toJson(list) );

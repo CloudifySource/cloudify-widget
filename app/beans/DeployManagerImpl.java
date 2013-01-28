@@ -16,7 +16,6 @@
 package beans;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 
 import javax.inject.Inject;
@@ -30,7 +29,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import play.i18n.Messages;
 import server.ApplicationContext;
 import server.DeployManager;
 import server.ProcExecutor;
@@ -54,53 +52,18 @@ public class DeployManagerImpl implements DeployManager
     
     @Inject 
     private ExecutorFactory executorFactory;
-    
-	static enum RecipeType
-	{
-		APPLICATION, SERVICE;
-		
-		static RecipeType getRecipeTypeByFileName( String fileName )
-		{
-			if ( fileName.endsWith(APPLICATION.getFileIdentifier()) )
-				return APPLICATION;
-			
-			if ( fileName.endsWith(SERVICE.getFileIdentifier()) )
-				return SERVICE;
-			
-			return null;
-		}
-		
-		public String getCmdParam()
-		{
-			switch( this )
-			{
-				case APPLICATION: return "install-application";
-				case SERVICE: return "install-service";
-				default: return null;
-			}
-		}
-		
-		public String getFileIdentifier()
-		{
-			switch( this )
-			{
-				case APPLICATION: return  "application.groovy";
-				case SERVICE: return "service.groovy";
-				default: return null;
-			}
-		}
-	}
+
 
 	public ProcExecutor fork(ServerNode server, File recipe)
 	{
-		RecipeType recipeType = getRecipeType( recipe );
+		Recipe.Type recipeType = new Recipe( recipe ).getRecipeType();
 		logger.info( "Deploying: [ServerIP={}] [recipe={}] [type={}]", new Object[]{server.getPublicIP(), recipe, recipeType.name()} );
 		String recipePath = FilenameUtils.separatorsToSystem(recipe.getPath());
 		
 		CommandLine cmdLine = new CommandLine( conf.cloudify.deployScript );
 		cmdLine.addArgument(server.getPublicIP());
 		cmdLine.addArgument(recipePath);
-		cmdLine.addArgument(recipeType.getCmdParam());
+		cmdLine.addArgument(recipeType.commandParam );
 		
 		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 
@@ -124,29 +87,7 @@ public class DeployManagerImpl implements DeployManager
 			throw new ServerException("Failed to execute process.", e);
 		}
 	}
-	
-   /** 
-	* @return recipe type Application or Service by recipe directory.
-	* @throws ServerException if found a not valid recipe file.
-	**/
-    protected RecipeType getRecipeType( File recipeDir )
-	{
-		String[] files = recipeDir.list( new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				return RecipeType.getRecipeTypeByFileName( name ) != null;
-			}
-		} );
-		   
-		if ( files == null || files.length == 0 )
-			throw new ServerException( Messages.get( "recipe.not.valid.1",
-                    RecipeType.APPLICATION.getFileIdentifier(), RecipeType.SERVICE.getFileIdentifier() ));
-		
-		if ( files.length > 1)
-			throw new ServerException( Messages.get( "recipe.not.valid.2",
-                    RecipeType.APPLICATION.getFileIdentifier(), RecipeType.SERVICE.getFileIdentifier() ));
 
-		return RecipeType.getRecipeTypeByFileName(files[0]);
-	}
 
     public void setConf( Conf conf )
     {

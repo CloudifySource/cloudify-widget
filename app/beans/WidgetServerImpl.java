@@ -20,7 +20,9 @@ import static server.Config.WIDGET_STOP_TIMEOUT;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import beans.config.Conf;
 import controllers.WidgetAdmin;
@@ -38,6 +40,7 @@ import models.Widget.Status;
 import models.WidgetInstance;
 import server.*;
 import server.exceptions.ServerException;
+import utils.CollectionUtils;
 import utils.Utils;
 
 import javax.annotation.PostConstruct;
@@ -65,6 +68,15 @@ public class WidgetServerImpl implements WidgetServer
 
     @Inject
     private DeployManager deployManager;
+
+    private static Map<Recipe.Type, Pattern> installationFinishedRegexMap = null;
+
+    static {
+        for ( Recipe.Type type  : Recipe.Type.values() ) {
+            String pattern = type + " .* installed successfully";
+            installationFinishedRegexMap.put(type, Pattern.compile( pattern, Pattern.CASE_INSENSITIVE) );
+        }
+    }
 
     private List<String> filterOutputLines = new LinkedList<String>(  );
     private List<String> filterOutputStrings = new LinkedList<String>(  );
@@ -105,21 +117,15 @@ public class WidgetServerImpl implements WidgetServer
 	
 	public WidgetInstance deploy( Widget widget, ServerNode server )
 	{
-		
 		File unzippedDir = Utils.downloadAndUnzip( widget.getRecipeURL(), widget.getApiKey() );
-
-
         File recipeDir = unzippedDir;
         if ( widget.getRecipeRootPath() != null  ){
             recipeDir = new File( unzippedDir, widget.getRecipeRootPath() );
         }
         logger.info("Deploying an instance for recipe at : [{}] ", recipeDir );
-
 		widget.countLaunch();
-		
 		deployManager.fork(server, recipeDir);
-		
-		return widget.addWidgetInstance( server.getId(), server.getPublicIP() );
+		return widget.addWidgetInstance( server, recipeDir );
 	}
 	
 	public void undeploy( String instanceId )
@@ -130,26 +136,47 @@ public class WidgetServerImpl implements WidgetServer
 		serverPool.destroy(instanceId);
 	}
 
-	
-	public Status getWidgetStatus( String instanceId )
-	{
-		ServerNode serverNode = ServerNode.find.byId(Long.getLong(instanceId));
-		if (serverNode == null) {
-			return new Status(Status.STATE_STOPPED, Messages.get( "server.was.terminated" ) );
-		}
-		String cachedOutput = Utils.getCachedOutput(instanceId);
-		List<String> output = Utils.formatOutput(cachedOutput, serverNode.getPrivateIP() + "]", filterOutputLines, filterOutputStrings );
-		
-		if (serverNode.getExpirationTime() != null) {
-			long elapsedTime = serverNode.getExpirationTime() - System.currentTimeMillis();
-			if ( elapsedTime <= 0 ) {
-				return new Status(Status.STATE_RUNNING, output, 0);
-			}
-			return new Status(Status.STATE_RUNNING, output, ( int )TimeUnit.MILLISECONDS.toMinutes( elapsedTime ));
-		} else {
-			return new Status(Status.STATE_RUNNING, output, 0);
-		}
-	}
+
+    @Override
+    public Status getWidgetStatus(ServerNode server) {
+        Status result = new Status();
+        List<String> output = new LinkedList<String>();
+        result.setOutput(output);
+
+        if (server == null) {
+            result.setState(Status.State.STOPPED);
+            output.add(Messages.get("server.was.terminated"));
+            return result;
+        }
+
+        WidgetInstance widgetInstance = WidgetInstance.findByInstanceId(server.getNodeId());
+        if (widgetInstance != null ){
+            widgetInstance.getWidget();
+            widgetInstance.getLink();
+            String last = CollectionUtils.last(output);
+            Pattern pattern = installationFinishedRegexMap.get(widgetInstance.getRecipeType());
+
+            if (pattern.matcher(last).matches()){
+                result.setLink( widgetInstance.getLink() );
+            }
+        }
+
+        result.setState(Status.State.RUNNING);
+        if (!StringUtils.isEmpty(server.getPublicIP())) {
+            result.setPublicIp(server.getPublicIP());
+        }
+
+        String cachedOutput = Utils.getCachedOutput(server.getNodeId());
+
+        output.addAll(Utils.formatOutput(cachedOutput, server.getPrivateIP() + "]", filterOutputLines, filterOutputStrings));
+
+        // server is remote we don't count time
+        if (!server.isRemote() && server.getExpirationTime() != null) {
+            long elapsedTime = server.getExpirationTime() - System.currentTimeMillis();
+            result.setTimeleft((int) TimeUnit.MILLISECONDS.toMinutes(elapsedTime));
+        }
+        return result;
+    }
 
     public void setServerPool(ServerPool serverPool) {
         this.serverPool = serverPool;

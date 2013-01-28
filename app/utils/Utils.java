@@ -31,9 +31,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipException;
 
-import models.Widget;
-import models.WidgetInstance;
-
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -188,30 +185,7 @@ public class Utils
 	}
 
 
-	/** 
-	 * Xstream library has a bug in serialization with graph objects that wrapped
-	 * in reflection proxy, for a while we need to copy to a regular collections.
-	 **/
-	public static List<Widget> workaround( List<Widget> wList)
-	{
-		List<Widget> outWidgets = new ArrayList<Widget>();
-		for(  Widget w : wList )
-		{
 
-			List<WidgetInstance> instanceList = w.getInstances();
-			List<WidgetInstance> outInstances = new ArrayList<WidgetInstance>();
-			for( WidgetInstance wi : instanceList )
-			{
-				if (wi.getInstanceId() != null)
-					outInstances.add(wi);
-			}
-
-			w.setInstances(outInstances);
-			outWidgets.add(w);
-		}
-
-		return outWidgets;
-	}
 
 	/** Format string output by different patters */
 	public static List<String> formatOutput( String str, String substringPrefix , Collection<String> filterOutputLines, Collection<String> filterOutputStrings )

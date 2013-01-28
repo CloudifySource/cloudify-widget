@@ -83,13 +83,13 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
 
     public ProcExecutorImpl( ServerNode server, File recipe, String... args )
     {
-        this.setId(server.getId());
+        this.setId(server.getNodeId());
 
         this.recipe = recipe;
         this.args = args;
-        this.id = server.getId();
+        this.id = server.getNodeId();
         
-        Cache.set( "output-" + server.getId(),  new StringBuilder());
+        Cache.set( "output-" + server.getNodeId(),  new StringBuilder());
     }
 
     public File getRecipe()

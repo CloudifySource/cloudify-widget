@@ -61,7 +61,7 @@ public class ExecutorFactoryImpl implements ExecutorFactory {
 		logger.info("Creating deploy executor.");
 		
 		WriteEventListener writeEventListener = createWriteEventListener();
-		writeEventListener.setKey(server.getId());
+		writeEventListener.setKey(server.getNodeId());
 		ProcessStreamHandler streamHandler = new ProcessStreamHandler(writeEventListener);
 		ExecuteWatchdog watchdog = new ExecuteWatchdog( ApplicationContext.get().conf().cloudify.bootstrapCloudWatchDogProcessTimeoutMillis );
 		
@@ -71,7 +71,7 @@ public class ExecutorFactoryImpl implements ExecutorFactory {
 		executor.setStreamHandler(streamHandler);
 		executor.setRecipe( recipe );
 		executor.setArgs( args );
-		executor.setId(server.getId());
+		executor.setId(server.getNodeId());
 		return  executor;
 	}
 

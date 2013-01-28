@@ -34,8 +34,9 @@ public class WidgetServerMock implements WidgetServer {
         logger.info("undeploying : {}", instanceId);
     }
 
-    public Widget.Status getWidgetStatus(String instanceId) {
-        logger.info("getting widget status : {}",  instanceId);
+    @Override
+    public Widget.Status getWidgetStatus(ServerNode serverNode) {
+        logger.info("getting widget status : {}",  serverNode.getNodeId());
         return null;
     }
 

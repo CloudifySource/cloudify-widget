@@ -15,18 +15,14 @@
  *******************************************************************************/
 package models;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.io.File;
+import java.util.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
+import beans.Recipe;
 import beans.config.ServerConfig;
+import org.apache.commons.collections.Predicate;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -34,6 +30,7 @@ import play.db.ebean.Model;
 import play.i18n.Messages;
 import server.ApplicationContext;
 import server.exceptions.ServerException;
+import utils.CollectionUtils;
 import utils.Utils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -42,7 +39,7 @@ import controllers.WidgetAdmin;
 
 /**
  * This class represents a widget metadata and relates to a specific {@link User}.
- * See {@link WidgetAdmin#createNewWidget(String, String, String, String, String, String, String, String, String)}
+ * See {@link WidgetAdmin#createNewWidget}
  * 
  * @author Igor Goldenberg
  * @see WidgetAdmin
@@ -65,12 +62,16 @@ public class Widget
 	private String apiKey;
 	private Integer launches;
 	private Boolean enabled;
+
     @JsonProperty(value="consolename")
 	private String consoleName;
+
     @JsonProperty(value="consoleurl")
 	private String consoleURL;
+
     @JsonProperty( value="rootpath")
     private String recipeRootPath;
+
 
     private long lifeExpectancy = 0;
     @JsonIgnore
@@ -78,7 +79,8 @@ public class Widget
     private User user;
 
 
-	@OneToMany(cascade=CascadeType.ALL) 
+    @JsonIgnore
+	@OneToMany(cascade=CascadeType.ALL, mappedBy = "widget")
 	private List<WidgetInstance> instances;
 
 	public static Finder<Long,Widget> find = new Finder<Long,Widget>(Long.class, Widget.class);
@@ -90,30 +92,55 @@ public class Widget
 	@XStreamAlias("status")
 	final static public class Status
 	{
+
+        public static enum State{
+            STOPPED, RUNNING
+        }
 		public final static String STATE_STOPPED = "stopped";
 		public final static String STATE_RUNNING = "running";
 		
-		private String state;
+		private State state;
 		private List<String> output;
-		private Integer timeleft;
-		
-		public Status( String state, String...messages )
-		{
-			this.state = state;
-			output = new ArrayList<String>();
-            Collections.addAll( output, messages );
-		}
-		
-		public Status( String state, List<String> output, int timeleftMin )
-		{
-			this.state = state;
-			this.output = output;
-			
-			if ( output.isEmpty() )
-				output.add( Messages.get("wait.while.preparing.env"));
-				
-			this.timeleft = timeleftMin == 0 ? 1 : timeleftMin; // since we show in minutes, the latest minute show always 1 minute.
-		}
+		private Integer timeleft; // minutes
+        private String publicIp;
+        private String instanceId;
+        private WidgetInstance.ConsoleLink link;
+
+
+        public Status() {
+        }
+
+        public void setLink(WidgetInstance.ConsoleLink link) {
+            this.link = link;
+        }
+
+        public void setState(State state) {
+            this.state = state;
+        }
+
+        public void setTimeleft(Integer timeleft) {
+            this.timeleft = timeleft <= 0 ? 1 : timeleft;
+        }
+
+        public void setPublicIp(String publicIp) {
+            this.publicIp = publicIp;
+        }
+
+        public void setInstanceId(String instanceId) {
+            this.instanceId = instanceId;
+        }
+
+        public void setOutput(List<String> output) {
+            this.output = output;
+        }
+
+        public List<String> getOutput() {
+            if ( CollectionUtils.isEmpty(output) ){
+                output = new LinkedList<String>();
+                output.add( Messages.get("wait.while.preparing.env"));
+            }
+            return output ;
+        }
 	}
 	
 	public Widget( String productName, String productVersion, String title, String youtubeVideoUrl,
@@ -133,18 +160,17 @@ public class Widget
         this.recipeRootPath = recipeRootPath;
 	}
 	
-	public WidgetInstance addWidgetInstance( String instanceId, String publicIP )
+	public WidgetInstance addWidgetInstance( ServerNode serverNode, File recipeDir )
 	{
-		WidgetInstance wInstance = new WidgetInstance( instanceId, publicIP, consoleName, consoleURL );
-		
+        Recipe.Type recipeType = new Recipe(recipeDir).getRecipeType();
+        WidgetInstance wInstance = new WidgetInstance();
+        wInstance.setRecipeType( recipeType );
+        wInstance.setServerNode( serverNode );
 		if (instances == null){
 			instances = new ArrayList<WidgetInstance>();
         }
-
 		instances.add( wInstance );
-		
 		save();
-		
 		return wInstance;
 	}
 
@@ -160,6 +186,13 @@ public class Widget
         return widget;
     }
 
+    public String getConsoleName() {
+        return consoleName;
+    }
+
+    public String getConsoleURL() {
+        return consoleURL;
+    }
 
     public static Widget findByUserAndId( User user, Long widgetId )
     {
@@ -211,6 +244,20 @@ public class Widget
 	{
 		this.apiKey = apiKey;
 	}
+
+    @JsonProperty("instances")
+    @Transient
+    public List<WidgetInstance> getViableInstances(){
+        List<WidgetInstance> result = new LinkedList<WidgetInstance>( instances );
+        CollectionUtils.filter( result, new Predicate() {
+            @Override
+            public boolean evaluate(Object o) {
+                return !((WidgetInstance) o).isCorrupted();
+            }
+        });
+        return result;
+    }
+
 
 	public List<WidgetInstance> getInstances()
 	{
@@ -343,12 +390,18 @@ public class Widget
 		launches++;
 		save();
 	}
-	
-	@Override
-	public String toString()
-	{
-		return Utils.reflectedToString(this);
-	}
+
+    @Override
+    public String toString() {
+        return "Widget{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", apiKey='" + apiKey + '\'' +
+                ", launches=" + launches +
+                ", enabled=" + enabled +
+                ", recipeRootPath='" + recipeRootPath + '\'' +
+                '}';
+    }
 
     public long getLifeExpectancy() {
         // by default use configuration

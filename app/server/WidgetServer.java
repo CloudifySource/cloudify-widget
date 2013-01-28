@@ -26,7 +26,7 @@ public interface WidgetServer
 
     public void undeploy(String instanceId);
 
-    public Widget.Status getWidgetStatus(String instanceId);
+    public Widget.Status getWidgetStatus( ServerNode serverNode );
     
     public WidgetInstance deploy( Widget widget, ServerNode server );
 }

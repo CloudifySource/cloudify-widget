@@ -25,6 +25,7 @@ import utils.Utils;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -74,6 +75,9 @@ extends Model
 	
 	@XStreamAsAttribute
 	private boolean remote = false;
+
+    @OneToOne
+    WidgetInstance widgetInstance = null;
 	
 	public static Finder<Long,ServerNode> find = new Finder<Long,ServerNode>(Long.class, ServerNode.class); 
 
@@ -91,7 +95,7 @@ extends Model
 		this.expirationTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis( 30 ); // default unless configured otherwise
 	}
 
-	public String getId()
+	public String getNodeId() // guy - it is dangerous to call this getId as it looks like the getter of "long id"
 	{
 		return serverId;
 	}

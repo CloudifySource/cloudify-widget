@@ -41,5 +41,5 @@ public interface ServerBootstrapper
 
     public void close();
     
-    public ServerNode bootstrapCloud(String user, String pass); 
+    public ServerNode bootstrapCloud( ServerNode serverNode );
 }

@@ -109,7 +109,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			{
 				// failed to boostrap machine, nothing todo - let destroy :(
 				if ( srvNode != null ) {
-					destroyServer(srvNode.getId());
+					destroyServer(srvNode.getNodeId());
                 }
 					
 				logger.error("Failed to bootstrap machine. ", e);
@@ -167,15 +167,13 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	
 
 	@Override
-	public ServerNode bootstrapCloud(String userName, String apiKey)  {
+	public ServerNode bootstrapCloud( ServerNode serverNode )  {
 		File cloudFolder = null;
-		ServerNode serverNode = new ServerNode();
 		try{
-			serverNode.save();
-			Cache.set( "output-" + serverNode.getId(),  new StringBuilder());
+			Cache.set( "output-" + serverNode.getNodeId(),  new StringBuilder());
 			
-			logger.info("Creating cloud folder with specific user credentials. User: " + userName + ", api key: " + apiKey);
-			cloudFolder = CloudifyUtils.createCloudFolder( userName, apiKey );
+			logger.info("Creating cloud folder with specific user credentials. User: " + serverNode.getUserName() + ", api key: " + serverNode.getApiKey());
+			cloudFolder = CloudifyUtils.createCloudFolder( serverNode.getUserName(), serverNode.getApiKey() );
 
 			//Command line for bootstrapping remote cloud.
 			CommandLine cmdLine = new CommandLine(conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile() + Utils.getExecutableExt());
@@ -183,19 +181,19 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
 			logger.info("Executing command line: " + cmdLine);
 			DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-			ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor(serverNode.getId());
+			ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor(serverNode.getNodeId());
 			bootstrapExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment() , resultHandler);
 			resultHandler.waitFor();
 			
 			//TODO[adaml]: the logger on cloudify directs valid output to the error stream.
 			if (resultHandler.getException() != null) {
-				String output = Utils.getCachedOutput(serverNode.getId());
+				String output = Utils.getCachedOutput(serverNode.getNodeId());
 				logger.info("Command execution ended with errors: " + output.toString());
 				throw new RuntimeException("Failed to bootstrap cloudify machine: " 
 						+ output.toString(), resultHandler.getException());
 			}
 			
-			String output = Utils.getCachedOutput(serverNode.getId());
+			String output = Utils.getCachedOutput(serverNode.getNodeId());
 			String publicIp = Utils.extractIpFromBootstrapOutput(output);
 			if (StringUtils.isEmpty(publicIp)) {
 				throw new RuntimeException( "Bootstrap failed. No IP address found in bootstrap output." 
@@ -210,8 +208,6 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			logger.info("Bootstrap cloud command ended successfully");
 			
 			serverNode.setPrivateKey(privateKey);
-			serverNode.setApiKey(apiKey);
-			serverNode.setUserName(userName);
 			serverNode.setRemote(true);
 
 			return serverNode;

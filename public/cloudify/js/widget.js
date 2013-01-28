@@ -79,14 +79,51 @@ $(function () {
         }
     };
 
+    var WidgetLog = function(){
+        var myLog = [];
+        var $dom = $("#log");
+
+        function clear(){
+            $dom.empty();
+        }
+
+        function write_log(message, class_name) {
+          $dom.append($("<li/>", {html: message}).addClass(class_name));
+          $dom.scrollTop($dom[0].scrollHeight);
+        }
+
+        // array of output strings.
+        // this function will append new lines of log if new log is longer than current log.
+        // otherwise it will clear the current log and rewrite it.
+        this.appendOrOverride = function (aOutput) {
+            if (widgetLog != aOutput) { // print only the difference
+
+                var index = widgetLog.length;
+                var logLength = aOutput.length;
+
+                if (logLength < index) {
+                    clear();
+                    index = 0;
+                }
+
+                for (; index < logLength; index = index + 1) {
+                    write_log(aOutput[index]);
+                }
+                widgetLog = aOutput;
+            }
+        };
+
+        this.clear= function(){clear()};
+        this.error = function (message){ write_log(message, "error"); };
+        this.important = function(message){ write_log(message,"important");};
+
+
+    };
+
 
 
     var widgetState = new WidgetState();
-
-  function write_log(message, class_name) {
-    $("#log").append($("<li/>", {html: message}).addClass(class_name));
-    $("#log").scrollTop($("#log")[0].scrollHeight);
-  }
+    var widgetLog = new WidgetLog();
 
     function setTimeoutForUpdateStatus( myTimeout )
     {
@@ -96,23 +133,34 @@ $(function () {
 
     function handleUpdateStatusSuccess( data )
     {
-        if ( data.status.state == "stopped" ) {
+
+        if ( data.status.timeleft ) {
+            $("#time_left").show();
+            $("#time_left_counter").text(data.status.timeleft + " minutes");
+        }
+
+        if ( data.status.output ){
+            widgetLog.appendOrOverride(data.status.output);
+        }
+
+        if ( data.status.publicIp ) {
+            widgetState.publicIp(data.publicIp);
+        }
+
+        if ( data.status.link ){
+            var link_info = data.status.link;
+            var custom_link = "<li id='custom_link'><a href='" + link_info.url + "' target='_blank'>" + link_info.title + "</a></li>";
+            set_cloudify_dashboard_link(custom_link);
+       }
+
+        else if ( data.status.state == "stopped" ) {
             $( "#start_btn,#stop_btn" ).toggle();
             stop_instance();
         } else if ( data.status.state == "error" ) {
             $( "#start_btn,#stop_btn" ).toggle();
-            write_log( data.status.message, "error" );
+            widgetLog.error( data.status.message );
             stop_instance();
-        } else {
-            if ( window.log != data.status.output ) {
-                $( "#log" ).empty();
-                $.each( data.status.output, function ( index, value )
-                {
-                    write_log( value );
-                } );
-                window.log = data.status.output;
-            }
-            $( "#time_left_counter" ).text( data.status.timeleft + " minutes" );
+        }  else{// status == running
             setTimeoutForUpdateStatus();
         }
     }
@@ -130,7 +178,7 @@ $(function () {
 
   function stop_instance() {
     if( $("#log" ).find(".successfully_completed_msg" ).length == 0 ){ // make sure this appears only once.. we might be firing an Ajax request after the first stop.
-        write_log("Test drive successfully completed! <br/><a class='download_link successfully_completed_msg' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.", "important");
+        widgetLog.important("Test drive successfully completed! <br/><a class='download_link successfully_completed_msg' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.");
     }
     $("#time_left, #links").hide();
     widgetState.remove( true );
@@ -149,25 +197,17 @@ $(function () {
 
                                     if ( data.status == "error" ) {
                                         $( "#start_btn,#stop_btn" ).toggle();
-                                        write_log( data.message, "error" );
+                                        widgetLog.error( data.message );
                                         return;
                                     }
 
-                                    if ( data.instance["@instanceId"] ) {
-                                        widgetState.instanceId( data.instance["@instanceId"] ).publicIp( data.instance["@publicIP"] ).remove( false );
-                                        $( "#time_left" ).show();
-                                        setTimeoutForUpdateStatus( 1 );
-
-                                        var link_info = data.instance.link;
-                                        var custom_link = "<li id='custom_link'><a href='" + link_info.url + "' target='_blank'>" + link_info.title + "</a></li>";
-                                        set_cloudify_dashboard_link( custom_link );
-                                    }
+                                    setTimeoutForUpdateStatus(1);
                             },
                     error: function( data ){
                         var displayMessage = data.getResponseHeader("display-message");
                         if ( displayMessage ){
                             var displayMessageObj = JSON.parse( displayMessage );
-                            write_log( displayMessageObj.msg, "error" );
+                            widgetLog.error( displayMessageObj.msg);
                         }
                     }
                 }
@@ -185,7 +225,7 @@ $(function () {
       $.post("/widget/"+ widgetState.instanceId() + "/stop?apiKey=" + params["apiKey"], {}, function (data) {
         if (data.status == "error") {
           $("#start_btn,#stop_btn").toggle();
-          write_log(data.message, "error");
+          widgetLog.error(data.message );
           return;
         }
         stop_instance();

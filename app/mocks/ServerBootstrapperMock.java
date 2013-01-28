@@ -44,8 +44,8 @@ public class ServerBootstrapperMock implements ServerBootstrapper
         logger.info("closing");
     }
     @Override
-    public ServerNode bootstrapCloud(String user, String pass){
-    	logger.info("bootstrapping cloud with [user,pass] = [{},{}]", user, pass);
+    public ServerNode bootstrapCloud( ServerNode serverNode ){
+    	logger.info("bootstrapping cloud with [user,pass] = [{},{}]", serverNode.getUserName(), serverNode.getApiKey() );
     	return null;
     	
     }

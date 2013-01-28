@@ -77,11 +77,16 @@ public class Application extends Controller
                     new HeaderMessage().setError("invalid hpcs credentials").apply(response().getHeaders());
                     return badRequest();
                 }
-				ServerNode server = ApplicationContext.get().getServerBootstrapper().bootstrapCloud( hpcsKey, hpcsSecretKey );
 
+                ServerNode server = new ServerNode();
+                server.setUserName( hpcsKey );
+                server.setApiKey( hpcsSecretKey );
+                server.save();
+                ApplicationContext.get().getServerBootstrapper().bootstrapCloud( server );
 				ApplicationContext.get().getWidgetServer().deploy(widget, server);
 				return ok();
-			}else{
+
+            }else{
 				wi = ApplicationContext.get().getWidgetServer().deploy(apiKey);
 			}
 			return resultAsJson(wi);
@@ -119,9 +124,11 @@ public class Application extends Controller
 	{
 		try
 		{
-			Widget.Status wstatus = ApplicationContext.get().getWidgetServer().getWidgetStatus(instanceId);
-
-
+            ServerNode serverNode = ServerNode.find.byId( Long.parseLong(instanceId) );
+            if ( serverNode == null ){
+                throw new RuntimeException( Messages.get("server.was.terminated"));
+            }
+			Widget.Status wstatus = ApplicationContext.get().getWidgetServer().getWidgetStatus(serverNode);
 			return resultAsJson( wstatus );
 		}catch(ServerException ex)
 		{
