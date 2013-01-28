@@ -39,7 +39,9 @@ public class ExpiredServersCollectorImpl extends Timer implements ExpiredServers
 
 	public void scheduleToDestroy(final ServerNode server)
 	{
-
+        if ( server.getNodeId() == null ){ // possible if remote bootstrap that failed for some reason.
+            server.delete();
+        }
 		
 		logger.info( "This server {} was scheduled for destroy after: {} ms", server.getPublicIP(), server.getElapsedTime() );
 		schedule( new TimerTask() {

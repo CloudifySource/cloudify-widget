@@ -104,6 +104,9 @@ public class ServerPoolImpl implements ServerPool
 	
 	public void destroy(String serverId)
 	{
+        if ( serverId == null ){
+            return; // nothing to do.
+        }
         logger.info("destroying server {}", serverId);
 		// when we move to Quarz just unregister from Cron
 		if ( ServerNode.getServerNode( serverId ) != null ){
