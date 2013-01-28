@@ -15,8 +15,6 @@
  *******************************************************************************/
 package beans.api;
 
-import java.io.File;
-
 import models.ServerNode;
 import server.ProcExecutor;
 
@@ -39,10 +37,8 @@ public interface ExecutorFactory {
 	/**
 	 * returns an executor for deploying a service or application on the cloud.
 	 * @param server the server node.
-	 * @param recipe the recipe to deploy
-	 * @param args
 	 * @return process executor.
 	 */
-	ProcExecutor getDeployExecutor( ServerNode server, File recipe, String ... args );
+	ProcExecutor getDeployExecutor( ServerNode server );
 	
 }

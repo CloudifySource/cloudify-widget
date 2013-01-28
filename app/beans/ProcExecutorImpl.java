@@ -25,6 +25,7 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
 
 import play.cache.Cache;
+import play.modules.spring.Spring;
 import server.DeployManager;
 import server.ProcExecutor;
 import server.ProcOutputStream;
@@ -32,8 +33,8 @@ import server.WriteEventListener;
 
 
 /**
- * This class extends a {@link DefaultExecutor} and contains the server information where the recipe was deployed.
- * It also contains an output stream for the forked process. 
+ * This class extends a {@link DefaultExecutor} and provides the ability to listen on the process output stream.
+ * an Id property is saved for accessing the output from the play cache. 
  * 
  * @author Igor Goldenberg
  * @author Adaml
@@ -47,9 +48,9 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
 	 {
 		private WriteEventListener writeEventListener;
 		
-		public ProcessStreamHandler(WriteEventListener wel) { 
-			this.setWriteEventListener(wel);
-			
+		public ProcessStreamHandler(String key) {
+			WriteEventListener writeEventListener = createWriteEventListener(key);
+			this.setWriteEventListener(writeEventListener);
 		}
 		
 		@Override
@@ -67,6 +68,12 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
 			super.createProcessErrorPump(is, procOutputStream);
 		}
 		
+		/**
+		 * 
+		 * enables the option to listen on the process output stream.
+		 * 
+		 * @param wel see {@link WriteEventListener}
+		 */
 		public void setWriteEventListener(final WriteEventListener wel) {
 			this.writeEventListener = wel;
 		}
@@ -75,6 +82,12 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
 			ProcOutputStream procOutputStream = new ProcOutputStream();
 			procOutputStream.setProcEventListener(this.writeEventListener);
 			return procOutputStream;
+		}
+		
+		private WriteEventListener createWriteEventListener(String key) {
+			WriteEventListener writeEventListener = ( WriteEventListener  ) Spring.getBean("executorFactoryWriteEventListener");
+			writeEventListener.setKey(key);
+			return writeEventListener;
 		}
 	 }
     
