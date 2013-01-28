@@ -141,25 +141,38 @@ $(function () {
     {
         $( "#start_btn,#stop_btn" ).toggle();
         if ( !widgetState.isValid() ) {
-			var playData = { apiKey : params["apiKey"], "hpcsKey" : $("#advanced [name=hpcs_key]").val(), "hpcsSecretKey":$("#advanced [name=hpcs_secret_key]").val() }
-            $.post( "/widget/start?" + $.param(playData), {}, function ( data, textStatus, jqXHR )
-            {
-                if ( data.status == "error" ) {
-                    $( "#start_btn,#stop_btn" ).toggle();
-                    write_log( data.message, "error" );
-                    return;
+			var playData = { apiKey : params["apiKey"], "hpcsKey" : $("#advanced [name=hpcs_key]").val(), "hpcsSecretKey":$("#advanced [name=hpcs_secret_key]").val() };
+            $.ajax(
+                { type:"POST",
+                  url : "/widget/start?" + $.param(playData),
+                    success: function ( data, textStatus, jqXHR ){
+
+                                    if ( data.status == "error" ) {
+                                        $( "#start_btn,#stop_btn" ).toggle();
+                                        write_log( data.message, "error" );
+                                        return;
+                                    }
+
+                                    if ( data.instance["@instanceId"] ) {
+                                        widgetState.instanceId( data.instance["@instanceId"] ).publicIp( data.instance["@publicIP"] ).remove( false );
+                                        $( "#time_left" ).show();
+                                        setTimeoutForUpdateStatus( 1 );
+
+                                        var link_info = data.instance.link;
+                                        var custom_link = "<li id='custom_link'><a href='" + link_info.url + "' target='_blank'>" + link_info.title + "</a></li>";
+                                        set_cloudify_dashboard_link( custom_link );
+                                    }
+                            },
+                    error: function( data ){
+                        var displayMessage = data.getResponseHeader("display-message");
+                        if ( displayMessage ){
+                            var displayMessageObj = JSON.parse( displayMessage );
+                            write_log( displayMessageObj.msg, "error" );
+                        }
+                    }
                 }
 
-                if ( data.instance["@instanceId"] ) {
-                    widgetState.instanceId( data.instance["@instanceId"] ).publicIp( data.instance["@publicIP"] ).remove( false );
-                    $( "#time_left" ).show();
-                    setTimeoutForUpdateStatus( 1 );
-
-                    var link_info = data.instance.link;
-                    var custom_link = "<li id='custom_link'><a href='" + link_info.url + "' target='_blank'>" + link_info.title + "</a></li>";
-                    set_cloudify_dashboard_link( custom_link );
-                }
-            } );
+            );
         }
     }
 

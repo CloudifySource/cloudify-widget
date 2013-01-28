@@ -65,9 +65,13 @@ public class Application extends Controller
 			ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ));
 			WidgetInstance wi = null;
 			//TODO[adaml]: add proper input validation response
-			if ( isValidInput(hpcsKey, hpcsSecretKey) ){
+			if ( !StringUtils.isEmpty( hpcsKey ) && !StringUtils.isEmpty( hpcsSecretKey ) ){
+                if ( !isValidInput(hpcsKey, hpcsSecretKey) ) {
+                    new HeaderMessage().setError("invalid hpcs credentials").apply(response().getHeaders());
+                    return badRequest();
+                }
 				ServerNode server = ApplicationContext.get().getServerBootstrapper().bootstrapCloud( hpcsKey, hpcsSecretKey );
-//				server.save();
+
 				ApplicationContext.get().getWidgetServer().deploy(widget, server);
 				return ok();
 			}else{
@@ -104,6 +108,7 @@ public class Application extends Controller
 		try
 		{
 			Widget.Status wstatus = ApplicationContext.get().getWidgetServer().getWidgetStatus(instanceId);
+
 
 			return resultAsJson( wstatus );
 		}catch(ServerException ex)
