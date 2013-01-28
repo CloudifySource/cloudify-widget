@@ -186,7 +186,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			bootstrapExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment() , resultHandler);
 			resultHandler.waitFor();
 
-			String output = Utils.getCachedOutput(serverNode.getId());
+			String output = Utils.getCachedOutput(serverNode.getNodeId());
 			if (resultHandler.getException() != null) {
 				if (output.contains("found existing management machines")) {
 					throw new RuntimeException("Found existing management machines. Process output was: " + output);
