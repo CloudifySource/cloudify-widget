@@ -173,7 +173,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		try{
 			serverNode.save();
 			Cache.set( "output-" + serverNode.getId(),  new StringBuilder());
-			
+
 			logger.info("Creating cloud folder with specific user credentials. User: " + userName + ", api key: " + apiKey);
 			cloudFolder = CloudifyUtils.createCloudFolder( userName, apiKey );
 
@@ -186,17 +186,17 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor(serverNode.getId());
 			bootstrapExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment() , resultHandler);
 			resultHandler.waitFor();
-			
+
 			String output = Utils.getCachedOutput(serverNode.getId());
 			if (resultHandler.getException() != null) {
 				if (output.contains("found existing management machines")) {
-					throw new RuntimeException("Found existing management machines");
+					throw new RuntimeException("Found existing management machines. Process output was: " + output);
 				}
 				logger.info("Command execution ended with errors: " + output.toString());
 				throw new RuntimeException("Failed to bootstrap cloudify machine: " 
-						+ output.toString(), resultHandler.getException());
+						+ output, resultHandler.getException());
 			}
-			
+
 			String publicIp = Utils.extractIpFromBootstrapOutput(output);
 			if (StringUtils.isEmpty(publicIp)) {
 				throw new RuntimeException( "Bootstrap failed. No IP address found in bootstrap output." 
@@ -207,9 +207,8 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			if (StringUtils.isEmpty(privateKey)) {
 				throw new RuntimeException( "Bootstrap failed. No pem file found in cloud directory." );
 			}
-			
 			logger.info("Bootstrap cloud command ended successfully");
-			
+
 			serverNode.setPrivateKey(privateKey);
 			serverNode.setApiKey(apiKey);
 			serverNode.setUserName(userName);
