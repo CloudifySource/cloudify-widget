@@ -67,7 +67,7 @@ public class DeployManagerImpl implements DeployManager
 		
 		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 
-		ProcExecutor executor = executorFactory.getDeployExecutor( server, recipe );
+		ProcExecutor executor = executorFactory.getDeployExecutor( server );
 
 		try
 		{

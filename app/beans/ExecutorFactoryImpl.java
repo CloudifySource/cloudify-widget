@@ -15,8 +15,6 @@
  *******************************************************************************/
 package beans;
 
-import java.io.File;
-
 import models.ServerNode;
 
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -26,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import play.modules.spring.Spring;
 import server.ApplicationContext;
 import server.ProcExecutor;
-import server.WriteEventListener;
 import beans.ProcExecutorImpl.ProcessStreamHandler;
 import beans.api.ExecutorFactory;
 
@@ -42,42 +39,34 @@ public class ExecutorFactoryImpl implements ExecutorFactory {
 	
 	@Override
 	public ProcExecutor getBootstrapExecutor( String key ) {
+
 		logger.info("Creating bootstrap executor.");
-		
-		WriteEventListener writeEventListener = createWriteEventListener();
-		writeEventListener.setKey(key);
-		ProcessStreamHandler streamHandler = new ProcessStreamHandler(writeEventListener);
+		ProcessStreamHandler streamHandler = new ProcessStreamHandler(key);
 		
 		ExecuteWatchdog watchdog = new ExecuteWatchdog(ApplicationContext.get().conf().cloudify.bootstrapCloudWatchDogProcessTimeoutMillis);
-		ProcExecutor executor = (ProcExecutor) Spring.getBean("bootstrapExecutor");
+		ProcExecutor executor = (ProcExecutor) Spring.getBean( "bootstrapExecutor" );
 		executor.setExitValue(0);
 		executor.setWatchdog(watchdog);
 		executor.setStreamHandler(streamHandler);
+		executor.setId(key);
 		return executor ;
 	}
 
 	@Override
-	public ProcExecutor getDeployExecutor( ServerNode server, File recipe, String ... args ) {
+	public ProcExecutor getDeployExecutor( ServerNode server ) {
+	
 		logger.info("Creating deploy executor.");
+		ProcessStreamHandler streamHandler = new ProcessStreamHandler(server.getId());
 		
-		WriteEventListener writeEventListener = createWriteEventListener();
-		writeEventListener.setKey(server.getNodeId());
-		ProcessStreamHandler streamHandler = new ProcessStreamHandler(writeEventListener);
 		ExecuteWatchdog watchdog = new ExecuteWatchdog( ApplicationContext.get().conf().cloudify.bootstrapCloudWatchDogProcessTimeoutMillis );
-		
-		ProcExecutor executor = ( (ProcExecutor) Spring.getBean( "deployExecutor" ) );
+		ProcExecutor executor = (ProcExecutor) Spring.getBean( "deployExecutor" );
 		executor.setExitValue(1);
 		executor.setWatchdog(watchdog);
 		executor.setStreamHandler(streamHandler);
-		executor.setRecipe( recipe );
-		executor.setArgs( args );
 		executor.setId(server.getNodeId());
 		return  executor;
 	}
 
-	private WriteEventListener createWriteEventListener() {
-		WriteEventListener writeEventListener = ( WriteEventListener  ) Spring.getBean("executorFactoryWriteEventListener");
-		return writeEventListener;
-	}
+
 
 }

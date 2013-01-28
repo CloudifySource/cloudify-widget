@@ -25,6 +25,7 @@ import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
 
 import play.cache.Cache;
+import play.modules.spring.Spring;
 import server.DeployManager;
 import server.ProcExecutor;
 import server.ProcOutputStream;
@@ -32,25 +33,24 @@ import server.WriteEventListener;
 
 
 /**
- * This class extends a {@link DefaultExecutor} and contains the server information where the recipe was deployed.
- * It also contains an output stream for the forked process. 
+ * This class extends a {@link DefaultExecutor} and provides the ability to listen on the process output stream.
+ * an Id property is saved for accessing the output from the play cache. 
  * 
  * @author Igor Goldenberg
+ * @author Adaml
  * @see DeployManager
  */
 public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor 
 {
     private String id;
-    private File recipe;
-    private String[] args;
 
     final static class ProcessStreamHandler extends PumpStreamHandler
 	 {
-		private WriteEventListener wel;
+		private WriteEventListener writeEventListener;
 		
-		public ProcessStreamHandler(WriteEventListener wel) { 
-			this.setWriteEventListener(wel);
-			
+		public ProcessStreamHandler(String key) {
+			WriteEventListener writeEventListener = createWriteEventListener(key);
+			this.setWriteEventListener(writeEventListener);
 		}
 		
 		@Override
@@ -68,14 +68,26 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
 			super.createProcessErrorPump(is, procOutputStream);
 		}
 		
+		/**
+		 * 
+		 * enables the option to listen on the process output stream.
+		 * 
+		 * @param wel see {@link WriteEventListener}
+		 */
 		public void setWriteEventListener(final WriteEventListener wel) {
-			this.wel = wel;
+			this.writeEventListener = wel;
 		}
 		
 		private ProcOutputStream createOutputStream() {
 			ProcOutputStream procOutputStream = new ProcOutputStream();
-			procOutputStream.setProcEventListener(this.wel);
+			procOutputStream.setProcEventListener(this.writeEventListener);
 			return procOutputStream;
+		}
+		
+		private WriteEventListener createWriteEventListener(String key) {
+			WriteEventListener writeEventListener = ( WriteEventListener  ) Spring.getBean("executorFactoryWriteEventListener");
+			writeEventListener.setKey(key);
+			return writeEventListener;
 		}
 	 }
     
@@ -83,34 +95,10 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
 
     public ProcExecutorImpl( ServerNode server, File recipe, String... args )
     {
-        this.setId(server.getNodeId());
-
-        this.recipe = recipe;
-        this.args = args;
         this.id = server.getNodeId();
         
-        Cache.set( "output-" + server.getNodeId(),  new StringBuilder());
+        Cache.set( "output-" + this.id,  new StringBuilder());
     }
-
-    public File getRecipe()
-    {
-        return recipe;
-    }
-
-    public String[] getArgs()
-    {
-        return args;
-    }
-
-	@Override
-	public void setRecipe(File recipe) {
-		this.recipe = recipe;
-	}
-
-	@Override
-	public void setArgs(String... args) {
-		this.args = args;
-	}
 	
 	@Override
     public String getId()

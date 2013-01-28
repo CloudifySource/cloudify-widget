@@ -171,7 +171,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		File cloudFolder = null;
 		try{
 			Cache.set( "output-" + serverNode.getNodeId(),  new StringBuilder());
-			
+
 			logger.info("Creating cloud folder with specific user credentials. User: " + serverNode.getUserName() + ", api key: " + serverNode.getApiKey());
 			cloudFolder = CloudifyUtils.createCloudFolder( serverNode.getUserName(), serverNode.getApiKey() );
 
@@ -179,23 +179,26 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			CommandLine cmdLine = new CommandLine(conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile() + Utils.getExecutableExt());
 			cmdLine.addArgument(cloudFolder.getName());
 
-			logger.info("Executing command line: " + cmdLine);
 			DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 			ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor(serverNode.getNodeId());
+			
+			logger.info("Executing command line: " + cmdLine);
 			bootstrapExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment() , resultHandler);
 			resultHandler.waitFor();
-			
-			//TODO[adaml]: the logger on cloudify directs valid output to the error stream.
+
+			String output = Utils.getCachedOutput(serverNode.getId());
 			if (resultHandler.getException() != null) {
-				String output = Utils.getCachedOutput(serverNode.getNodeId());
+				if (output.contains("found existing management machines")) {
+					throw new RuntimeException("Found existing management machines. Process output was: " + output);
+				}
 				logger.info("Command execution ended with errors: " + output.toString());
 				throw new RuntimeException("Failed to bootstrap cloudify machine: " 
-						+ output.toString(), resultHandler.getException());
+						+ output, resultHandler.getException());
 			}
-			
-			String output = Utils.getCachedOutput(serverNode.getNodeId());
+
 			String publicIp = Utils.extractIpFromBootstrapOutput(output);
 			if (StringUtils.isEmpty(publicIp)) {
+				logger.warn("No public ip address found in bootstrap output. " + output);
 				throw new RuntimeException( "Bootstrap failed. No IP address found in bootstrap output." 
 						+ output, resultHandler.getException() );
 			}
@@ -204,14 +207,13 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			if (StringUtils.isEmpty(privateKey)) {
 				throw new RuntimeException( "Bootstrap failed. No pem file found in cloud directory." );
 			}
-			
 			logger.info("Bootstrap cloud command ended successfully");
-			
+
 			serverNode.setPrivateKey(privateKey);
 			serverNode.setRemote(true);
 
 			return serverNode;
-		} catch(Exception e) { 
+		} catch(Exception e) {
 			throw new RuntimeException("Unable to bootstrap cloud", e);
 		} finally {
 			if (cloudFolder != null)

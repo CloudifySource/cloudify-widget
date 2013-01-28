@@ -16,8 +16,6 @@
 
 package server;
 
-import java.io.File;
-
 import org.apache.commons.exec.Executor;
 
 /**
@@ -36,10 +34,6 @@ import org.apache.commons.exec.Executor;
 public interface ProcExecutor extends Executor 
 {
 	public String getId();
-
-	public void setRecipe(File recipe); 
-	
-	public void setArgs(String ... args);
 	
 	public void setId(String id);
 	
