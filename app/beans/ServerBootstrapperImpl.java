@@ -181,9 +181,10 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			CommandLine cmdLine = new CommandLine(conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile() + Utils.getExecutableExt());
 			cmdLine.addArgument(cloudFolder.getName());
 
-			logger.info("Executing command line: " + cmdLine);
 			DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 			ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor(serverNode.getId());
+			
+			logger.info("Executing command line: " + cmdLine);
 			bootstrapExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment() , resultHandler);
 			resultHandler.waitFor();
 
@@ -199,6 +200,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
 			String publicIp = Utils.extractIpFromBootstrapOutput(output);
 			if (StringUtils.isEmpty(publicIp)) {
+				logger.warn("No public ip address found in bootstrap output. " + output);
 				throw new RuntimeException( "Bootstrap failed. No IP address found in bootstrap output." 
 						+ output, resultHandler.getException() );
 			}
