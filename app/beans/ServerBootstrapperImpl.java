@@ -187,15 +187,16 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			bootstrapExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment() , resultHandler);
 			resultHandler.waitFor();
 			
-			//TODO[adaml]: the logger on cloudify directs valid output to the error stream.
+			String output = Utils.getCachedOutput(serverNode.getId());
 			if (resultHandler.getException() != null) {
-				String output = Utils.getCachedOutput(serverNode.getId());
+				if (output.contains("found existing management machines")) {
+					throw new RuntimeException("Found existing management machines");
+				}
 				logger.info("Command execution ended with errors: " + output.toString());
 				throw new RuntimeException("Failed to bootstrap cloudify machine: " 
 						+ output.toString(), resultHandler.getException());
 			}
 			
-			String output = Utils.getCachedOutput(serverNode.getId());
 			String publicIp = Utils.extractIpFromBootstrapOutput(output);
 			if (StringUtils.isEmpty(publicIp)) {
 				throw new RuntimeException( "Bootstrap failed. No IP address found in bootstrap output." 
@@ -215,7 +216,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			serverNode.setRemote(true);
 
 			return serverNode;
-		} catch(Exception e) { 
+		} catch(Exception e) {
 			throw new RuntimeException("Unable to bootstrap cloud", e);
 		} finally {
 			if (cloudFolder != null)
