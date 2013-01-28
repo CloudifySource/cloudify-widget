@@ -23,6 +23,7 @@ import models.Widget;
 import models.WidgetInstance;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,7 @@ public class Application extends Controller
 		{
 			Exception e = new Exception("here");
 			//Why is this being called twice?
-			System.out.println(e.getStackTrace());
+			System.out.println(ExceptionUtils.getFullStackTrace(e));
 			logger.info("starting widget with [apiKey, hpcsKey, hpcsSecretKey] = [{},{},{}]", new Object[]{apiKey, hpcsKey, hpcsSecretKey} );
  			Widget widget = Widget.getWidget( apiKey );
            	if ( widget == null || !widget.isEnabled()) {
