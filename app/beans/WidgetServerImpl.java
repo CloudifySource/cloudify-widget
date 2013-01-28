@@ -18,6 +18,7 @@ package beans;
 import static server.Config.WIDGET_STOP_TIMEOUT;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +73,7 @@ public class WidgetServerImpl implements WidgetServer
     private static Map<Recipe.Type, Pattern> installationFinishedRegexMap = null;
 
     static {
+        installationFinishedRegexMap = new HashMap<Recipe.Type, Pattern>();
         for ( Recipe.Type type  : Recipe.Type.values() ) {
             String pattern = type + " .* installed successfully";
             installationFinishedRegexMap.put(type, Pattern.compile( pattern, Pattern.CASE_INSENSITIVE) );
