@@ -69,8 +69,6 @@ public class ExecutorFactoryImpl implements ExecutorFactory {
 		executor.setExitValue(1);
 		executor.setWatchdog(watchdog);
 		executor.setStreamHandler(streamHandler);
-		executor.setRecipe( recipe );
-		executor.setArgs( args );
 		executor.setId(server.getId());
 		return  executor;
 	}

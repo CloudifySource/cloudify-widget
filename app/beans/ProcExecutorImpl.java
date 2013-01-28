@@ -36,17 +36,16 @@ import server.WriteEventListener;
  * It also contains an output stream for the forked process. 
  * 
  * @author Igor Goldenberg
+ * @author Adaml
  * @see DeployManager
  */
 public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor 
 {
     private String id;
-    private File recipe;
-    private String[] args;
 
     final static class ProcessStreamHandler extends PumpStreamHandler
 	 {
-		private WriteEventListener wel;
+		private WriteEventListener writeEventListener;
 		
 		public ProcessStreamHandler(WriteEventListener wel) { 
 			this.setWriteEventListener(wel);
@@ -69,12 +68,12 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
 		}
 		
 		public void setWriteEventListener(final WriteEventListener wel) {
-			this.wel = wel;
+			this.writeEventListener = wel;
 		}
 		
 		private ProcOutputStream createOutputStream() {
 			ProcOutputStream procOutputStream = new ProcOutputStream();
-			procOutputStream.setProcEventListener(this.wel);
+			procOutputStream.setProcEventListener(this.writeEventListener);
 			return procOutputStream;
 		}
 	 }
@@ -83,34 +82,10 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
 
     public ProcExecutorImpl( ServerNode server, File recipe, String... args )
     {
-        this.setId(server.getId());
-
-        this.recipe = recipe;
-        this.args = args;
         this.id = server.getId();
         
-        Cache.set( "output-" + server.getId(),  new StringBuilder());
+        Cache.set( "output-" + this.id,  new StringBuilder());
     }
-
-    public File getRecipe()
-    {
-        return recipe;
-    }
-
-    public String[] getArgs()
-    {
-        return args;
-    }
-
-	@Override
-	public void setRecipe(File recipe) {
-		this.recipe = recipe;
-	}
-
-	@Override
-	public void setArgs(String... args) {
-		this.args = args;
-	}
 	
 	@Override
     public String getId()
