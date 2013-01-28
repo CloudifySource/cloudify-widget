@@ -13,27 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-
 package server;
 
-import models.ServerNode;
-
-import java.io.File;
-
 /**
- * The main abstraction to deploy recipe.
- *
- * The interface allows to
- * <ul>
- *  <li>to fork process on specific Server</li>
- *  <li>get the process executor of the forked process and get the output</li>
- *  <li>destroy process executor</li>
- * </ul>
+ * Write event listener interface.
  * 
- * @author Igor Goldenberg
- * @see ProcExecutor
+ * @author adaml
+ *
  */
-public interface DeployManager 
-{
-   public ProcExecutor fork( ServerNode server, File recipe );
+public interface WriteEventListener {
+    	
+        public void writeEvent(int b);
+        
+        public void setKey(String key);
+        
 }

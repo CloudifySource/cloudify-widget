@@ -20,6 +20,7 @@ import static server.Config.WIDGET_STOP_TIMEOUT;
 import java.io.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import beans.config.Conf;
 import controllers.WidgetAdmin;
@@ -116,9 +117,9 @@ public class WidgetServerImpl implements WidgetServer
 
 		widget.countLaunch();
 		
-		String instanceId = deployManager.fork(server, recipeDir).getId();
+		deployManager.fork(server, recipeDir);
 		
-		return widget.addWidgetInstance( instanceId, server.getPublicIP() );
+		return widget.addWidgetInstance( server.getId(), server.getPublicIP() );
 	}
 	
 	public void undeploy( String instanceId )
@@ -132,14 +133,22 @@ public class WidgetServerImpl implements WidgetServer
 	
 	public Status getWidgetStatus( String instanceId )
 	{
-		ProcExecutor pe = deployManager.getExecutor(instanceId);
-		if ( pe == null )
+		ServerNode serverNode = ServerNode.find.byId(Long.getLong(instanceId));
+		if (serverNode == null) {
 			return new Status(Status.STATE_STOPPED, Messages.get( "server.was.terminated" ) );
+		}
+		String cachedOutput = Utils.getCachedOutput(instanceId);
+		List<String> output = Utils.formatOutput(cachedOutput, serverNode.getPrivateIP() + "]", filterOutputLines, filterOutputStrings );
 		
-		List<String> output = Utils.formatOutput(pe.getOutput(), pe.getPrivateServerIP() + "]", filterOutputLines, filterOutputStrings );
-		Status wstatus = new Status(Status.STATE_RUNNING, output, pe.getElapsedTimeMin());
-		
-		return wstatus;
+		if (serverNode.getExpirationTime() != null) {
+			long elapsedTime = serverNode.getExpirationTime() - System.currentTimeMillis();
+			if ( elapsedTime <= 0 ) {
+				return new Status(Status.STATE_RUNNING, output, 0);
+			}
+			return new Status(Status.STATE_RUNNING, output, ( int )TimeUnit.MILLISECONDS.toMinutes( elapsedTime ));
+		} else {
+			return new Status(Status.STATE_RUNNING, output, 0);
+		}
 	}
 
     public void setServerPool(ServerPool serverPool) {

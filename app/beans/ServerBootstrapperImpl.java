@@ -28,8 +28,6 @@ import models.ServerNode;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jclouds.ContextBuilder;
@@ -53,13 +51,15 @@ import org.jclouds.util.Strings2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import play.cache.Cache;
 import server.ApplicationContext;
 import server.DeployManager;
+import server.ProcExecutor;
 import server.ServerBootstrapper;
 import server.exceptions.ServerException;
 import utils.CloudifyUtils;
 import utils.Utils;
-import beans.ProcExecutorImpl.ProcessStreamHandler;
+import beans.api.ExecutorFactory;
 import beans.config.Conf;
 
 import com.google.common.net.HostAndPort;
@@ -87,6 +87,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     @Inject
     private Conf conf;
 
+    @Inject
+    private ExecutorFactory executorFactory;
+    
     @Inject
     private DeployManager deployManager;
 	
@@ -166,7 +169,11 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	@Override
 	public ServerNode bootstrapCloud(String userName, String apiKey)  {
 		File cloudFolder = null;
+		ServerNode serverNode = new ServerNode();
 		try{
+			serverNode.save();
+			Cache.set( "output-" + serverNode.getId(),  new StringBuilder());
+			
 			logger.info("Creating cloud folder with specific user credentials. User: " + userName + ", api key: " + apiKey);
 			cloudFolder = CloudifyUtils.createCloudFolder( userName, apiKey );
 
@@ -176,28 +183,23 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
 			logger.info("Executing command line: " + cmdLine);
 			DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-			ExecuteWatchdog watchdog = new ExecuteWatchdog(conf.cloudify.bootstrapCloudWatchDogProcessTimeoutMillis);
-			ProcessStreamHandler streamHandler = new ProcessStreamHandler();
-			
-			DefaultExecutor defaultExecutor  = new DefaultExecutor();
-			defaultExecutor.setStreamHandler(streamHandler);
-			defaultExecutor.setExitValue(0);
-			defaultExecutor.setWatchdog(watchdog);
-			defaultExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment() , resultHandler);
+			ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor(serverNode.getId());
+			bootstrapExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment() , resultHandler);
 			resultHandler.waitFor();
 			
 			//TODO[adaml]: the logger on cloudify directs valid output to the error stream.
 			if (resultHandler.getException() != null) {
-				logger.info("Command execution ended with errors: " + streamHandler.getOutput());
+				String output = Utils.getCachedOutput(serverNode.getId());
+				logger.info("Command execution ended with errors: " + output.toString());
 				throw new RuntimeException("Failed to bootstrap cloudify machine: " 
-						+ streamHandler.getOutput(), resultHandler.getException());
+						+ output.toString(), resultHandler.getException());
 			}
 			
-			ServerNode serverNode = new ServerNode();
-			String publicIp = Utils.extractIpFromBootstrapOutput(streamHandler.getOutput());
+			String output = Utils.getCachedOutput(serverNode.getId());
+			String publicIp = Utils.extractIpFromBootstrapOutput(output);
 			if (StringUtils.isEmpty(publicIp)) {
 				throw new RuntimeException( "Bootstrap failed. No IP address found in bootstrap output." 
-						+ streamHandler.getOutput(), resultHandler.getException() );
+						+ output, resultHandler.getException() );
 			}
 			serverNode.setPublicIP(publicIp);
 			String privateKey = CloudifyUtils.getCloudPrivateKey(cloudFolder);
@@ -210,6 +212,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			serverNode.setPrivateKey(privateKey);
 			serverNode.setApiKey(apiKey);
 			serverNode.setUserName(userName);
+			serverNode.setRemote(true);
 
 			return serverNode;
 		} catch(Exception e) { 
@@ -217,13 +220,12 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		} finally {
 			if (cloudFolder != null)
 				FileUtils.deleteQuietly(cloudFolder);
+			serverNode.setStopped(true);
 		}
 	}
-
 	
 	private void deleteServer( String serverId )
 	{
-		deployManager.destroyExecutor(serverId);
 		ServerApi serverApi = _nova.getApi().getServerApiForZone( conf.server.bootstrap.zoneName );
 		serverApi.delete(serverId);
 		logger.info("Server id: {} was deleted.", serverId);

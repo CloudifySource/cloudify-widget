@@ -8,7 +8,11 @@
 
 
     <bean id="deployManager" class="beans.DeployManagerImpl"/>
+    <bean id="executorFactory" class="beans.ExecutorFactoryImpl"/>
 
+	<bean id="executorFactoryWriteEventListener" scope="prototype" class="beans.ProcExecutorEventListener"/>
+	<bean id="bootstrapExecutor" scope="prototype" class="beans.ProcExecutorImpl"/>
+	<bean id="deployExecutor" scope="prototype" class="beans.ProcExecutorImpl"/>
 
     <bean id="expiredServerCollector" class="beans.ExpiredServersCollectorImpl"/>
     <bean id="serverBootstrapper" class="beans.ServerBootstrapperImpl" init-method="init"/>

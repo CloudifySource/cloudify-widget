@@ -16,6 +16,8 @@
 
 package server;
 
+import java.io.File;
+
 import org.apache.commons.exec.Executor;
 
 /**
@@ -35,11 +37,10 @@ public interface ProcExecutor extends Executor
 {
 	public String getId();
 
-	public String getPrivateServerIP();
+	public void setRecipe(File recipe); 
 	
-    public String getPublicServerIP();
-
-	public String getOutput();
-
-	public int getElapsedTimeMin();
+	public void setArgs(String ... args);
+	
+	public void setId(String id);
+	
 }

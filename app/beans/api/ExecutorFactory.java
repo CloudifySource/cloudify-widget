@@ -13,27 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-
-package server;
-
-import models.ServerNode;
+package beans.api;
 
 import java.io.File;
 
+import models.ServerNode;
+import server.ProcExecutor;
+
 /**
- * The main abstraction to deploy recipe.
- *
- * The interface allows to
- * <ul>
- *  <li>to fork process on specific Server</li>
- *  <li>get the process executor of the forked process and get the output</li>
- *  <li>destroy process executor</li>
- * </ul>
+ * Executor factory interface.
  * 
- * @author Igor Goldenberg
- * @see ProcExecutor
+ * @author adaml
+ *
  */
-public interface DeployManager 
-{
-   public ProcExecutor fork( ServerNode server, File recipe );
+public interface ExecutorFactory {
+
+	/**
+	 * returns an executor for performing bootstrap to the cloud.
+	 * 
+	 * @param key The key that the executor uses to write to the play cache.
+	 * @return process executor.
+	 */
+	ProcExecutor getBootstrapExecutor( String key );
+	
+	/**
+	 * returns an executor for deploying a service or application on the cloud.
+	 * @param server the server node.
+	 * @param recipe the recipe to deploy
+	 * @param args
+	 * @return process executor.
+	 */
+	ProcExecutor getDeployExecutor( ServerNode server, File recipe, String ... args );
+	
 }
