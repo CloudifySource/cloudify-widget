@@ -120,6 +120,14 @@ public class Widget
             this.cloudifyUiIsAvailable = cloudifyUiIsAvailable;
         }
 
+        public Boolean getInstanceIsAvailable() {
+            return instanceIsAvailable;
+        }
+
+        public Boolean getCloudifyUiIsAvailable() {
+            return cloudifyUiIsAvailable;
+        }
+
         public void setInstanceIsAvailable(Boolean instanceIsAvailable) {
             this.instanceIsAvailable = instanceIsAvailable;
         }

@@ -139,6 +139,7 @@ public class WidgetServerImpl implements WidgetServer
 	}
 
     private static boolean isFinished( Recipe.Type recipeType, String line ){
+        logger.debug("checking to see if [{}] has finished using [{}]", recipeType, line );
         Pattern pattern = installationFinishedRegexMap.get(recipeType);
         return pattern.matcher(line).matches();
     }
@@ -162,6 +163,7 @@ public class WidgetServerImpl implements WidgetServer
             widgetInstance.getWidget();
             widgetInstance.getLink();
             if (isFinished(widgetInstance.getRecipeType(), (String)CollectionUtils.last(output))){
+                logger.debug("detected finished installation");
                 result.setInstanceIsAvailable(Boolean.TRUE);
                 result.setConsoleLink(widgetInstance.getLink());
             }
