@@ -31,6 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipException;
 
+import models.ServerNode;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -344,8 +345,9 @@ public class Utils
 		return "N/A";
 	}
 	
-	public static String getCachedOutput(String serverNodeId) {
-		String output = ( (StringBuilder) Cache.get("output-" + serverNodeId )).toString();
+	public static String getCachedOutput( ServerNode serverNode ) {
+        StringBuilder stringBuilder = (StringBuilder) Cache.get("output-" + serverNode.getId() );
+        String output = stringBuilder == null ? "N/A" : stringBuilder.toString();
 		return output;
 	}
 }

@@ -25,7 +25,7 @@ import server.WriteEventListener;
  * @author adaml
  *
  */
-public class ProcExecutorEventListener implements WriteEventListener {
+public class ProcExecutorWriteEventListener implements WriteEventListener {
 
 	private String serverNodeId;
 	
@@ -33,19 +33,26 @@ public class ProcExecutorEventListener implements WriteEventListener {
 	
 	private String keyFormat = "output-%s";
 
-	public ProcExecutorEventListener( String serverNodeId ) {
+	public ProcExecutorWriteEventListener(String serverNodeId) {
 		this.serverNodeId = serverNodeId;
 	}
 	
-	public ProcExecutorEventListener( ) {
+	public ProcExecutorWriteEventListener() {
 		
 	}
+
+    private String getKey(){
+        return String.format( keyFormat, serverNodeId );
+    }
+
+    @Override
+    public void init(){
+        sb = new StringBuilder();
+        Cache.set( getKey(), sb );
+    }
 	
 	@Override
 	public void writeEvent(int b) {
-		if (this.sb == null) { 
-			sb  = ( (StringBuilder) Cache.get( String.format( keyFormat, serverNodeId) ) );
-		}
 		sb.append(Character.toChars(b));
 	}
 	

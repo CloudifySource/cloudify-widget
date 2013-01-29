@@ -168,7 +168,7 @@ public class WidgetServerImpl implements WidgetServer
             result.setPublicIp(server.getPublicIP());
         }
 
-        String cachedOutput = Utils.getCachedOutput(server.getNodeId());
+        String cachedOutput = Utils.getCachedOutput( server );
 
         output.addAll(Utils.formatOutput(cachedOutput, server.getPrivateIP() + "]", filterOutputLines, filterOutputStrings));
 

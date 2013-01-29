@@ -51,7 +51,6 @@ import org.jclouds.util.Strings2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import play.cache.Cache;
 import server.ApplicationContext;
 import server.DeployManager;
 import server.ProcExecutor;
@@ -171,8 +170,6 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	public ServerNode bootstrapCloud( ServerNode serverNode )  {
 		File cloudFolder = null;
 		try{
-			Cache.set( "output-" + serverNode.getNodeId(),  new StringBuilder());
-
 			logger.info("Creating cloud folder with specific user credentials. User: " + serverNode.getUserName() + ", api key: " + serverNode.getApiKey());
 			cloudFolder = CloudifyUtils.createCloudFolder( serverNode.getUserName(), serverNode.getApiKey() );
 
@@ -181,18 +178,18 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			cmdLine.addArgument(cloudFolder.getName());
 
 			DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-			ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor(serverNode.getNodeId());
+			ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor( serverNode );
 			
 			logger.info("Executing command line: " + cmdLine);
 			bootstrapExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment() , resultHandler);
 			resultHandler.waitFor();
 
-			String output = Utils.getCachedOutput(serverNode.getNodeId());
+			String output = Utils.getCachedOutput( serverNode );
 			if (resultHandler.getException() != null) {
 				if (output.contains("found existing management machines")) {
 					throw new RuntimeException("Found existing management machines. Process output was: " + output);
 				}
-				logger.info("Command execution ended with errors: " + output.toString());
+				logger.info("Command execution ended with errors: {}", output);
 				throw new RuntimeException("Failed to bootstrap cloudify machine: " 
 						+ output, resultHandler.getException());
 			}
