@@ -86,12 +86,8 @@ public class ServerPoolImpl implements ServerPool
         Collection<ServerNode> busyServer = CollectionUtils.select( servers, busyServerPredicate );
         logger.info("I found {} busy servers", CollectionUtils.size(busyServer));
         if ( !CollectionUtils.isEmpty( busyServer )){
-            for (ServerNode server : servers) {
-				if ( server.isBusy() )
-				{
-                     logger.info( "Found a busy server, setting destruction: {}", server );
+            for (ServerNode server : busyServer) {
 				     expiredServerCollector.scheduleToDestroy(server);
-				}
 			}
 		}// for
 
@@ -100,14 +96,14 @@ public class ServerPoolImpl implements ServerPool
 		// create new servers if need
 		if ( CollectionUtils.size( availableServer )  < conf.server.pool.minNode )
 		{
-			int serversToInit = conf.server.pool.minNode - CollectionUtils.size( servers );
+			int serversToInit = conf.server.pool.minNode - CollectionUtils.size( availableServer );
             logger.info("creating {} new Servers", serversToInit);
             logger.info( "ServerPool starting to initialize {} servers...", serversToInit );
             addNewServerToPool( serversToInit );
             // remove servers if we have too much
 		} else if ( CollectionUtils.size(availableServer) > conf.server.pool.maxNodes ){
             int i =0;
-            int serversToDelete = CollectionUtils.size(servers) - conf.server.pool.maxNodes ;
+            int serversToDelete = CollectionUtils.size(availableServer) - conf.server.pool.maxNodes ;
             logger.info("deleting {} servers",serversToDelete);
             for (ServerNode server : availableServer) {
                 if ( i >= serversToDelete){
