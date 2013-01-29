@@ -94,9 +94,9 @@ $(function () {
         // this function will append new lines of log if new log is longer than current log.
         // otherwise it will clear the current log and rewrite it.
         this.appendOrOverride = function (aOutput) {
-            if (widgetLog != aOutput) { // print only the difference
+            if (myLog!= aOutput) { // print only the difference
 
-                var index = widgetLog.length;
+                var index = myLog.length;
                 var logLength = aOutput.length;
 
                 if (logLength < index) {
@@ -107,7 +107,7 @@ $(function () {
                 for (; index < logLength; index = index + 1) {
                     write_log(aOutput[index]);
                 }
-                widgetLog = aOutput;
+                myLog = aOutput;
             }
         };
 
