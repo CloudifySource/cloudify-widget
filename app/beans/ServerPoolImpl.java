@@ -113,6 +113,7 @@ public class ServerPoolImpl implements ServerPool
                 if ( i >= serversToDelete){
                     break;
                 }
+                i++;
                 destroy( server.getNodeId() );
             }
         }
