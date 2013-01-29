@@ -142,7 +142,7 @@ $(function () {
         }
 
         if ( data.status.publicIp ) {
-            widgetState.publicIp(data.publicIp);
+            widgetState.publicIp(data.status.publicIp);
         }
 
         if ( data.status.consoleLink ){
@@ -151,14 +151,15 @@ $(function () {
             set_cloudify_dashboard_link(custom_link);
        }
 
-        else if ( data.status.state == "stopped" ) {
-            $( "#start_btn,#stop_btn" ).toggle();
+
+        var state = data.status.state.toLocaleLowerCase();
+        if ( state == "stopped") {
+            $("#start_btn,#stop_btn").toggle();
+            if ( data.status.message ){
+                widgetLog.error( data.status.message );
+            }
             stop_instance();
-        } else if ( data.status.state == "error" ) {
-            $( "#start_btn,#stop_btn" ).toggle();
-            widgetLog.error( data.status.message );
-            stop_instance();
-        }  else{// status == running
+        } else {// status == running
             setTimeoutForUpdateStatus();
         }
     }
@@ -193,9 +194,9 @@ $(function () {
                   url : "/widget/start?" + $.param(playData),
                     success: function ( data, textStatus, jqXHR ){
 
-                                    if ( data.status == "error" ) {
+                                    if ( data.status.state == "error" ) {
                                         $( "#start_btn,#stop_btn" ).toggle();
-                                        widgetLog.error( data.message );
+                                        widgetLog.error( data.status.message );
                                         return;
                                     }
                                     if ( data.status.instanceId ){
@@ -224,9 +225,9 @@ $(function () {
     $("#start_btn,#stop_btn").toggle();
     if ( widgetState.instanceId()) {
       $.post("/widget/"+ widgetState.instanceId() + "/stop?apiKey=" + params["apiKey"], {}, function (data) {
-        if (data.status == "error") {
+        if (data.status.state == "error") {
           $("#start_btn,#stop_btn").toggle();
-          widgetLog.error(data.message );
+          widgetLog.error(data.status.message );
           return;
         }
         stop_instance();

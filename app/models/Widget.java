@@ -100,12 +100,14 @@ public class Widget
 		public final static String STATE_STOPPED = "stopped";
 		public final static String STATE_RUNNING = "running";
 		
-		private State state;
+		private State state = State.RUNNING;
 		private List<String> output;
 		private Integer timeleft; // minutes
         private String publicIp;
         private String instanceId;
+        private Boolean remote;
         private WidgetInstance.ConsoleLink consoleLink;
+        private String message; // for errors
 
 
         public Status() {
@@ -123,8 +125,25 @@ public class Widget
             this.timeleft = timeleft <= 0 ? 1 : timeleft;
         }
 
+        public Status setRemote(Boolean remote) {
+            this.remote = remote;
+            return this;
+        }
+
         public void setPublicIp(String publicIp) {
             this.publicIp = publicIp;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public Boolean getRemote() {
+            return remote;
         }
 
         public Status setInstanceId(String instanceId) {

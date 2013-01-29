@@ -92,14 +92,25 @@ public class Application extends Controller
                 serverNode = wi.getServerNode();
             }
 
-            Map<String,Object> result = new HashMap<String,Object>();
-            result.put("status", new Widget.Status().setInstanceId(serverNode.getId().toString()));
-			return ok( Json.toJson(result));
+            return statusToResult( new Widget.Status().setInstanceId(serverNode.getId().toString()).setRemote( serverNode.isRemote()) );
 		}catch(ServerException ex)
 		{
-			return resultErrorAsJson(ex.getMessage());
+            return exceptionToStatus( ex );
 		}
 	}
+
+
+    private static Result exceptionToStatus( Exception e ){
+        Widget.Status status = new Widget.Status();
+        status.setState(Widget.Status.State.STOPPED);
+        status.setMessage(e.getMessage());
+        return statusToResult(status);
+    }
+    private static Result statusToResult( Widget.Status status ){
+        Map<String,Object> result = new HashMap<String, Object>();
+        result.put("status", status );
+        return ok( Json.toJson( result ));
+    }
 
 	private static boolean isValidInput(String hpcsKey, String hpcsSecretKey) {
 		return !StringUtils.isEmpty(hpcsKey) && !StringUtils.isEmpty(hpcsSecretKey)
@@ -108,7 +119,6 @@ public class Application extends Controller
 	
 	public static Result stop( String apiKey, String instanceId )
 	{
-		
 		ServerNode serverNode = ServerNode.find.byId(Long.parseLong(instanceId));
 		if (serverNode.isRemote()) {
 			return notFound();
@@ -124,6 +134,7 @@ public class Application extends Controller
 			return ok(OK_STATUS).as("application/json");
 		}
 	}
+
 	
 	public static Result getWidgetStatus( String apiKey, String instanceId )
 	{
@@ -137,10 +148,10 @@ public class Application extends Controller
                 throw new ServerException( Messages.get("server.was.terminated") );
             }
 			Widget.Status wstatus = ApplicationContext.get().getWidgetServer().getWidgetStatus(serverNode);
-			return resultAsJson( wstatus );
+			return statusToResult( wstatus );
 		}catch(ServerException ex)
 		{
-			return resultErrorAsJson(ex.getMessage());
+			return exceptionToStatus( ex );
 		}
 	}
 

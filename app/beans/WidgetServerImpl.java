@@ -151,6 +151,8 @@ public class WidgetServerImpl implements WidgetServer
             return result;
         }
 
+        result.setRemote( server.isRemote() ); // let UI know this is a remote bootstrap.
+
         WidgetInstance widgetInstance = WidgetInstance.findByServerNode(server);
         if (widgetInstance != null ){
             widgetInstance.getWidget();
