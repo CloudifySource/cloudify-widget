@@ -45,6 +45,9 @@ import com.avaje.ebean.config.dbplatform.MySqlPlatform;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Widget controller with the main functions like start(), stop(), getWidgetStatus().
  * 
@@ -89,7 +92,9 @@ public class Application extends Controller
                 serverNode = wi.getServerNode();
             }
 
-			return ok(Json.toJson(new Widget.Status().setInstanceId(serverNode.getId().toString())));
+            Map<String,Object> result = new HashMap<String,Object>();
+            result.put("status", new Widget.Status().setInstanceId(serverNode.getId().toString()));
+			return ok( Json.toJson(result));
 		}catch(ServerException ex)
 		{
 			return resultErrorAsJson(ex.getMessage());
