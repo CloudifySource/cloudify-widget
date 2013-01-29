@@ -32,7 +32,6 @@ import play.i18n.Messages;
 import server.ApplicationContext;
 import server.exceptions.ServerException;
 import utils.CollectionUtils;
-import utils.Utils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -106,14 +105,14 @@ public class Widget
 		private Integer timeleft; // minutes
         private String publicIp;
         private String instanceId;
-        private WidgetInstance.ConsoleLink link;
+        private WidgetInstance.ConsoleLink consoleLink;
 
 
         public Status() {
         }
 
-        public void setLink(WidgetInstance.ConsoleLink link) {
-            this.link = link;
+        public void setConsoleLink(WidgetInstance.ConsoleLink link) {
+            this.consoleLink = link;
         }
 
         public void setState(State state) {
@@ -161,8 +160,8 @@ public class Widget
             return instanceId;
         }
 
-        public WidgetInstance.ConsoleLink getLink() {
-            return link;
+        public WidgetInstance.ConsoleLink getConsoleLink() {
+            return consoleLink;
         }
     }
 	

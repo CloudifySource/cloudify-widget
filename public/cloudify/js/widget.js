@@ -145,9 +145,9 @@ $(function () {
             widgetState.publicIp(data.publicIp);
         }
 
-        if ( data.status.link ){
-            var link_info = data.status.link;
-            var custom_link = "<li id='custom_link'><a href='" + link_info.url + "' target='_blank'>" + link_info.title + "</a></li>";
+        if ( data.status.consoleLink ){
+            var link_info = data.status.consoleLink;
+            var custom_link = $("<li></li>",{"id":"custom_link"}).append($("<a></a>", {"href": link_info.url, "target":"_blank", "text":link_info.title}).text(link_info.title));
             set_cloudify_dashboard_link(custom_link);
        }
 
@@ -268,8 +268,7 @@ $(function () {
   }
 
   if (widgetState.instanceId()) {
-    $("#start_btn,#stop_btn,#time_left").toggle();
-    set_cloudify_dashboard_link( widgetState.customLink() );
+    $("#start_btn,#stop_btn").toggle();
     setTimeoutForUpdateStatus( 1 );
   }
 

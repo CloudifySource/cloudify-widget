@@ -159,7 +159,7 @@ public class WidgetServerImpl implements WidgetServer
             Pattern pattern = installationFinishedRegexMap.get(widgetInstance.getRecipeType());
 
             if (pattern.matcher(last).matches()){
-                result.setLink( widgetInstance.getLink() );
+                result.setConsoleLink(widgetInstance.getLink());
             }
         }
 
