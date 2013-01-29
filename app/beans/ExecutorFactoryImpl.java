@@ -38,11 +38,9 @@ public class ExecutorFactoryImpl implements ExecutorFactory {
 	
 	private static Logger logger = LoggerFactory.getLogger( ExecutorFactoryImpl.class );
 
-    ServerNode serverNode = new ServerNode();
-
     public WriteEventListener getExecutorWriteEventListener( String key ){
         WriteEventListener writeEventListener = (WriteEventListener) Spring.getBean("executorWriteEventListener");
-        writeEventListener.setKey( serverNode.getId().toString() );
+        writeEventListener.setKey( key );
         writeEventListener.init();
         return writeEventListener;
     }
