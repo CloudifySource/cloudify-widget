@@ -96,7 +96,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     public List<ServerNode> createServers( int numOfServers )
 	{
 		List<ServerNode> servers = new ArrayList<ServerNode>();
-		
+		logger.info("creating {} new instances", numOfServers );
 		for( int i=0; i< numOfServers; i++ )
 		{
 			ServerNode srvNode = null;

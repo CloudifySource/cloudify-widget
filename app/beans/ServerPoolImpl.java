@@ -58,14 +58,14 @@ public class ServerPoolImpl implements ServerPool
     private static Predicate busyServerPredicate = new Predicate() {
         @Override
         public boolean evaluate(Object o) {
-            return ((ServerNode)o).isBusy();
+            return ((ServerNode)o).isBusy() && !((ServerNode)o).isRemote();
         }
     };
 
     private static Predicate nonBusyServerPredicate = new Predicate() {
         @Override
         public boolean evaluate(Object o) {
-            return !((ServerNode)o).isBusy();
+            return !((ServerNode)o).isBusy() && !((ServerNode)o).isRemote();
         }
     };
 
@@ -84,7 +84,8 @@ public class ServerPoolImpl implements ServerPool
         List<ServerNode> servers = ServerNode.all();
 
         Collection<ServerNode> busyServer = CollectionUtils.select( servers, busyServerPredicate );
-        if ( !CollectionUtils.isEmpty( servers )){
+        logger.info("I found {} busy servers", CollectionUtils.size(busyServer));
+        if ( !CollectionUtils.isEmpty( busyServer )){
             for (ServerNode server : servers) {
 				if ( server.isBusy() )
 				{
@@ -95,17 +96,21 @@ public class ServerPoolImpl implements ServerPool
 		}// for
 
         Collection<ServerNode> availableServer = CollectionUtils.select( servers, nonBusyServerPredicate );
+        logger.info(" I have {} available server, I need a minimum of {} and maximum of {}", CollectionUtils.size(availableServer));
 		// create new servers if need
 		if ( CollectionUtils.size( availableServer )  < conf.server.pool.minNode )
 		{
 			int serversToInit = conf.server.pool.minNode - CollectionUtils.size( servers );
-			logger.info( "ServerPool starting to initialize {} servers...", serversToInit );
+            logger.info("creating {} new Servers", serversToInit);
+            logger.info( "ServerPool starting to initialize {} servers...", serversToInit );
             addNewServerToPool( serversToInit );
             // remove servers if we have too much
 		} else if ( CollectionUtils.size(availableServer) > conf.server.pool.maxNodes ){
             int i =0;
+            int serversToDelete = conf.server.pool.maxNodes - CollectionUtils.size(servers);
+            logger.info("deleting {} servers",serversToDelete);
             for (ServerNode server : availableServer) {
-                if ( i >= conf.server.pool.maxNodes - CollectionUtils.size(servers) ){
+                if ( i >= serversToDelete){
                     break;
                 }
                 destroy( server.getNodeId() );
@@ -115,7 +120,7 @@ public class ServerPoolImpl implements ServerPool
         // failed bootstraps.
         Collection<ServerNode> failedBootstraps =CollectionUtils.select( servers,  failedBootstrapsPredicate );
         if (!CollectionUtils.isEmpty(failedBootstraps)) {
-            logger.info("deleting failed bootstraps : " + failedBootstraps);
+            logger.info("deleting {} failed bootstraps : {}", CollectionUtils.size( failedBootstraps) ,failedBootstraps);
             Ebean.delete(failedBootstraps);
         }
     }
