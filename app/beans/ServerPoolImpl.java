@@ -19,6 +19,7 @@ import java.util.List;
 
 import beans.config.Conf;
 
+import com.avaje.ebean.Ebean;
 import models.ServerNode;
 import models.WidgetInstance;
 import org.slf4j.Logger;
@@ -86,6 +87,12 @@ public class ServerPoolImpl implements ServerPool
             }
         }
 
+        // failed bootstraps.
+        List<ServerNode> failedBootstraps = ServerNode.findByCriteria(new ServerNode.QueryConf().criteria().setServerIdIsNull(true).done());
+        if (CollectionUtils.isEmpty(failedBootstraps)) {
+            logger.info("deleting failed bootstraps : " + failedBootstraps);
+            Ebean.delete(failedBootstraps);
+        }
     }
 	
 	/** @return a ServerNode from the pool, otherwise <code>null</code> if no free server available */

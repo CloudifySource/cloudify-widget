@@ -178,6 +178,14 @@ extends Model
             if (criteria.stopped != null) {
                 conjuction.eq("stopped", criteria.stopped);
             }
+
+            if ( criteria.serverIdIsNull != null ){
+                if ( criteria.serverIdIsNull ){
+                    conjuction.isNull("serverId");
+                }else{
+                    conjuction.isNotNull("serverId");
+                }
+            }
         }
 
         if ( conf.maxRows > 0 ){
@@ -273,6 +281,7 @@ extends Model
         public Boolean busy = null;
         public String nodeId = null;
         private QueryConf conf;
+        private Boolean serverIdIsNull;
 
         public Criteria(QueryConf conf) {
             this.conf = conf;
@@ -299,6 +308,12 @@ extends Model
 
         public Criteria setNodeId(String nodeId) {
             this.nodeId = nodeId;
+            return this;
+        }
+
+
+        public Criteria setServerIdIsNull(boolean serverIdIsNull) {
+            this.serverIdIsNull = serverIdIsNull;
             return this;
         }
     }
