@@ -89,7 +89,7 @@ public class ServerPoolImpl implements ServerPool
 
         // failed bootstraps.
         List<ServerNode> failedBootstraps = ServerNode.findByCriteria(new ServerNode.QueryConf().criteria().setServerIdIsNull(true).done());
-        if (CollectionUtils.isEmpty(failedBootstraps)) {
+        if (!CollectionUtils.isEmpty(failedBootstraps)) {
             logger.info("deleting failed bootstraps : " + failedBootstraps);
             Ebean.delete(failedBootstraps);
         }
