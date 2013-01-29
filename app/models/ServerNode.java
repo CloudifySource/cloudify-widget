@@ -15,6 +15,8 @@
  *******************************************************************************/
 package models;
 
+import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.Junction;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
@@ -156,6 +158,25 @@ extends Model
 		return find.all();
 	}
 
+    static public List<ServerNode> findByCriteria(Criteria... criterias) {
+        ExpressionList<ServerNode> where = find.where();
+        Junction<ServerNode> disjunction = where.disjunction();
+
+        for (Criteria criteria : criterias) {
+            ExpressionList<ServerNode> conjuction = disjunction.conjunction();
+            if (criteria.busy != null) {
+                conjuction.eq("busy", criteria.busy);
+            }
+            if (criteria.remote != null) {
+                conjuction.eq("remote", criteria.remote);
+            }
+            if (criteria.stopped != null) {
+                conjuction.eq("stopped", criteria.stopped);
+            }
+        }
+        return where.findList();
+    }
+
 	static public ServerNode getFreeServer()
 	{
 		return ServerNode.find.where().eq("busy", "false").setMaxRows(1).findUnique();
@@ -221,4 +242,33 @@ extends Model
 	public void setRemote(boolean remote) {
 		this.remote = remote;
 	}
+
+
+
+    public static class Criteria{
+        public Boolean remote = null;
+        public Boolean stopped = null;
+        public Boolean busy = null;
+        public String nodeId = null;
+
+        public Criteria setRemote(Boolean remote) {
+            this.remote = remote;
+            return this;
+        }
+
+        public Criteria setStopped(Boolean stopped) {
+            this.stopped = stopped;
+            return this;
+        }
+
+        public Criteria setBusy(Boolean busy) {
+            this.busy = busy;
+            return this;
+        }
+
+        public Criteria setNodeId(String nodeId) {
+            this.nodeId = nodeId;
+            return this;
+        }
+    }
 }

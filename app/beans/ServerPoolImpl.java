@@ -58,18 +58,14 @@ public class ServerPoolImpl implements ServerPool
 	{
 		logger.info( "Started to initialize ServerPool, cold-init={}", conf.server.pool.coldInit );
 		// get all available running servers
-        List<ServerNode> servers = ServerNode.all();
+        List<ServerNode> servers = ServerNode.findByCriteria(new ServerNode.Criteria().setRemote(false));
         if ( !CollectionUtils.isEmpty( servers )){
             for (ServerNode server : servers) {
 				if ( server.isBusy() )
 				{
-
                      logger.info( "Found a busy server, setting destruction: {}", server );
 				     expiredServerCollector.scheduleToDestroy(server);
-
 				}
-				else
-				   logger.info( "Found a free bootstrapped server, add to a server pool: {}", server );
 			}
 		}// for
 
@@ -79,9 +75,18 @@ public class ServerPoolImpl implements ServerPool
 			int serversToInit = conf.server.pool.minNode - CollectionUtils.size( servers );
 			logger.info( "ServerPool starting to initialize {} servers...", serversToInit );
             addNewServerToPool( serversToInit );
+            // remove servers if we have too much
+		} else if ( CollectionUtils.size(servers) > conf.server.pool.maxNodes ){
+            int i =0;
+            for (ServerNode server : servers) {
+                if ( i >= conf.server.pool.maxNodes - CollectionUtils.size(servers) ){
+                    break;
+                }
+                destroy( server.getNodeId() );
+            }
+        }
 
-		}
-	}
+    }
 	
 	/** @return a ServerNode from the pool, otherwise <code>null</code> if no free server available */
     @Override
@@ -138,8 +143,9 @@ public class ServerPoolImpl implements ServerPool
 				{
 					List<ServerNode> servers = serverBootstrapper.createServers( 1 );
 					
-					for( ServerNode srv :  servers )
+					for( ServerNode srv :  servers ){
 						srv.save();
+                    }
 				} catch (Exception e)
 				{
 					logger.error("ServerPool failed to create a new server node", e);

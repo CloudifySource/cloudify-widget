@@ -393,14 +393,7 @@ public class Widget
 
     @Override
     public String toString() {
-        return "Widget{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", apiKey='" + apiKey + '\'' +
-                ", launches=" + launches +
-                ", enabled=" + enabled +
-                ", recipeRootPath='" + recipeRootPath + '\'' +
-                '}';
+        return String.format("Widget{id=%d, title='%s', apiKey='%s', launches=%d, enabled=%s, recipeRootPath='%s'}", id, title, apiKey, launches, enabled, recipeRootPath);
     }
 
     public long getLifeExpectancy() {
