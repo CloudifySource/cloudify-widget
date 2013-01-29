@@ -25,6 +25,7 @@ import org.jclouds.openstack.nova.v2_0.domain.Server;
 import play.db.ebean.Model;
 import utils.Utils;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
@@ -79,7 +80,7 @@ extends Model
 	@XStreamAsAttribute
 	private boolean remote = false;
 
-    @OneToOne
+    @OneToOne( cascade = CascadeType.REMOVE )
     WidgetInstance widgetInstance = null;
 	
 	public static Finder<Long,ServerNode> find = new Finder<Long,ServerNode>(Long.class, ServerNode.class); 

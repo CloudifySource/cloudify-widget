@@ -125,8 +125,8 @@ public class ServerPoolImpl implements ServerPool
 			addNewServerToPool();
         }
 
-		WidgetInstance.deleteByInstanceId(serverId);
-		ServerNode.deleteServer( serverId );
+        // guy - removing WidgetInstance.delete since we cascade removal
+        // guy - removing ServerNode.delete, since we established it does not exist.
         serverBootstrapper.destroyServer( serverId );
 	}
 

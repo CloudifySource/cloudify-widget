@@ -100,17 +100,13 @@ public class WidgetInstance
         return null;
     }
 
+    public static WidgetInstance findByServerNode(ServerNode server) {
+        return find.where().eq("serverNode", server).findUnique();
+    }
 
     public static WidgetInstance findByInstanceId(String instanceId) {
         return find.where().eq("instanceId", instanceId).findUnique();
     }
-	
-	public static void deleteByInstanceId( String instanceId )
-	{
-        WidgetInstance widgetInstance = findByInstanceId(instanceId);
-		if ( widgetInstance != null )
-			 widgetInstance.delete();
-	}
 
     public Widget getWidget() {
         return widget;

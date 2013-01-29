@@ -151,7 +151,7 @@ public class WidgetServerImpl implements WidgetServer
             return result;
         }
 
-        WidgetInstance widgetInstance = WidgetInstance.findByInstanceId(server.getNodeId());
+        WidgetInstance widgetInstance = WidgetInstance.findByServerNode(server);
         if (widgetInstance != null ){
             widgetInstance.getWidget();
             widgetInstance.getLink();
