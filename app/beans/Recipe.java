@@ -76,7 +76,7 @@ public class Recipe {
                     Type.APPLICATION.fileIdentifier, Type.SERVICE.fileIdentifier));
         }
 
-        String filename = CollectionUtils.first(files);
-        return Type.getRecipeTypeByFileName(filename);
+        File filename = CollectionUtils.first(files);
+        return Type.getRecipeTypeByFileName(filename.getName());
     }
 }
