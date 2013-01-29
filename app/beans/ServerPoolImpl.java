@@ -15,13 +15,14 @@
  *******************************************************************************/
 package beans;
 
+import java.util.Collection;
 import java.util.List;
 
 import beans.config.Conf;
 
 import com.avaje.ebean.Ebean;
 import models.ServerNode;
-import models.WidgetInstance;
+import org.apache.commons.collections.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import server.*;
@@ -54,12 +55,35 @@ public class ServerPoolImpl implements ServerPool
     private Conf conf;
 
 
+    private static Predicate busyServerPredicate = new Predicate() {
+        @Override
+        public boolean evaluate(Object o) {
+            return ((ServerNode)o).isBusy();
+        }
+    };
+
+    private static Predicate nonBusyServerPredicate = new Predicate() {
+        @Override
+        public boolean evaluate(Object o) {
+            return !((ServerNode)o).isBusy();
+        }
+    };
+
+    private static Predicate failedBootstrapsPredicate = new Predicate() {
+        @Override
+        public boolean evaluate(Object o) {
+            return ((ServerNode)o).getNodeId() == null;
+        }
+    };
+
 	@Override
     public void init()
 	{
 		logger.info( "Started to initialize ServerPool, cold-init={}", conf.server.pool.coldInit );
 		// get all available running servers
-        List<ServerNode> servers = ServerNode.findByCriteria(new ServerNode.QueryConf().criteria().setRemote(false).done());
+        List<ServerNode> servers = ServerNode.all();
+
+        Collection<ServerNode> busyServer = CollectionUtils.select( servers, busyServerPredicate );
         if ( !CollectionUtils.isEmpty( servers )){
             for (ServerNode server : servers) {
 				if ( server.isBusy() )
@@ -70,16 +94,17 @@ public class ServerPoolImpl implements ServerPool
 			}
 		}// for
 
+        Collection<ServerNode> availableServer = CollectionUtils.select( servers, nonBusyServerPredicate );
 		// create new servers if need
-		if ( CollectionUtils.size( servers )  < conf.server.pool.minNode )
+		if ( CollectionUtils.size( availableServer )  < conf.server.pool.minNode )
 		{
 			int serversToInit = conf.server.pool.minNode - CollectionUtils.size( servers );
 			logger.info( "ServerPool starting to initialize {} servers...", serversToInit );
             addNewServerToPool( serversToInit );
             // remove servers if we have too much
-		} else if ( CollectionUtils.size(servers) > conf.server.pool.maxNodes ){
+		} else if ( CollectionUtils.size(availableServer) > conf.server.pool.maxNodes ){
             int i =0;
-            for (ServerNode server : servers) {
+            for (ServerNode server : availableServer) {
                 if ( i >= conf.server.pool.maxNodes - CollectionUtils.size(servers) ){
                     break;
                 }
@@ -88,7 +113,7 @@ public class ServerPoolImpl implements ServerPool
         }
 
         // failed bootstraps.
-        List<ServerNode> failedBootstraps = ServerNode.findByCriteria(new ServerNode.QueryConf().criteria().setServerIdIsNull(true).done());
+        Collection<ServerNode> failedBootstraps =CollectionUtils.select( servers,  failedBootstrapsPredicate );
         if (!CollectionUtils.isEmpty(failedBootstraps)) {
             logger.info("deleting failed bootstraps : " + failedBootstraps);
             Ebean.delete(failedBootstraps);
