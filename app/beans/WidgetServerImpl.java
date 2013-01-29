@@ -75,7 +75,7 @@ public class WidgetServerImpl implements WidgetServer
     static {
         installationFinishedRegexMap = new HashMap<Recipe.Type, Pattern>();
         for ( Recipe.Type type  : Recipe.Type.values() ) {
-            String pattern = type + " .* installed successfully";
+            String pattern = type + " .* (installed|successfully) (installed|successfully)";
             installationFinishedRegexMap.put(type, Pattern.compile( pattern, Pattern.CASE_INSENSITIVE) );
         }
     }
@@ -138,6 +138,10 @@ public class WidgetServerImpl implements WidgetServer
 		serverPool.destroy(instanceId);
 	}
 
+    private static boolean isFinished( Recipe.Type recipeType, String line ){
+        Pattern pattern = installationFinishedRegexMap.get(recipeType);
+        return pattern.matcher(line).matches();
+    }
 
     @Override
     public Status getWidgetStatus(ServerNode server) {
@@ -157,10 +161,7 @@ public class WidgetServerImpl implements WidgetServer
         if (widgetInstance != null ){
             widgetInstance.getWidget();
             widgetInstance.getLink();
-            String last = CollectionUtils.last(output);
-            Pattern pattern = installationFinishedRegexMap.get(widgetInstance.getRecipeType());
-
-            if (pattern.matcher(last).matches()){
+            if (isFinished(widgetInstance.getRecipeType(), (String)CollectionUtils.last(output))){
                 result.setInstanceIsAvailable(Boolean.TRUE);
                 result.setConsoleLink(widgetInstance.getLink());
             }
