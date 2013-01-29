@@ -147,11 +147,8 @@ public class ServerPoolImpl implements ServerPool
             return; // nothing to do.
         }
         logger.info("destroying server {}", serverId);
-		// when we move to Quarz just unregister from Cron
-		if ( ServerNode.getServerNode( serverId ) != null ){
-			addNewServerToPool();
-        }
 
+        // guy - removing "addNewServerToPool" - this is the destroy function, not create function.
         // guy - removing WidgetInstance.delete since we cascade removal
         // guy - removing ServerNode.delete, since we established it does not exist.
         serverBootstrapper.destroyServer( serverId );
