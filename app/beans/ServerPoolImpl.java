@@ -107,7 +107,7 @@ public class ServerPoolImpl implements ServerPool
             // remove servers if we have too much
 		} else if ( CollectionUtils.size(availableServer) > conf.server.pool.maxNodes ){
             int i =0;
-            int serversToDelete = conf.server.pool.maxNodes - CollectionUtils.size(servers);
+            int serversToDelete = CollectionUtils.size(servers) - conf.server.pool.maxNodes ;
             logger.info("deleting {} servers",serversToDelete);
             for (ServerNode server : availableServer) {
                 if ( i >= serversToDelete){
