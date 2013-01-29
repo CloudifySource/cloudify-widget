@@ -107,7 +107,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 				return servers;
 			} catch (Exception e) 
 			{
-				// failed to boostrap machine, nothing todo - let destroy :(
+				// failed to boostrap machine, nothing to do - let destroy :(
 				if ( srvNode != null ) {
 					destroyServer(srvNode.getNodeId());
                 }

@@ -107,7 +107,11 @@ extends Model
 		return privateIP;
 	}
 
-	public String getPublicIP()
+    public Long getId() {
+        return id;
+    }
+
+    public String getPublicIP()
 	{
 		return publicIP;
 	}
