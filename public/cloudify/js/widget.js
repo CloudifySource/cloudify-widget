@@ -56,7 +56,7 @@ $(function () {
         function generateFieldFunction( key ){ return function( val ){ return get_or_set.call(this,key,val) };}
         this.instanceId = generateFieldFunction("instanceId");
         this.publicIp = generateFieldFunction("publicIp");
-        this.customLink = generateFieldFunction("publicIp");
+        this.customLink = generateFieldFunction("customLink");
 
         this.remove = function ( remove )
         {
@@ -94,12 +94,12 @@ $(function () {
         // this function will append new lines of log if new log is longer than current log.
         // otherwise it will clear the current log and rewrite it.
         this.appendOrOverride = function (aOutput) {
-            if (myLog!= aOutput) { // print only the difference
+            if (myLog.length!= aOutput.length || myLog[0] != aOutput[0]) { // print only the difference
 
                 var index = myLog.length;
                 var logLength = aOutput.length;
 
-                if (logLength < index) {
+                if (logLength <= index) {
                     clear();
                     index = 0;
                 }
@@ -145,10 +145,15 @@ $(function () {
             widgetState.publicIp(data.status.publicIp);
         }
 
+        if ( data.status.cloudifyUiIsAvailable ){ // must be after publicIp
+            show_cloudify_ui_link( ui );
+        }
+
         if ( data.status.consoleLink ){
             var link_info = data.status.consoleLink;
             var custom_link = $("<li></li>",{"id":"custom_link"}).append($("<a></a>", {"href": link_info.url, "target":"_blank", "text":link_info.title}).text(link_info.title));
-            set_cloudify_dashboard_link(custom_link);
+            widgetState.customLink(custom_link);
+            show_custom_link( true );
        }
 
 
@@ -174,15 +179,16 @@ $(function () {
   }
 
 
+    function stop_instance() {
+        if ($("#log").find(".successfully_completed_msg").length == 0) { // make sure this appears only once.. we might be firing an Ajax request after the first stop.
+            widgetLog.important("Test drive successfully completed! <br/><a class='download_link successfully_completed_msg' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.");
+        }
+        show_cloudify_ui_link(false);
+        show_custom_link(false);
+        $("#time_left").hide();
+        widgetState.remove(true);
 
-  function stop_instance() {
-    if( $("#log" ).find(".successfully_completed_msg" ).length == 0 ){ // make sure this appears only once.. we might be firing an Ajax request after the first stop.
-        widgetLog.important("Test drive successfully completed! <br/><a class='download_link successfully_completed_msg' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.");
     }
-    $("#time_left, #links").hide();
-    widgetState.remove( true );
-
-  }
 
     function start_instance_btn_handler()
     {
@@ -236,18 +242,29 @@ $(function () {
   }
 
 
-
-
-
-  function set_cloudify_dashboard_link(custom_link) {
-    $("#links").show();
-    $("#cloudify_dashboard_link").attr("href", "http://" + widgetState.publicIp() + ":8099/");
-      widgetState.customLink( custom_link );
-    if ($("#custom_link").get(0))
-      $("#custom_link").replaceWith(custom_link);
-    else
-      $("#links").append($(custom_link));
+  function show_cloudify_ui_link( show ){
+      if ( show ){
+        $("#links").find("li").show();
+        $("#cloudify_dashboard_link").attr("href", "http://" + widgetState.publicIp() + ":8099/");
+      }else{
+          $("#links").find("li").hide();
+      }
   }
+
+
+    function show_custom_link( show ) {
+        if ( show ){
+            var custom_link = widgetState.customLink();
+            if ($("#custom_link").get(0)){
+                $("#custom_link").replaceWith(custom_link);
+            }
+            else{
+                $("#links").append($(custom_link));
+            }
+        }else{
+            $("#custom_link").remove();
+        }
+    }
 
 
     $("#title").text(decodeURIComponent(params["title"]));
@@ -270,8 +287,19 @@ $(function () {
 
   if (widgetState.instanceId()) {
     $("#start_btn,#stop_btn").toggle();
+
+      // lets update these just in case the update status fails.
+      if (widgetState.publicIp()) {
+          show_cloudify_ui_link( true );
+      }
+
+      if (widgetState.customLink()) {
+          show_custom_link( true );
+      }
     setTimeoutForUpdateStatus( 1 );
   }
+
+
 
   $("#start_btn").click(start_instance_btn_handler);
   $("#stop_btn").click(stop_instance_btn_handler);

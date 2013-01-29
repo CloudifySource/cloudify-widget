@@ -86,32 +86,44 @@ public class Widget
 	public static Finder<Long,Widget> find = new Finder<Long,Widget>(Long.class, Widget.class);
 
 
-
-
-    /** This class serves as status of the widget instance  */
-	@XStreamAlias("status")
+    @XStreamAlias("status")
     @JsonRootName("status")
-	final static public class Status
-	{
+    final static public class Status {
 
-        public static enum State{
-            STOPPED, RUNNING
-        }
-		public final static String STATE_STOPPED = "stopped";
-		public final static String STATE_RUNNING = "running";
-		
-		private State state = State.RUNNING;
-		private List<String> output;
-		private Integer timeleft; // minutes
+        /**
+         * This class serves as status of the widget instance
+         */
+        public final static String STATE_RUNNING = "running";
+        public final static String STATE_STOPPED = "stopped";
+
+        private State state = State.RUNNING;
+
+        private List<String> output;
+        private Integer timeleft; // minutes
         private String publicIp;
         private String instanceId;
         private Boolean remote;
         private WidgetInstance.ConsoleLink consoleLink;
         private String message; // for errors
+        private Boolean instanceIsAvailable; // if install finished
+        private Boolean cloudifyUiIsAvailable;
 
 
+
+        public static enum State {
+            STOPPED, RUNNING;
+        }
         public Status() {
         }
+
+        public void setCloudifyUiIsAvailable(Boolean cloudifyUiIsAvailable) {
+            this.cloudifyUiIsAvailable = cloudifyUiIsAvailable;
+        }
+
+        public void setInstanceIsAvailable(Boolean instanceIsAvailable) {
+            this.instanceIsAvailable = instanceIsAvailable;
+        }
+
 
         public void setConsoleLink(WidgetInstance.ConsoleLink link) {
             this.consoleLink = link;
@@ -156,11 +168,11 @@ public class Widget
         }
 
         public List<String> getOutput() {
-            if ( CollectionUtils.isEmpty(output) ){
+            if (CollectionUtils.isEmpty(output)) {
                 output = new LinkedList<String>();
-                output.add( Messages.get("wait.while.preparing.env"));
+                output.add(Messages.get("wait.while.preparing.env"));
             }
-            return output ;
+            return output;
         }
 
         public State getState() {
@@ -183,8 +195,8 @@ public class Widget
             return consoleLink;
         }
     }
-	
-	public Widget( String productName, String productVersion, String title, String youtubeVideoUrl,
+
+    public Widget( String productName, String productVersion, String title, String youtubeVideoUrl,
 					String providerURL, String recipeURL, String consoleName, String consoleURL, String recipeRootPath )
 	{
 		this.productName = productName;

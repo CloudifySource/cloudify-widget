@@ -161,6 +161,7 @@ public class WidgetServerImpl implements WidgetServer
             Pattern pattern = installationFinishedRegexMap.get(widgetInstance.getRecipeType());
 
             if (pattern.matcher(last).matches()){
+                result.setInstanceIsAvailable(Boolean.TRUE);
                 result.setConsoleLink(widgetInstance.getLink());
             }
         }
@@ -168,6 +169,7 @@ public class WidgetServerImpl implements WidgetServer
         result.setState(Status.State.RUNNING);
         if (!StringUtils.isEmpty(server.getPublicIP())) {
             result.setPublicIp(server.getPublicIP());
+            result.setCloudifyUiIsAvailable(Boolean.TRUE);
         }
 
         String cachedOutput = Utils.getCachedOutput( server );
