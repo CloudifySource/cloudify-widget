@@ -96,7 +96,7 @@ public class ServerPoolImpl implements ServerPool
 		}// for
 
         Collection<ServerNode> availableServer = CollectionUtils.select( servers, nonBusyServerPredicate );
-        logger.info(" I have {} available server, I need a minimum of {} and maximum of {}", CollectionUtils.size(availableServer));
+        logger.info(" I have {} available server, I need a minimum of {} and maximum of {}", new Object[]{ CollectionUtils.size(availableServer), conf.server.pool.minNode, conf.server.pool.maxNodes} );
 		// create new servers if need
 		if ( CollectionUtils.size( availableServer )  < conf.server.pool.minNode )
 		{
