@@ -170,12 +170,16 @@ $(function () {
     }
 
   function update_status() {
-    $.ajax({
-        type:'get',
-        url: "/widget/"+ widgetState.instanceId() + "/status?apiKey=" + apiKey,
-        success:function( data ){ handleUpdateStatusSuccess(data); },
-        error:function(){ setTimeoutForUpdateStatus() }
-    });
+      if ( widgetState.instanceId() ){  // guy - double check. saw that sometimes it misses.
+            $.ajax({
+                type:'get',
+                url: "/widget/"+ widgetState.instanceId() + "/status?apiKey=" + apiKey,
+                success:function( data ){ handleUpdateStatusSuccess(data); },
+                error:function(){ setTimeoutForUpdateStatus() }
+            });
+      }else{
+          stop_instance();
+      }
   }
 
 
