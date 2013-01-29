@@ -122,8 +122,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     
 	public void destroyServer( String serverId )
 	{
-        logger.info("destroying server {}", serverId );
+       logger.info("destroying server {}", serverId );
 	   deleteServer(serverId);
+       ServerNode.deleteServer(serverId);
 	}
 
     public void init(){
