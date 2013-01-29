@@ -144,7 +144,27 @@ public class Widget
             }
             return output ;
         }
-	}
+
+        public State getState() {
+            return state;
+        }
+
+        public Integer getTimeleft() {
+            return timeleft;
+        }
+
+        public String getPublicIp() {
+            return publicIp;
+        }
+
+        public String getInstanceId() {
+            return instanceId;
+        }
+
+        public WidgetInstance.ConsoleLink getLink() {
+            return link;
+        }
+    }
 	
 	public Widget( String productName, String productVersion, String title, String youtubeVideoUrl,
 					String providerURL, String recipeURL, String consoleName, String consoleURL, String recipeRootPath )
