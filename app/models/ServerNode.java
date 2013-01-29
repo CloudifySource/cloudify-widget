@@ -29,6 +29,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -162,11 +163,11 @@ extends Model
 		return find.all();
 	}
 
-    static public List<ServerNode> findByCriteria(Criteria... criterias) {
+    static public List<ServerNode> findByCriteria( QueryConf conf) {
         ExpressionList<ServerNode> where = find.where();
         Junction<ServerNode> disjunction = where.disjunction();
 
-        for (Criteria criteria : criterias) {
+        for (Criteria criteria : conf.criterias) {
             ExpressionList<ServerNode> conjuction = disjunction.conjunction();
             if (criteria.busy != null) {
                 conjuction.eq("busy", criteria.busy);
@@ -178,13 +179,13 @@ extends Model
                 conjuction.eq("stopped", criteria.stopped);
             }
         }
+
+        if ( conf.maxRows > 0 ){
+            where.setMaxRows( conf.maxRows );
+        }
+
         return where.findList();
     }
-
-	static public ServerNode getFreeServer()
-	{
-		return ServerNode.find.where().eq("busy", "false").setMaxRows(1).findUnique();
-	}
 
 	static public ServerNode getServerNode( String serverId )
 	{
@@ -193,9 +194,10 @@ extends Model
 
 	static public void deleteServer( String serverId )
 	{
-		ServerNode server = find.where().eq("serverId", serverId).findUnique();
-		if ( server != null )
+		ServerNode server = getServerNode( serverId );
+		if ( server != null ){
 			server.delete();
+        }
 	}
 
 	public String toDebugString() {
@@ -248,16 +250,41 @@ extends Model
 	}
 
 
+    // guy - todo - formalize this for reuse.
+    public static class QueryConf {
+        public int maxRows;
+        public List<Criteria> criterias = new LinkedList<Criteria>();
 
+        public QueryConf setMaxRows(int maxRows) {
+            this.maxRows = maxRows;
+            return this;
+        }
+
+        public Criteria criteria(){
+            Criteria c = new Criteria(this);
+            criterias.add(c);
+            return c;
+        }
+
+    }
     public static class Criteria{
         public Boolean remote = null;
         public Boolean stopped = null;
         public Boolean busy = null;
         public String nodeId = null;
+        private QueryConf conf;
+
+        public Criteria(QueryConf conf) {
+            this.conf = conf;
+        }
 
         public Criteria setRemote(Boolean remote) {
             this.remote = remote;
             return this;
+        }
+
+        public QueryConf done(){
+            return conf;
         }
 
         public Criteria setStopped(Boolean stopped) {

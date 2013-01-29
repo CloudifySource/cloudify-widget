@@ -19,9 +19,7 @@ $(function () {
 
 
     var WidgetState = function(){
-
         var cookieName = "widgetCookie" + origin_page_url;
-
         function _get(){
             try{
                 var cookieValue = JSON.parse( $.cookie(cookieName) );
@@ -199,6 +197,9 @@ $(function () {
                                         $( "#start_btn,#stop_btn" ).toggle();
                                         widgetLog.error( data.message );
                                         return;
+                                    }
+                                    if ( data.status.instanceId ){
+                                        widgetState.instanceId( data.status.instanceId );
                                     }
 
                                     setTimeoutForUpdateStatus(1);

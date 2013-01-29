@@ -58,7 +58,7 @@ public class ServerPoolImpl implements ServerPool
 	{
 		logger.info( "Started to initialize ServerPool, cold-init={}", conf.server.pool.coldInit );
 		// get all available running servers
-        List<ServerNode> servers = ServerNode.findByCriteria(new ServerNode.Criteria().setRemote(false));
+        List<ServerNode> servers = ServerNode.findByCriteria(new ServerNode.QueryConf().criteria().setRemote(false).done());
         if ( !CollectionUtils.isEmpty( servers )){
             for (ServerNode server : servers) {
 				if ( server.isBusy() )
@@ -92,9 +92,9 @@ public class ServerPoolImpl implements ServerPool
     @Override
 	synchronized public ServerNode get( long lifeExpectancy )
 	{
-		ServerNode freeServer = ServerNode.getFreeServer();
+		ServerNode freeServer = CollectionUtils.first(ServerNode.findByCriteria(new ServerNode.QueryConf().setMaxRows(1).criteria().setBusy(false).setRemote(false).done()));
 		if ( freeServer != null)
-		{
+		{    // guy : todo : need to lock this somehow
 			freeServer.setBusy(true);
 			freeServer.setExpirationTime( lifeExpectancy + System.currentTimeMillis() );
 			// schedule to destroy after time expiration 

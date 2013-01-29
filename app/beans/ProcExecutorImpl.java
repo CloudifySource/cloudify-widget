@@ -96,7 +96,6 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
     public ProcExecutorImpl( ServerNode server, File recipe, String... args )
     {
         this.id = server.getId().toString();
-        
         Cache.set( "output-" + this.id,  new StringBuilder());
     }
 	

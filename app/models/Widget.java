@@ -26,6 +26,7 @@ import org.apache.commons.collections.Predicate;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import org.codehaus.jackson.map.annotate.JsonRootName;
 import play.db.ebean.Model;
 import play.i18n.Messages;
 import server.ApplicationContext;
@@ -90,6 +91,7 @@ public class Widget
 
     /** This class serves as status of the widget instance  */
 	@XStreamAlias("status")
+    @JsonRootName("status")
 	final static public class Status
 	{
 
@@ -126,8 +128,9 @@ public class Widget
             this.publicIp = publicIp;
         }
 
-        public void setInstanceId(String instanceId) {
+        public Status setInstanceId(String instanceId) {
             this.instanceId = instanceId;
+            return this;
         }
 
         public void setOutput(List<String> output) {

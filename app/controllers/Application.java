@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import play.Play;
 import play.Routes;
 import play.i18n.Messages;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import server.ApplicationContext;
@@ -44,7 +45,6 @@ import com.avaje.ebean.config.dbplatform.MySqlPlatform;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 
-
 /**
  * Widget controller with the main functions like start(), stop(), getWidgetStatus().
  * 
@@ -57,11 +57,11 @@ public class Application extends Controller
     //              we should be able to decode it, verify user's ownership on the widget and go from there.
 	public static Result start( String apiKey, String hpcsKey, String hpcsSecretKey )
 	{
-		//TODO[guym]: add field isRemote to server_node table. 
 		try
 		{
 			logger.info("starting widget with [apiKey, hpcsKey, hpcsSecretKey] = [{},{},{}]", new Object[]{apiKey, hpcsKey, hpcsSecretKey} );
  			Widget widget = Widget.getWidget( apiKey );
+            ServerNode serverNode = null;
            	if ( widget == null || !widget.isEnabled()) {
                 	new HeaderMessage().setError( Messages.get("widget.disabled.by.administrator") ).apply( response().getHeaders() );
 	                return badRequest(  );
@@ -75,18 +75,21 @@ public class Application extends Controller
                     return badRequest();
                 }
 
-                ServerNode server = new ServerNode();
-                server.setUserName( hpcsKey );
-                server.setApiKey( hpcsSecretKey );
-                server.save();
-                ApplicationContext.get().getServerBootstrapper().bootstrapCloud( server );
-				ApplicationContext.get().getWidgetServer().deploy(widget, server);
+                serverNode = new ServerNode();
+                serverNode.setUserName( hpcsKey );
+                serverNode.setRemote(true);
+                serverNode.setApiKey( hpcsSecretKey );
+                serverNode.save();
+                ApplicationContext.get().getServerBootstrapper().bootstrapCloud( serverNode );
+				ApplicationContext.get().getWidgetServer().deploy(widget, serverNode);
 				return ok();
 
             }else{
 				wi = ApplicationContext.get().getWidgetServer().deploy(apiKey);
-			}
-			return resultAsJson(wi);
+                serverNode = wi.getServerNode();
+            }
+
+			return ok(Json.toJson(new Widget.Status().setInstanceId(serverNode.getId().toString())));
 		}catch(ServerException ex)
 		{
 			return resultErrorAsJson(ex.getMessage());
