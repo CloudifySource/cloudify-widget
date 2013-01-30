@@ -205,24 +205,24 @@ $(function () {
             $.ajax(
                 { type:"POST",
                   url : "/widget/start?" + $.param(playData),
-                    success: function ( data, textStatus, jqXHR ){
+                    success: function (data, textStatus, jqXHR) {
+                        var state = data.status.state.toLowerCase();
+                        if (state == "error" || state == "stopped") {
+                            $("#start_btn,#stop_btn").toggle();
+                            widgetLog.error(data.status.message);
+                            return;
+                        }
+                        if (data.status.instanceId) {
+                            widgetState.instanceId(data.status.instanceId);
+                        }
 
-                                    if ( data.status.state == "error" ) {
-                                        $( "#start_btn,#stop_btn" ).toggle();
-                                        widgetLog.error( data.status.message );
-                                        return;
-                                    }
-                                    if ( data.status.instanceId ){
-                                        widgetState.instanceId( data.status.instanceId );
-                                    }
-
-                                    setTimeoutForUpdateStatus(1);
-                            },
-                    error: function( data ){
+                        setTimeoutForUpdateStatus(1);
+                    },
+                    error: function (data) {
                         var displayMessage = data.getResponseHeader("display-message");
-                        if ( displayMessage ){
-                            var displayMessageObj = JSON.parse( displayMessage );
-                            widgetLog.error( displayMessageObj.msg);
+                        if (displayMessage) {
+                            var displayMessageObj = JSON.parse(displayMessage);
+                            widgetLog.error(displayMessageObj.msg);
                         }
                     }
                 }
