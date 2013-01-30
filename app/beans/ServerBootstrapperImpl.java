@@ -273,14 +273,20 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
 			String script = FileUtils.readFileToString( conf.server.bootstrap.script );
 			ExecResponse response = runScriptOnNode( conf, server.getPublicIP(), script );
-			
+
+            logger.info("script finished");
 			logger.info("Bootstrap for server: {} finished successfully successfully. " +
                     "ExitStatus: {} \nOutput:  {}", new Object[]{server.getPublicIP(),
                     response.getExitStatus(),
                     response.getOutput()} );
 		}catch(Exception ex)
 		{
-			throw new ServerException("Failed to bootstrap cloudify machine: " + server.getPublicIP(), ex);
+            try{
+                destroyServer( server.getNodeId() );
+            }catch(Exception e){
+                logger.info("destroying server after failed bootstrap threw exception",e);
+            }
+			throw new ServerException("Failed to bootstrap cloudify machine: " + server.toDebugString(), ex);
 		}
 	}
 	
@@ -297,7 +303,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		try
 		{
 			sshConnection.connect();
+            logger.info("ssh connected, executing");
 			execResponse = sshConnection.exec(script);
+            logger.info("finished execution");
 		 }finally 
 		 {
 			if (sshConnection != null)
