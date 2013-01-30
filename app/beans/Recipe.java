@@ -77,6 +77,6 @@ public class Recipe {
         }
 
         File filename = CollectionUtils.first(files);
-        return Type.getRecipeTypeByFileName(filename.getName());
+        return filename == null ? null : Type.getRecipeTypeByFileName(filename.getName());
     }
 }

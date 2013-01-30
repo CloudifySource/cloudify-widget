@@ -1,6 +1,5 @@
 package utils;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -37,13 +36,19 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
     }
 
     public static <T> T last(List list) {
-        if ( CollectionUtils.isEmpty(list)){
-            return null;
+        if (size(list) > 0) {
+            if (CollectionUtils.isEmpty(list)) {
+                return null;
+            }
+            return (T) list.get(size(list) - 1);
         }
-        return (T) list.get( size(list) - 1);
+        return null;
     }
 
     public static <T> T first(Collection collection) {
-        return (T) collection.iterator().next();
+        if ( size(collection) > 0 ){
+            return (T) collection.iterator().next();
+        }
+        return null;
     }
 }
