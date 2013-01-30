@@ -146,14 +146,17 @@ $(function () {
         }
 
         if ( data.status.cloudifyUiIsAvailable ){ // must be after publicIp
-            show_cloudify_ui_link( ui );
+            show_cloudify_ui_link( data.status.cloudifyUiIsAvailable );
         }
 
-        if ( data.status.consoleLink ){
-            var link_info = data.status.consoleLink;
-            var custom_link = $("<li></li>",{"id":"custom_link"}).append($("<a></a>", {"href": link_info.url, "target":"_blank", "text":link_info.title}).text(link_info.title));
-            widgetState.customLink(custom_link);
-            show_custom_link( true );
+        if ( data.status.instanceIsAvailable ){
+            console.log(["installation finished", data]);
+            if (data.status.consoleLink) {
+                var link_info = data.status.consoleLink;
+                var custom_link = $("<li></li>", {"id": "custom_link"}).append($("<a></a>", {"href": link_info.url, "target": "_blank", "text": link_info.title}));
+                widgetState.customLink(custom_link);
+                show_custom_link(true);
+            }
        }
 
 
