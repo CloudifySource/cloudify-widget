@@ -70,7 +70,7 @@ $(function () {
                     console.log( ["error removing cookie", e] )
                 }
                 var currentCookie = _get();
-                if ( $.isEmptyObject( currentCookie ) ) {
+                if ( !$.isEmptyObject( currentCookie ) ) {
                     console.log( ["cookie is not removed for some reason, using logic delete instead"] )
                 }
             }
