@@ -163,10 +163,7 @@ $(function () {
         var state = data.status.state.toLocaleLowerCase();
         if ( state == "stopped") {
             $("#start_btn,#stop_btn").toggle();
-            if ( data.status.message ){
-                widgetLog.error( data.status.message );
-            }
-            stop_instance();
+            stop_instance( data.status.message );
         } else {// status == running
             setTimeoutForUpdateStatus();
         }
@@ -186,8 +183,11 @@ $(function () {
   }
 
 
-    function stop_instance() {
-        if ($("#log").find(".successfully_completed_msg").length == 0) { // make sure this appears only once.. we might be firing an Ajax request after the first stop.
+    function stop_instance(msg) {
+        if ( msg ){
+            widgetLog.error(msg);
+        }
+        else if ($("#log").find(".successfully_completed_msg").length == 0) { // make sure this appears only once.. we might be firing an Ajax request after the first stop.
             widgetLog.important("Test drive successfully completed! <br/><a class='download_link successfully_completed_msg' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.");
         }
         show_cloudify_ui_link(false);
