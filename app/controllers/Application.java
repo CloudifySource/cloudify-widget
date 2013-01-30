@@ -16,11 +16,10 @@
 package controllers;
 
 import static utils.RestUtils.OK_STATUS;
-import static utils.RestUtils.resultAsJson;
-import static utils.RestUtils.resultErrorAsJson;
+
+import akka.util.Duration;
 import models.ServerNode;
 import models.Widget;
-import models.WidgetInstance;
 
 import org.apache.commons.lang.NumberUtils;
 import org.apache.commons.lang.StringUtils;
@@ -29,7 +28,9 @@ import org.slf4j.LoggerFactory;
 
 import play.Play;
 import play.Routes;
+import play.cache.Cache;
 import play.i18n.Messages;
+import play.libs.Akka;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -47,6 +48,7 @@ import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Widget controller with the main functions like start(), stop(), getWidgetStatus().
@@ -62,6 +64,13 @@ public class Application extends Controller
 	{
 		try
 		{
+            // guy - todo - get rid of the "exception/catch" flow and use simple return result statements instead.
+            // don't allow for 30 seconds to start the widget again
+            Long timeLeft = (Long) Cache.get(Controller.request().remoteAddress());
+            if (timeLeft != null) {
+                throw new ServerException(Messages.get("please.wait.x.sec", (timeLeft - System.currentTimeMillis()) / 1000));
+            }
+
 			logger.info("starting widget with [apiKey, hpcsKey, hpcsSecretKey] = [{},{},{}]", new Object[]{apiKey, hpcsKey, hpcsSecretKey} );
  			Widget widget = Widget.getWidget( apiKey );
             ServerNode serverNode = null;
@@ -70,11 +79,10 @@ public class Application extends Controller
 	                return badRequest(  );
             }
 			ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ));
-			WidgetInstance wi = null;
 			//TODO[adaml]: add proper input validation response
-			if ( !StringUtils.isEmpty( hpcsKey ) && !StringUtils.isEmpty( hpcsSecretKey ) ){
+            if ( !StringUtils.isEmpty( hpcsKey ) && !StringUtils.isEmpty( hpcsSecretKey ) ){
                 if ( !isValidInput(hpcsKey, hpcsSecretKey) ) {
-                    new HeaderMessage().setError("invalid hpcs credentials").apply(response().getHeaders());
+                    new HeaderMessage().setError(Messages.get("invalid.hpcs.credentials")).apply(response().getHeaders());
                     return badRequest();
                 }
 
@@ -83,16 +91,30 @@ public class Application extends Controller
                 serverNode.setRemote(true);
                 serverNode.setApiKey( hpcsSecretKey );
                 serverNode.save();
-                ApplicationContext.get().getServerBootstrapper().bootstrapCloud( serverNode );
-				ApplicationContext.get().getWidgetServer().deploy(widget, serverNode);
-				return ok();
-
             }else{
-				wi = ApplicationContext.get().getWidgetServer().deploy(apiKey);
-                serverNode = wi.getServerNode();
+                serverNode = ApplicationContext.get().getServerPool().get(widget.getLifeExpectancy());
+                if (serverNode == null) {
+                    ApplicationContext.get().getMailSender().sendPoolIsEmptyMail();
+                    throw new ServerException(Messages.get("no.available.servers"));
+                }
             }
 
-            return statusToResult( new Widget.Status().setInstanceId(serverNode.getId().toString()).setRemote( serverNode.isRemote()) );
+            // run the "bootstrap" and "deploy" in another thread.
+            final ServerNode finalServerNode = serverNode;
+            final Widget finalWidget = widget;
+            Akka.system().scheduler().scheduleOnce(
+                    Duration.create(0, TimeUnit.SECONDS),
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            if (finalServerNode.isRemote()) {
+                                ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode);
+                            }
+                            ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode);
+                        }
+                    });
+
+            return statusToResult( new Widget.Status().setInstanceId(serverNode.getId().toString()).setRemote(serverNode.isRemote()) );
 		}catch(ServerException ex)
 		{
             return exceptionToStatus( ex );
@@ -148,7 +170,7 @@ public class Application extends Controller
                 throw new ServerException( Messages.get("server.was.terminated") );
             }
 			Widget.Status wstatus = ApplicationContext.get().getWidgetServer().getWidgetStatus(serverNode);
-			return statusToResult( wstatus );
+			return statusToResult(wstatus);
 		}catch(ServerException ex)
 		{
 			return exceptionToStatus( ex );

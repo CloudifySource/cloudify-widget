@@ -22,7 +22,6 @@ import models.WidgetInstance;
 
 public interface WidgetServer 
 {
-    public WidgetInstance deploy(String apiKey);
 
     public void undeploy(String instanceId);
 
