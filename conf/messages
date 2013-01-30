@@ -7,6 +7,8 @@ no.available.servers=No servers are available to process your request, please re
 widget.disabled.by.administrator=This widget has been disabled and cannot be used to launch recipes.
 please.wait.x.sec=Please wait for {0} seconds...
 invalid.hpcs.credentials=Invalid HPCS credentials
+cloudify.already.exists=Cloudify already exists on your cloud
+test.drive.successfully.complete=Test drive successfully completed! <br/><a class='download_link successfully_completed_msg' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.
 
 info.password.policy=Minimum of 8 characters. \n At least 1 upper-case, \n 1 lower-case \n and 1 digit.
 

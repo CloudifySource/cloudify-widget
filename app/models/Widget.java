@@ -232,6 +232,10 @@ public class Widget
         }
 		instances.add( wInstance );
 		save();
+        // server node has the foreign key..
+        serverNode.setWidgetInstance(wInstance);
+        serverNode.save();
+
 		return wInstance;
 	}
 

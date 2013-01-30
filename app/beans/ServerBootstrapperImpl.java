@@ -51,6 +51,7 @@ import org.jclouds.util.Strings2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import play.i18n.Messages;
 import server.ApplicationContext;
 import server.DeployManager;
 import server.ProcExecutor;
@@ -184,10 +185,10 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			bootstrapExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment() , resultHandler);
 			resultHandler.waitFor();
 
-			String output = Utils.getCachedOutput( serverNode );
+			String output = Utils.getOrDefault(Utils.getCachedOutput(serverNode), "");
 			if (resultHandler.getException() != null) {
 				if (output.contains("found existing management machines")) {
-					throw new RuntimeException("Found existing management machines. Process output was: " + output);
+					throw new ServerException( Messages.get("cloudify.already.exists") );
 				}
 				logger.info("Command execution ended with errors: {}", output);
 				throw new RuntimeException("Failed to bootstrap cloudify machine: " 
@@ -214,8 +215,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		} catch(Exception e) {
 			throw new RuntimeException("Unable to bootstrap cloud", e);
 		} finally {
-			if (cloudFolder != null)
+			if (cloudFolder != null){
 				FileUtils.deleteQuietly(cloudFolder);
+            }
 			serverNode.setStopped(true);
 		}
 	}

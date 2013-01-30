@@ -258,6 +258,10 @@ extends Model
 		this.remote = remote;
 	}
 
+    public void setWidgetInstance(WidgetInstance widgetInstance) {
+        this.widgetInstance = widgetInstance;
+    }
+
 
     // guy - todo - formalize this for reuse.
     public static class QueryConf {

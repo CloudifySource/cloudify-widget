@@ -125,7 +125,7 @@ public class WidgetServerImpl implements WidgetServer
 
         if (server == null) {
             result.setState(Status.State.STOPPED);
-            output.add(Messages.get("server.was.terminated"));
+            output.add(Messages.get("test.drive.successfully.complete"));
             return result;
         }
 
@@ -133,8 +133,6 @@ public class WidgetServerImpl implements WidgetServer
 
         WidgetInstance widgetInstance = WidgetInstance.findByServerNode(server);
         if (widgetInstance != null ){
-            widgetInstance.getWidget();
-            widgetInstance.getLink();
             if (isFinished(widgetInstance.getRecipeType(), (String)CollectionUtils.last(output))){
                 logger.debug("detected finished installation");
                 result.setInstanceIsAvailable(Boolean.TRUE);

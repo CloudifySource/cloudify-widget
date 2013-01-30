@@ -347,7 +347,12 @@ public class Utils
 	
 	public static String getCachedOutput( ServerNode serverNode ) {
         StringBuilder stringBuilder = (StringBuilder) Cache.get("output-" + serverNode.getId() );
-        String output = stringBuilder == null ? "N/A" : stringBuilder.toString();
+        String output = stringBuilder == null ? null : stringBuilder.toString();
 		return output;
 	}
+
+    // return result if not null; otherwise return default
+    public static <T> T getOrDefault(T result, T defaultResult) {
+        return result == null ? defaultResult : result;
+    }
 }
