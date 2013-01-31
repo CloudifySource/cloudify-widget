@@ -121,6 +121,7 @@ public class ServerConfig {
         public String username="<tenant>:<user>";
         public String cloudProvider="hpcloud-compute";
         public File script;
+        public String tags = null;
     }
     
     // cloud bootstrap configuration.
