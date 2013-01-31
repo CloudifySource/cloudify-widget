@@ -13,7 +13,7 @@ else
 fi
 
 echo "downloading cloudify"
-CLOUDIFY_FOLDER=gigaspaces-cloudify-2.3.0-ga-b3500
+CLOUDIFY_FOLDER=gigaspaces-cloudify-2.3.0-ga-b3510
 CLOUDIFY_FILE=${CLOUDIFY_FOLDER}.zip
 if [ -e $CLOUDIFY_FILE ]; then
     echo "cloudify already installed, nothing to go"
