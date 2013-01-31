@@ -131,6 +131,8 @@ public class WidgetServerImpl implements WidgetServer
         result.setRemote( server.isRemote() ); // let UI know this is a remote bootstrap.
 
         String cachedOutput = Utils.getCachedOutput( server );// need to sort out the cache before we decide if the installation finished.
+        output.addAll(Utils.formatOutput(cachedOutput, server.getPrivateIP() + "]", filterOutputLines, filterOutputStrings));
+
         WidgetInstance widgetInstance = WidgetInstance.findByServerNode(server);
         logger.debug("checking if installation finished for {}" , widgetInstance );
         if (widgetInstance != null ){
@@ -146,10 +148,6 @@ public class WidgetServerImpl implements WidgetServer
             result.setPublicIp(server.getPublicIP());
             result.setCloudifyUiIsAvailable(Boolean.TRUE);
         }
-
-
-
-        output.addAll(Utils.formatOutput(cachedOutput, server.getPrivateIP() + "]", filterOutputLines, filterOutputStrings));
 
         // server is remote we don't count time
         if (!server.isRemote() && server.getExpirationTime() != null) {
