@@ -74,7 +74,30 @@ $(function () {
                     console.log( ["cookie is not removed for some reason, using logic delete instead"] )
                 }
             }
-        }
+        };
+
+        // guy - todo - replace this with a CSS solution on the widget div.
+        // guy - todo - replace the "click" events with "start_widget" and "stop_widget" events and listen to the widget.
+        // guy - todo - go over this script, make sure everything relates to the widget. Widget.log, Widget.start, Widget.stop etc..
+                        // show time left
+                        // set custom link
+                        // getRemoteCredentials
+                        // etc..
+                        // get rid of ID references outside the object.
+        this.showStopButton = function(){
+            $("#stop_btn").show();
+            $("#play_btn").hide();
+        };
+        this.showPlayButton = function(){
+            $("#stop_btn").hide();
+            $("#play_btn").show();
+        };
+        this.onStop = function( handler ){
+            $("#stop_btn").click(stop_instance_btn_handler);
+        };
+        this.onPlay = function( handler ){
+            $("#start_btn").click(start_instance_btn_handler);
+        };
     };
 
     var WidgetLog = function(){
@@ -114,8 +137,6 @@ $(function () {
         this.clear= function(){clear()};
         this.error = function (message){ write_log(message, "error"); };
         this.important = function(message){ write_log(message,"important");};
-
-
     };
 
 
@@ -162,7 +183,7 @@ $(function () {
 
         var state = data.status.state.toLocaleLowerCase();
         if ( state == "stopped") {
-            $("#start_btn,#stop_btn").toggle();
+            widgetState.showPlayButton();
             stop_instance( data.status.message );
         } else {// status == running
             setTimeoutForUpdateStatus();
@@ -199,7 +220,8 @@ $(function () {
 
     function start_instance_btn_handler()
     {
-        $( "#start_btn,#stop_btn" ).toggle();
+        widgetState.showStopButton();
+
         if ( !widgetState.isValid() ) {
 			var playData = { apiKey : params["apiKey"], "hpcsKey" : $("#advanced [name=hpcs_key]").val(), "hpcsSecretKey":$("#advanced [name=hpcs_secret_key]").val() };
             $.ajax(
@@ -208,7 +230,7 @@ $(function () {
                     success: function (data, textStatus, jqXHR) {
                         var state = data.status.state.toLowerCase();
                         if (state == "error" || state == "stopped") {
-                            $("#start_btn,#stop_btn").toggle();
+                            widgetState.showPlayButton();
                             widgetLog.error(data.status.message);
                             return;
                         }
@@ -235,11 +257,11 @@ $(function () {
     if (!confirm("Are you sure you want to stop the instance?")) {
       return;
     }
-    $("#start_btn,#stop_btn").toggle();
+    widgetState.showPlayButton();
     if ( widgetState.instanceId()) {
       $.post("/widget/"+ widgetState.instanceId() + "/stop?apiKey=" + params["apiKey"], {}, function (data) {
         if (data.status.state == "error") {
-          $("#start_btn,#stop_btn").toggle();
+          widgetState.showPlayButton();
           widgetLog.error(data.status.message );
           return;
         }
@@ -293,7 +315,7 @@ $(function () {
   }
 
   if (widgetState.instanceId()) {
-    $("#start_btn,#stop_btn").toggle();
+        widgetState.showStopButton();
 
       // lets update these just in case the update status fails.
       if (widgetState.publicIp()) {
@@ -307,9 +329,9 @@ $(function () {
   }
 
 
+    widgetState.onPlay( start_instance_btn_handler );
+    widgetState.onStop( stop_instance_btn_handler );
 
-  $("#start_btn").click(start_instance_btn_handler);
-  $("#stop_btn").click(stop_instance_btn_handler);
 
   $("#show_advanced, #hide_advanced").click(function () {
     $("#advanced").toggle();
