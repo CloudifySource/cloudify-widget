@@ -13,11 +13,12 @@ else
 fi
 
 echo "downloading cloudify"
-CLOUDIFY_FILE=gigaspaces-cloudify-2.2.0-ga-b2500.zip
+CLOUDIFY_FOLDER=gigaspaces-cloudify-2.3.0-ga-b3500
+CLOUDIFY_FILE=${CLOUDIFY_FOLDER}.zip
 if [ -e $CLOUDIFY_FILE ]; then
     echo "cloudify already installed, nothing to go"
 else
-    wget 'http://repository.cloudifysource.org/org/cloudifysource/2.2.0-RELEASE/${CLOUDIFY_FILE}'
+    wget 'http://repository.cloudifysource.org/org/cloudifysource/2.3.0-RELEASE/${CLOUDIFY_FILE}'
     unzip $CLOUDIFY_FILE
 fi
 
@@ -46,6 +47,7 @@ echo "copying configuration files"
 ln -fs ~/$CLOUDIFY_FILE bin/cloudify-folder # create a symbolic link to cloudify home.
 chmod 755 cloudify-widget/*.sh
 chmod 755 cloudify-widget/bin/*.sh
+ln -s /root/$CLOUDIFY_FOLDER cloudify-widget/cloudify-folder
 
 #install mysql
 echo "installing mysql"
@@ -91,12 +93,13 @@ mkdir -p /var/www/cloudifyWidget/public/error_pages
 
 echo "intalling monit"
 \cp -Rf conf/monit/repo  /etc/yum.repos.d/epel.repo
+yum clean all
 yum -y install monit
 chkconfig --levels 235 monit on
 
 
 echo "upgrading system"
-upgrade_server
+./upgrade_server.sh
 
 echo "installing takipi"
 cd ~
