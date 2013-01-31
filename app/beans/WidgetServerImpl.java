@@ -132,6 +132,7 @@ public class WidgetServerImpl implements WidgetServer
         result.setRemote( server.isRemote() ); // let UI know this is a remote bootstrap.
 
         WidgetInstance widgetInstance = WidgetInstance.findByServerNode(server);
+        logger.debug("checking if installation finished for {}" , widgetInstance );
         if (widgetInstance != null ){
             if (isFinished(widgetInstance.getRecipeType(), (String)CollectionUtils.last(output))){
                 logger.debug("detected finished installation");

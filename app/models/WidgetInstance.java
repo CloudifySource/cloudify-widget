@@ -21,10 +21,8 @@ import beans.Recipe;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import play.db.ebean.Model;
-import utils.Utils;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import controllers.Application;
@@ -151,9 +149,12 @@ public class WidgetInstance
         this.recipeType = recipeType;
     }
 
+    public String toDebugString() {
+        return toString();
+    }
+
     @Override
-	public String toString()
-	{
-		return Utils.reflectedToString(this);
-	}
+    public String toString() {
+        return String.format("WidgetInstance{id=%d, serverNode=%s, widget=%s, recipeType=%s}", id, serverNode == null ? "N/A" : serverNode.getNodeId(), widget == null ? "N/A" : widget.getTitle() + ":" + widget.getId(), recipeType);
+    }
 }
