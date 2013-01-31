@@ -167,15 +167,19 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	
 
 	@Override
-	public ServerNode bootstrapCloud(String userName, String apiKey)  {
+	public ServerNode bootstrapCloud( String userName, String apiKey )  {
 		File cloudFolder = null;
+		ComputeServiceContext jCloudsContext = null;
 		ServerNode serverNode = new ServerNode();
 		try{
 			serverNode.save();
 			Cache.set( "output-" + serverNode.getId(),  new StringBuilder());
-
+			
+			jCloudsContext = CloudifyUtils.createJcloudsContext( userName, apiKey );
 			logger.info("Creating cloud folder with specific user credentials. User: " + userName + ", api key: " + apiKey);
-			cloudFolder = CloudifyUtils.createCloudFolder( userName, apiKey );
+			cloudFolder = CloudifyUtils.createCloudFolder( userName, apiKey, jCloudsContext );
+			logger.info("Creating security group for user.");
+			CloudifyUtils.createCloudifySecurityGroup( jCloudsContext );
 
 			//Command line for bootstrapping remote cloud.
 			CommandLine cmdLine = new CommandLine(conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile() + Utils.getExecutableExt());
@@ -220,9 +224,14 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		} catch(Exception e) {
 			throw new RuntimeException("Unable to bootstrap cloud", e);
 		} finally {
-			if (cloudFolder != null)
+			if (cloudFolder != null) {
 				FileUtils.deleteQuietly(cloudFolder);
+			}
+			if (jCloudsContext != null) {
+				jCloudsContext.close();
+			}
 			serverNode.setStopped(true);
+			
 		}
 	}
 	

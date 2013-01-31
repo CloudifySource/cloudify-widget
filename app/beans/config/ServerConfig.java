@@ -125,6 +125,7 @@ public class ServerConfig {
     
     // cloud bootstrap configuration.
     public static class CloudBootstrapConfiguration {
+    	public String securityGroupName = "cloudifySecurityGroup";
     	public String cloudName = "hp";
         public File remoteBootstrap = Utils.getFileByRelativePath("/bin/remote_bootstrap");
         public String keyPairName = "cloudify";

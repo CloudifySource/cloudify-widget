@@ -27,13 +27,19 @@ import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.openstack.nova.v2_0.NovaApi;
 import org.jclouds.openstack.nova.v2_0.NovaAsyncApi;
+import org.jclouds.openstack.nova.v2_0.domain.Ingress;
+import org.jclouds.openstack.nova.v2_0.domain.IpProtocol;
 import org.jclouds.openstack.nova.v2_0.domain.KeyPair;
+import org.jclouds.openstack.nova.v2_0.domain.SecurityGroup;
 import org.jclouds.openstack.nova.v2_0.extensions.KeyPairApi;
+import org.jclouds.openstack.nova.v2_0.extensions.SecurityGroupApi;
 import org.jclouds.rest.RestContext;
 
 import server.ApplicationContext;
 import server.exceptions.ServerException;
 import beans.config.ServerConfig.CloudBootstrapConfiguration;
+
+import com.google.common.collect.FluentIterable;
 
 
 /**
@@ -53,7 +59,7 @@ public class CloudifyUtils {
 	 * 			A path to the newly created cloud folder.
 	 * @throws IOException
 	 */
-	public static File createCloudFolder(String userName, String apiKey) throws IOException {
+	public static File createCloudFolder(String userName, String apiKey, ComputeServiceContext context) throws IOException {
 		
 		CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
 		String cloudifyBuildFolder = ApplicationContext.get().conf().server.environment.getEnvironment()
@@ -66,7 +72,7 @@ public class CloudifyUtils {
 
 		// create new pem file using new credentials.
 		File pemFolder = new File(destFolder, cloudConf.cloudifyHpUploadDirName);
-		File newPemFile = createPemFile(userName, apiKey);
+		File newPemFile = createPemFile( context );
 		FileUtils.copyFile(newPemFile, new File(pemFolder, newPemFile.getName() +".pem"), true);
 
 		int colonIndex = userName.indexOf(":");
@@ -119,18 +125,9 @@ public class CloudifyUtils {
 	}
 	
 	// creates a new pem file for a given hp cloud account.
-	private static File createPemFile(String userName, String apiKey) {
+	private static File createPemFile( ComputeServiceContext context ){
 		CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
-		ComputeServiceContext context = null;
 		try {
-			Properties overrides = new Properties();
-			overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
-			context = ContextBuilder.newBuilder( cloudConf.cloudProvider )
-					.credentials( userName, apiKey )
-					.overrides(overrides)
-					.buildView(ComputeServiceContext.class);
-
-			// use jClouds to create a new pem file.
 			RestContext<NovaApi, NovaAsyncApi> novaClient = context.unwrap();
 			NovaApi api = novaClient.getApi();
 			KeyPairApi keyPairApi = api.getKeyPairExtensionForZone( cloudConf.zoneName ).get();
@@ -143,10 +140,55 @@ public class CloudifyUtils {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		finally {
-			if (context != null) 
-				context.close();
-		}
+	}
+	
+	/**
+	 * 
+	 * Create a security group with all ports open.
+	 * 
+	 * @param context The jClouds context.
+	 */
+	public static void createCloudifySecurityGroup( ComputeServiceContext context ) {
+		CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
+		try {
+			RestContext<NovaApi, NovaAsyncApi> novaClient = context.unwrap();
+			NovaApi novaApi = novaClient.getApi();
+			SecurityGroupApi securityGroupClient = novaApi.getSecurityGroupExtensionForZone(cloudConf.zoneName).get();
+			//Check if group already exists.
+			FluentIterable<? extends SecurityGroup> groupsList = securityGroupClient.list();
+			for (Object group : groupsList) {
+				if (((SecurityGroup)group).getName().equals(cloudConf.securityGroupName)) {
+					return;
+				}
+			}
+			//Create a new security group with open port range of 80-65535.
+			Ingress ingress = Ingress.builder().ipProtocol(IpProtocol.TCP).fromPort(80).toPort(65535).build();
+			SecurityGroup securityGroup = securityGroupClient.createWithDescription(cloudConf.securityGroupName, "All ports open.");
+			securityGroupClient.createRuleAllowingCidrBlock(securityGroup.getId(), ingress, "0.0.0.0/0");
+		} 
+		catch (Exception e) {
+			throw new RuntimeException("Failed creating security group.", e);
+		} 
+	}
+	
+	/**
+	 * Create an HP cloud context.
+	 * @param userName HP cloud username.
+	 * @param apiKey HP cloud API key.
+	 * @return the HP lClouds compute context.
+	 */
+	public static ComputeServiceContext createJcloudsContext(String userName,
+			String apiKey) {
+		CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
+		ComputeServiceContext context;
+		Properties overrides = new Properties();
+		overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
+		context = ContextBuilder.newBuilder( cloudConf.cloudProvider )
+				.credentials( userName, apiKey )
+				.overrides(overrides)
+				.buildView(ComputeServiceContext.class);
+
+		return context;
 	}
 
 	private static String getTempSuffix() {
