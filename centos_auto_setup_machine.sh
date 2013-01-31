@@ -39,7 +39,7 @@ CLOUDIFY_FILE=${CLOUDIFY_FOLDER}.zip
 if [ -f $CLOUDIFY_FILE ]; then
     echo "cloudify already installed, nothing to go"
 else
-    wget 'http://repository.cloudifysource.org/org/cloudifysource/2.3.0-RELEASE/${CLOUDIFY_FILE}'
+    wget "http://repository.cloudifysource.org/org/cloudifysource/2.3.0-RELEASE/${CLOUDIFY_FILE}"
     unzip $CLOUDIFY_FILE
 fi
 
