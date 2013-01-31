@@ -313,6 +313,9 @@ public class Widget
     @JsonProperty("instances")
     @Transient
     public List<WidgetInstance> getViableInstances(){
+        if ( CollectionUtils.isEmpty( instances )){
+            return new LinkedList<WidgetInstance>();
+        }
         List<WidgetInstance> result = new LinkedList<WidgetInstance>( instances );
         CollectionUtils.filter( result, new Predicate() {
             @Override
