@@ -114,7 +114,7 @@ public class WidgetServerImpl implements WidgetServer
     private static boolean isFinished( Recipe.Type recipeType, String line ){
         logger.debug("checking to see if [{}] has finished using [{}]", recipeType, line );
         Pattern pattern = installationFinishedRegexMap.get(recipeType);
-        return pattern.matcher(line).matches();
+        return pattern != null && !StringUtils.isEmpty(line) && pattern.matcher(line).matches();
     }
 
     @Override
