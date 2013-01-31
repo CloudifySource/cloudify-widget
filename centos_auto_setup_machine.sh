@@ -98,14 +98,17 @@ echo "installing nginx"
 cp conf/nginx/install.conf /etc/yum.repos.d/nginx.repo
 yum -y install nginx
 mv /etc/nginx/nginx.conf /etc/nginx/nginx_conf_backup
-cp conf/nginx/nginx.conf /etc/nginx/
+
 
 # copy nginx configuration while sed-ing the domain names
 mkdir -p /var/log/nginx/$SITE_DOMAIN
 mkdir -p /etc/nginx/sites-available
 mkdir -p /etc/nginx/sites-enabled
-cat conf/nginx/site.nginx  | sed 's/__domain_name__/'"$SITE_DOMAIN"'/' | sed 's/__staging_name__/'"$SITE_STAGING_DOMAIN"'/' > /etc/nginx/sites-available/$SITE_DOMAIN
+touch /etc/nginx/sites-available/$SITE_DOMAIN
 ln -s  /etc/nginx/sites-available/$SITE_DOMAIN /etc/nginx/sites-enabled/$SITE_DOMAIN
+
+### actual copy of files is done in "upgrade" script
+
 service nginx restart
 
 echo "creating error pages"

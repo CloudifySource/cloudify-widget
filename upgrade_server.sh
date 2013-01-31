@@ -15,6 +15,13 @@ echo "changing mode for sh files"
 chmod 755 $WIDGET_HOME/*.sh
 chmod 755 $WIDGET_HOME/bin/*.sh
 
+
+echo "copying nginx configurations"
+\cp -f conf/nginx/nginx.conf /etc/nginx/
+cat conf/nginx/site.nginx  | sed 's/__domain_name__/'"$SITE_DOMAIN"'/' | sed 's/__staging_name__/'"$SITE_STAGING_DOMAIN"'/' > /etc/nginx/sites-available/$SITE_DOMAIN
+echo "restarting nginx"
+service nginx restart
+
 # assume with are in "cloudify-widget" folder
 echo "copying error pages"
 # copy content from public error_pages to that path
