@@ -166,9 +166,7 @@ public class Application extends Controller
                 return badRequest();
             }
             ServerNode serverNode = ServerNode.find.byId( Long.parseLong(instanceId) );
-            if ( serverNode == null ){
-                throw new ServerException( Messages.get("server.was.terminated") );
-            }
+
 			Widget.Status wstatus = ApplicationContext.get().getWidgetServer().getWidgetStatus(serverNode);
 			return statusToResult(wstatus);
 		}catch(ServerException ex)
