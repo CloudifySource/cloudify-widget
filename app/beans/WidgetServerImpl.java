@@ -40,7 +40,6 @@ import models.Widget;
 import models.Widget.Status;
 import models.WidgetInstance;
 import server.*;
-import server.exceptions.ServerException;
 import utils.CollectionUtils;
 import utils.Utils;
 
@@ -131,6 +130,7 @@ public class WidgetServerImpl implements WidgetServer
 
         result.setRemote( server.isRemote() ); // let UI know this is a remote bootstrap.
 
+        String cachedOutput = Utils.getCachedOutput( server );// need to sort out the cache before we decide if the installation finished.
         WidgetInstance widgetInstance = WidgetInstance.findByServerNode(server);
         logger.debug("checking if installation finished for {}" , widgetInstance );
         if (widgetInstance != null ){
@@ -147,7 +147,7 @@ public class WidgetServerImpl implements WidgetServer
             result.setCloudifyUiIsAvailable(Boolean.TRUE);
         }
 
-        String cachedOutput = Utils.getCachedOutput( server );
+
 
         output.addAll(Utils.formatOutput(cachedOutput, server.getPrivateIP() + "]", filterOutputLines, filterOutputStrings));
 
