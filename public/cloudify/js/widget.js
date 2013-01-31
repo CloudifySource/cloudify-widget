@@ -150,6 +150,12 @@ $(function () {
         setTimeout( update_status, myTimeout );
     }
 
+
+    function get_custom_link(  ){
+        var link_info = widgetState.customLink();
+        return $("<li></li>", {"id":"custom_link"}).append($("<a></a>", {"href": link_info.url, "target": "_blank", "text": link_info.title}));
+    }
+
     function handleUpdateStatusSuccess( data )
     {
 
@@ -174,8 +180,7 @@ $(function () {
             console.log(["installation finished", data]);
             if (data.status.consoleLink) {
                 var link_info = data.status.consoleLink;
-                var custom_link = $("<li></li>", {"id": "custom_link"}).append($("<a></a>", {"href": link_info.url, "target": "_blank", "text": link_info.title}));
-                widgetState.customLink(custom_link.html());
+                widgetState.customLink( link_info );
                 show_custom_link(true);
             }
        }
@@ -283,7 +288,7 @@ $(function () {
 
     function show_custom_link( show ) {
         if ( show ){
-            var custom_link = widgetState.customLink();
+            var custom_link = get_custom_link();
             if ($("#custom_link").get(0)){
                 $("#custom_link").replaceWith($(custom_link));
             }
