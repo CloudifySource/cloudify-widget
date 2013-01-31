@@ -34,8 +34,9 @@ else
 fi
 
 echo "downloading cloudify"
-CLOUDIFY_FOLDER=gigaspaces-cloudify-2.3.0-ga-b3510
-CLOUDIFY_FILE=${CLOUDIFY_FOLDER}.zip
+CLOUDIFY_FOLDER=gigaspaces-cloudify-2.3.0-ga
+CLOUDIFY_ZIP_NAME=${CLOUDIFY_FOLDER}-b3510
+CLOUDIFY_FILE=${CLOUDIFY_ZIP_NAME}.zip
 if [ -f $CLOUDIFY_FILE ]; then
     echo "cloudify already installed, nothing to go"
 else
@@ -65,10 +66,10 @@ echo "copying sysconfig file"
 echo "copying configuration files"
 \cp -f ${PROD_CONF_FILE} cloudify-widget/conf
 \cp -f ${PEM_FILE} cloudify-widget/bin
-ln -fs ~/${CLOUDIFY_FILE} bin/cloudify-folder # create a symbolic link to cloudify home.
+ln -fs ~/${CLOUDIFY_FOLDER} cloudify-widget/cloudify-folder # create a symbolic link to cloudify home.
 chmod 755 cloudify-widget/*.sh
 chmod 755 cloudify-widget/bin/*.sh
-ln -s /root/${CLOUDIFY_FOLDER} cloudify-widget/cloudify-folder
+ln -fs /root/${CLOUDIFY_FOLDER} cloudify-widget/cloudify-folder
 
 #install mysql
 echo "installing mysql"
