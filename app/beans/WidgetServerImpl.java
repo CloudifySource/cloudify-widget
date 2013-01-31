@@ -134,7 +134,7 @@ public class WidgetServerImpl implements WidgetServer
         output.addAll(Utils.formatOutput(cachedOutput, server.getPrivateIP() + "]", filterOutputLines, filterOutputStrings));
 
         WidgetInstance widgetInstance = WidgetInstance.findByServerNode(server);
-        logger.debug("checking if installation finished for {}" , widgetInstance );
+        logger.debug("checking if installation finished for {} on the following output {}" , widgetInstance, output );
         if (widgetInstance != null ){
             if (isFinished(widgetInstance.getRecipeType(), (String)CollectionUtils.last(output))){
                 logger.debug("detected finished installation");
