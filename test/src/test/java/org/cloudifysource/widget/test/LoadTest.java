@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
  * Time: 15:41
  */
 public class LoadTest extends AbstractCloudifyWidgetTest{
+    private static final int random = (int)(Math.random() * 1000);
     public static final String SERVICE = context().getTestConf().getService();
     public static final String SERVICE_URL_POSTFIX = context().getTestConf().getServiceUrlPostFix();
     private final int N = context().getTestConf().getNumOfMachines();
