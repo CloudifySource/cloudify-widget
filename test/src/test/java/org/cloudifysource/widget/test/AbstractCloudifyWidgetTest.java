@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * User: sagib
@@ -23,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Time: 16:33
  */
 public class AbstractCloudifyWidgetTest {
+    public static final int NUM_OF_SUITES = 2;
     protected static WebDriver webDriver;
 
     public static final String HOST = context().getTestConf().getHost();
@@ -30,12 +32,14 @@ public class AbstractCloudifyWidgetTest {
     protected static final String PASSWORD = "testTest1" + random;
     protected static final String EMAIL = "test@test" + random + ".com";
     protected static final String NAME = "test" + random;
+    private static AtomicInteger counter = new AtomicInteger(0);
 
     private static Logger logger = LoggerFactory.getLogger(AbstractCloudifyWidgetTest.class);
 
     @BeforeClass
     public static void before(){
-        logger.info("before class - starting webDriver");
+        int i = counter.incrementAndGet();
+        logger.info("before class - starting webDriver counter is at: " + i);
         webDriver = context().getWebDriver();
         webDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         webDriver.get(HOST);
@@ -60,7 +64,8 @@ public class AbstractCloudifyWidgetTest {
     @AfterClass
     public static void after(){
         logger.info("after class - closing webDriver");
-        webDriver.close();
+        if(counter.get() >= NUM_OF_SUITES)
+            webDriver.close();
     }
 
     protected void waitForElement(final By by) {
