@@ -30,20 +30,22 @@ public class AbstractCloudifyWidgetTest {
     public static final String HOST = context().getTestConf().getHost();
     private static AtomicInteger counter = new AtomicInteger(0);
     private static final int random = (int)(Math.random() * 1000);
-    protected static final String PASSWORD = "testTest1" + random + counter.get();
-    protected static final String EMAIL = "test@test" + random + counter.get() + ".com";
-    protected static final String NAME = "test" + random + counter.get();
+    protected static String PASSWORD = "testTest1" + random + counter.get();
+    protected static String EMAIL = "test@test" + random + counter.get() + ".com";
+    protected static String NAME = "test" + random + counter.get();
 
     private static Logger logger = LoggerFactory.getLogger(AbstractCloudifyWidgetTest.class);
 
     @BeforeClass
     public static void before(){
-        logger.info("before class - starting webDriver counter is at: " + counter.incrementAndGet());
+        int i = counter.incrementAndGet();
+        logger.info("before class - starting webDriver counter is at: " + i);
         webDriver = context().getWebDriver();
         webDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         webDriver.get(HOST);
         dropSession();
-        subscribe(EMAIL, PASSWORD, NAME);
+        if(i == 1)
+            subscribe(EMAIL, PASSWORD, NAME);
     }
 
     @Before
