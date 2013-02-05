@@ -72,7 +72,7 @@ public class LoadTest extends AbstractCloudifyWidgetTest{
         WebElement log = webDriver.findElement(logBy);
         long start = System.currentTimeMillis();
         boolean started = false;
-        while (!started && System.currentTimeMillis() - start <= 60000){
+        while (!started && System.currentTimeMillis() - start <= 120000){
             try {
                 assertServiceStarted(log);
                 started = true;
