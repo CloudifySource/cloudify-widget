@@ -112,12 +112,12 @@
                      <form class="form-search pull-left">
                        <input type="text" placeholder="Filter instances" class="instance_search input-medium search-query">
                      </form>
+                       <div class="alert pull-right"><i class="icon-warning-sign" style="padding-right:10px"></i>Not showing instances outside my cloud.</div>
 
                      <table class="table table-hover">
                        <thead class="list_head">
                          <tr>
                            <th>Id</th>
-                           <th>Anonymous</th>
                            <th>Public IP</th>
                            <th></th>
                          </tr>
@@ -143,7 +143,6 @@
     <script id="widget_instance_tmpl" type="text/x-jquery-tmpl">
         <tr class="instance" data-instance_id="${instanceId}">
           <td>${instanceId}</td>
-          <td>${anonymous}</td>
           <td>${publicIP}</td> @* todo : change case to Ip *@
           <td><a href="#" class="btn btn-danger shutdown_instance btn-small">Shutdown</a></td>
         </tr>

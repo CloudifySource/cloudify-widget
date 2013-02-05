@@ -2,6 +2,7 @@ package utils;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * User: guym
@@ -32,5 +33,22 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
 
     public static int size( Collection c ){
         return c == null ? 0 : c.size();
+    }
+
+    public static <T> T last(List list) {
+        if (size(list) > 0) {
+            if (CollectionUtils.isEmpty(list)) {
+                return null;
+            }
+            return (T) list.get(size(list) - 1);
+        }
+        return null;
+    }
+
+    public static <T> T first(Collection collection) {
+        if ( size(collection) > 0 ){
+            return (T) collection.iterator().next();
+        }
+        return null;
     }
 }

@@ -15,17 +15,12 @@
  *******************************************************************************/
 package beans;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeoutException;
-
-import javax.inject.Inject;
-
+import beans.api.ExecutorFactory;
+import beans.config.Conf;
+import com.google.common.net.HostAndPort;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import models.ServerNode;
-
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.io.FileUtils;
@@ -50,8 +45,7 @@ import org.jclouds.sshj.config.SshjSshClientModule;
 import org.jclouds.util.Strings2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import play.cache.Cache;
+import play.i18n.Messages;
 import server.ApplicationContext;
 import server.DeployManager;
 import server.ProcExecutor;
@@ -59,22 +53,28 @@ import server.ServerBootstrapper;
 import server.exceptions.ServerException;
 import utils.CloudifyUtils;
 import utils.Utils;
-import beans.api.ExecutorFactory;
-import beans.config.Conf;
 
-import com.google.common.net.HostAndPort;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import javax.inject.Inject;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 
 
 /**
  * This class manages a compute cloud provider by JCloud openstack nova infrastructure.
  * It provides ability to create/delete specific server with desired flavor configuration.
- * On each new server runs a bootstrap script that prepare machine for a server-pool, 
+ * On each new server runs a bootstrap script that prepare machine for a server-pool,
  * it includes a setup of firewall, JDK, cloudify installation and etc...
  * The bootstrap script can be found under ssh/bootstrap_machine.sh
- * 
+ *
  * @author Igor Goldenberg
  */
 public class ServerBootstrapperImpl implements ServerBootstrapper
@@ -89,41 +89,42 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
     @Inject
     private ExecutorFactory executorFactory;
-    
+
     @Inject
     private DeployManager deployManager;
-	
+
     public List<ServerNode> createServers( int numOfServers )
 	{
 		List<ServerNode> servers = new ArrayList<ServerNode>();
-		
+		logger.info("creating {} new instances", numOfServers );
 		for( int i=0; i< numOfServers; i++ )
 		{
 			ServerNode srvNode = null;
 	    	try {
 				srvNode =  createServerNode();
 				servers.add( srvNode );
-				
+
 				return servers;
-			} catch (Exception e) 
+			} catch (Exception e)
 			{
-				// failed to boostrap machine, nothing todo - let destroy :(
+				// failed to boostrap machine, nothing to do - let destroy :(
 				if ( srvNode != null ) {
-					destroyServer(srvNode.getId());
+					destroyServer(srvNode.getNodeId());
                 }
-					
+
 				logger.error("Failed to bootstrap machine. ", e);
 			}
 		}
-		
+
 		return servers;
 	}
-	
-    
+
+
 	public void destroyServer( String serverId )
 	{
-        logger.info("destroying server {}", serverId );
+       logger.info("destroying server {}", serverId );
 	   deleteServer(serverId);
+       ServerNode.deleteServer(serverId);
 	}
 
     public void init(){
@@ -138,46 +139,65 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         _nova = context.unwrap();
     }
 
-	
+
 	private ServerNode createServerNode() throws RunNodesException, TimeoutException
 	{
 		logger.info( "Starting to create new Server [imageId={}, flavorId={}]", conf.server.bootstrap.imageId, conf.server.bootstrap.flavorId );
-		
+
 		ServerApi serverApi = _nova.getApi().getServerApiForZone(conf.server.bootstrap.zoneName);
 		CreateServerOptions serverOpts = new CreateServerOptions();
+
+        Map<String,String> metadata = new HashMap<String, String>();
+
+        List<String> tags = new LinkedList<String>();
+        String hostname = null;
+        try {
+            java.net.InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            logger.debug("unable to get hostname",e);
+        }
+
+        if ( hostname != null ){
+            tags.add( hostname );
+        }
+
+        if ( !StringUtils.isEmpty(conf.server.bootstrap.tags) ){
+            tags.add( conf.server.bootstrap.tags );
+        }
+        metadata.put("tags", StringUtils.join(tags, ","));
+        serverOpts.metadata(metadata);
 		serverOpts.keyPairName( conf.server.bootstrap.keyPair );
-		serverOpts.securityGroupNames( conf.server.bootstrap.securityGroup );
-		
+		serverOpts.securityGroupNames(conf.server.bootstrap.securityGroup);
+
 		ServerCreated serverCreated = serverApi.create( conf.server.bootstrap.serverNamePrefix + System.currentTimeMillis(), conf.server.bootstrap.imageId , conf.server.bootstrap.flavorId, serverOpts);
 		blockUntilServerInState(serverCreated.getId(), Server.Status.ACTIVE, 1000, 5, serverApi);
 		Server server = serverApi.get(serverCreated.getId());
 
 		ServerNode serverNode = new ServerNode( server );
-		
+
 		logger.info("Server created, wait 10 seconds before starting to bootstrap machine: {}" ,  serverNode.getPublicIP() );
 		Utils.threadSleep(10000); // need for a network interfaces initialization
-		
+
 		// bootstrap machine: firewall, jvm, start cloudify
 		bootstrapMachine( serverNode );
-		
+
 		logger.info("Server created.{} " , server.getAddresses() );
-		
+
 		return serverNode;
 	}
-	
+
 
 	@Override
-	public ServerNode bootstrapCloud( String userName, String apiKey )  {
+	public ServerNode bootstrapCloud( ServerNode serverNode )  {
 		File cloudFolder = null;
 		ComputeServiceContext jCloudsContext = null;
-		ServerNode serverNode = new ServerNode();
 		try{
-			serverNode.save();
-			Cache.set( "output-" + serverNode.getId(),  new StringBuilder());
-			
-			jCloudsContext = CloudifyUtils.createJcloudsContext( userName, apiKey );
-			logger.info("Creating cloud folder with specific user credentials. User: " + userName + ", api key: " + apiKey);
-			cloudFolder = CloudifyUtils.createCloudFolder( userName, apiKey, jCloudsContext );
+            String username = serverNode.getUserName();
+            String apiKey = serverNode.getApiKey();
+            logger.info("Creating cloud folder with specific user credentials. User: " + username + ", api key: " + apiKey);
+            jCloudsContext = CloudifyUtils.createJcloudsContext(username, apiKey);
+            cloudFolder = CloudifyUtils.createCloudFolder(username, apiKey, jCloudsContext);
+
 			logger.info("Creating security group for user.");
 			CloudifyUtils.createCloudifySecurityGroup( jCloudsContext );
 
@@ -186,26 +206,26 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			cmdLine.addArgument(cloudFolder.getName());
 
 			DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-			ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor(serverNode.getId());
-			
+			ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor( serverNode );
+
 			logger.info("Executing command line: " + cmdLine);
 			bootstrapExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment() , resultHandler);
 			resultHandler.waitFor();
 
-			String output = Utils.getCachedOutput(serverNode.getId());
+			String output = Utils.getOrDefault(Utils.getCachedOutput(serverNode), "");
 			if (resultHandler.getException() != null) {
 				if (output.contains("found existing management machines")) {
-					throw new RuntimeException("Found existing management machines. Process output was: " + output);
+					throw new ServerException( Messages.get("cloudify.already.exists") );
 				}
-				logger.info("Command execution ended with errors: " + output.toString());
-				throw new RuntimeException("Failed to bootstrap cloudify machine: " 
+				logger.info("Command execution ended with errors: {}", output);
+				throw new RuntimeException("Failed to bootstrap cloudify machine: "
 						+ output, resultHandler.getException());
 			}
 
 			String publicIp = Utils.extractIpFromBootstrapOutput(output);
 			if (StringUtils.isEmpty(publicIp)) {
 				logger.warn("No public ip address found in bootstrap output. " + output);
-				throw new RuntimeException( "Bootstrap failed. No IP address found in bootstrap output." 
+				throw new RuntimeException( "Bootstrap failed. No IP address found in bootstrap output."
 						+ output, resultHandler.getException() );
 			}
 			serverNode.setPublicIP(publicIp);
@@ -216,8 +236,6 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			logger.info("Bootstrap cloud command ended successfully");
 
 			serverNode.setPrivateKey(privateKey);
-			serverNode.setApiKey(apiKey);
-			serverNode.setUserName(userName);
 			serverNode.setRemote(true);
 
 			return serverNode;
@@ -234,24 +252,24 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			
 		}
 	}
-	
+
 	private void deleteServer( String serverId )
 	{
 		ServerApi serverApi = _nova.getApi().getServerApiForZone( conf.server.bootstrap.zoneName );
 		serverApi.delete(serverId);
 		logger.info("Server id: {} was deleted.", serverId);
 	}
-	
-	
+
+
 	/**
 	 * Will block until the server is in the correct state.
-	 * 
+	 *
 	 * @param serverId The id of the server to block on
 	 * @param status The status the server needs to reach before the method stops blocking
 	 * @param timeoutSeconds The maximum amount of time to block before throwing a TimeoutException
 	 * @param delaySeconds The amount of time between server status checks
 	 * @param serverApi The ServerApi used to do the checking
-	 * 
+	 *
 	 * @throws TimeoutException If the server does not reach the status by timeoutSeconds
 	 */
 	private void blockUntilServerInState(String serverId, Status status,
@@ -279,7 +297,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
 		throw new TimeoutException(message);
 	}
-	
+
 	private void bootstrapMachine( ServerNode server )
 	{
 		try
@@ -288,17 +306,23 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
 			String script = FileUtils.readFileToString( conf.server.bootstrap.script );
 			ExecResponse response = runScriptOnNode( conf, server.getPublicIP(), script );
-			
+
+            logger.info("script finished");
 			logger.info("Bootstrap for server: {} finished successfully successfully. " +
                     "ExitStatus: {} \nOutput:  {}", new Object[]{server.getPublicIP(),
                     response.getExitStatus(),
                     response.getOutput()} );
 		}catch(Exception ex)
 		{
-			throw new ServerException("Failed to bootstrap cloudify machine: " + server.getPublicIP(), ex);
+            try{
+                destroyServer( server.getNodeId() );
+            }catch(Exception e){
+                logger.info("destroying server after failed bootstrap threw exception",e);
+            }
+			throw new ServerException("Failed to bootstrap cloudify machine: " + server.toDebugString(), ex);
 		}
 	}
-	
+
 	static public ExecResponse runScriptOnNode( Conf conf, String serverIP, String script)
 			throws NumberFormatException, IOException
 	{
@@ -312,8 +336,10 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		try
 		{
 			sshConnection.connect();
+            logger.info("ssh connected, executing");
 			execResponse = sshConnection.exec(script);
-		 }finally 
+            logger.info("finished execution");
+		 }finally
 		 {
 			if (sshConnection != null)
 			   sshConnection.disconnect();
@@ -321,7 +347,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
 		return execResponse;
 	}
-	
+
 	/**
 	 * Always close your service when you're done with it.
 	 */

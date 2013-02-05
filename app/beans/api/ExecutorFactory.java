@@ -26,13 +26,14 @@ import server.ProcExecutor;
  */
 public interface ExecutorFactory {
 
+
 	/**
 	 * returns an executor for performing bootstrap to the cloud.
 	 * 
-	 * @param key The key that the executor uses to write to the play cache.
+	 * @param serverNode The key that the executor uses to write to the play cache.
 	 * @return process executor.
 	 */
-	ProcExecutor getBootstrapExecutor( String key );
+	ProcExecutor getBootstrapExecutor( ServerNode serverNode );
 	
 	/**
 	 * returns an executor for deploying a service or application on the cloud.

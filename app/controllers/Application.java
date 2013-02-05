@@ -16,19 +16,22 @@
 package controllers;
 
 import static utils.RestUtils.OK_STATUS;
-import static utils.RestUtils.resultAsJson;
-import static utils.RestUtils.resultErrorAsJson;
+
+import akka.util.Duration;
 import models.ServerNode;
 import models.Widget;
-import models.WidgetInstance;
 
+import org.apache.commons.lang.NumberUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import play.Play;
 import play.Routes;
+import play.cache.Cache;
 import play.i18n.Messages;
+import play.libs.Akka;
+import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import server.ApplicationContext;
@@ -43,6 +46,9 @@ import com.avaje.ebean.config.dbplatform.MySqlPlatform;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Widget controller with the main functions like start(), stop(), getWidgetStatus().
@@ -56,32 +62,77 @@ public class Application extends Controller
     //              we should be able to decode it, verify user's ownership on the widget and go from there.
 	public static Result start( String apiKey, String hpcsKey, String hpcsSecretKey )
 	{
-		//TODO[guym]: add field isRemote to server_node table. 
 		try
 		{
+            // guy - todo - get rid of the "exception/catch" flow and use simple return result statements instead.
+            // don't allow for 30 seconds to start the widget again
+            Long timeLeft = (Long) Cache.get(Controller.request().remoteAddress());
+            if (timeLeft != null) {
+                throw new ServerException(Messages.get("please.wait.x.sec", (timeLeft - System.currentTimeMillis()) / 1000));
+            }
+
 			logger.info("starting widget with [apiKey, hpcsKey, hpcsSecretKey] = [{},{},{}]", new Object[]{apiKey, hpcsKey, hpcsSecretKey} );
  			Widget widget = Widget.getWidget( apiKey );
+            ServerNode serverNode = null;
            	if ( widget == null || !widget.isEnabled()) {
                 	new HeaderMessage().setError( Messages.get("widget.disabled.by.administrator") ).apply( response().getHeaders() );
 	                return badRequest(  );
             }
 			ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ));
-			WidgetInstance wi = null;
 			//TODO[adaml]: add proper input validation response
-			if ( isValidInput(hpcsKey, hpcsSecretKey) ){
-				ServerNode server = ApplicationContext.get().getServerBootstrapper().bootstrapCloud( hpcsKey, hpcsSecretKey );
-//				server.save();
-				ApplicationContext.get().getWidgetServer().deploy(widget, server);
-				return ok();
-			}else{
-				wi = ApplicationContext.get().getWidgetServer().deploy(apiKey);
-			}
-			return resultAsJson(wi);
+            if ( !StringUtils.isEmpty( hpcsKey ) && !StringUtils.isEmpty( hpcsSecretKey ) ){
+                if ( !isValidInput(hpcsKey, hpcsSecretKey) ) {
+                    new HeaderMessage().setError(Messages.get("invalid.hpcs.credentials")).apply(response().getHeaders());
+                    return badRequest();
+                }
+
+                serverNode = new ServerNode();
+                serverNode.setUserName( hpcsKey );
+                serverNode.setRemote(true);
+                serverNode.setApiKey( hpcsSecretKey );
+                serverNode.save();
+            }else{
+                serverNode = ApplicationContext.get().getServerPool().get(widget.getLifeExpectancy());
+                if (serverNode == null) {
+                    ApplicationContext.get().getMailSender().sendPoolIsEmptyMail();
+                    throw new ServerException(Messages.get("no.available.servers"));
+                }
+            }
+
+            // run the "bootstrap" and "deploy" in another thread.
+            final ServerNode finalServerNode = serverNode;
+            final Widget finalWidget = widget;
+            Akka.system().scheduler().scheduleOnce(
+                    Duration.create(0, TimeUnit.SECONDS),
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            if (finalServerNode.isRemote()) {
+                                ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode);
+                            }
+                            ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode);
+                        }
+                    });
+
+            return statusToResult( new Widget.Status().setInstanceId(serverNode.getId().toString()).setRemote(serverNode.isRemote()) );
 		}catch(ServerException ex)
 		{
-			return resultErrorAsJson(ex.getMessage());
+            return exceptionToStatus( ex );
 		}
 	}
+
+
+    private static Result exceptionToStatus( Exception e ){
+        Widget.Status status = new Widget.Status();
+        status.setState(Widget.Status.State.STOPPED);
+        status.setMessage(e.getMessage());
+        return statusToResult(status);
+    }
+    private static Result statusToResult( Widget.Status status ){
+        Map<String,Object> result = new HashMap<String, Object>();
+        result.put("status", status );
+        return ok( Json.toJson( result ));
+    }
 
 	private static boolean isValidInput(String hpcsKey, String hpcsSecretKey) {
 		return !StringUtils.isEmpty(hpcsKey) && !StringUtils.isEmpty(hpcsSecretKey)
@@ -90,7 +141,6 @@ public class Application extends Controller
 	
 	public static Result stop( String apiKey, String instanceId )
 	{
-		
 		ServerNode serverNode = ServerNode.find.byId(Long.parseLong(instanceId));
 		if (serverNode.isRemote()) {
 			return notFound();
@@ -106,17 +156,22 @@ public class Application extends Controller
 			return ok(OK_STATUS).as("application/json");
 		}
 	}
+
 	
 	public static Result getWidgetStatus( String apiKey, String instanceId )
 	{
 		try
 		{
-			Widget.Status wstatus = ApplicationContext.get().getWidgetServer().getWidgetStatus(instanceId);
+            if (!NumberUtils.isNumber( instanceId )){
+                return badRequest();
+            }
+            ServerNode serverNode = ServerNode.find.byId( Long.parseLong(instanceId) );
 
-			return resultAsJson( wstatus );
+			Widget.Status wstatus = ApplicationContext.get().getWidgetServer().getWidgetStatus(serverNode);
+			return statusToResult(wstatus);
 		}catch(ServerException ex)
 		{
-			return resultErrorAsJson(ex.getMessage());
+			return exceptionToStatus( ex );
 		}
 	}
 

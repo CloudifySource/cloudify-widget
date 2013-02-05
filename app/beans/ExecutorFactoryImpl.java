@@ -15,6 +15,7 @@
  *******************************************************************************/
 package beans;
 
+import beans.api.ProcessStreamHandler;
 import models.ServerNode;
 
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -24,8 +25,8 @@ import org.slf4j.LoggerFactory;
 import play.modules.spring.Spring;
 import server.ApplicationContext;
 import server.ProcExecutor;
-import beans.ProcExecutorImpl.ProcessStreamHandler;
 import beans.api.ExecutorFactory;
+import server.WriteEventListener;
 
 /**
  * A factory class for generating different process executors.
@@ -36,37 +37,59 @@ import beans.api.ExecutorFactory;
 public class ExecutorFactoryImpl implements ExecutorFactory {
 	
 	private static Logger logger = LoggerFactory.getLogger( ExecutorFactoryImpl.class );
-	
+
+    public WriteEventListener getExecutorWriteEventListener( String key ){
+        WriteEventListener writeEventListener = (WriteEventListener) Spring.getBean("executorWriteEventListener");
+        writeEventListener.setKey( key );
+        writeEventListener.init();
+        return writeEventListener;
+    }
+
+    public ProcessStreamHandler getProcessStreamHandler( String key ){
+        ProcessStreamHandler streamHandler = (ProcessStreamHandler) Spring.getBean("processStreamHandler");
+        streamHandler.setWriteEventListener( getExecutorWriteEventListener( key ) );
+        return streamHandler;
+    }
+
 	@Override
-	public ProcExecutor getBootstrapExecutor( String key ) {
+	public ProcExecutor getBootstrapExecutor( ServerNode serverNode ) {
 
 		logger.info("Creating bootstrap executor.");
-		ProcessStreamHandler streamHandler = new ProcessStreamHandler(key);
-		
+        String key = getKey(serverNode);
+
+        ProcessStreamHandler streamHandler = getProcessStreamHandler(key);
 		ExecuteWatchdog watchdog = new ExecuteWatchdog(ApplicationContext.get().conf().cloudify.bootstrapCloudWatchDogProcessTimeoutMillis);
-		ProcExecutor executor = (ProcExecutor) Spring.getBean( "bootstrapExecutor" );
+
+        ProcExecutor executor = (ProcExecutor) Spring.getBean( "bootstrapExecutor" );
 		executor.setExitValue(0);
 		executor.setWatchdog(watchdog);
 		executor.setStreamHandler(streamHandler);
 		executor.setId(key);
-		return executor ;
+
+        return executor ;
 	}
 
 	@Override
 	public ProcExecutor getDeployExecutor( ServerNode server ) {
 	
 		logger.info("Creating deploy executor.");
-		ProcessStreamHandler streamHandler = new ProcessStreamHandler(server.getId());
-		
+        String key = getKey(server);
+
+        ProcessStreamHandler streamHandler = getProcessStreamHandler(key);
 		ExecuteWatchdog watchdog = new ExecuteWatchdog( ApplicationContext.get().conf().cloudify.bootstrapCloudWatchDogProcessTimeoutMillis );
-		ProcExecutor executor = (ProcExecutor) Spring.getBean( "deployExecutor" );
+
+        ProcExecutor executor = (ProcExecutor) Spring.getBean( "deployExecutor" );
 		executor.setExitValue(1);
 		executor.setWatchdog(watchdog);
 		executor.setStreamHandler(streamHandler);
-		executor.setId(server.getId());
-		return  executor;
+		executor.setId(key);
+
+        return  executor;
 	}
 
+    private String getKey(ServerNode server) {
+        return server.getId().toString();
+    }
 
 
 }

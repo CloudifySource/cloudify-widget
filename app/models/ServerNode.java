@@ -15,6 +15,8 @@
  *******************************************************************************/
 package models;
 
+import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.Junction;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
@@ -23,9 +25,12 @@ import org.jclouds.openstack.nova.v2_0.domain.Server;
 import play.db.ebean.Model;
 import utils.Utils;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -74,6 +79,9 @@ extends Model
 	
 	@XStreamAsAttribute
 	private boolean remote = false;
+
+    @OneToOne( cascade = CascadeType.REMOVE )
+    WidgetInstance widgetInstance = null;
 	
 	public static Finder<Long,ServerNode> find = new Finder<Long,ServerNode>(Long.class, ServerNode.class); 
 
@@ -91,7 +99,7 @@ extends Model
 		this.expirationTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis( 30 ); // default unless configured otherwise
 	}
 
-	public String getId()
+	public String getNodeId() // guy - it is dangerous to call this getId as it looks like the getter of "long id"
 	{
 		return serverId;
 	}
@@ -101,7 +109,11 @@ extends Model
 		return privateIP;
 	}
 
-	public String getPublicIP()
+    public Long getId() {
+        return id;
+    }
+
+    public String getPublicIP()
 	{
 		return publicIP;
 	}
@@ -152,10 +164,37 @@ extends Model
 		return find.all();
 	}
 
-	static public ServerNode getFreeServer()
-	{
-		return ServerNode.find.where().eq("busy", "false").setMaxRows(1).findUnique();
-	}
+    static public List<ServerNode> findByCriteria( QueryConf conf) {
+        ExpressionList<ServerNode> where = find.where();
+        Junction<ServerNode> disjunction = where.disjunction();
+
+        for (Criteria criteria : conf.criterias) {
+            ExpressionList<ServerNode> conjuction = disjunction.conjunction();
+            if (criteria.busy != null) {
+                conjuction.eq("busy", criteria.busy);
+            }
+            if (criteria.remote != null) {
+                conjuction.eq("remote", criteria.remote);
+            }
+            if (criteria.stopped != null) {
+                conjuction.eq("stopped", criteria.stopped);
+            }
+
+            if ( criteria.serverIdIsNull != null ){
+                if ( criteria.serverIdIsNull ){
+                    conjuction.isNull("serverId");
+                }else{
+                    conjuction.isNotNull("serverId");
+                }
+            }
+        }
+
+        if ( conf.maxRows > 0 ){
+            where.setMaxRows( conf.maxRows );
+        }
+
+        return where.findList();
+    }
 
 	static public ServerNode getServerNode( String serverId )
 	{
@@ -164,9 +203,10 @@ extends Model
 
 	static public void deleteServer( String serverId )
 	{
-		ServerNode server = find.where().eq("serverId", serverId).findUnique();
-		if ( server != null )
+		ServerNode server = getServerNode( serverId );
+		if ( server != null ){
 			server.delete();
+        }
 	}
 
 	public String toDebugString() {
@@ -217,4 +257,69 @@ extends Model
 	public void setRemote(boolean remote) {
 		this.remote = remote;
 	}
+
+    public void setWidgetInstance(WidgetInstance widgetInstance) {
+        this.widgetInstance = widgetInstance;
+    }
+
+
+    // guy - todo - formalize this for reuse.
+    public static class QueryConf {
+        public int maxRows;
+        public List<Criteria> criterias = new LinkedList<Criteria>();
+
+        public QueryConf setMaxRows(int maxRows) {
+            this.maxRows = maxRows;
+            return this;
+        }
+
+        public Criteria criteria(){
+            Criteria c = new Criteria(this);
+            criterias.add(c);
+            return c;
+        }
+
+    }
+    public static class Criteria{
+        public Boolean remote = null;
+        public Boolean stopped = null;
+        public Boolean busy = null;
+        public String nodeId = null;
+        private QueryConf conf;
+        private Boolean serverIdIsNull;
+
+        public Criteria(QueryConf conf) {
+            this.conf = conf;
+        }
+
+        public Criteria setRemote(Boolean remote) {
+            this.remote = remote;
+            return this;
+        }
+
+        public QueryConf done(){
+            return conf;
+        }
+
+        public Criteria setStopped(Boolean stopped) {
+            this.stopped = stopped;
+            return this;
+        }
+
+        public Criteria setBusy(Boolean busy) {
+            this.busy = busy;
+            return this;
+        }
+
+        public Criteria setNodeId(String nodeId) {
+            this.nodeId = nodeId;
+            return this;
+        }
+
+
+        public Criteria setServerIdIsNull(boolean serverIdIsNull) {
+            this.serverIdIsNull = serverIdIsNull;
+            return this;
+        }
+    }
 }

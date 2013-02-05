@@ -1,11 +1,32 @@
 
 #! /bin/bash
+
+
+PROD_CONF_FILE=~/prod.conf
+PEM_FILE=~/hpcloud.pem
+SYSCONF_FILE=~/sysconfig_play
+
+if [ ! -f ${PROD_CONF_FILE} ]; then
+    echo "missing ${PROD_CONF_FILE}"
+    exit 1
+fi
+if [ ! -f ${PEM_FILE} ]; then
+    echo "missing ${PEM_FILE}"
+    exit 1
+fi
+
+if [ ! -f ${SYSCONF_FILE} ]; then
+    echo "missing ${SYSCONF_FILE}"
+    exit 1
+fi
+
+
 echo "installing java"
 yum  -y install java-1.6.0-openjdk-devel
 export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk.x86_64
 
 echo "downloading play"
-if [ -e play-2.0.4.zip ]; then
+if [ -f play-2.0.4.zip ]; then
     echo "play already exists - nothing to do"
 else
     wget 'http://download.playframework.org/releases/play-2.0.4.zip'
@@ -13,11 +34,13 @@ else
 fi
 
 echo "downloading cloudify"
-CLOUDIFY_FILE=gigaspaces-cloudify-2.2.0-ga-b2500.zip
-if [ -e $CLOUDIFY_FILE ]; then
+CLOUDIFY_FOLDER=gigaspaces-cloudify-2.3.0-ga
+CLOUDIFY_ZIP_NAME=${CLOUDIFY_FOLDER}-b3510
+CLOUDIFY_FILE=${CLOUDIFY_ZIP_NAME}.zip
+if [ -f $CLOUDIFY_FILE ]; then
     echo "cloudify already installed, nothing to go"
 else
-    wget 'http://repository.cloudifysource.org/org/cloudifysource/2.2.0-RELEASE/${CLOUDIFY_FILE}'
+    wget "http://repository.cloudifysource.org/org/cloudifysource/2.3.0-RELEASE/${CLOUDIFY_FILE}"
     unzip $CLOUDIFY_FILE
 fi
 
@@ -36,16 +59,17 @@ gem install sass
 
 # assuming sysconfig_play exists on machine
 echo "copying sysconfig file"
-\cp -f ~/sysconfig_play /etc/sysconfig/play
+\cp -f ${SYSCONF_FILE} /etc/sysconfig/play
 . /etc/sysconfig/play
 
 # assuming there is a prod.conf copied to here
 echo "copying configuration files"
-\cp -f ~/prod.conf cloudify-widget/conf
-\cp -f ~/hpcloud.pem cloudify-widget/bin
-ln -fs ~/$CLOUDIFY_FILE bin/cloudify-folder # create a symbolic link to cloudify home.
+\cp -f ${PROD_CONF_FILE} cloudify-widget/conf
+\cp -f ${PEM_FILE} cloudify-widget/bin
+ln -fs ~/${CLOUDIFY_FOLDER} cloudify-widget/cloudify-folder # create a symbolic link to cloudify home.
 chmod 755 cloudify-widget/*.sh
 chmod 755 cloudify-widget/bin/*.sh
+ln -fs /root/${CLOUDIFY_FOLDER} cloudify-widget/cloudify-folder
 
 #install mysql
 echo "installing mysql"
@@ -75,14 +99,17 @@ echo "installing nginx"
 cp conf/nginx/install.conf /etc/yum.repos.d/nginx.repo
 yum -y install nginx
 mv /etc/nginx/nginx.conf /etc/nginx/nginx_conf_backup
-cp conf/nginx/nginx.conf /etc/nginx/
+
 
 # copy nginx configuration while sed-ing the domain names
 mkdir -p /var/log/nginx/$SITE_DOMAIN
 mkdir -p /etc/nginx/sites-available
 mkdir -p /etc/nginx/sites-enabled
-cat conf/nginx/site.nginx  | sed 's/__domain_name__/'"$SITE_DOMAIN"'/' | sed 's/__staging_name__/'"$SITE_STAGING_DOMAIN"'/' > /etc/nginx/sites-available/$SITE_DOMAIN
+touch /etc/nginx/sites-available/$SITE_DOMAIN
 ln -s  /etc/nginx/sites-available/$SITE_DOMAIN /etc/nginx/sites-enabled/$SITE_DOMAIN
+
+### actual copy of files is done in "upgrade" script
+
 service nginx restart
 
 echo "creating error pages"
@@ -91,12 +118,13 @@ mkdir -p /var/www/cloudifyWidget/public/error_pages
 
 echo "intalling monit"
 \cp -Rf conf/monit/repo  /etc/yum.repos.d/epel.repo
+yum clean all
 yum -y install monit
 chkconfig --levels 235 monit on
 
 
 echo "upgrading system"
-upgrade_server
+./upgrade_server.sh
 
 echo "installing takipi"
 cd ~
