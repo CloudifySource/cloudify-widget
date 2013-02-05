@@ -28,18 +28,17 @@ public class AbstractCloudifyWidgetTest {
     protected static WebDriver webDriver;
 
     public static final String HOST = context().getTestConf().getHost();
-    private static final int random = (int)(Math.random() * 1000);
-    protected static final String PASSWORD = "testTest1" + random;
-    protected static final String EMAIL = "test@test" + random + ".com";
-    protected static final String NAME = "test" + random;
     private static AtomicInteger counter = new AtomicInteger(0);
+    private static final int random = (int)(Math.random() * 1000);
+    protected static final String PASSWORD = "testTest1" + random + counter.get();
+    protected static final String EMAIL = "test@test" + random + counter.get() + ".com";
+    protected static final String NAME = "test" + random + counter.get();
 
     private static Logger logger = LoggerFactory.getLogger(AbstractCloudifyWidgetTest.class);
 
     @BeforeClass
     public static void before(){
-        int i = counter.incrementAndGet();
-        logger.info("before class - starting webDriver counter is at: " + i);
+        logger.info("before class - starting webDriver counter is at: " + counter.incrementAndGet());
         webDriver = context().getWebDriver();
         webDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         webDriver.get(HOST);
@@ -63,9 +62,11 @@ public class AbstractCloudifyWidgetTest {
 
     @AfterClass
     public static void after(){
-        logger.info("after class - closing webDriver");
-        if(counter.get() >= NUM_OF_SUITES)
+        logger.info("after class - counter at: " + counter.get());
+        if(counter.get() >= NUM_OF_SUITES) {
+            logger.info("after class - closing webDriver");
             webDriver.close();
+        }
     }
 
     protected void waitForElement(final By by) {
