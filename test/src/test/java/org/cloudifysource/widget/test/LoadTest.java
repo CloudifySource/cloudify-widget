@@ -31,7 +31,7 @@ public class LoadTest extends AbstractCloudifyWidgetTest{
     @Override
     @Before
     public void beforeMethod(){
-        jClouds.waitForMinMachines(3, 5 * 60 * 1000);
+        jClouds.waitForMinMachines(2, 5 * 60 * 1000);
     }
 
     @After
