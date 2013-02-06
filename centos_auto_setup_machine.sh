@@ -47,9 +47,23 @@ fi
 echo "installing git"
 yum  -y install git
 cd play-2.0.4
+echo "cloning cloudify-widget"
+CHECKOUT_FOLDER=cloudify-widget
+if [ -z $GIT_LOCATION ]; then
+    GIT_LOCATION="https://github.com/CloudifySource/cloudify-widget.git"
+fi
+echo "using git location : ${GIT_LOCATION}"
 
-echo "cloning widget"
-git clone https://github.com/CloudifySource/cloudify-widget.git
+git clone $GIT_LOCATION $CHECKOUT_FOLDER
+
+if [ -z $GIT_BRANCH  ]; then
+        echo "no branch specified"
+else
+    echo "checking out branch ${GIT_BRANCH}"
+    cd $CHECKOUT_FOLDER
+    git checkout $GIT_BRANCH
+    cd -
+fi
 
 echo "installing ruby"
 yum install -y ruby rubygems
