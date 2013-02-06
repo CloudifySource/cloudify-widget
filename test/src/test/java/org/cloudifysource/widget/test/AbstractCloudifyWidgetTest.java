@@ -2,20 +2,21 @@ package org.cloudifysource.widget.test;
 
 
 import com.google.common.base.Predicate;
+import org.cloudifysource.widget.beans.JCloudsContext;
 import org.cloudifysource.widget.beans.TestContext;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.openqa.selenium.*;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * User: sagib
@@ -23,33 +24,38 @@ import java.util.concurrent.TimeUnit;
  * Time: 16:33
  */
 public class AbstractCloudifyWidgetTest {
+    public static final int NUM_OF_SUITES = 2;
     protected static WebDriver webDriver;
+
     public static final String HOST = context().getTestConf().getHost();
+    private static AtomicInteger counter = new AtomicInteger(0);
     private static final int random = (int)(Math.random() * 1000);
-    protected static final String PASSWORD = "testTest1" + random;
-    protected static final String EMAIL = "test@test" + random + ".com";
-    protected static final String NAME = "test" + random;
+    protected static String PASSWORD = "testTest1" + random + counter.get();
+    protected static String EMAIL = "test@test" + random + counter.get() + ".com";
+    protected static String NAME = "test" + random + counter.get();
+
     private static Logger logger = LoggerFactory.getLogger(AbstractCloudifyWidgetTest.class);
 
     @BeforeClass
     public static void before(){
-        logger.info("before class - starting webDriver");
-        webDriver = new FirefoxDriver();
+        int i = counter.incrementAndGet();
+        logger.info("before class - starting webDriver counter is at: " + i);
+        webDriver = context().getWebDriver();
         webDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         webDriver.get(HOST);
         dropSession();
-
-
-
-
-        subscribe(EMAIL, PASSWORD, NAME);
+        if(i == 1)
+            subscribe(EMAIL, PASSWORD, NAME);
     }
 
     @Before
     public void beforeMethod(){
         logger.info("before method - log in if not logged in");
         if(!isLoggedIn(EMAIL)){
-            webDriver.get(HOST + "/admin/signin");
+            String signinUrl = HOST + "/admin/signin";
+            if(!signinUrl.equals(webDriver.getCurrentUrl())) {
+                webDriver.get(signinUrl);
+            }
             logger.info("driver at " + webDriver.getCurrentUrl() + "trying to sign in");
             login(EMAIL, PASSWORD);
         }
@@ -58,8 +64,11 @@ public class AbstractCloudifyWidgetTest {
 
     @AfterClass
     public static void after(){
-        logger.info("after class - closing webDriver");
-        webDriver.close();
+        logger.info("after class - counter at: " + counter.get());
+        if(counter.get() >= NUM_OF_SUITES) {
+            logger.info("after class - closing webDriver");
+            webDriver.close();
+        }
     }
 
     protected void waitForElement(final By by) {
@@ -89,10 +98,15 @@ public class AbstractCloudifyWidgetTest {
 
     protected void login(String username, String password) {
         logger.info("driver at " + webDriver.getCurrentUrl() + " trying to login with " + username + ":" + password);
-        webDriver.findElement(By.name("email")).sendKeys(username);
-        webDriver.findElement(By.name("password")).sendKeys(password);
+        dropSession();
+        By email = By.name("email");
+        By passwordElem = By.name("password");
         By button = By.className("btn-primary");
+        waitForElement(email);
+        waitForElement(passwordElem);
         waitForElement(button);
+        webDriver.findElement(email).sendKeys(username);
+        webDriver.findElement(passwordElem).sendKeys(password);
         logger.info("about to login cookies are : {}", webDriver.manage().getCookies());
         webDriver.findElement(button).click();
     }
@@ -116,12 +130,14 @@ public class AbstractCloudifyWidgetTest {
         webDriver.findElement(logoutBy).click();
     }
 
-
     protected void assertUserIsLoggedIn() {
-        webDriver.get(HOST);
+        assertUserIsLoggedIn(30);
+    }
+
+    protected void assertUserIsLoggedIn(int seconds) {
         logger.info("driver at " + webDriver.getCurrentUrl() + " asserting logged in");
         FluentWait<By> fw = new FluentWait<By>(By.id("username"));
-        fw.withTimeout(30, TimeUnit.SECONDS);
+        fw.withTimeout(seconds, TimeUnit.SECONDS);
         try{
             fw.until(new Predicate<By>() {
                 @Override
@@ -151,8 +167,15 @@ public class AbstractCloudifyWidgetTest {
     protected void assertLoggedOut() {
         webDriver.get(HOST);
         logger.info("driver at " + webDriver.getCurrentUrl() + " asserting logged out");
-        Assert.isNull(webDriver.manage().getCookieNamed("authToken"), "authToken cookie is still defined");
-        Assert.isNull(webDriver.manage().getCookieNamed("PLAY_SESSION"), "PLAY_SESSION cookie is still defined");
+
+        Set<Cookie> cookies = null;
+        try{
+            cookies = webDriver.manage().getCookies();
+        }catch (IllegalArgumentException e){}
+        if(cookies != null){
+            Assert.assertFalse("authToken cookie is still defined", cookies.contains("authToken"));
+            Assert.assertFalse("\"PLAY_SESSION cookie is still defined\"", cookies.contains("PLAY_SESSION"));
+        }
     }
 
     protected String changePassword(String password, String newPassword) {

@@ -4,14 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created with IntelliJ IDEA.
@@ -125,4 +122,11 @@ public class Utils {
             throw new RuntimeException(e);
         }
     }
+
+    public static void sleep(TimeUnit unit, int amount ) {
+        try {
+            Thread.sleep( unit.toMillis(amount));
+        } catch (InterruptedException e) {}
+    }
+
 }
