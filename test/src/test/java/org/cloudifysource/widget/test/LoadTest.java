@@ -12,6 +12,7 @@ import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 
@@ -53,7 +54,11 @@ public class LoadTest extends AbstractCloudifyWidgetTest{
                 invokeWidget(apiKey);
             }
         } catch (AssertionError e) {
-            takeScreenshot();
+            try {
+                takeScreenshot();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
             throw e;
         }
     }
