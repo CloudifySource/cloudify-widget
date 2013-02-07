@@ -110,7 +110,7 @@ public class MailSender {
         String user = args[1];
         String pass = args[2];
         String recipients = args[3];
-        String body = readFile("target/site/surefire-report.xml");
+        String body = readFile("target/site/surefire-report.html");
         send(host, user, pass, "Cloudify-Widget Test Report", body, Arrays.asList(recipients.split(",")));
     }
 }
