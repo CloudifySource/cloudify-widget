@@ -1,9 +1,15 @@
 package org.cloudifysource.widget.test;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
@@ -44,7 +50,34 @@ public class MailSender {
         MimeMessage message = new MimeMessage(mailSession);
         message.addFrom(address);
         message.setSubject(title);
-        message.setContent(content, "text/html; charset=ISO-8859-1");
+        // create the message part
+        MimeBodyPart messageBodyPart =
+                new MimeBodyPart();
+
+        //fill message
+        messageBodyPart.setContent(content, "text/html; charset=ISO-8859-1");
+
+        Multipart multipart = new MimeMultipart();
+        multipart.addBodyPart(messageBodyPart);
+
+        String fileAttachment = "";
+        for(String fileName : new File(System.getProperty("user.dir")).list()){
+            if(fileName.toLowerCase().endsWith(".png")){
+                fileAttachment = fileName;
+            }
+        }
+        // Part two is attachment
+        if(!fileAttachment.equals("")){
+            messageBodyPart = new MimeBodyPart();
+            DataSource source =
+                    new FileDataSource(fileAttachment);
+            messageBodyPart.setDataHandler(
+                    new DataHandler(source));
+            messageBodyPart.setFileName(fileAttachment);
+            multipart.addBodyPart(messageBodyPart);
+        }
+        message.setContent(multipart);
+
 
         InternetAddress[] recipientAddresses = new InternetAddress[recipients.size()];
         for (int i = 0; i < recipients.size(); i++) {
