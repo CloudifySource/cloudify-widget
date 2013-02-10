@@ -127,7 +127,7 @@ public class ServerConfig {
     // cloud bootstrap configuration.
     public static class CloudBootstrapConfiguration {
     	public String cloudName = "hp";
-        public File remoteBootstrap = Utils.getFileByRelativePath("/bin/remote_bootstrap");
+        public File remoteBootstrap = Utils.getFileByRelativePath("/bin/remote_bootstrap.sh");
         public String keyPairName = "cloudify";
         public String cloudifyHpUploadDirName = "upload";
         public String cloudPropertiesFileName = "hp-cloud.properties";
