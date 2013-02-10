@@ -2,7 +2,7 @@ package org.cloudifysource.widget.test;
 
 
 import com.google.common.base.Predicate;
-import org.cloudifysource.widget.beans.JCloudsContext;
+import org.apache.commons.io.FileUtils;
 import org.cloudifysource.widget.beans.TestContext;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -13,9 +13,12 @@ import org.openqa.selenium.support.ui.FluentWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -194,5 +197,12 @@ public class AbstractCloudifyWidgetTest {
 
     protected static void dropSession(){
         webDriver.manage().deleteAllCookies();
+    }
+
+    public void takeScreenshot() throws IOException {
+        if (webDriver != null) {
+            File screenShot = ((TakesScreenshot)webDriver).getScreenshotAs(OutputType.FILE);
+            FileUtils.copyFile(screenShot, new File("test-screenshot-" + new SimpleDateFormat("HH:mm:ss-dd-MM-yyyy").format(new Date()) + ".png"));
+        }
     }
 }

@@ -12,6 +12,7 @@ import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 
@@ -28,8 +29,8 @@ public class LoadTest extends AbstractCloudifyWidgetTest{
     private static HttpClient client = new HttpClient();
     private static final JCloudsContext jClouds = new JCloudsContext();
 
-    @Override
-    @Before
+
+    @Override @Before
     public void beforeMethod(){
         jClouds.waitForMinMachines(3, 5 * 60 * 1000);
     }
@@ -42,13 +43,23 @@ public class LoadTest extends AbstractCloudifyWidgetTest{
 
     @Test(timeout = 30 * 60 * 1000)
     public void loadTest() throws Exception{
-        logger.info("running test on [{}]", context().getTestConf().getHost());
-        String apiKey = createWidget();
-        logout();
-        logger.info("got Api key: " + apiKey);
-        for (int i = 0; i < N; i++){
-            logger.info("starting iteration [{}]", i);
-            invokeWidget(apiKey);
+
+        try {
+            logger.info("running test on [{}]", context().getTestConf().getHost());
+            String apiKey = createWidget();
+            logout();
+            logger.info("got Api key: " + apiKey);
+            for (int i = 0; i < N; i++){
+                logger.info("starting iteration [{}]", i);
+                invokeWidget(apiKey);
+            }
+        } catch (AssertionError e) {
+            try {
+                takeScreenshot();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            throw e;
         }
     }
 
