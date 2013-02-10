@@ -62,8 +62,7 @@ public class CloudifyUtils {
 	public static File createCloudFolder(String userName, String apiKey, ComputeServiceContext context) throws IOException {
 		
 		CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
-		String cloudifyBuildFolder = ApplicationContext.get().conf().server.environment.getEnvironment()
-									.get("CLOUDIFY_HOME").toString();
+		String cloudifyBuildFolder = ApplicationContext.get().conf().server.environment.cloudifyHome;
 		File cloudifyEscFolder = new File(cloudifyBuildFolder, cloudConf.cloudifyEscDirRelativePath);
 
 		//copy the content of hp configuration files to a new folder
