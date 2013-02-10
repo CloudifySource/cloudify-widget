@@ -125,7 +125,11 @@ public class ConfigBean {
         @Override
         public File getValue( Configuration conf, String key )
         {
-            File file = Play.application().getFile( conf.getString( key ) );
+            String string = conf.getString(key);
+            if ( string == null ){
+                return null;
+            }
+            File file = Play.application().getFile(string);
             if ( !file.exists() ) {
                 logger.warn( "file {} does not exists but required by the configuration", file.getAbsolutePath() );
             }
