@@ -1,4 +1,3 @@
-
 #! /bin/bash
 
 
@@ -47,12 +46,30 @@ fi
 echo "installing git"
 yum  -y install git
 cd play-2.0.4
+echo "cloning cloudify-widget"
+CHECKOUT_FOLDER=cloudify-widget
+if [ -z $GIT_LOCATION ] || [ $GIT_LOCATION"xxx" = "xxx" ]; then
+    GIT_LOCATION="https://github.com/CloudifySource/cloudify-widget.git"
+fi
+echo "using git location : ${GIT_LOCATION}"
 
-echo "cloning widget"
-git clone https://github.com/CloudifySource/cloudify-widget.git
+git clone $GIT_LOCATION $CHECKOUT_FOLDER
+
+if [ -z $GIT_BRANCH  ] || [ $GIT_BRANCH"xxx" = "xxx" ]; then
+        echo "no branch specified"
+else
+    echo "checking out branch ${GIT_BRANCH}"
+    cd $CHECKOUT_FOLDER
+    git checkout $GIT_BRANCH
+    cd -
+fi
 
 echo "installing ruby"
-yum install -y ruby rubygems
+yum install -y ruby ruby-devel rubygems gcc make libxml2 libxml2-devel libxslt libxslt-devel
+#curl -sL https://docs.hpcloud.com/file/hpfog-0.0.19.gem >hpfog-0.0.19.gem
+#curl -sL https://docs.hpcloud.com/file/hpcloud-1.6.0.gem >hpcloud-1.6.0.gem
+#echo "installing hpcloud cli"
+#gem install --no-rdoc --no-ri hpfog-0.0.19.gem hpcloud-1.6.0.gem
 
 echo "installing sass"
 gem install sass
