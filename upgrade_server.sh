@@ -56,6 +56,13 @@ echo "upgrading init.d script"
 \cp -f conf/initd/widget /etc/init.d/widget
 chmod 755 /etc/init.d/widget
 
+
+echo "overriding hp-cloud.groovy in cloudify home"
+cat conf/cloudify/hp-cloud.groovy | sed 's,__CLOUDIFY_SECURITY_GROUP__,'"$CLOUDIFY_SECURITY_GROUP"','  > $CLOUDIFY_HOME/tools/cli/plugins/esc/hp/hp-cloud.groovy
+echo "injecting variables to cloudify.conf, and generating cloudify-prod.conf - extend this file in production instead of cloudify.conf"
+cat conf/cloudify.conf | sed 's,__CLOUDIFY_SECURITY_GROUP__,'"$CLOUDIFY_SECURITY_GROUP"','  > conf/cloudify-prod.conf
+
+
 echo "upgrading monit configurations"
 cat conf/monit/conf.monit | sed 's,__monit_from__,'"$MONIT_FROM"',' | sed 's,__monit_to__,'"$MONIT_SET_ALERT"',' > /etc/monit.conf
 \cp -f conf/monit/mysql.monit /etc/monit.d/mysqld

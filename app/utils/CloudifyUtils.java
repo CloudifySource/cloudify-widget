@@ -157,13 +157,13 @@ public class CloudifyUtils {
 			//Check if group already exists.
 			FluentIterable<? extends SecurityGroup> groupsList = securityGroupClient.list();
 			for (Object group : groupsList) {
-				if (((SecurityGroup)group).getName().equals(cloudConf.securityGroupName)) {
+				if (((SecurityGroup)group).getName().equals(cloudConf.securityGroup)) {
 					return;
 				}
 			}
 			//Create a new security group with open port range of 80-65535.
 			Ingress ingress = Ingress.builder().ipProtocol(IpProtocol.TCP).fromPort(80).toPort(65535).build();
-			SecurityGroup securityGroup = securityGroupClient.createWithDescription(cloudConf.securityGroupName, "All ports open.");
+			SecurityGroup securityGroup = securityGroupClient.createWithDescription(cloudConf.securityGroup, "All ports open.");
 			securityGroupClient.createRuleAllowingCidrBlock(securityGroup.getId(), ingress, "0.0.0.0/0");
 		} 
 		catch (Exception e) {

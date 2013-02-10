@@ -126,7 +126,6 @@ public class ServerConfig {
     
     // cloud bootstrap configuration.
     public static class CloudBootstrapConfiguration {
-    	public String securityGroupName = "cloudifySecurityGroup";
     	public String cloudName = "hp";
         public File remoteBootstrap = Utils.getFileByRelativePath("/bin/remote_bootstrap");
         public String keyPairName = "cloudify";
@@ -135,7 +134,7 @@ public class ServerConfig {
         public String zoneName = "az-2.region-a.geo-1";
         public String hardwareId = zoneName + "/102";
         public String linuxImageId = zoneName + "/221";
-        public String securityGroup = "default";
+        public String securityGroup = "cloudifySecurityGroup";
         public String cloudProvider = "hpcloud-compute";
         public String cloudifyEscDirRelativePath = "tools/cli/plugins/esc/";
     }
