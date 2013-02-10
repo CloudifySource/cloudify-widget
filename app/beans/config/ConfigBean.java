@@ -166,7 +166,7 @@ public class ConfigBean {
                         field.set( obj, value );
                     }
                 } catch ( Exception e ) {
-                    logger.error( "unable to set value",e );
+                    logger.error( String.format("unable to set value for field [%s.%s]", field.getDeclaringClass().getName() , field.getName()) ,e );
                 }
             } else { // this is probably an Object. need to instantiate
                 try {
