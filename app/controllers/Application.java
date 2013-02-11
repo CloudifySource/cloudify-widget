@@ -108,8 +108,10 @@ public class Application extends Controller
                         @Override
                         public void run() {
                             if (finalServerNode.isRemote()) {
+                                logger.info("bootstrapping remote cloud");
                                 ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode);
                             }
+                            logger.info("installing widget on remote cloud");
                             ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode);
                         }
                     });
