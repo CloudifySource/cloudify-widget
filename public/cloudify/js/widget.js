@@ -18,18 +18,21 @@ $(function () {
   var origin_page_url = params["origin_page_url"];
 
 
+    // guy - we should consider using $.cookie.json=true
+    // it will save us the trouble of parsing back and forward the cookie value
+    // read more at https://github.com/carhartl/jquery-cookie
     var WidgetState = function(){
         var cookieName = "widgetCookie" + origin_page_url;
         function _get(){
             try{
                 var cookieValue = JSON.parse( $.cookie(cookieName) );
                 return cookieValue == null ? {} : cookieValue; // never return null
-            }catch(e){ console.log(["error parsing cookie. deleting the cookie ",e]);$.cookie( cookieName,null ); return {}; }
+            }catch(e){ console.log(["error parsing cookie. deleting the cookie ",e]);$.cookie( cookieName,null, {'path':'/'} ); return {}; }
         }
 
         function _set( obj ){
             var newObj = $.extend(_get(), obj);
-            $.cookie( cookieName, JSON.stringify(newObj) );
+            $.cookie( cookieName, JSON.stringify(newObj), { 'path' : '/' } );
         }
 
         function get_or_set( key, val )
@@ -65,7 +68,7 @@ $(function () {
 
                 try {
                     $.removeCookie( cookieName );
-                    $.cookie( cookieName, null );
+                    $.cookie( cookieName, null, {'path':'/'} );
                 } catch ( e ) {
                     console.log( ["error removing cookie", e] )
                 }
