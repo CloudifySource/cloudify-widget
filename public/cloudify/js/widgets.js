@@ -4,7 +4,7 @@ jQuery.fn.reset = function ()
     {
         this.reset();
     } );
-}
+};
 
 $( function ()
 {
@@ -70,8 +70,8 @@ $( function ()
 
             $.each( widget.instances, function ( index, instance )
             {
-                var instance = $( "#widget_instance_tmpl" ).tmpl( instance );
-                instances_container.append( instance );
+                var instanceTmpl = $( "#widget_instance_tmpl" ).tmpl( instance );
+                instances_container.append( instanceTmpl );
             } );
         }
 
@@ -163,7 +163,7 @@ $( function ()
     }
 
     for ( var key in field_tips ) {
-        if ( field_tips[key] ) {
+        if ( field_tips.hasOwnProperty(key) && field_tips[key] ) {
             $( "#" + key ).after( $( "<i class='info-icon' id='" + key + "_info'></i>" ) );
             $( "#" + key + "_info" ).tooltip( {title: field_tips[key]} );
         }
@@ -202,7 +202,7 @@ $( function ()
             }} );
         } finally {
             e.stopPropagation();
-            return false;
+            return false; // guy - this is ok, I always want to return false.
         }
 
     } );
