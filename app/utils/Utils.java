@@ -177,7 +177,11 @@ public class Utils
 
 
 
-
+     // guy - TODO _ this is an ugly method. it has 2 loops and an "if/else" pattern. We need to organize this somehow.
+    // lets use a prototype bean that has a list (order matters) of filters.
+    // each filter can return null - which means, remove this line.
+    // the filters can have state - as they can be prototypes as well.
+    // we can unite the "filterOutputLines" and "filterOutputStrings" to a regex.
 	/** Format string output by different patters */
 	public static List<String> formatOutput( String str, String substringPrefix , Collection<String> filterOutputLines, Collection<String> filterOutputStrings )
 	{
@@ -212,6 +216,19 @@ public class Utils
 		List<String> newList = new ArrayList<String>();
 		for( String s : list )
 		{
+
+            if ( s.toLowerCase().contains("operation failed")){
+                logger.debug("detected operation failed");
+                newList.add("Operation Failed");
+                break;
+            }
+            if ( s.startsWith("[") ){ // guy - ugly formatting logic..
+                String substr = s.substring( 1, s.indexOf("]"));
+                if ( substr.split("\\.").length > 2 ){ // detect lines that have [ip]
+                    logger.debug("removing ip square-brackets from start of line");
+                    continue;
+                }
+            }
 			if ( !s.equals("") && !s.equals(".") )
 				newList.add( s );
 		}
