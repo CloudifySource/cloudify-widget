@@ -38,3 +38,31 @@ iframe {
   width: 350px;
   height: 90px;
 }
+
+.demo-content {
+  padding: 101px 10px 10px;
+  margin: 35px 119px;
+  width: 1015px;
+}
+
+.nav-links{
+  border-radius: 20px;
+  margin-right: -71px;
+  float:right;
+
+  width: 200px;
+  white-space: nowrap;
+
+  .demo-link{
+      text-align: left;
+    padding-top:20px;
+      cursor: pointer;
+      .product-name, .product-version {
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+      .product-name{ font-size:20px; }
+      .product-version{ color:grey;}
+  }
+
+}

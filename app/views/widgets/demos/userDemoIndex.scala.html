@@ -21,15 +21,13 @@
 </head>
 <body data-user-id="@{userId}">
 
-    <script id="nav_button" type="text/x-jquery-tmpl">
-            <button type="button" class="btn btn-primary" data-api-key="${apiKey}">${productName}</button>
-    </script>
-
     <script id="widget_nav" type="text/x-jquery-tmpl">
-        <div class="buttons btn-group" data-toggle="buttons-radio">
-
+        <div class="nav-links btn-group-vertical" data-toggle="buttons-radio">
               {{each(i,widget) widgets}}
-                    {{tmpl(widget) "#nav_button"}}
+                    <div class="btn demo-link" data-api-key="${apiKey}">
+                        <div class="product-name">${productName}</div>
+                        <div class="product-version">${productVersion}</div>
+                    </div>
               {{/each}}
         </div>
     </script>
@@ -37,17 +35,24 @@
 
 
     <script id="widget_record" type="text/x-jquery-tmpl">
-        <div class="recipe" class="${productName}" data-api-key="${apiKey}">
-            <iframe src="/demos/${userId}/${apiKey}"></iframe>
-        </div>
     </script>
 
     <script id="widgets_list" type="text/x-jquery-tmpl">
         <div class="widgets">
         {{each(i,widget) widgets }}
-            {{tmpl( {"apiKey":widget.apiKey, "userId":userId}) "#widget_record"}}
+            <div class="recipe" class="${productName}" data-api-key="${apiKey}">
+                <iframe src="/demos/${userId}/${apiKey}"></iframe>
+            </div>
         {{/each}}
         </div>
     </script>
+
+    <div>
+        <div class="container">
+            <div class="demo-content">
+
+            </div>
+        </div>
+    </div>
 </body>
 </html>
