@@ -45,6 +45,7 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.MySqlPlatform;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
+import utils.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -144,8 +145,11 @@ public class Application extends Controller
 	public static Result stop( String apiKey, String instanceId )
 	{
 		ServerNode serverNode = ServerNode.find.byId(Long.parseLong(instanceId));
+        if ( serverNode != null ){
+            Utils.deleteCachedOutput(serverNode);
+        }
 		if (serverNode.isRemote()) {
-			return notFound();
+			return ok(); // lets assume
 		}else {
 			Widget widget = Widget.getWidget( apiKey );
 			if ( widget != null ){
