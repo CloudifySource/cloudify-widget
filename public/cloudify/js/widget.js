@@ -6,7 +6,6 @@ $(function () {
     }
   function get_params() {
 
-      debugger;
     var params = {};
     var hash;
     var hashes = window.location.search.substring(1).split('&');
@@ -23,7 +22,6 @@ $(function () {
   }
 
   var params = get_params();
-    debugger;
   var origin_page_url = params["origin_page_url"];
 
 
