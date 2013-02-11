@@ -28,6 +28,7 @@ import utils.Utils;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -66,6 +67,7 @@ extends Model
 	private Boolean busy = false;
 
 	@XStreamAsAttribute
+    @Lob
 	private String privateKey;
 
 	@XStreamAsAttribute
