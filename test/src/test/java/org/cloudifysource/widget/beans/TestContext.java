@@ -1,6 +1,7 @@
 package org.cloudifysource.widget.beans;
 
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -18,12 +19,15 @@ public class TestContext {
     @Inject
     private TestConf testConf;
 
+    @Inject
+    private WebDriver webDriver;
+
     private static TestContext instance;
 
     static {
         String context = null;
         try {
-            context = System.getenv("test.context");
+            context = System.getProperty("test.context");
             if (StringUtils.isEmpty(context)) {
                 context = "base-suite-context.xml";
             }
@@ -33,6 +37,12 @@ public class TestContext {
             logger.error(String.format("unable to load spring context %s", context), e);
             throw new RuntimeException("unable to load context", e);
         }
+    }
+
+
+
+    public  WebDriver getWebDriver(){
+        return webDriver;
     }
 
     public static TestContext get(){
@@ -46,6 +56,7 @@ public class TestContext {
     public void setTestConf(TestConf testConf) {
         this.testConf = testConf;
     }
+
 
 }
 

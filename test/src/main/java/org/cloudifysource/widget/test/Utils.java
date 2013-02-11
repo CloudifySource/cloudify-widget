@@ -8,6 +8,7 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created with IntelliJ IDEA.
@@ -121,4 +122,11 @@ public class Utils {
             throw new RuntimeException(e);
         }
     }
+
+    public static void sleep(TimeUnit unit, int amount ) {
+        try {
+            Thread.sleep( unit.toMillis(amount));
+        } catch (InterruptedException e) {}
+    }
+
 }
