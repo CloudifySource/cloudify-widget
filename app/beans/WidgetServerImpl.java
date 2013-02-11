@@ -128,7 +128,7 @@ public class WidgetServerImpl implements WidgetServer
             return result;
         }
 
-        result.setRemote( server.isRemote() ); // let UI know this is a remote bootstrap.
+        result.setRemote( server.isRemote() ).setHasPemFile( !StringUtils.isEmpty(server.getPrivateKey()) ); // let UI know this is a remote bootstrap.
 
         String cachedOutput = Utils.getCachedOutput( server );// need to sort out the cache before we decide if the installation finished.
         output.addAll(Utils.formatOutput(cachedOutput, server.getPrivateIP() + "]", filterOutputLines, filterOutputStrings));

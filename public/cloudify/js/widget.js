@@ -172,7 +172,7 @@ $(function () {
             widgetState.publicIp(data.status.publicIp);
         }
 
-        if ( data.status.remote && $("#pemFileLink").is(":not(:visible)") ){
+        if ( data.status.hasPemFile && $("#pemFileLink").is(":not(:visible)") ){
             $("#pemFileLink").attr("href", jsRoutes.controllers.Application.downloadPemFile(widgetState.instanceId()).url).show();
         }
 

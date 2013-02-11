@@ -103,6 +103,7 @@ public class Widget
         private String publicIp;
         private String instanceId;
         private Boolean remote;
+        private Boolean hasPemFile;
         private WidgetInstance.ConsoleLink consoleLink;
         private String message; // for errors
         private Boolean instanceIsAvailable; // if install finished
@@ -145,6 +146,11 @@ public class Widget
             this.timeleft = timeleft <= 0 ? 1 : timeleft;
         }
 
+        public Status setHasPemFile(Boolean hasPemFile) {
+            this.hasPemFile = hasPemFile;
+            return this;
+        }
+
         public Status setRemote(Boolean remote) {
             this.remote = remote;
             return this;
@@ -164,6 +170,10 @@ public class Widget
 
         public Boolean getRemote() {
             return remote;
+        }
+
+        public Boolean getHasPemFile() {
+            return hasPemFile;
         }
 
         public Status setInstanceId(String instanceId) {
