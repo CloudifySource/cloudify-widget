@@ -122,11 +122,11 @@ body {
   bottom: 195px;
   right: 24px;
   z-index: 10;
-  background-color: black;
+  background-color: #87CEFA;
   color: white;
   text-decoration: none;
   border-radius: 5px;
-  padding: 4px;
+  padding: 4px 4px 4px 12px;
   font-size: 10px;
   font-weight: bold;
 
@@ -138,6 +138,12 @@ body {
       display:inline-block;
       width:11px;
       height:15px;
+      top: -3px;
+      z-index: 10;
+      content: "";
+      position: absolute;
+      left: 2px;
+      background-repeat: no-repeat;
     }
 }
 
