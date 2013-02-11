@@ -210,11 +210,16 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
 			logger.info("Executing command line: " + cmdLine);
 			bootstrapExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment() , resultHandler);
+            logger.info("waiting for output");
 			resultHandler.waitFor();
+            logger.info("finished waiting , exit value is [{}]", resultHandler.getExitValue() );
+
 
 			String output = Utils.getOrDefault(Utils.getCachedOutput(serverNode), "");
 			if (resultHandler.getException() != null) {
+                logger.info("we have exceptions, checking for known issues");
 				if (output.contains("found existing management machines")) {
+                    logger.info("found 'found existing management machines' - issuing cloudify already exists message");
 					throw new ServerException( Messages.get("cloudify.already.exists") );
 				}
 				logger.info("Command execution ended with errors: {}", output);
@@ -222,22 +227,28 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 						+ output, resultHandler.getException());
 			}
 
+            logger.info("finished handling errors, extracting IP");
 			String publicIp = Utils.extractIpFromBootstrapOutput(output);
 			if (StringUtils.isEmpty(publicIp)) {
 				logger.warn("No public ip address found in bootstrap output. " + output);
 				throw new RuntimeException( "Bootstrap failed. No IP address found in bootstrap output."
 						+ output, resultHandler.getException() );
 			}
-			serverNode.setPublicIP(publicIp);
+            logger.info("ip is [{}], saving to serverNode", publicIp);
+
 			String privateKey = CloudifyUtils.getCloudPrivateKey(cloudFolder);
 			if (StringUtils.isEmpty(privateKey)) {
 				throw new RuntimeException( "Bootstrap failed. No pem file found in cloud directory." );
 			}
+            logger.info("found PEM string");
 			logger.info("Bootstrap cloud command ended successfully");
 
+            logger.info("updating server node with new info");
+            serverNode.setPublicIP(publicIp);
 			serverNode.setPrivateKey(privateKey);
 			serverNode.setRemote(true);
-
+            serverNode.save();
+            logger.info("server node updated and saved");
 			return serverNode;
 		} catch(Exception e) {
 			throw new RuntimeException("Unable to bootstrap cloud", e);
