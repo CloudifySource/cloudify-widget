@@ -21,6 +21,8 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import controllers.WidgetAdmin;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonManagedReference;
 import play.cache.Cache;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;
@@ -86,6 +88,7 @@ public class User
             return BooleanUtils.isTrue( admin );
         }
 
+        @JsonIgnore
 		public boolean isAdmin()
 		{
 			return BooleanUtils.isTrue( admin );
@@ -114,10 +117,12 @@ public class User
 	private String authToken; 
 	
 	private String expires;
-	
+
+    @JsonIgnore
 	@XStreamOmitField
 	private Boolean admin;
 
+//    @JsonManagedReference
 	@OneToMany(cascade= CascadeType.ALL, mappedBy = "user")
 	private List<Widget> widgets;
 
@@ -384,6 +389,7 @@ public class User
 		this.expires = expires;
 	}
 
+    @JsonIgnore
 	public boolean isAdmin()
 	{
 		return BooleanUtils.isTrue( admin );

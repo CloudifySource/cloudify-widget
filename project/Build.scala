@@ -18,6 +18,7 @@ object ApplicationBuild extends Build {
       "org.reflections" % "reflections" % "0.9.8"  ,
       "com.google.code.gson" % "gson" % "2.2.2"  ,
       "com.google.guava" % "guava" % "13.0.1"  ,
+      "commons-validator" % "commons-validator" % "1.4.0",
       "play" % "spring_2.9.1" % "2.0"  ,
       "mysql" % "mysql-connector-java" % "5.1.18"  ,
       "commons-lang" % "commons-lang" % "2.3",

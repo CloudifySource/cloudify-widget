@@ -37,9 +37,7 @@
   }
 }
 
-#new_widget_modal form {
-  margin: 0px;
-}
+#require_login_modal , #new_widget_modal{  form { margin: 0px;} }
 
 .logotype {
   margin-left: 10px;

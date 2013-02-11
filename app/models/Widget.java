@@ -23,6 +23,7 @@ import javax.persistence.*;
 import beans.Recipe;
 import beans.config.ServerConfig;
 import org.apache.commons.collections.Predicate;
+import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -71,6 +72,10 @@ public class Widget
 
     @JsonProperty( value="rootpath")
     private String recipeRootPath;
+    private Boolean requireLogin = false; // should this widget support login?
+    private String loginVerificationUrl = null; // url to verify user IDs.
+    private String webServiceKey=null; // secret key we add on the web service calls.
+
 
 
     private long lifeExpectancy = 0;
@@ -487,4 +492,58 @@ public class Widget
         this.lifeExpectancy = lifeExpectancy;
     }
 
+
+
+    public String toDebugString() {
+        return "Widget{" +
+                "id=" + id +
+                ", productName='" + productName + '\'' +
+                ", title='" + title + '\'' +
+                ", enabled=" + enabled +
+                ", apiKey='" + apiKey + '\'' +
+                ", user=" + user.toDebugString() +
+                '}';
+    }
+
+
+    @JsonBackReference
+//    @JsonProperty
+    public User getUser() {
+        return user;
+    }
+
+    // guy - for display properties only!
+    @JsonProperty
+    public String getUsername(){
+        return user.getEmail();
+    }
+
+
+    public boolean isRequiresLogin() {
+        return requireLogin == Boolean.TRUE; // solves NPE
+    }
+
+    public Boolean getRequireLogin() {
+        return requireLogin;
+    }
+
+    public void setRequireLogin(Boolean requireLogin) {
+        this.requireLogin = requireLogin;
+    }
+
+    public String getLoginVerificationUrl() {
+        return loginVerificationUrl;
+    }
+
+    public void setLoginVerificationUrl(String loginVerificationUrl) {
+        this.loginVerificationUrl = loginVerificationUrl;
+    }
+
+    public String getWebServiceKey() {
+        return webServiceKey;
+    }
+
+    public void setWebServiceKey(String webServiceKey) {
+        this.webServiceKey = webServiceKey;
+    }
 }

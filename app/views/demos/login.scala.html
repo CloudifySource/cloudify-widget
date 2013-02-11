@@ -1,0 +1,15 @@
+@import tags._
+
+@context.set("head"){
+
+    <script src="/public/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/public/js/jquery.ba-postmessage.min.js"></script>
+}
+
+@context.set("body"){
+    @*<script type="text/javascript" id="cloudify-widget" data-api-key="b49a9066-bfb1-49da-bfc0-dc07e77e8416" data-title="mongo-1.0" data-host="localhost:9000" data-video_url="" src="http://localhost:9000/js/get_widget.js"></script>*@
+    <script type="text/javascript" id="cloudify-widget" data-api-key="ae933425-d816-4778-81cc-c7b6ca128b4c" data-title="Launch MongoDB " data-host="localhost:9000" data-video_url="http://www.youtube.com/embed/w5qr4sx5Vt0" src="http://localhost:9000/js/get_widget.js"></script>
+    <script type="text/javascript" src="/public/js/demos/login.js"></script>
+}
+
+@views.html.demos.template()

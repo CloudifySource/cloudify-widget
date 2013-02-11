@@ -24,6 +24,8 @@ public class Conf {
 
     public ServerConfig server = new ServerConfig();
 
+    public FeaturesConfig features = new FeaturesConfig();
+
     public SettingsConfig settings = new SettingsConfig();
 
     @Config(ignoreNullValues = true)
@@ -42,6 +44,34 @@ public class Conf {
         public boolean expireSession = false; // do not use the session expired mechanism.
     }
 
+    public static class FeaturesConfigItem {
+        public String users = ".*"; // all users by default
+        @Config( ignoreNullValues = true )
+        public boolean on = false ;
+
+        public FeaturesConfigItem setUsers(String users) {
+            this.users = users;
+            return this;
+        }
+
+        public FeaturesConfigItem setOn(boolean on) {
+            this.on = on;
+            return this;
+        }
+    }
+
+    public static class FeaturesConfig {
+        public FeaturesConfigItem socialLogin = new FeaturesConfigItem();
+    }
+
+
+    public static class WidgetConfiguration{
+
+        public String serverId;
+
+        public long stopTimeoutMillis;
+    }
+
     public static class CloudifyConfiguration{
 
         public long deployWatchDogProcessTimeoutMillis = Utils.parseTimeToMillis( "2mn" );
@@ -53,6 +83,9 @@ public class Conf {
         public String removeOutputLines = "";
 
         public String removeOutputString = "";
+
+        @Config(ignoreNullValues = true)
+        public long verifyLoginUserIdTimeout = Utils.parseTimeToMillis("20s");
     }
 
 

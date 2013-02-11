@@ -1,7 +1,7 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
-
+POST     /widget/requireLogin            controllers.WidgetAdmin.postRequireLogin(authToken:String, widgetId:Long, requireLogin:Boolean, loginVerificationUrl:String ?="", webServicePrivateKey:String?="")
 GET     /exportSchema                   controllers.Application.generateDDL
 GET     /javascriptRoutes               controllers.Application.javascriptRoutes
 
@@ -10,8 +10,12 @@ GET     /javascriptRoutes               controllers.Application.javascriptRoutes
 GET     /demos/:email                  controllers.DemosController.getDemoPageForUser( email:String )
 GET     /demos/:userId/list            controllers.DemosController.listWidgetForDemoUser( userId:Long )
 GET     /demos/:userId/:apiKey         controllers.DemosController.getDemoPageForWidget( userId:Long, apiKey:String )
+GET     /demos/loginWithGoogle           controllers.Demos.loginWithGoogle
+GET     /demos/googleLoginCallback       controllers.Demos.googleLoginCallback
+POST    /demos/verifyWidgetLogin         controllers.Demos.validateUserIdFromLogin(userId:String)
+
 # Widget
-POST     /widget/start		     	    controllers.Application.start( apiKey: String, hpcsKey:String ?= "", hpcsSecretKey:String ?= "" )
+POST     /widget/start		     	    controllers.Application.start( apiKey: String, hpcsKey:String ?= "", hpcsSecretKey:String ?= "", userId:String?="" )
 POST     /widget/:instanceId/stop	    controllers.Application.stop( apiKey: String, instanceId: String)
 GET      /widget/:instanceId/status     controllers.Application.getWidgetStatus( apiKey: String, instanceId: String )
 GET      /widget/:instanceId/pem        controllers.Application.downloadPemFile( instanceId:String )
@@ -43,7 +47,8 @@ GET     /widget/previewWidget           controllers.WidgetAdmin.previewWidget( a
 GET      /widget/summary 				controllers.WidgetAdmin.summary( authToken: String )
 GET      /server/list 					controllers.WidgetAdmin.getAllServers
 GET      /server/headers            	controllers.WidgetAdmin.headers
-GET     /widget/widget                  controllers.WidgetAdmin.getWidget
+GET     /widget/widget                  controllers.WidgetAdmin.getWidget( apiKey:String )
+
 
 
 # Map static resources from the /public folder to the /assets URL path

@@ -22,7 +22,6 @@ import models.ServerNode;
 import models.Widget;
 
 import org.apache.commons.lang.NumberUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +44,7 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.MySqlPlatform;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
+import utils.StringUtils;
 import utils.Utils;
 
 import java.util.HashMap;
@@ -58,10 +58,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class Application extends Controller
 {
-    private static Logger logger = LoggerFactory.getLogger( Application.class );
+
+    private static Logger logger = LoggerFactory.getLogger(Application.class);
     // guy - todo - apiKey should be an encoded string that contains the userId and widgetId.
     //              we should be able to decode it, verify user's ownership on the widget and go from there.
-	public static Result start( String apiKey, String hpcsKey, String hpcsSecretKey )
+	public static Result start( String apiKey, String hpcsKey, String hpcsSecretKey, String userId )
 	{
 		try
 		{
@@ -81,7 +82,7 @@ public class Application extends Controller
             }
 			ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ));
 			//TODO[adaml]: add proper input validation response
-            if ( !StringUtils.isEmpty( hpcsKey ) && !StringUtils.isEmpty( hpcsSecretKey ) ){
+            if ( !StringUtils.isEmpty(hpcsKey) && !StringUtils.isEmpty( hpcsSecretKey ) ){
                 if ( !isValidInput(hpcsKey, hpcsSecretKey) ) {
                     new HeaderMessage().setError(Messages.get("invalid.hpcs.credentials")).apply(response().getHeaders());
                     return badRequest();
@@ -124,6 +125,13 @@ public class Application extends Controller
 		}
 	}
 
+    private static Result exceptionToStatus( Exception e ){
+           Widget.Status status = new Widget.Status();
+           status.setState(Widget.Status.State.STOPPED);
+           status.setMessage(e.getMessage());
+           return statusToResult(status);
+       }
+
     public static Result downloadPemFile( String instanceId ){
         ServerNode serverNode = ServerNode.find.byId( Long.parseLong( instanceId ) );
         if ( serverNode != null && !StringUtils.isEmpty(serverNode.getPrivateKey()) ){
@@ -133,13 +141,6 @@ public class Application extends Controller
         return badRequest("instance stopped");
     }
 
-
-    private static Result exceptionToStatus( Exception e ){
-        Widget.Status status = new Widget.Status();
-        status.setState(Widget.Status.State.STOPPED);
-        status.setMessage(e.getMessage());
-        return statusToResult(status);
-    }
     private static Result statusToResult( Widget.Status status ){
         Map<String,Object> result = new HashMap<String, Object>();
         result.put("status", status );
@@ -218,6 +219,7 @@ public class Application extends Controller
                         routes.javascript.WidgetAdmin.postChangePassword(),
                         routes.javascript.WidgetAdmin.getPasswordMatch(),
                         routes.javascript.WidgetAdmin.deleteWidget(),
+                        routes.javascript.WidgetAdmin.postRequireLogin(),
                         routes.javascript.Application.downloadPemFile(),
                         routes.javascript.DemosController.listWidgetForDemoUser()
 
