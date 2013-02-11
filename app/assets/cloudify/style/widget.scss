@@ -117,6 +117,31 @@ body {
   margin-bottom: -6px;
   margin-right: 8px;
 }
+#pemFileLink{
+  position: absolute;
+  bottom: 195px;
+  right: 24px;
+  z-index: 10;
+  background-color: black;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  padding: 4px;
+  font-size: 10px;
+  font-weight: bold;
+
+}
+
+.download-link{
+  &:before{
+      background-image: url('/public/img/icons/download-arrow.png');
+      display:inline-block;
+      width:11px;
+      height:15px;
+    }
+}
+
+
 
 #advanced {
   background-image: url("/img/advanced_form.png");
