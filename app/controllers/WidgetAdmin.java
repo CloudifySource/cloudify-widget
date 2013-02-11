@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import data.validation.GsConstraints;
 import models.ServerNode;
 import models.Summary;
 import models.User;
@@ -60,9 +61,12 @@ public class WidgetAdmin extends Controller
 
     private static Logger logger = LoggerFactory.getLogger( WidgetAdmin.class );
 
-    public static Result getWidget(){
-
-        return ok( widget.render( ApplicationContext.get().conf().mixpanelApiKey ) );
+    public static Result getWidget( String apiKey ){
+        Widget widgetItem = Widget.getWidget(apiKey);
+        if ( widgetItem == null || !widgetItem.isEnabled()){
+            return ok();
+        }
+        return ok(widget.render(ApplicationContext.get().conf().mixpanelApiKey, widgetItem));
     }
 	/*
 	 * Creates new account.
@@ -441,4 +445,25 @@ public class WidgetAdmin extends Controller
 
     	return ok(sb.toString());
 	}
+
+    public static Result postRequireLogin( String authToken, Long widgetId, boolean requireLogin,  String loginVerificationUrl, String webServiceKey ){
+
+        User user = User.validateAuthToken( authToken );
+        Widget widget = Widget.findByUserAndId( user, widgetId );
+        if ( widget == null ){
+            new HeaderMessage().setError(" User is not allowed to edit this widget ").apply(response().getHeaders());
+            return badRequest();
+        }
+        GsConstraints.UrlValidator validator = new GsConstraints.UrlValidator();
+        if ( !validator.isValid(loginVerificationUrl) ){
+            new HeaderMessage().addFormError("loginVerificationUrl", "invalid value").apply(response().getHeaders());
+            return badRequest();
+        }
+
+        widget.setRequireLogin( requireLogin );
+        widget.setLoginVerificationUrl( loginVerificationUrl );
+        widget.setWebServiceKey( webServiceKey );
+        widget.save();
+        return ok();
+    }
 }

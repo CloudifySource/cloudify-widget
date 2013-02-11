@@ -29,6 +29,7 @@ import javax.persistence.OneToMany;
 
 import com.avaje.ebean.Expr;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.springframework.expression.spel.ExpressionState;
@@ -73,15 +74,21 @@ public class Widget
 	private String consoleURL;
     @JsonProperty( value="rootpath")
     private String recipeRootPath;
-    @JsonIgnore
+    private Boolean requireLogin = false; // should this widget support login?
+    private String loginVerificationUrl = null; // url to verify user IDs.
+    private String webServiceKey=null; // secret key we add on the web service calls.
+
     @ManyToOne( optional = false )
     private User user;
+
+
 
 
 	@OneToMany(cascade=CascadeType.ALL) 
 	private List<WidgetInstance> instances;
 
 	public static Finder<Long,Widget> find = new Finder<Long,Widget>(Long.class, Widget.class);
+
 
 
 
@@ -349,4 +356,58 @@ public class Widget
 	{
 		return Utils.reflectedToString(this);
 	}
+
+
+    public String toDebugString() {
+        return "Widget{" +
+                "id=" + id +
+                ", productName='" + productName + '\'' +
+                ", title='" + title + '\'' +
+                ", enabled=" + enabled +
+                ", apiKey='" + apiKey + '\'' +
+                ", user=" + user.toDebugString() +
+                '}';
+    }
+
+
+    @JsonBackReference
+//    @JsonProperty
+    public User getUser() {
+        return user;
+    }
+
+    // guy - for display properties only!
+    @JsonProperty
+    public String getUsername(){
+        return user.getEmail();
+    }
+
+
+    public boolean isRequiresLogin() {
+        return requireLogin == Boolean.TRUE; // solves NPE
+    }
+
+    public Boolean getRequireLogin() {
+        return requireLogin;
+    }
+
+    public void setRequireLogin(Boolean requireLogin) {
+        this.requireLogin = requireLogin;
+    }
+
+    public String getLoginVerificationUrl() {
+        return loginVerificationUrl;
+    }
+
+    public void setLoginVerificationUrl(String loginVerificationUrl) {
+        this.loginVerificationUrl = loginVerificationUrl;
+    }
+
+    public String getWebServiceKey() {
+        return webServiceKey;
+    }
+
+    public void setWebServiceKey(String webServiceKey) {
+        this.webServiceKey = webServiceKey;
+    }
 }

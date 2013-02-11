@@ -1,20 +1,29 @@
 $(function () {
 
 
-
+    function is_requires_login(){
+        return $("body").is("[data-requires-login]");
+    }
   function get_params() {
-    var params = [], hash;
-    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+
+      debugger;
+    var params = {};
+    var hash;
+    var hashes = window.location.search.substring(1).split('&');
+    console.log(["using search tearm", hashes ]);
     for(var i = 0; i < hashes.length; i++)
     {
       hash = hashes[i].split('=');
-      params.push(hash[0]);
-      params[hash[0]] = hash[1];
+      if ($.trim(hash[1]) != ""){
+            params[hash[0]] = hash[1];
+      }
     }
+    console.log(["params are",params]);
     return params;
   }
 
   var params = get_params();
+    debugger;
   var origin_page_url = params["origin_page_url"];
 
 
@@ -139,9 +148,23 @@ $(function () {
 
     function start_instance_btn_handler()
     {
+        var myUrl = document.location.origin;
+        console.log(["sending message", myUrl, parent ] );
+        $.postMessage( JSON.stringify({name:"playwidget", comment:"requires_login"}), myUrl , parent );
+        $.receiveMessage( function(e){
+            var msg = JSON.stringify(e.data);
+            if ( msg.name == "userlogin"){
+                params["userId"] = e.data;
+            }
+        }, origin_page_url);
+        console.log("after message");
+        if ( is_requires_login() && !params["userId"] ){
+            return;
+        }
+
         $( "#start_btn,#stop_btn" ).toggle();
         if ( !widgetState.isValid() ) {
-            $.post( "/widget/start?apiKey=" + params["apiKey"], {}, function ( data, textStatus, jqXHR )
+            $.post( "/widget/start?" + $.param( params ), {}, function ( data, textStatus, jqXHR )
             {
                 if ( data.status == "error" ) {
                     $( "#start_btn,#stop_btn" ).toggle();

@@ -24,9 +24,14 @@ import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import models.Widget;
 import models.WidgetInstance;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.Play;
 import play.Routes;
 import play.i18n.Messages;
+import play.libs.F;
+import play.libs.WS;
 import play.mvc.Controller;
 import play.mvc.Result;
 import server.ApplicationContext;
@@ -43,17 +48,39 @@ import static utils.RestUtils.*;
  */
 public class Application extends Controller
 {
+
+    private static Logger logger = LoggerFactory.getLogger(Application.class);
     // guy - todo - apiKey should be an encoded string that contains the userId and widgetId.
     //              we should be able to decode it, verify user's ownership on the widget and go from there.
-	public static Result start( String apiKey, String hpcsKey, String hpcsSecretKey )
+	public static Result start( String apiKey, String hpcsKey, String hpcsSecretKey, String userId )
 	{
-		try
-		{
-            Widget widget = Widget.getWidget( apiKey );
-            if ( widget == null || !widget.isEnabled()){
-                new HeaderMessage().setError( Messages.get("widget.disabled.by.administrator") ).apply( response().getHeaders() );
-                return badRequest(  );
+		try {
+            Widget widget = Widget.getWidget(apiKey);
+            if (widget == null || !widget.isEnabled()) {
+                logger.info("issuing widget disabled msg for widget: [" + apiKey + "]");
+                new HeaderMessage().setError(Messages.get("widget.disabled.by.administrator")).apply(response().getHeaders());
+                return badRequest();
             }
+
+            if (widget.isRequiresLogin() && StringUtils.isEmpty(userId)) {
+                logger.info("widget requires login yet reached the server");
+                new HeaderMessage().setError(Messages.get("widget.requires.login"));
+            } else if (!StringUtils.isEmpty(widget.getLoginVerificationUrl())) {
+                WS.WSRequestHolder url = WS.url(widget.getLoginVerificationUrl());
+                url.setQueryParameter("userId", userId);
+                if ( !StringUtils.isEmpty( widget.getWebServiceKey()) ){
+                    url.setQueryParameter("webServiceKey", widget.getWebServiceKey());
+                }
+                logger.info("sending post request to validate login");
+                F.Promise<WS.Response> responsePromise = url.post("cloudify widget userId verification");
+
+                WS.Response response = responsePromise.get( ApplicationContext.get().conf().cloudify.verifyLoginUserIdTimeout );
+                if (response.getStatus() != OK) {
+                    new HeaderMessage().setError(Messages.get("widget.login.verification.failed")).apply(response().getHeaders());
+                    return badRequest(response.getBody());
+                }
+            }
+
             ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ) );
 			WidgetInstance wi = ApplicationContext.get().getWidgetServer().deploy(apiKey);
 			return resultAsJson(wi);
@@ -62,6 +89,8 @@ public class Application extends Controller
 			return resultErrorAsJson(ex.getMessage());
 		}
 	}
+
+
 	
 	
 	public static Result stop( String apiKey, String instanceId )
@@ -118,6 +147,7 @@ public class Application extends Controller
                         routes.javascript.WidgetAdmin.checkPasswordStrength(),
                         routes.javascript.WidgetAdmin.postChangePassword(),
                         routes.javascript.WidgetAdmin.getPasswordMatch(),
+                        routes.javascript.WidgetAdmin.postRequireLogin(),
                         routes.javascript.WidgetAdmin.deleteWidget()
 
                 )

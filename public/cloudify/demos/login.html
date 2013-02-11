@@ -1,0 +1,24 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <link href="/public/style/demo.css" rel="stylesheet">
+    <script src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/public/js/jquery.ba-postmessage.js"></script>
+</head>
+<body>
+<!--<script type="text/javascript" id="cloudify-widget" data-api-key="11dc02f8-15d0-4490-b7a4-dd923b8ff98a"-->
+            <!--data-title="Launch MongoDB" src="http://launch.cloudifysource.org/js/get_widget.js"></script>-->
+<script type="text/javascript" id="cloudify-widget" data-api-key="b49a9066-bfb1-49da-bfc0-dc07e77e8416" data-title="mongo-1.0" data-host="localhost:9000" data-video_url="" src="http://localhost:9000/js/get_widget.js"></script>
+<script>
+
+    $(function(){
+        $.receiveMessage( function(e){
+            console.log(["parent got the message",e])} , $("#cloudify-widget").attr("src").split("/js")[0]);
+
+        $.receiveMessage( function(e){
+            console.log(["after login",e]) }, @routes.con))
+    })
+
+</script>
+</body>
+</html>
