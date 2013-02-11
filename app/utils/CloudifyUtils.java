@@ -161,7 +161,7 @@ public class CloudifyUtils {
 				}
 			}
 			//Create a new security group with open port range of 80-65535.
-			Ingress ingress = Ingress.builder().ipProtocol(IpProtocol.TCP).fromPort(80).toPort(65535).build();
+			Ingress ingress = Ingress.builder().ipProtocol(IpProtocol.TCP).fromPort(1).toPort(65535).build();
 			SecurityGroup securityGroup = securityGroupClient.createWithDescription(cloudConf.securityGroup, "All ports open.");
 			securityGroupClient.createRuleAllowingCidrBlock(securityGroup.getId(), ingress, "0.0.0.0/0");
 		} 
