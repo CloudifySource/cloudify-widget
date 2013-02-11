@@ -334,6 +334,10 @@ public class Utils
 		}
 		return "N/A";
 	}
+
+    public static void deleteCachedOutput( ServerNode serverNode ){
+        Cache.set( "output-" + serverNode.getId() , null );
+    }
 	
 	public static String getCachedOutput( ServerNode serverNode ) {
         StringBuilder stringBuilder = (StringBuilder) Cache.get("output-" + serverNode.getId() );

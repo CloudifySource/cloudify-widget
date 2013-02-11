@@ -124,6 +124,15 @@ public class Application extends Controller
 		}
 	}
 
+    public static Result downloadPemFile( String instanceId ){
+        ServerNode serverNode = ServerNode.find.byId( Long.parseLong( instanceId ) );
+        if ( serverNode != null && !StringUtils.isEmpty(serverNode.getPrivateKey()) ){
+            response().setHeader("Content-Disposition", String.format("attachment; filename=privateKey_%s.pem", instanceId));
+            return ok ( serverNode.getPrivateKey() );
+        }
+        return badRequest("instance stopped");
+    }
+
 
     private static Result exceptionToStatus( Exception e ){
         Widget.Status status = new Widget.Status();
@@ -209,6 +218,7 @@ public class Application extends Controller
                         routes.javascript.WidgetAdmin.postChangePassword(),
                         routes.javascript.WidgetAdmin.getPasswordMatch(),
                         routes.javascript.WidgetAdmin.deleteWidget(),
+                        routes.javascript.Application.downloadPemFile(),
                         routes.javascript.DemosController.listWidgetForDemoUser()
 
                 )

@@ -12,8 +12,9 @@ GET     /demos/:userId/list            controllers.DemosController.listWidgetFor
 GET     /demos/:userId/:apiKey         controllers.DemosController.getDemoPageForWidget( userId:Long, apiKey:String )
 # Widget
 POST     /widget/start		     	    controllers.Application.start( apiKey: String, hpcsKey:String ?= "", hpcsSecretKey:String ?= "" )
-POST     /widget/:instanceId/stop		controllers.Application.stop( apiKey: String, instanceId: String)
-GET      /widget/:instanceId/status   	controllers.Application.getWidgetStatus( apiKey: String, instanceId: String )
+POST     /widget/:instanceId/stop	    controllers.Application.stop( apiKey: String, instanceId: String)
+GET      /widget/:instanceId/status     controllers.Application.getWidgetStatus( apiKey: String, instanceId: String )
+GET      /widget/:instanceId/pem        controller.Application.downloadPemFile( instanceId:String )
 
 
 # Admin API
