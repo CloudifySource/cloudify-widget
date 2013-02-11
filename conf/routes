@@ -5,6 +5,11 @@
 GET     /exportSchema                   controllers.Application.generateDDL
 GET     /javascriptRoutes               controllers.Application.javascriptRoutes
 
+
+#Demos
+GET     /demos/:email                  controllers.DemosController.getDemoPageForUser( email:String )
+GET     /demos/:userId/list            controllers.DemosController.listWidgetForDemoUser( userId:Long )
+GET     /demos/:userId/:apiKey         controllers.DemosController.getDemoPageForWidget( userId:Long, apiKey:String )
 # Widget
 POST     /widget/start		     	    controllers.Application.start( apiKey: String, hpcsKey:String ?= "", hpcsSecretKey:String ?= "" )
 POST     /widget/:instanceId/stop		controllers.Application.stop( apiKey: String, instanceId: String)

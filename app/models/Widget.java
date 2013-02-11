@@ -259,6 +259,7 @@ public class Widget
         return consoleURL;
     }
 
+
     public static Widget findByUserAndId( User user, Long widgetId )
     {
         return find.where( ).eq( "user", user ).eq( "id",widgetId ).findUnique();

@@ -1,0 +1,52 @@
+@(userId:Long)
+<!DOCTYPE HTML>
+<!--
+  ~ Copyright (c) 2013 GigaSpaces Technologies Ltd. All rights reserved
+  ~ <p/>
+  ~ The software source code is proprietary and confidential information of GigaSpaces.
+  ~ You may use the software source code solely under the terms and limitations of
+  ~ the license agreement granted to you by GigaSpaces.
+  -->
+
+<html>
+<head>
+    <title>Test Page For Cloudify Widget</title>
+    <script src="/public/js/jquery.min.js"></script>
+    <script src="/public/js/bootstrap.min.js"></script>
+    <script src="/public/js/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" src="/public/js/demo.js"></script>
+    <link href="/public/style/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/style/demos.css" rel="stylesheet">
+    <script src="@routes.Application.javascriptRoutes()" type="text/javascript"></script>
+</head>
+<body data-user-id="@{userId}">
+
+    <script id="nav_button" type="text/x-jquery-tmpl">
+            <button type="button" class="btn btn-primary" data-api-key="${apiKey}">${title}</button>
+    </script>
+
+    <script id="widget_nav" type="text/x-jquery-tmpl">
+        <div class="buttons btn-group" data-toggle="buttons-radio">
+              {{each(i,widget)}}
+                    {{tmpl(widget) "#nav_button"}}
+            {{each}}
+        </div>
+    </script>
+
+
+
+    <script id="widget_record" type="text/x-jquery-tmpl">
+        <div class="recipe" class="${productName}">
+            <iframe src="/demos/${userId}/${apiKey}"></iframe>
+        </div>
+    </script>
+
+    <script id="widgets_list" type="text/x-jquery-tmpl">
+        <div class="widgets">
+        {{each(i,widget) widgets }}
+            {{tmpl(widget) "#widget_record"}}
+        {{each}}
+        </div>
+    </script>
+</body>
+</html>

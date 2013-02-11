@@ -202,7 +202,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			CloudifyUtils.createCloudifySecurityGroup( jCloudsContext );
 
 			//Command line for bootstrapping remote cloud.
-			CommandLine cmdLine = new CommandLine(conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile() + Utils.getExecutableExt());
+			CommandLine cmdLine = new CommandLine(conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile());
 			cmdLine.addArgument(cloudFolder.getName());
 
 			DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();

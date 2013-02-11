@@ -351,7 +351,7 @@ $(function () {
             mixpanel.track("Documentation Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url});
         });
 
-        mixpanel.track("Widget Impression");
+   mixpanel.track("Widget Impression");
 
   $(".share_link").click(function (e) {
     e.preventDefault();

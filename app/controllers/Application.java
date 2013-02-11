@@ -202,7 +202,8 @@ public class Application extends Controller
                         routes.javascript.WidgetAdmin.checkPasswordStrength(),
                         routes.javascript.WidgetAdmin.postChangePassword(),
                         routes.javascript.WidgetAdmin.getPasswordMatch(),
-                        routes.javascript.WidgetAdmin.deleteWidget()
+                        routes.javascript.WidgetAdmin.deleteWidget(),
+                        routes.javascript.DemosController.listWidgetForDemoUser()
 
                 )
         );

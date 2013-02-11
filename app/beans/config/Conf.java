@@ -19,6 +19,9 @@ public class Conf {
     // who is sending the mail?
     public GsMailer.Mailer mailer = new GsMailer.Mailer();
 
+    @Config( ignoreNullValues =  true )
+    public String demoUserEmailSuffix = "_demo@gigaspaces.com";
+
     public ServerConfig server = new ServerConfig();
 
     public SettingsConfig settings = new SettingsConfig();
