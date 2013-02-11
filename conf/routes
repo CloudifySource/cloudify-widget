@@ -50,7 +50,7 @@ GET     /widget/widget                  controllers.WidgetAdmin.getWidget
 GET     /recipes/*file      	   		controllers.Assets.at(path="/public/recipes", file)
 GET     /public/*file  		     	    controllers.Assets.at(path="/public/cloudify", file)
 GET     /assets/*file             	    controllers.Assets.at(path="/public", file)
-GET     /d                              controllers.Assets.at(path="/public/cloudify/", file="demo.html")
+GET     /d                              controllers.DemosController.getDemoPageForUser(email="default_demo@gigaspaces.com")
 GET     /*file        		     	    controllers.Assets.at(path="/public/cloudify", file)
 
 
