@@ -15,28 +15,29 @@
     <script src="/public/js/bootstrap.min.js"></script>
     <script src="/public/js/jquery.tmpl.min.js"></script>
     <script type="text/javascript" src="/public/js/demo.js"></script>
-    <link href="/public/style/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/public/style/demos.css" rel="stylesheet">
+    <link href="/public/style/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/public/style/demos.css" rel="stylesheet"/>
     <script src="@routes.Application.javascriptRoutes()" type="text/javascript"></script>
 </head>
 <body data-user-id="@{userId}">
 
     <script id="nav_button" type="text/x-jquery-tmpl">
-            <button type="button" class="btn btn-primary" data-api-key="${apiKey}">${title}</button>
+            <button type="button" class="btn btn-primary" data-api-key="${apiKey}">${productName}</button>
     </script>
 
     <script id="widget_nav" type="text/x-jquery-tmpl">
         <div class="buttons btn-group" data-toggle="buttons-radio">
-              {{each(i,widget)}}
+
+              {{each(i,widget) widgets}}
                     {{tmpl(widget) "#nav_button"}}
-            {{each}}
+              {{/each}}
         </div>
     </script>
 
 
 
     <script id="widget_record" type="text/x-jquery-tmpl">
-        <div class="recipe" class="${productName}">
+        <div class="recipe" class="${productName}" data-api-key="${apiKey}">
             <iframe src="/demos/${userId}/${apiKey}"></iframe>
         </div>
     </script>
@@ -44,8 +45,8 @@
     <script id="widgets_list" type="text/x-jquery-tmpl">
         <div class="widgets">
         {{each(i,widget) widgets }}
-            {{tmpl(widget) "#widget_record"}}
-        {{each}}
+            {{tmpl( {"apiKey":widget.apiKey, "userId":userId}) "#widget_record"}}
+        {{/each}}
         </div>
     </script>
 </body>
