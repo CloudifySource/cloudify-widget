@@ -107,18 +107,23 @@ $(function () {
             if ( !handler ){
                 $("#stop_btn").click();
             }else{
-                $("#stop_btn").click( function(){ widgetIsPlaying = false;  handler(arguments);});
+                $("#stop_btn").click( function(){  handler(arguments);});
             }
         };
         this.onPlay = function( handler ){
             if ( !handler ){
                 $("#start_btn").click();
             }else{
-                $("#start_btn").click( function(){ widgetIsPlaying = true; handler(arguments);});
+                $("#start_btn").click( function(){ handler(arguments);});
             }
         };
-        this.isPlaying = function(){
-            return widgetIsPlaying;
+        this.isPlaying = function( value ){
+            if ( typeof(value) == "undefined"){
+                return widgetIsPlaying;
+            }
+            else{
+                widgetIsPlaying = value;
+            }
         }
     };
 
@@ -246,6 +251,7 @@ $(function () {
         show_custom_link(false);
         $("#time_left").hide();
         widgetState.remove(true);
+        widgetState.isPlaying(false);
 
     }
 
@@ -285,7 +291,7 @@ $(function () {
         }else{
             $.postMessage( JSON.stringify({name:"playwidget"}), myUrl , parent );
         }
-
+        widgetState.isPlaying(true);
         widgetState.showStopButton();
         if ( !widgetState.isValid() ) {
 			var playData = { apiKey : params["apiKey"], "hpcsKey" : $("#advanced [name=hpcs_key]").val(), "hpcsSecretKey":$("#advanced [name=hpcs_secret_key]").val() };
