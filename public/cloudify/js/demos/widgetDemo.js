@@ -10,7 +10,9 @@ $(function () {
             console.log(["parent got the message", e]);
             try {
                 var msg = JSON.parse(e.data);
-                callbacks[msg.name](e);
+                if ( typeof(callbacks[msg.name]) =="function" ){
+                    callbacks[msg.name](e);
+                }
             } catch (exc) {
                 console.log(["problem invoking callback for ", e, exc, callbacks])
             };
