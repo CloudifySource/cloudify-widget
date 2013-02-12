@@ -7,11 +7,11 @@ GET     /javascriptRoutes               controllers.Application.javascriptRoutes
 
 
 #Demos
+GET     /demos/loginWithGoogle           controllers.Demos.loginWithGoogle
+GET     /demos/googleLoginCallback       controllers.Demos.googleLoginCallback
 GET     /demos/:email                  controllers.DemosController.getDemoPageForUser( email:String )
 GET     /demos/:userId/list            controllers.DemosController.listWidgetForDemoUser( userId:Long )
 GET     /demos/:userId/:apiKey         controllers.DemosController.getDemoPageForWidget( userId:Long, apiKey:String )
-GET     /demos/loginWithGoogle           controllers.Demos.loginWithGoogle
-GET     /demos/googleLoginCallback       controllers.Demos.googleLoginCallback
 POST    /demos/verifyWidgetLogin         controllers.Demos.validateUserIdFromLogin(userId:String)
 
 # Widget

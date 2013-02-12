@@ -29,6 +29,7 @@ $(function () {
     // it will save us the trouble of parsing back and forward the cookie value
     // read more at https://github.com/carhartl/jquery-cookie
     var WidgetState = function(){
+        var widgetIsPlaying = false;
         var cookieName = "widgetCookie" + origin_page_url;
         function _get(){
             try{
@@ -103,11 +104,22 @@ $(function () {
             $("#play_btn").show();
         };
         this.onStop = function( handler ){
-            $("#stop_btn").click(stop_instance_btn_handler);
+            if ( !handler ){
+                $("#stop_btn").click();
+            }else{
+                $("#stop_btn").click( function(){ widgetIsPlaying = false;  handler(arguments);});
+            }
         };
         this.onPlay = function( handler ){
-            $("#start_btn").click(start_instance_btn_handler);
+            if ( !handler ){
+                $("#start_btn").click();
+            }else{
+                $("#start_btn").click( function(){ widgetIsPlaying = true; handler(arguments);});
+            }
         };
+        this.isPlaying = function(){
+            return widgetIsPlaying;
+        }
     };
 
     var WidgetLog = function(){
@@ -168,7 +180,7 @@ $(function () {
 
     function handleUpdateStatusSuccess( data )
     {
-
+        $.postMessage( JSON.stringify({name:"widgetstatus", comment:"status_was_updated", status:data.status}), document.location.origin , parent );
         if ( data.status.timeleft ) {
             $("#time_left").show();
             $("#time_left_counter").text(data.status.timeleft + " minutes");
@@ -237,20 +249,41 @@ $(function () {
 
     }
 
+    console.log(["registering event on " , origin_page_url ]);
+    $.receiveMessage( function(e){
+        console.log(["widget got a message",e]);
+        var msg = JSON.parse(e.data);
+        if ( msg.name == "userlogin"){
+            params["userId"] = msg.userId;
+        } else if ( msg.name == "playwidget"){
+            if ( widgetState.isPlaying() ){ // this is an echo.
+                return;
+            }
+            if ( msg.advanced ){
+                $("#advanced [name=hpcs_key]").val( msg.advanced.hpcs_key );
+                $("#advanced [name=hpcs_secret_key]").val( msg.advanced.hpcs_secret_key );
+            }else{
+                $("#advanced [name=hpcs_key], #advanced [name=hpcs_secret_key]").val("");
+            }
+           widgetState.onPlay();
+        } else if ( msg.name == "stopwidget"){
+            if ( !widgetState.isPlaying() ){ // might be an echo.
+                return;
+            }
+            widgetState.onStop();
+        }
+     }, parent.location.origin); // origin_page_url
+
     function start_instance_btn_handler()
     {
         var myUrl = document.location.origin;
         console.log(["sending message", myUrl, parent ] );
-        $.postMessage( JSON.stringify({name:"playwidget", comment:"requires_login"}), myUrl , parent );
-        $.receiveMessage( function(e){
-            var msg = JSON.stringify(e.data);
-            if ( msg.name == "userlogin"){
-                params["userId"] = e.data;
-            }
-        }, origin_page_url);
         console.log("after message");
         if ( is_requires_login() && !params["userId"] ){
+            $.postMessage( JSON.stringify({name:"requirelogin"}), myUrl , parent );
             return;
+        }else{
+            $.postMessage( JSON.stringify({name:"playwidget"}), myUrl , parent );
         }
 
         widgetState.showStopButton();
@@ -289,6 +322,7 @@ $(function () {
     if (!confirm("Are you sure you want to stop the instance?")) {
       return;
     }
+        $.postMessage( JSON.stringify({name:"stopwidget"}), document.location.origin , parent );
     widgetState.showPlayButton();
     if ( widgetState.instanceId()) {
       $.post("/widget/"+ widgetState.instanceId() + "/stop?apiKey=" + params["apiKey"], {}, function (data) {

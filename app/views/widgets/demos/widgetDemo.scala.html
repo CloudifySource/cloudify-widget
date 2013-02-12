@@ -4,9 +4,14 @@
 <html>
 <head>
     <link href="/public/style/demo.css" rel="stylesheet">
-    <!-- TODO : add login code here -->
+    <script src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/public/js/jquery.ba-postmessage.js"></script>
+    @if(widget.isRequiresLogin){
+         <script src="/public/js/demos/login.js"></script>
+    }
 </head>
 <body>
     @embedCode(widget.getApiKey, widget.getTitle, widget.getYoutubeVideoUrl, host)
+    <script src="/public/js/demos/widgetDemo.js"> </script><!-- general js file for demo purposes -->
 </body>
 </html>
