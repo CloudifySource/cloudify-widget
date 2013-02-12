@@ -9,4 +9,5 @@ $(function(){
 //    $iframe.attr("src", $iframe.attr("src") + "&userId=" + encodeURIComponent(userId));
     $.postMessage( JSON.stringify({"name":"userlogin", "userId" : userId }),document.location.origin, $iframe[0].contentWindow);
     $.postMessage( JSON.stringify({"name" : "playwidget"}),document.location.origin, $iframe[0].contentWindow);
+    window.close();
 });
