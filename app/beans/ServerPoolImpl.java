@@ -128,7 +128,7 @@ public class ServerPoolImpl implements ServerPool
         for ( ServerNode serverNode : pool ) {
             if ( !isManagementAvailable(serverNode) ){
                 logger.info( "found a dead server [{}] I should destroy this server..", serverNode );
-//                destroy( serverNode.getNodeId() );
+                destroy( serverNode.getNodeId() );
             }else{
                 logger.info( "Found a working management server [{}], adding to clean pool", serverNode );
                 cleanPool.add( serverNode );

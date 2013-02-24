@@ -212,7 +212,7 @@ extends Model
 	}
 
 	public String toDebugString() {
-		return String.format("ServerNode{id='%s\', serverId='%s\', expirationTime=%d, publicIP='%s\', privateIP='%s\', busy=%s}", id, serverId, expirationTime, publicIP, privateIP, busy);
+		return String.format("ServerNode{id='%s', serverId='%s', expirationTime=%d, publicIP='%s', privateIP='%s', busy=%s}", id, serverId, expirationTime, publicIP, privateIP, busy);
 	}
 	@Override
 	public String toString()
