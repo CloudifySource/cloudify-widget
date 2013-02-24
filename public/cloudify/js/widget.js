@@ -332,7 +332,7 @@ $(function () {
     widgetState.showPlayButton();
     if ( widgetState.instanceId()) {
       $.post("/widget/"+ widgetState.instanceId() + "/stop?apiKey=" + params["apiKey"], {}, function (data) {
-        if (data.status.state == "error") {
+        if (data && data.status && data.status.state == "error") {
           widgetState.showPlayButton();
           widgetLog.error(data.status.message );
           return;
