@@ -106,7 +106,7 @@ public class ServerPoolImpl implements ServerPool
                 logger.info( "parsed json to [{}]", parse );
             }
 
-        } catch ( RuntimeException e ) {
+        } catch ( Exception e ) {  // guy - don't ask me how but compiler does not pick this up.. maybe because it is scala.
             logger.error( "unable to check if serverNode [{}] is up", serverNode, e );
         }
         return false;
