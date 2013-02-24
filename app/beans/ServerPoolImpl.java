@@ -16,6 +16,7 @@
 package beans;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import beans.config.Conf;
@@ -23,8 +24,13 @@ import beans.config.Conf;
 import com.avaje.ebean.Ebean;
 import models.ServerNode;
 import org.apache.commons.collections.Predicate;
+import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.api.libs.ws.Response;
+import play.api.libs.ws.WS;
+import play.libs.Json;
 import server.*;
 import utils.CollectionUtils;
 
@@ -76,12 +82,69 @@ public class ServerPoolImpl implements ServerPool
         }
     };
 
+
+    private boolean isManagementAvailable( ServerNode serverNode )
+    {
+        logger.info( "testing if management is available at : {}", serverNode );
+
+        try {
+            Response response = WS.url( "http://" + serverNode.getPublicIP() + ":8100/service/testrest" ).get().value().get();
+            String body = response.body();
+            logger.info( "got testrest result with body [{}] ", body );
+            if ( StringUtils.isEmpty( body ) ) {
+                logger.info( "body is empty" );
+                return false;
+            } else {
+                logger.info( "body is not empty, testing if status successful" );
+                JsonNode parse = Json.parse( body );
+                if ( parse.has( "status" ) ){
+                    JsonNode nodeValue = parse.get("status");
+                    String textValue = nodeValue == null ? "null" : nodeValue.getTextValue();
+                    logger.info( "response has 'status' key which is equal to [{}]", textValue );
+                    return "success".equals( textValue );
+                }
+                logger.info( "parsed json to [{}]", parse );
+            }
+
+        } catch ( RuntimeException e ) {
+            logger.error( "unable to check if serverNode [{}] is up", serverNode, e );
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @param pool - the pool we need to clean
+     * @return - a clean pool
+     */
+    private List<ServerNode> cleanPool( List<ServerNode> pool ){
+
+        if ( CollectionUtils.isEmpty( pool )){
+            return new LinkedList<ServerNode>(  );
+        }
+
+
+        List<ServerNode> cleanPool = new LinkedList<ServerNode>(  );
+        for ( ServerNode serverNode : pool ) {
+            if ( !isManagementAvailable(serverNode) ){
+                logger.info( "found a dead server [{}] I should destroy this server..", serverNode );
+//                destroy( serverNode.getNodeId() );
+            }else{
+                logger.info( "Found a working management server [{}], adding to clean pool", serverNode );
+                cleanPool.add( serverNode );
+            }
+        }
+        return cleanPool;
+    }
+
 	@Override
     public void init()
 	{
 		logger.info( "Started to initialize ServerPool, cold-init={}", conf.server.pool.coldInit );
 		// get all available running servers
         List<ServerNode> servers = ServerNode.all();
+        servers = cleanPool( servers );
+
 
         Collection<ServerNode> busyServer = CollectionUtils.select( servers, busyServerPredicate );
         logger.info("I found {} busy servers", CollectionUtils.size(busyServer));
