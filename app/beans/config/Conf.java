@@ -64,14 +64,6 @@ public class Conf {
         public FeaturesConfigItem socialLogin = new FeaturesConfigItem();
     }
 
-
-    public static class WidgetConfiguration{
-
-        public String serverId;
-
-        public long stopTimeoutMillis;
-    }
-
     public static class CloudifyConfiguration{
 
         public long deployWatchDogProcessTimeoutMillis = Utils.parseTimeToMillis( "2mn" );

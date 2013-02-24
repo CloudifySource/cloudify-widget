@@ -1,4 +1,8 @@
 #! /bin/bash
+# this script requires 3 more files
+# 1. hpcloud.pem - the certificate to connect to the cloud machines
+# 2. sysconfig_play - the sysconfig file for the application
+# 3. prod.conf - production configuration
 
 
 PROD_CONF_FILE=~/prod.conf
