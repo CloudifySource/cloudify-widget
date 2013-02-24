@@ -15,7 +15,7 @@ echo Setting sudo privileged mode
 sudo sed -i 's/^Defaults.*requiretty/#&/g' /etc/sudoers
 
 JAVA_64_URL="http://repository.cloudifysource.org/com/oracle/java/1.6.0_32/jdk-6u32-linux-x64.bin"
-CLOUDIFY_URL="http://repository.cloudifysource.org/org/cloudifysource/2.2.0-RELEASE/gigaspaces-cloudify-2.2.0-ga-b2500.zip"
+CLOUDIFY_URL="http://repository.cloudifysource.org/org/cloudifysource/2.3.0-RELEASE/gigaspaces-cloudify-2.3.0-ga-b3510.zip"
 
 echo Downloading JDK from $JAVA_64_URL
 wget -q -O ~/java.bin $JAVA_64_URL
@@ -42,7 +42,7 @@ unzip ~/cloudify.zip > /dev/null
 rm -rf ~/cloudify.zip
 
 echo Starting Cloudify bootstrap-localcloud `hostname -I`
-nohup ~/gigaspaces-cloudify-2.2.0-ga/bin/cloudify.sh "bootstrap-localcloud -nic-address `hostname -I`"
+nohup ~/gigaspaces-cloudify-2.3.0-ga/bin/cloudify.sh "bootstrap-localcloud -nic-address `hostname -I`"
 
 cat nohup.out
 exit 0

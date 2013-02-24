@@ -1,0 +1,1 @@
+alter table server_node add column remote tinyint(1) default 0;

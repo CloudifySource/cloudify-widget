@@ -15,103 +15,46 @@
  *******************************************************************************/
 package beans;
 
+import java.io.File;
+
 import models.ServerNode;
+
 import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.PumpStreamHandler;
 
 import server.DeployManager;
 import server.ProcExecutor;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.concurrent.TimeUnit;
-
 
 /**
- * This class extends a {@link DefaultExecutor} and contains the server information where the recipe was deployed.
- * It also contains an output stream for the forked process. 
+ * This class extends a {@link DefaultExecutor} and provides the ability to listen on the process output stream.
+ * an Id property is saved for accessing the output from the play cache. 
  * 
  * @author Igor Goldenberg
+ * @author Adaml
  * @see DeployManager
  */
 public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor 
 {
     private String id;
-    private String publicIP; // todo : change case to Ip
-    private String privateIP;  // todo : change case to Ip
-    private File recipe;
-    private String[] args;
-    private long expirationTime;
-    private ProcessStreamHandler procHandler;
 
-    final static class ProcessStreamHandler extends PumpStreamHandler
-	 {
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-		@Override
-		protected void createProcessOutputPump(InputStream is, OutputStream os)
-		{
-			super.createProcessOutputPump(is, baos);
-		}
-
-		public String getOutput()
-		{
-			return baos.toString();
-		}
-	 }
+    
+    public ProcExecutorImpl() { }
 
     public ProcExecutorImpl( ServerNode server, File recipe, String... args )
     {
-        this.id = server.getId();
+        this.id = server.getId().toString();
 
-        this.publicIP = server.getPublicIP();
-        this.privateIP = server.getPrivateIP();
-        this.recipe = recipe;
-        this.args = args;
-        this.expirationTime = server.getExpirationTime();
-
-        procHandler = new ProcessStreamHandler();
-        setStreamHandler( procHandler );
     }
-
+	
+	@Override
     public String getId()
     {
         return id;
     }
+	
+	@Override
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public String getPublicServerIP()
-    {
-        return publicIP;
-    }
-
-    public String getPrivateServerIP()
-    {
-        return privateIP;
-    }
-
-    public File getRecipe()
-    {
-        return recipe;
-    }
-
-    public String[] getArgs()
-    {
-        return args;
-    }
-
-    public String getOutput()
-    {
-        return procHandler.getOutput();
-    }
-
-    public int getElapsedTimeMin()
-    {
-        long elapsedTime = expirationTime - System.currentTimeMillis();
-        if ( elapsedTime <= 0 )
-            return 0;
-        else
-            return ( int ) TimeUnit.MILLISECONDS.toMinutes( elapsedTime );
-    }
 }

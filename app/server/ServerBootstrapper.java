@@ -16,10 +16,9 @@
 
 package server;
 
-import models.ServerNode;
-import org.jclouds.openstack.nova.v2_0.domain.Server;
-
 import java.util.List;
+
+import models.ServerNode;
 
 /**
  * The main abstraction to bootstrap servers on a cloud.
@@ -38,9 +37,9 @@ public interface ServerBootstrapper
 {
     public List<ServerNode> createServers(int numOfServers);
 
-    public List<Server> getServerList();
-
     public void destroyServer(String serverId);
 
     public void close();
+    
+    public ServerNode bootstrapCloud( ServerNode serverNode );
 }

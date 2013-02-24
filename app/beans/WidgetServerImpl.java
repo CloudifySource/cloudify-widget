@@ -18,8 +18,12 @@ package beans;
 import static server.Config.WIDGET_STOP_TIMEOUT;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import beans.config.Conf;
 import controllers.WidgetAdmin;
@@ -36,7 +40,7 @@ import models.Widget;
 import models.Widget.Status;
 import models.WidgetInstance;
 import server.*;
-import server.exceptions.ServerException;
+import utils.CollectionUtils;
 import utils.Utils;
 
 import javax.annotation.PostConstruct;
@@ -65,6 +69,16 @@ public class WidgetServerImpl implements WidgetServer
     @Inject
     private DeployManager deployManager;
 
+    private static Map<Recipe.Type, Pattern> installationFinishedRegexMap = null;
+
+    static {
+        installationFinishedRegexMap = new HashMap<Recipe.Type, Pattern>();
+        for ( Recipe.Type type  : Recipe.Type.values() ) {
+            String pattern = type + " .* (installed|successfully) (installed|successfully)";
+            installationFinishedRegexMap.put(type, Pattern.compile( pattern, Pattern.CASE_INSENSITIVE) );
+        }
+    }
+
     private List<String> filterOutputLines = new LinkedList<String>(  );
     private List<String> filterOutputStrings = new LinkedList<String>(  );
 
@@ -73,47 +87,20 @@ public class WidgetServerImpl implements WidgetServer
         Utils.addAllTrimmed( filterOutputLines,  StringUtils.split( conf.cloudify.removeOutputLines, "|" ));
         Utils.addAllTrimmed( filterOutputStrings,  StringUtils.split( conf.cloudify.removeOutputString, "|" ));
     }
-	/**
-	 * Deploy a widget instance.
-	 * @param apiKey 
-	 */
-	public WidgetInstance deploy( String apiKey )
+
+	
+	public WidgetInstance deploy( Widget widget, ServerNode server )
 	{
-		// don't allow for 30 seconds to start the widget again
-		Long timeLeft = (Long)Cache.get(Controller.request().remoteAddress()); // todo : move this block of code to controller. too play oriented.
-		if ( timeLeft != null )
-        {
-			throw new ServerException( Messages.get( "please.wait.x.sec", (timeLeft - System.currentTimeMillis()) / 1000) );
-        }
-
-		Widget widget = Widget.getWidget( apiKey ); // todo : get user to here somehow and use that signature.
-		if ( !widget.isEnabled() )
-        {
-			throw new ServerException( Messages.get( "widget.disabled.by.administrator" ) );
-        }
-			
-		File unzippedDir = Utils.downloadAndUnzip( widget.getRecipeURL(), apiKey );
-
-
+		File unzippedDir = Utils.downloadAndUnzip( widget.getRecipeURL(), widget.getApiKey() );
         File recipeDir = unzippedDir;
         if ( widget.getRecipeRootPath() != null  ){
             recipeDir = new File( unzippedDir, widget.getRecipeRootPath() );
         }
         logger.info("Deploying an instance for recipe at : [{}] ", recipeDir );
-
-		ServerNode server = serverPool.get();
-		if ( server == null ){
-            mailSender.sendPoolIsEmptyMail();
-			throw new ServerException(Messages.get("no.available.servers"));
-        }
-		
 		widget.countLaunch();
-		
-		String instanceId = deployManager.fork(server, recipeDir).getId();
-		
-		return widget.addWidgetInstance( instanceId, server.getPublicIP() );
+		deployManager.fork(server, recipeDir);
+		return widget.addWidgetInstance( server, recipeDir );
 	}
-	
 	
 	public void undeploy( String instanceId )
 	{
@@ -123,18 +110,52 @@ public class WidgetServerImpl implements WidgetServer
 		serverPool.destroy(instanceId);
 	}
 
-	
-	public Status getWidgetStatus( String instanceId )
-	{
-		ProcExecutor pe = deployManager.getExecutor(instanceId);
-		if ( pe == null )
-			return new Status(Status.STATE_STOPPED, Messages.get( "server.was.terminated" ) );
-		
-		List<String> output = Utils.formatOutput(pe.getOutput(), pe.getPrivateServerIP() + "]", filterOutputLines, filterOutputStrings );
-		Status wstatus = new Status(Status.STATE_RUNNING, output, pe.getElapsedTimeMin());
-		
-		return wstatus;
-	}
+    private static boolean isFinished( Recipe.Type recipeType, String line ){
+        logger.debug("checking to see if [{}] has finished using [{}]", recipeType, line );
+        Pattern pattern = installationFinishedRegexMap.get(recipeType);
+        return pattern != null && !StringUtils.isEmpty(line) && pattern.matcher(line).matches();
+    }
+
+    @Override
+    public Status getWidgetStatus(ServerNode server) {
+        Status result = new Status();
+        List<String> output = new LinkedList<String>();
+        result.setOutput(output);
+
+        if (server == null) {
+            result.setState(Status.State.STOPPED);
+            output.add(Messages.get("test.drive.successfully.complete"));
+            return result;
+        }
+
+        result.setRemote( server.isRemote() ).setHasPemFile( !StringUtils.isEmpty(server.getPrivateKey()) ); // let UI know this is a remote bootstrap.
+
+        String cachedOutput = Utils.getCachedOutput( server );// need to sort out the cache before we decide if the installation finished.
+        output.addAll(Utils.formatOutput(cachedOutput, server.getPrivateIP() + "]", filterOutputLines, filterOutputStrings));
+
+        WidgetInstance widgetInstance = WidgetInstance.findByServerNode(server);
+        logger.debug("checking if installation finished for {} on the following output {}" , widgetInstance, output );
+        if (widgetInstance != null ){
+            if (isFinished(widgetInstance.getRecipeType(), (String)CollectionUtils.last(output))){
+                logger.debug("detected finished installation");
+                result.setInstanceIsAvailable(Boolean.TRUE);
+                result.setConsoleLink(widgetInstance.getLink());
+            }
+        }
+
+        result.setState(Status.State.RUNNING);
+        if (!StringUtils.isEmpty(server.getPublicIP())) {
+            result.setPublicIp(server.getPublicIP());
+            result.setCloudifyUiIsAvailable(Boolean.TRUE);
+        }
+
+        // server is remote we don't count time
+        if (!server.isRemote() && server.getExpirationTime() != null) {
+            long elapsedTime = server.getExpirationTime() - System.currentTimeMillis();
+            result.setTimeleft((int) TimeUnit.MILLISECONDS.toMinutes(elapsedTime));
+        }
+        return result;
+    }
 
     public void setServerPool(ServerPool serverPool) {
         this.serverPool = serverPool;

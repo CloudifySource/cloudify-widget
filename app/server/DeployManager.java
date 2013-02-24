@@ -36,8 +36,4 @@ import java.io.File;
 public interface DeployManager 
 {
    public ProcExecutor fork( ServerNode server, File recipe );
-
-   public ProcExecutor getExecutor( String id );
-
-   public void destroyExecutor(String id);
 }

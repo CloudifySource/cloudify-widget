@@ -125,7 +125,11 @@ public class ConfigBean {
         @Override
         public File getValue( Configuration conf, String key )
         {
-            File file = Play.application().getFile( conf.getString( key ) );
+            String string = conf.getString(key);
+            if ( string == null ){
+                return null;
+            }
+            File file = Play.application().getFile(string);
             if ( !file.exists() ) {
                 logger.warn( "file {} does not exists but required by the configuration", file.getAbsolutePath() );
             }
@@ -166,7 +170,7 @@ public class ConfigBean {
                         field.set( obj, value );
                     }
                 } catch ( Exception e ) {
-                    logger.error( "unable to set value",e );
+                    logger.error( String.format("unable to set value for field [%s.%s]", field.getDeclaringClass().getName() , field.getName()) ,e );
                 }
             } else { // this is probably an Object. need to instantiate
                 try {

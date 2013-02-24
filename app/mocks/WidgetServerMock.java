@@ -16,6 +16,7 @@
 
 package mocks;
 
+import models.ServerNode;
 import models.Widget;
 import models.WidgetInstance;
 import org.slf4j.Logger;
@@ -24,17 +25,20 @@ import server.WidgetServer;
 
 public class WidgetServerMock implements WidgetServer {
     private static Logger logger = LoggerFactory.getLogger(WidgetServerMock.class);
-    public WidgetInstance deploy(String apiKey) {
-        logger.info("deploying : {}", apiKey);
-        return null;
-    }
 
     public void undeploy(String instanceId) {
         logger.info("undeploying : {}", instanceId);
     }
 
-    public Widget.Status getWidgetStatus(String instanceId) {
-        logger.info("getting widget status : {}",  instanceId);
+    @Override
+    public Widget.Status getWidgetStatus(ServerNode serverNode) {
+        logger.info("getting widget status : {}",  serverNode.getNodeId());
         return null;
     }
+
+	@Override
+	public WidgetInstance deploy(Widget widget, ServerNode server) {
+		logger.info("deploying : {}", server.getPublicIP());
+		return null;
+	}
 }

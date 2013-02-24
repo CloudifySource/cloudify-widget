@@ -39,7 +39,6 @@ public class UserTest extends AbstractCloudifyWidgetTest {
         logout();
         login(EMAIL, newPassword);
         assertUserIsLoggedIn();
-        logout();
         changePassword(newPassword, PASSWORD);
         assertUserIsLoggedIn();
     }

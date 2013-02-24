@@ -34,12 +34,7 @@ import org.apache.commons.exec.Executor;
 public interface ProcExecutor extends Executor 
 {
 	public String getId();
-
-	public String getPrivateServerIP();
 	
-    public String getPublicServerIP();
-
-	public String getOutput();
-
-	public int getElapsedTimeMin();
+	public void setId(String id);
+	
 }

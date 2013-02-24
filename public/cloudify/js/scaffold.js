@@ -13,12 +13,24 @@ $( function ()
         console.log( ["handling error", jqXHR.getAllResponseHeaders(), jqXHR.getResponseHeader( "session-expired" )] );
         if ( jqXHR.getResponseHeader( "session-expired" ) ) { // this should handle all session-expired problems
             console.log( "redirecting to login since session expired" );
+
+
             window.location.href = "/admin/signin?message=Session Expired";
             return;
         }
         if ( jqXHR.getResponseHeader( "display-message" ) ) {
             try {
-                $( ".global-message" ).trigger( "showMessage", JSON.parse( jqXHR.getResponseHeader( "display-message" ) ) );
+                console.log(["handling field-error-message", arguments]);
+                var displayMessage = JSON.parse( jqXHR.getResponseHeader( "display-message" ) );
+                $( ".global-message" ).trigger( "showMessage", displayMessage );
+                if ( ajaxSettings.form && displayMessage.formErrors ){
+                    var $form = $(ajaxSettings.form)
+                    var formField = null;
+                    for ( formField in displayMessage.formErrors ){
+                        var msg = displayMessage.formErrors[formField];
+                        $form.find("[name=" + formField + "]").closest(".control-group").addClass("error").popover({content:msg});
+                    }
+                }
                 return;
             } catch ( e ) {
                 console.log( ["error showing message", e] );

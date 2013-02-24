@@ -16,14 +16,16 @@
 
 package server;
 
+import models.ServerNode;
 import models.Widget;
 import models.WidgetInstance;
 
 public interface WidgetServer 
 {
-    public WidgetInstance deploy(String apiKey);
 
     public void undeploy(String instanceId);
 
-    public Widget.Status getWidgetStatus(String instanceId);
+    public Widget.Status getWidgetStatus( ServerNode serverNode );
+    
+    public WidgetInstance deploy( Widget widget, ServerNode server );
 }

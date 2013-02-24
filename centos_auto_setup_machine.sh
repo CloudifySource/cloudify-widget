@@ -1,33 +1,95 @@
 #! /bin/bash
+
+
+PROD_CONF_FILE=~/prod.conf
+PEM_FILE=~/hpcloud.pem
+SYSCONF_FILE=~/sysconfig_play
+
+if [ ! -f ${PROD_CONF_FILE} ]; then
+    echo "missing ${PROD_CONF_FILE}"
+    exit 1
+fi
+if [ ! -f ${PEM_FILE} ]; then
+    echo "missing ${PEM_FILE}"
+    exit 1
+fi
+
+if [ ! -f ${SYSCONF_FILE} ]; then
+    echo "missing ${SYSCONF_FILE}"
+    exit 1
+fi
+
+
+echo "installing java"
 yum  -y install java-1.6.0-openjdk-devel
 export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk.x86_64
 
-wget 'http://download.playframework.org/releases/play-2.0.4.zip'
-unzip play-2.0.4.zip
+echo "downloading play"
+if [ -f play-2.0.4.zip ]; then
+    echo "play already exists - nothing to do"
+else
+    wget 'http://download.playframework.org/releases/play-2.0.4.zip'
+    unzip play-2.0.4.zip
+fi
 
-wget 'http://repository.cloudifysource.org/org/cloudifysource/2.2.0-RELEASE/gigaspaces-cloudify-2.2.0-ga-b2500.zip'
-unzip gigaspaces-cloudify-2.2.0-ga-b2500.zip
+echo "downloading cloudify"
+CLOUDIFY_FOLDER=gigaspaces-cloudify-2.3.0-ga
+CLOUDIFY_ZIP_NAME=${CLOUDIFY_FOLDER}-b3510
+CLOUDIFY_FILE=${CLOUDIFY_ZIP_NAME}.zip
+if [ -f $CLOUDIFY_FILE ]; then
+    echo "cloudify already installed, nothing to go"
+else
+    wget "http://repository.cloudifysource.org/org/cloudifysource/2.3.0-RELEASE/${CLOUDIFY_FILE}"
+    unzip $CLOUDIFY_FILE
+fi
 
-
-
+echo "installing git"
 yum  -y install git
 cd play-2.0.4
-git clone https://github.com/CloudifySource/cloudify-widget.git
+echo "cloning cloudify-widget"
+CHECKOUT_FOLDER=cloudify-widget
+if [ -z $GIT_LOCATION ] || [ $GIT_LOCATION"xxx" = "xxx" ]; then
+    GIT_LOCATION="https://github.com/CloudifySource/cloudify-widget.git"
+fi
+echo "using git location : ${GIT_LOCATION}"
 
-yum install -y ruby rubygems
+git clone $GIT_LOCATION $CHECKOUT_FOLDER
+
+if [ -z $GIT_BRANCH  ] || [ $GIT_BRANCH"xxx" = "xxx" ]; then
+        echo "no branch specified"
+else
+    echo "checking out branch ${GIT_BRANCH}"
+    cd $CHECKOUT_FOLDER
+    git checkout $GIT_BRANCH
+    cd -
+fi
+
+echo "installing ruby"
+yum install -y ruby ruby-devel rubygems gcc make libxml2 libxml2-devel libxslt libxslt-devel
+#curl -sL https://docs.hpcloud.com/file/hpfog-0.0.19.gem >hpfog-0.0.19.gem
+#curl -sL https://docs.hpcloud.com/file/hpcloud-1.6.0.gem >hpcloud-1.6.0.gem
+#echo "installing hpcloud cli"
+#gem install --no-rdoc --no-ri hpfog-0.0.19.gem hpcloud-1.6.0.gem
+
+echo "installing sass"
 gem install sass
 
 # assuming sysconfig_play exists on machine
-cp ~/sysconfig_play /etc/sysconfig/play
+echo "copying sysconfig file"
+\cp -f ${SYSCONF_FILE} /etc/sysconfig/play
 . /etc/sysconfig/play
 
 # assuming there is a prod.conf copied to here
-mv ~/prod.conf cloudify-widget/conf
-mv ~/hpcloud.pem cloudify-widget/bin
+echo "copying configuration files"
+\cp -f ${PROD_CONF_FILE} cloudify-widget/conf
+\cp -f ${PEM_FILE} cloudify-widget/bin
+ln -fs ~/${CLOUDIFY_FOLDER} cloudify-widget/cloudify-folder # create a symbolic link to cloudify home.
 chmod 755 cloudify-widget/*.sh
 chmod 755 cloudify-widget/bin/*.sh
+ln -fs /root/${CLOUDIFY_FOLDER} cloudify-widget/cloudify-folder
 
 #install mysql
+echo "installing mysql"
 yum -y install mysql-server mysql php-mysql
 chkconfig --levels 235 mysqld on
 service mysqld start
@@ -41,6 +103,8 @@ mysql -u $DB_ADMIN -e "DROP USER ''@'localhost';"
 mysql -u $DB_ADMIN -p$DB_ADMIN_PASSWORD  -e  "DROP USER ''@'localhost.localdomain';"
 mysql -u $DB_ADMIN -e "DROP USER ''@'localhost.localdomain';"
 
+cd cloudify-widget
+
 echo "creating DB scheme"
 bin/migrate_db.sh create
 echo "127.0.0.1 `hostname`" >> /etc/hosts
@@ -48,30 +112,36 @@ ln -s ~/play-2.0.4/play /usr/bin/play
 
 
 # install nginx
-cp cloudify-widget/conf/nginx/install.conf /etc/yum.repos.d/nginx.repo
+echo "installing nginx"
+cp conf/nginx/install.conf /etc/yum.repos.d/nginx.repo
 yum -y install nginx
 mv /etc/nginx/nginx.conf /etc/nginx/nginx_conf_backup
-cp  cloudify-widget/conf/nginx/nginx.conf /etc/nginx/
+
 
 # copy nginx configuration while sed-ing the domain names
 mkdir -p /var/log/nginx/$SITE_DOMAIN
 mkdir -p /etc/nginx/sites-available
 mkdir -p /etc/nginx/sites-enabled
-cat cloudify-widget/conf/nginx/site.conf  | sed 's/__domain_name__/'"$SITE_DOMAIN"'/' | sed 's/__staging_name__/'"$SITE_STAGING_DOMAIN"'/' > /etc/nginx/sites-available/$SITE_DOMAIN
+touch /etc/nginx/sites-available/$SITE_DOMAIN
 ln -s  /etc/nginx/sites-available/$SITE_DOMAIN /etc/nginx/sites-enabled/$SITE_DOMAIN
 
+### actual copy of files is done in "upgrade" script
+
+service nginx restart
+
+echo "creating error pages"
 # create path /var/www/cloudifyWidget/public/error_pages
 mkdir -p /var/www/cloudifyWidget/public/error_pages
 
-cd cloudify-widget
 echo "intalling monit"
 \cp -Rf conf/monit/repo  /etc/yum.repos.d/epel.repo
+yum clean all
 yum -y install monit
 chkconfig --levels 235 monit on
 
 
 echo "upgrading system"
-upgrade_server
+./upgrade_server.sh
 
 echo "installing takipi"
 cd ~
@@ -90,15 +160,15 @@ chmod +x ./takipi-install
 
 
 #we already have a key?
-if [ "$TAKIPI_KEY" -ne "" ]; then
+if [ -z $TAKIPI_KEY ]; then
     echo "reusing takipi key"
     /etc/takipi/takipi-stop
-    echo $TAKIPI_KEY > /var/lib/takipi/work/service.key
+    echo $TAKIPI_KEY >> /var/lib/takipi/work/service.key
     /etc/takipi/takipi-start
 else
     echo "we do not have existing takipi key, lets use the new one"
     TAKIPI_KEY=`cat /var/lib/takipi/work/service.key`
-    echo "\nTAKIPI_KEY=${TAKIPI_KEY}" > /etc/sysconfig/play
+    echo -e "\nTAKIPI_KEY=${TAKIPI_KEY}" >> /etc/sysconfig/play
 fi
 
 echo "to see takipi information go to  https://app.takipi.com with ${TAKIPI_KEY}"

@@ -16,34 +16,37 @@
 
 package mocks;
 
+import java.util.List;
+
 import models.ServerNode;
-import org.jclouds.openstack.nova.v2_0.domain.Server;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import server.ServerBootstrapper;
 
-import java.util.List;
+import server.ServerBootstrapper;
 
 public class ServerBootstrapperMock implements ServerBootstrapper 
 {
     private static Logger logger = LoggerFactory.getLogger(ServerBootstrapperMock.class);
 
-    public List<Server> getServerList() {
-        logger.info("getting server list");
-        return null;
-    }
-
+    @Override
     public void destroyServer(String serverId) {
         logger.info("destroying server {}",serverId);
 
     }
-
+    @Override
     public List<ServerNode> createServers(int numOfServers) {
         logger.info("creating servers {}", numOfServers);
         return null;
     }
-
+    @Override
     public void close() {
         logger.info("closing");
+    }
+    @Override
+    public ServerNode bootstrapCloud( ServerNode serverNode ){
+    	logger.info("bootstrapping cloud with [user,pass] = [{},{}]", serverNode.getUserName(), serverNode.getApiKey() );
+    	return null;
+    	
     }
 }

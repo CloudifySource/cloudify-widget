@@ -4,7 +4,7 @@ jQuery.fn.reset = function ()
     {
         this.reset();
     } );
-}
+};
 
 $( function ()
 {
@@ -70,8 +70,8 @@ $( function ()
 
             $.each( widget.instances, function ( index, instance )
             {
-                var instance = $( "#widget_instance_tmpl" ).tmpl( instance );
-                instances_container.append( instance );
+                var instanceTmpl = $( "#widget_instance_tmpl" ).tmpl( instance );
+                instances_container.append( instanceTmpl );
             } );
         }
 
@@ -163,7 +163,7 @@ $( function ()
     }
 
     for ( var key in field_tips ) {
-        if ( field_tips[key] ) {
+        if ( field_tips.hasOwnProperty(key) && field_tips[key] ) {
             $( "#" + key ).after( $( "<i class='info-icon' id='" + key + "_info'></i>" ) );
             $( "#" + key + "_info" ).tooltip( {title: field_tips[key]} );
         }
@@ -202,10 +202,32 @@ $( function ()
             }} );
         } finally {
             e.stopPropagation();
-            return false;
+            return false; // guy - this is ok, I always want to return false.
         }
 
     } );
+
+    $("#require_login_form").submit(function (e) {
+        try {
+            var $me = $(this);
+            var data = $me.formParams();
+            var widget = widgetsModel.getWidgetById( data.widgetId );
+            jsRoutes.controllers.WidgetAdmin.postRequireLogin(authToken, data.widgetId, data.requireLogin ? 1:0, data.loginVerificationUrl, data.webServiceKey).ajax({
+                form:this,
+                success: function () {
+                    $me[0].reset();
+                    $me.closest(".modal").modal('hide');
+                    widget.loginVerificationUrl=data.loginVerificationUrl;
+                    widget.webServiceKey = data.webServiceKey;
+                    widget.requireLogin=data.requireLogin;
+                }
+
+            });
+        } finally {
+            e.stopPropagation();
+            return false;
+        }
+    });
 
     $( "#new_widget_form" ).submit( function ( e )
     {
@@ -253,6 +275,26 @@ $( function ()
     // reset Id value when closing the widget dialog.
     $("#new_widget_modal" ).live("hide", function(){ $(this ).find("#widgetId" ).val("")});
 
+    function getWidgetByTarget( target ){
+        return widgetsModel.getWidgetById( $(target).parents( "tr.widget ").attr("data-widget_id") )
+    }
+
+    $(".require_login_btn").live("click", function( e ) {
+        var widget = getWidgetByTarget( e.target );
+        var $form = $("#require_login_form");
+        $form.find(".controls [name]").each( function(index, item){
+            var $input = $(item);
+            if ( $input.attr("type") == "checkbox"){
+                $input.attr("checked", widget[$input.attr("name")] ? "checked":null);
+            }else{
+                $input.val( widget[$input.attr("name")]);
+            }
+
+        });
+        $form.find("[name=widgetId]").val( widget.id );
+        $("#require_login_modal").modal("show");
+    });
+
 
     $( ".edit_widget_btn" ).live( "click", function ( e )
     {
@@ -264,7 +306,7 @@ $( function ()
             var $input = $(item );
             $input.val( widget[$input.attr("name")] );
         });
-        $form.find("[name=widgetId]" ).val( widgetId );
+        $form.find("[name=widgetId]" ).val( widget.id );
         $( '#new_widget_modal' ).modal( 'show' );
 
     } );

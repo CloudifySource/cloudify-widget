@@ -15,16 +15,18 @@
  *******************************************************************************/
 package beans;
 
+import java.util.Collection;
 import java.util.List;
 
 import beans.config.Conf;
-import org.jclouds.openstack.nova.v2_0.domain.Server;
 
+import com.avaje.ebean.Ebean;
 import models.ServerNode;
-import models.WidgetInstance;
+import org.apache.commons.collections.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import server.*;
+import utils.CollectionUtils;
 
 import javax.inject.Inject;
 
@@ -53,96 +55,82 @@ public class ServerPoolImpl implements ServerPool
     private Conf conf;
 
 
+    private static Predicate busyServerPredicate = new Predicate() {
+        @Override
+        public boolean evaluate(Object o) {
+            return ((ServerNode)o).isBusy() && !((ServerNode)o).isRemote();
+        }
+    };
+
+    private static Predicate nonBusyServerPredicate = new Predicate() {
+        @Override
+        public boolean evaluate(Object o) {
+            return !((ServerNode)o).isBusy() && !((ServerNode)o).isRemote();
+        }
+    };
+
+    private static Predicate failedBootstrapsPredicate = new Predicate() {
+        @Override
+        public boolean evaluate(Object o) {
+            return ((ServerNode)o).getNodeId() == null;
+        }
+    };
+
 	@Override
     public void init()
 	{
 		logger.info( "Started to initialize ServerPool, cold-init={}", conf.server.pool.coldInit );
-		
 		// get all available running servers
-		List<Server> serverList = serverBootstrapper.getServerList();
-		for( java.util.Iterator<Server> iter = serverList.iterator(); iter.hasNext(); )
-		{
-			Server srv = iter.next();
-			
-			// ignore our server
-			if ( srv.getId().equals( conf.widget.serverId ) )
-			{
-				iter.remove();
-				continue;
-			}
-			
-			ServerNode server = ServerNode.getServerNode(srv.getId());
-			
-			// if null this server wasn't found in our DB or server expired - we terminate it
-//			if ( server == null || server.isExpired() || conf.server.pool.coldInit )
-//			{
-//				logger.info( "ServerId: {} expired or not found in server-pool, address: {}", srv.getId(), srv.getAddresses()  );
-//				serverBootstrapper.destroyServer( srv.getId() );
-//				iter.remove();
-//			}
-			if ( server!= null )
-			{
-				if ( server.isBusy() )
-				{
-				   logger.info( "Found a busy server, leave it: {}", srv );
-				   iter.remove();
-				      
-				   if ( server.isTimeLimited() )  {
+        List<ServerNode> servers = ServerNode.all();
+
+        Collection<ServerNode> busyServer = CollectionUtils.select( servers, busyServerPredicate );
+        logger.info("I found {} busy servers", CollectionUtils.size(busyServer));
+        if ( !CollectionUtils.isEmpty( busyServer )){
+            for (ServerNode server : busyServer) {
 				     expiredServerCollector.scheduleToDestroy(server);
-                   }
-				}
-				else
-				   logger.info( "Found a free bootstrapped server, add to a server pool: {}", srv );
 			}
 		}// for
 
-		
-		/* check whether in server-pool left some orphans servers,
-		 * it may happen if server-pool still keeps some server that already terminated 
-		 */
-		logger.info("Check whether in server-pool left some orphans servers...");
-		for( ServerNode node : ServerNode.all() )
-		{
-			boolean isFound = false;
-			for( Server activeServer : serverList  )
-			{
-				if ( activeServer.getId().equals(node.getId()) )
-				{
-					isFound = true;
-					break;
-				}
-			}
-			
-			if ( !isFound )
-			{
-				logger.info("Delete orphans server from a server pool {}" , node);
-				node.delete();
-			}
-		}
-		
+        Collection<ServerNode> availableServer = CollectionUtils.select( servers, nonBusyServerPredicate );
+        logger.info(" I have {} available server, I need a minimum of {} and maximum of {}", new Object[]{ CollectionUtils.size(availableServer), conf.server.pool.minNode, conf.server.pool.maxNodes} );
 		// create new servers if need
-		if ( serverList.size() < conf.server.pool.minNode )
+		if ( CollectionUtils.size( availableServer )  < conf.server.pool.minNode )
 		{
-			int serversToInit = conf.server.pool.minNode - serverList.size();
-			
-			logger.info( "ServerPool starting to initialize {} servers...", serversToInit );
-			
-			List<ServerNode> servers = serverBootstrapper.createServers(serversToInit);
+			int serversToInit = conf.server.pool.minNode - CollectionUtils.size( availableServer );
+            logger.info("creating {} new Servers", serversToInit);
+            logger.info( "ServerPool starting to initialize {} servers...", serversToInit );
+            addNewServerToPool( serversToInit );
+            // remove servers if we have too much
+		} else if ( CollectionUtils.size(availableServer) > conf.server.pool.maxNodes ){
+            int i =0;
+            int serversToDelete = CollectionUtils.size(availableServer) - conf.server.pool.maxNodes ;
+            logger.info("deleting {} servers",serversToDelete);
+            for (ServerNode server : availableServer) {
+                if ( i >= serversToDelete){
+                    break;
+                }
+                i++;
+                destroy( server.getNodeId() );
+            }
+        }
 
-			// keep in DB as free servers
-			for( ServerNode srv :  servers )
-				srv.save();
-		}
-	}
+        // failed bootstraps.
+        Collection<ServerNode> failedBootstraps =CollectionUtils.select( servers,  failedBootstrapsPredicate );
+        if (!CollectionUtils.isEmpty(failedBootstraps)) {
+            logger.info("deleting {} failed bootstraps : {}", CollectionUtils.size( failedBootstraps) ,failedBootstraps);
+            Ebean.delete(failedBootstraps);
+        }
+    }
 	
 	/** @return a ServerNode from the pool, otherwise <code>null</code> if no free server available */
-	synchronized public ServerNode get()
+    @Override
+	synchronized public ServerNode get( long lifeExpectancy )
 	{
-		ServerNode freeServer = ServerNode.getFreeServer();
+		ServerNode freeServer = CollectionUtils.first(ServerNode.findByCriteria(new ServerNode.QueryConf().setMaxRows(1).criteria().setBusy(false).setRemote(false).done()));
 		if ( freeServer != null)
-		{
+		{    // guy : todo : need to lock this somehow
 			freeServer.setBusy(true);
-			
+			freeServer.setExpirationTime( lifeExpectancy + System.currentTimeMillis() );
 			// schedule to destroy after time expiration 
 			// TODO when unlimited server will support uncomment this line if ( freeServer.isTimeLimited() )
 			expiredServerCollector.scheduleToDestroy(freeServer);
@@ -155,24 +143,29 @@ public class ServerPoolImpl implements ServerPool
 	
 	public void destroy(String serverId)
 	{
-		// when we move to Quarz just unregister from Cron
-		if ( ServerNode.getServerNode( serverId ) != null ){
-			addNewServerToPool();
+        if ( serverId == null ){
+            return; // nothing to do.
         }
+        logger.info("destroying server {}", serverId);
 
-		WidgetInstance.deleteByInstanceId(serverId);
-		ServerNode.deleteServer( serverId );
+        // guy - removing "addNewServerToPool" - this is the destroy function, not create function.
+        // guy - removing WidgetInstance.delete since we cascade removal
+        // guy - removing ServerNode.delete, since we established it does not exist.
         serverBootstrapper.destroyServer( serverId );
 	}
+
+    private void addNewServerToPool( int number ){
+        for (int i = 0; i < number; i++) {
+            addNewServerToPool();
+        }
+    }
+
+    private boolean isPoolSaturated(){
+        return ServerNode.count() >= conf.server.pool.maxNodes;
+    }
 	
 	void addNewServerToPool()
 	{
-		if ( ServerNode.count() >= conf.server.pool.maxNodes )
-		{
-			logger.info("Server-pool has reached maximum capacity: {}" , conf.server.pool.maxNodes);
-			return;
-		}
-
 		new Thread(new Runnable()
 		{
 			public void run()
@@ -181,8 +174,9 @@ public class ServerPoolImpl implements ServerPool
 				{
 					List<ServerNode> servers = serverBootstrapper.createServers( 1 );
 					
-					for( ServerNode srv :  servers )
+					for( ServerNode srv :  servers ){
 						srv.save();
+                    }
 				} catch (Exception e)
 				{
 					logger.error("ServerPool failed to create a new server node", e);

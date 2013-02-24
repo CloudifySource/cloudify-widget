@@ -1,0 +1,1 @@
+alter table server_node  change column private_key private_key longtext;

@@ -8,6 +8,9 @@
 
 package server;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -28,6 +31,10 @@ public class HeaderMessage<T extends HeaderMessage> {
     @JsonProperty("msg")
     public String message;
 
+    @JsonProperty("formErrors")
+    public Map<String,String> formErrors = new HashMap<String,String>();
+
+
     protected String headerKey = DISPLAY_MESSAGE;
 
     public static enum Type{
@@ -40,6 +47,21 @@ public class HeaderMessage<T extends HeaderMessage> {
     public T setMessage( String message )
     {
         this.message = message;
+        return (T) this;
+    }
+
+    private T _addFormError( String fieldName, String message ){
+        formErrors.put(fieldName,message);
+        return (T) this;
+    }
+
+
+    public T addFormError( String fieldName, String message ){
+        return (T) setMessage( message ).setType( Type.ERROR )._addFormError( fieldName, message );
+    }
+
+    private T setHeaderKey( String value ){
+        headerKey = value;
         return (T) this;
     }
 
