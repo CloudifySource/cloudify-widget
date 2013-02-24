@@ -117,7 +117,7 @@ public class ServerPoolImpl implements ServerPool
      * @param pool - the pool we need to clean
      * @return - a clean pool
      */
-    private List<ServerNode> cleanPool( List<ServerNode> pool ){
+    private List<ServerNode> cleanPool( Collection<ServerNode> pool ){
 
         if ( CollectionUtils.isEmpty( pool )){
             return new LinkedList<ServerNode>(  );
@@ -143,8 +143,6 @@ public class ServerPoolImpl implements ServerPool
 		logger.info( "Started to initialize ServerPool, cold-init={}", conf.server.pool.coldInit );
 		// get all available running servers
         List<ServerNode> servers = ServerNode.all();
-        servers = cleanPool( servers );
-
 
         Collection<ServerNode> busyServer = CollectionUtils.select( servers, busyServerPredicate );
         logger.info("I found {} busy servers", CollectionUtils.size(busyServer));
@@ -155,6 +153,7 @@ public class ServerPoolImpl implements ServerPool
 		}// for
 
         Collection<ServerNode> availableServer = CollectionUtils.select( servers, nonBusyServerPredicate );
+        availableServer = cleanPool( availableServer );
         logger.info(" I have {} available server, I need a minimum of {} and maximum of {}", new Object[]{ CollectionUtils.size(availableServer), conf.server.pool.minNode, conf.server.pool.maxNodes} );
 		// create new servers if need
 		if ( CollectionUtils.size( availableServer )  < conf.server.pool.minNode )
