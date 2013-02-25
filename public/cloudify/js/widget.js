@@ -185,7 +185,7 @@ $(function () {
 
     function handleUpdateStatusSuccess( data )
     {
-        $.postMessage( JSON.stringify({name:"widgetstatus", comment:"status_was_updated", status:data.status}), parent.location.origin , parent );
+        $.postMessage( JSON.stringify({name:"widgetstatus", comment:"status_was_updated", status:data.status}), origin_page_url , parent );
         if ( data.status.timeleft ) {
             $("#time_left").show();
             $("#time_left_counter").text(data.status.timeleft + " minutes");
@@ -278,11 +278,11 @@ $(function () {
             }
             widgetState.onStop();
         }
-     }, parent.location.origin); // origin_page_url
+     }, origin_page_url); // origin_page_url
 
     function start_instance_btn_handler()
     {
-        var myUrl = parent.location.origin;
+        var myUrl = origin_page_url;
         console.log(["sending message", myUrl, parent ] );
         console.log("after message");
         if ( is_requires_login() && !params["userId"] ){
@@ -328,7 +328,7 @@ $(function () {
     if (!confirm("Are you sure you want to stop the instance?")) {
       return;
     }
-        $.postMessage( JSON.stringify({name:"stopwidget"}), parent.location.origin , parent );
+        $.postMessage( JSON.stringify({name:"stopwidget"}), origin_page_url , parent );
     widgetState.showPlayButton();
     if ( widgetState.instanceId()) {
       $.post("/widget/"+ widgetState.instanceId() + "/stop?apiKey=" + params["apiKey"], {}, function (data) {
