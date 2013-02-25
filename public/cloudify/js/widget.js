@@ -23,6 +23,7 @@ $(function () {
 
   var params = get_params();
   var origin_page_url = params["origin_page_url"];
+  var origin_page_host = origin_page_url.replace( /([^:]+:\/\/[^\/]+).*/, '$1' );
 
 
     // guy - we should consider using $.cookie.json=true
@@ -278,7 +279,7 @@ $(function () {
             }
             widgetState.onStop();
         }
-     }, origin_page_url); // origin_page_url
+     }, origin_page_host ); // origin_page_host
 
     function start_instance_btn_handler()
     {
