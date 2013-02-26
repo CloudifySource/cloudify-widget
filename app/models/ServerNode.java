@@ -214,13 +214,23 @@ extends Model
 	public String toDebugString() {
 		return String.format("ServerNode{id='%s', serverId='%s', expirationTime=%d, publicIP='%s', privateIP='%s', busy=%s}", id, serverId, expirationTime, publicIP, privateIP, busy);
 	}
-	@Override
-	public String toString()
-	{
-		return Utils.reflectedToString(this);
-	}
 
-	public String getPrivateKey() {
+    @Override
+    public String toString()
+    {
+        return "ServerNode{" +
+                "id=" + id +
+                ", serverId='" + serverId + '\'' +
+                ", expirationTime=" + expirationTime +
+                ", publicIP='" + publicIP + '\'' +
+                ", privateIP='" + privateIP + '\'' +
+                ", busy=" + busy +
+                ", remote=" + remote +
+                ", userName='" + userName + '\'' +
+                '}';
+    }
+
+    public String getPrivateKey() {
 		return privateKey;
 	}
 

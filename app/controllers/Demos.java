@@ -27,6 +27,8 @@ public class Demos extends Controller {
         return redirect(s);
     }
 
+
+
     public static Result googleLoginCallback(){
         OpenID.UserInfo userInfo = OpenID.verifiedId().get();
         return ok( views.html.demos.loginResult.render(userInfo.id.split("id=")[1], userInfo.attributes.get("email")));

@@ -41,7 +41,6 @@
 
     <logger name="net.schmizz.sshj.connection.channel.direct.SessionChannel" additivity="false" level="ERROR">
         <appender-ref ref="FILE"/>
-
     </logger>
 
 

@@ -30,7 +30,9 @@ import play.Routes;
 import play.cache.Cache;
 import play.i18n.Messages;
 import play.libs.Akka;
+import play.libs.F;
 import play.libs.Json;
+import play.libs.WS;
 import play.mvc.Controller;
 import play.mvc.Result;
 import server.ApplicationContext;
@@ -80,7 +82,22 @@ public class Application extends Controller
                 	new HeaderMessage().setError( Messages.get("widget.disabled.by.administrator") ).apply( response().getHeaders() );
 	                return badRequest(  );
             }
-			ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ));
+
+
+            if ( !StringUtils.isEmptyOrSpaces( widget.getLoginVerificationUrl() ) ) {
+                try {
+                    F.Promise<WS.Response> post = WS.url( widget.getLoginVerificationUrl().replace( "$userId", userId ) ).post( "content" );
+                    WS.Response response = post.get( 5L, TimeUnit.SECONDS );
+                    if ( response.getStatus() != 200 ) {
+                        return badRequest( "userId not verified : " + response.toString() );
+                    }
+                } catch ( Exception e ) {
+                    logger.error( "error while validating userId [{}] on url [{}]", userId, widget.getLoginVerificationUrl() );
+                }
+            }
+
+
+            ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ));
 			//TODO[adaml]: add proper input validation response
             if ( !StringUtils.isEmpty(hpcsKey) && !StringUtils.isEmpty( hpcsSecretKey ) ){
                 if ( !isValidInput(hpcsKey, hpcsSecretKey) ) {

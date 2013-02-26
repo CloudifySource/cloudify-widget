@@ -53,50 +53,6 @@ public class Utils
 	final static String RECIPE_FOLDER = Play.application().path().getPath() + "/recipes";
 	private static Logger logger = LoggerFactory.getLogger( Utils.class );
 
-
-	// TODO : lets not rescue only on IllegaException, lets catch on all Exception
-	// TODO : silent failure... lets log a warning.
-	// TODO : instead of writing our own implementation, lets try using : http://commons.apache.org/lang/api-2.4/org/apache/commons/lang/builder/ReflectionToStringBuilder.html
-
-	/**
-	 * @return a String key=value of all fields of the passed object
-	 */
-	@Deprecated
-	// guy - please don't use this method, as it might end up in
-	// an infinite loop. Imagine User has a Widget, and Widget points back to User,
-	// each of which implement toString using this function.. we will have infinite calls.
-	static public String reflectedToString( Object obj )
-	{
-		if ( obj == null ) {
-			return "null";
-		}
-		try {
-			StringBuilder b = new StringBuilder( obj.getClass() + "[" );
-
-			Field[] fields = obj.getClass().getDeclaredFields();
-			Field.setAccessible( fields, true );
-
-			for ( Field f : fields ) {
-				if ( !Modifier.isStatic( f.getModifiers() ) ) {
-					try {
-
-						b.append( f.getName() ).append( "=" ).append( f.get( obj ) ).append( ",\n" );
-					} catch ( IllegalAccessException e ) {
-						// pass, don't print
-					}
-				}
-			}
-
-			b.append( ']' );
-			return b.toString();
-		} catch ( Exception e ) {
-			logger.warn( "unable to print object : {}" , obj.toString() );
-		}
-		return "N/A";
-	}
-	
-
-
 	/**
 	 * Download the archived recipe from url, save file it to local directory and unzip it.
 	 * NOTE: The recipe file must be archived in zip format.

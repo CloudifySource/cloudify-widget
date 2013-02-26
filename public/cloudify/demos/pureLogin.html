@@ -1,0 +1,16 @@
+This is the embed page
+
+<body>
+
+<script type="text/javascript" id="cloudify-widget" data-api-key="7726c969-3423-427c-81a5-e00e0d6545ed" data-title="Login Example" data-host="launch.cloudifysource.org" data-video_url="http://www.youtube.com/embed/w5qr4sx5Vt0" src="http://launch.cloudifysource.org/js/get_widget.js"></script>
+
+<script type="text/javascript">
+    function receiveMessage(event)
+    {
+        console.log(["got a message",event]);
+    }
+    window.addEventListener("message", receiveMessage, false);
+</script>
+
+</body>
+
