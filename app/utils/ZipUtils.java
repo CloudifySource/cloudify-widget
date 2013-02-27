@@ -27,7 +27,8 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.io.IOUtils;
 
-import play.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An utility class that helps to unzip any zip file to desired output directory.
@@ -36,6 +37,7 @@ import play.Logger;
  */
 public class ZipUtils
 {
+    private static Logger logger = LoggerFactory.getLogger( ZipUtils.class );
 	static public void unzipArchive(File archive, File outputDir)
 		throws ZipException
 	{
@@ -50,7 +52,7 @@ public class ZipUtils
 		} catch (Exception e)
 		{
 			String msg = "Failed to extract archive: " + archive;
-			Logger.error(msg);
+			logger.error( msg, e );
 			throw new ZipException(msg);
 		}
 	}
@@ -69,7 +71,7 @@ public class ZipUtils
 		if (!outputFile.getParentFile().exists())
 			outputFile.getParentFile().mkdir();
 
-		Logger.info("Extracting: " + entry);
+		logger.debug("Extracting: [{}]", entry);
 		BufferedInputStream inputStream = new BufferedInputStream(zipfile.getInputStream(entry));
 		BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(outputFile));
 
