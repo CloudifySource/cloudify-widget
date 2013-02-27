@@ -66,7 +66,7 @@ public class ConfigBean {
         injectConfiguration( root, Play.application().configuration() );
         try{
             logger.info( "getting configuration : {}" , Json.stringify( Json.toJson( root ) ));
-            logger.info( System.getProperty( "java.class.path" ) );
+            logger.debug( System.getProperty( "java.class.path" ) );
         }catch(RuntimeException e){ }
         return root;
     }

@@ -22,9 +22,9 @@
 
     <bean id="mailSender" class="beans.MailSenderImpl"/>
 
-    <bean id="beansFactory" class="beans.BeansFactory"/>
     <bean id="eventMonitorImpl" class="beans.EventMonitorMixpanel" p:apiKey="#{conf.mixpanelApiKey}" init-method="init"/>
     <bean id="eventMonitorMock" class="mocks.EventMonitorMock"/>
+    <bean id="beansFactory" class="beans.BeansFactory"/>
     <bean id="eventMonitor" class="server.EventMonitor" factory-bean="beansFactory" factory-method="getEventMonitor"/>
 
     <bean id="serverPool" class="beans.ServerPoolImpl"/>
