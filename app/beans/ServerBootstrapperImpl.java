@@ -440,4 +440,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     {
         this.conf = conf;
     }
+
+    public void setRetries( int retries )
+    {
+        this.retries = retries;
+    }
 }
