@@ -397,16 +397,12 @@ public class WidgetAdmin extends Controller
 			int totalUsers = User.find.findRowCount();
 			int totalWidgets = Widget.find.findRowCount();
 
-
             // find only widget instances deployed on my cloud.
             int localInstances = WidgetInstance.find.where().eq( "serverNode.remote", false ).findRowCount();
-
-
 
             summary.addAttribute( "Users", String.valueOf( totalUsers ) );
 			summary.addAttribute("Widgets", String.valueOf( totalWidgets ));
 			summary.addAttribute("Instances", String.valueOf( localInstances ));
-
 
             ServerNodesPoolStats stats = ApplicationContext.get().getServerPool().getStats();
             summary.addAttribute("Idle Servers", String.valueOf( stats.nonBusyServers ));
