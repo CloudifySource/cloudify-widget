@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import beans.ServerNodesPoolStats;
 import data.validation.GsConstraints;
 import models.ServerNode;
 import models.Summary;
@@ -395,15 +396,21 @@ public class WidgetAdmin extends Controller
 		{		
 			int totalUsers = User.find.findRowCount();
 			int totalWidgets = Widget.find.findRowCount();
-			int totalInstances = WidgetInstance.find.findRowCount();
-			int totalIdleServers = ServerNode.find.where().eq("busy", "false").findRowCount();
-			int totalBusyServers = ServerNode.find.where().eq("busy", "true").findRowCount();
-	
-			summary.addAttribute("Users", String.valueOf( totalUsers ));
+
+
+            // find only widget instances deployed on my cloud.
+            int localInstances = WidgetInstance.find.where().eq( "serverNode.remote", false ).findRowCount();
+
+
+
+            summary.addAttribute( "Users", String.valueOf( totalUsers ) );
 			summary.addAttribute("Widgets", String.valueOf( totalWidgets ));
-			summary.addAttribute("Instances", String.valueOf( totalInstances ));
-			summary.addAttribute("Idle Servers", String.valueOf( totalIdleServers ));
-			summary.addAttribute("Busy Servers", String.valueOf( totalBusyServers ));
+			summary.addAttribute("Instances", String.valueOf( localInstances ));
+
+
+            ServerNodesPoolStats stats = ApplicationContext.get().getServerPool().getStats();
+            summary.addAttribute("Idle Servers", String.valueOf( stats.nonBusyServers ));
+			summary.addAttribute("Busy Servers", String.valueOf( stats.busyServers ));
 		}
 
 
