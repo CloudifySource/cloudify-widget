@@ -92,8 +92,12 @@ public class Application extends Controller
             }
 
 
-            ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ));
-			//TODO[adaml]: add proper input validation response
+            try {
+                ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ) );
+            } catch ( RuntimeException e ) {
+                logger.info( "ran into problem firing event : [{}]", ApplicationContext.get().getEventMonitor(), e );
+            }
+            //TODO[adaml]: add proper input validation response
             if ( !StringUtils.isEmpty(hpcsKey) && !StringUtils.isEmpty( hpcsSecretKey ) ){
                 if ( !isValidInput(hpcsKey, hpcsSecretKey) ) {
                     new HeaderMessage().setError(Messages.get("invalid.hpcs.credentials")).apply(response().getHeaders());
