@@ -429,6 +429,7 @@ public class WidgetAdmin extends Controller
 	{
         User user = User.validateAuthToken( authToken );
         Widget widget = Widget.regenerateApiKey(user, apiKey);
+        logger.info( "regenerated api key to [{}]", widget );
 		return resultAsJson(widget);
 	}
 
