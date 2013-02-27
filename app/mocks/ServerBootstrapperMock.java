@@ -49,4 +49,10 @@ public class ServerBootstrapperMock implements ServerBootstrapper
     	return null;
     	
     }
+
+    @Override
+    public boolean validateBootstrap( ServerNode serverNode )
+    {
+        return true;
+    }
 }

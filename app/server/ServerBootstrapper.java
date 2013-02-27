@@ -39,6 +39,13 @@ public interface ServerBootstrapper
 
     public void destroyServer(String serverId);
 
+    /**
+     *
+     * @param serverNode - the server we need to check
+     * @return true iff bootstrap was a success
+     */
+    public boolean validateBootstrap( ServerNode serverNode );
+
     public void close();
     
     public ServerNode bootstrapCloud( ServerNode serverNode );

@@ -82,36 +82,6 @@ public class ServerPoolImpl implements ServerPool
         }
     };
 
-
-    private boolean isManagementAvailable( ServerNode serverNode )
-    {
-        logger.info( "testing if management is available at : {}", serverNode );
-
-        try {
-            Response response = WS.url( "http://" + serverNode.getPublicIP() + ":8100/service/testrest" ).get().value().get();
-            String body = response.body();
-            logger.info( "got testrest result with body [{}] ", body );
-            if ( StringUtils.isEmpty( body ) ) {
-                logger.info( "body is empty" );
-                return false;
-            } else {
-                logger.info( "body is not empty, testing if status successful" );
-                JsonNode parse = Json.parse( body );
-                if ( parse.has( "status" ) ){
-                    JsonNode nodeValue = parse.get("status");
-                    String textValue = nodeValue == null ? "null" : nodeValue.getTextValue();
-                    logger.info( "response has 'status' key which is equal to [{}]", textValue );
-                    return "success".equals( textValue );
-                }
-                logger.info( "parsed json to [{}]", parse );
-            }
-
-        } catch ( Exception e ) {  // guy - don't ask me how but compiler does not pick this up.. maybe because it is scala.
-            logger.error( "unable to check if serverNode [{}] is up", serverNode, e );
-        }
-        return false;
-    }
-
     /**
      *
      * @param pool - the pool we need to clean
@@ -126,7 +96,7 @@ public class ServerPoolImpl implements ServerPool
 
         List<ServerNode> cleanPool = new LinkedList<ServerNode>(  );
         for ( ServerNode serverNode : pool ) {
-            if ( !isManagementAvailable(serverNode) ){
+            if ( !serverBootstrapper.validateBootstrap(serverNode) ){
                 logger.info( "found a dead server [{}] I should destroy this server..", serverNode );
                 destroy( serverNode.getNodeId() );
             }else{
@@ -188,15 +158,20 @@ public class ServerPoolImpl implements ServerPool
     @Override
 	synchronized public ServerNode get( long lifeExpectancy )
 	{
+        logger.info( "getting a server node with lifeExpectancy [{}]", lifeExpectancy );
 		ServerNode freeServer = CollectionUtils.first(ServerNode.findByCriteria(new ServerNode.QueryConf().setMaxRows(1).criteria().setBusy(false).setRemote(false).done()));
 		if ( freeServer != null)
-		{    // guy : todo : need to lock this somehow
+		{
+		    // guy : todo : need to lock this somehow
 			freeServer.setBusy(true);
 			freeServer.setExpirationTime( lifeExpectancy + System.currentTimeMillis() );
 			// schedule to destroy after time expiration 
 			// TODO when unlimited server will support uncomment this line if ( freeServer.isTimeLimited() )
 			expiredServerCollector.scheduleToDestroy(freeServer);
-		}
+
+		}else{
+            logger.info( "freeServer is null, adding a new server" );
+        }
 
 		addNewServerToPool();
 
@@ -228,6 +203,7 @@ public class ServerPoolImpl implements ServerPool
 	
 	void addNewServerToPool()
 	{
+        logger.info( "adding new server to the pool" );
 		new Thread(new Runnable()
 		{
 			public void run()
@@ -235,7 +211,6 @@ public class ServerPoolImpl implements ServerPool
 				try
 				{
 					List<ServerNode> servers = serverBootstrapper.createServers( 1 );
-					
 					for( ServerNode srv :  servers ){
 						srv.save();
                     }

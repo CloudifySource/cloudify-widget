@@ -25,6 +25,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.JsonNode;
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
@@ -45,7 +46,10 @@ import org.jclouds.sshj.config.SshjSshClientModule;
 import org.jclouds.util.Strings2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.api.libs.ws.Response;
+import play.api.libs.ws.WS;
 import play.i18n.Messages;
+import play.libs.Json;
 import server.ApplicationContext;
 import server.DeployManager;
 import server.ProcExecutor;
@@ -84,6 +88,8 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	private ComputeService _compute;
 	private RestContext<NovaApi, NovaAsyncApi> _nova;
 
+    private int retries = 2;
+
     @Inject
     private Conf conf;
 
@@ -93,31 +99,87 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     @Inject
     private DeployManager deployManager;
 
+    private Exception lastKnownException = null;
+
     public List<ServerNode> createServers( int numOfServers )
 	{
 		List<ServerNode> servers = new ArrayList<ServerNode>();
 		logger.info("creating {} new instances", numOfServers );
 		for( int i=0; i< numOfServers; i++ )
 		{
-			ServerNode srvNode = null;
-	    	try {
-				srvNode =  createServerNode();
-				servers.add( srvNode );
-
-				return servers;
-			} catch (Exception e)
-			{
-				// failed to boostrap machine, nothing to do - let destroy :(
-				if ( srvNode != null ) {
-					destroyServer(srvNode.getNodeId());
-                }
-
-				logger.error("Failed to bootstrap machine. ", e);
-			}
-		}
-
+            ServerNode server = createServer();
+            servers.add( server );
+        }
 		return servers;
 	}
+
+    public ServerNode createServer()
+    {
+
+        ServerNode serverNode = null;
+        int i =0;
+        for ( ; i < retries && serverNode == null ; i++){
+            logger.info( "creating new server node, try #[{}]",i );
+            serverNode = tryCreateServer();
+        }
+
+        if ( serverNode == null ){
+            throw new RuntimeException( "unable to create new nodes!! printed last known exception here", lastKnownException );
+        }
+        return serverNode;
+
+    }
+
+    public ServerNode tryCreateServer(){
+        ServerNode srvNode = null;
+        try {
+            srvNode = createServerNode();
+            return srvNode;
+        } catch ( Exception e ) {
+            lastKnownException = e;
+            // failed to boostrap machine, nothing to do - let destroy :(
+            if ( srvNode != null ) {
+                destroyServer( srvNode.getNodeId() );
+            }
+            logger.error( "Failed to bootstrap machine. [{}]", srvNode, e );
+        }
+        return null;
+    }
+
+    @Override
+    public boolean validateBootstrap( ServerNode serverNode )
+    {
+        return isManagementAvailable( serverNode );
+    }
+
+    private boolean isManagementAvailable( ServerNode serverNode )
+      {
+          logger.info( "testing if management is available at : {}", serverNode );
+
+          try {
+              Response response = WS.url( "http://" + serverNode.getPublicIP() + ":8100/service/testrest" ).get().value().get();
+              String body = response.body();
+              logger.info( "got testrest result with body [{}] ", body );
+              if ( org.apache.commons.lang3.StringUtils.isEmpty( body ) ) {
+                  logger.info( "body is empty" );
+                  return false;
+              } else {
+                  logger.info( "body is not empty, testing if status successful" );
+                  JsonNode parse = Json.parse( body );
+                  if ( parse.has( "status" ) ){
+                      JsonNode nodeValue = parse.get("status");
+                      String textValue = nodeValue == null ? "null" : nodeValue.getTextValue();
+                      logger.info( "response has 'status' key which is equal to [{}]", textValue );
+                      return "success".equals( textValue );
+                  }
+                  logger.info( "parsed json to [{}]", parse );
+              }
+
+          } catch ( Exception e ) {  // guy - don't ask me how but compiler does not pick this up.. maybe because it is scala.
+              logger.error( "unable to check if serverNode [{}] is up", serverNode, e );
+          }
+          return false;
+      }
 
 
 	public void destroyServer( String serverId )
