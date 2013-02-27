@@ -18,6 +18,9 @@ package server;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import mocks.EventMonitorMock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.modules.spring.Spring;
 import beans.GsMailer;
 import beans.HmacImpl;
@@ -40,6 +43,7 @@ import beans.config.Conf;
 public class ApplicationContext
 {
 
+    private static Logger logger = LoggerFactory.getLogger( ApplicationContext.class );
     @Inject private DeployManager deployManager;
     @Inject private WidgetServer widgetServer;
     @Inject private ServerPool serverPool;
@@ -154,6 +158,10 @@ public class ApplicationContext
 
     public EventMonitor getEventMonitor()
     {
+        if ( eventMonitor == null ){
+            logger.info("eventMonitor is null for some reason");
+            return new EventMonitorMock();
+        }
         return eventMonitor;
     }
 

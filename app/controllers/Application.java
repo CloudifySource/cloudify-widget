@@ -92,11 +92,8 @@ public class Application extends Controller
             }
 
 
-            try {
-                ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ) );
-            } catch ( RuntimeException e ) {
-                logger.info( "ran into problem firing event : [{}]", ApplicationContext.get().getEventMonitor(), e );
-            }
+             ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ) );
+
             //TODO[adaml]: add proper input validation response
             if ( !StringUtils.isEmpty(hpcsKey) && !StringUtils.isEmpty( hpcsSecretKey ) ){
                 if ( !isValidInput(hpcsKey, hpcsSecretKey) ) {
