@@ -27,5 +27,5 @@ public interface WidgetServer
 
     public Widget.Status getWidgetStatus( ServerNode serverNode );
     
-    public WidgetInstance deploy( Widget widget, ServerNode server );
+    public WidgetInstance deploy( Widget widget, ServerNode server, String remoteAddress );
 }

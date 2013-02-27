@@ -125,6 +125,7 @@ public class Application extends Controller
             // run the "bootstrap" and "deploy" in another thread.
             final ServerNode finalServerNode = serverNode;
             final Widget finalWidget = widget;
+            final String remoteAddress = request().remoteAddress();
             Akka.system().scheduler().scheduleOnce(
                     Duration.create(0, TimeUnit.SECONDS),
                     new Runnable() {
@@ -135,7 +136,7 @@ public class Application extends Controller
                                 ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode);
                             }
                             logger.info("installing widget on remote cloud");
-                            ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode);
+                            ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress );
                         }
                     });
 

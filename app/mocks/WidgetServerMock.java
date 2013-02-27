@@ -37,7 +37,7 @@ public class WidgetServerMock implements WidgetServer {
     }
 
 	@Override
-	public WidgetInstance deploy(Widget widget, ServerNode server) {
+	public WidgetInstance deploy(Widget widget, ServerNode server, String remoteAddress) {
 		logger.info("deploying : {}", server.getPublicIP());
 		return null;
 	}
