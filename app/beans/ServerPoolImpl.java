@@ -24,13 +24,8 @@ import beans.config.Conf;
 import com.avaje.ebean.Ebean;
 import models.ServerNode;
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import play.api.libs.ws.Response;
-import play.api.libs.ws.WS;
-import play.libs.Json;
 import server.*;
 import utils.CollectionUtils;
 
@@ -61,17 +56,24 @@ public class ServerPoolImpl implements ServerPool
     private Conf conf;
 
 
+    private static Predicate nonRemotePredicate = new Predicate() {
+        @Override
+        public boolean evaluate( Object o )
+        {
+            return !((ServerNode)o).isRemote();
+        }
+    };
     private static Predicate busyServerPredicate = new Predicate() {
         @Override
         public boolean evaluate(Object o) {
-            return ((ServerNode)o).isBusy() && !((ServerNode)o).isRemote();
+            return ((ServerNode)o).isBusy() && nonRemotePredicate.evaluate( o );
         }
     };
 
     private static Predicate nonBusyServerPredicate = new Predicate() {
         @Override
         public boolean evaluate(Object o) {
-            return !((ServerNode)o).isBusy() && !((ServerNode)o).isRemote();
+            return !((ServerNode)o).isBusy() && nonRemotePredicate.evaluate( o );
         }
     };
 
@@ -96,7 +98,7 @@ public class ServerPoolImpl implements ServerPool
 
         List<ServerNode> cleanPool = new LinkedList<ServerNode>(  );
         for ( ServerNode serverNode : pool ) {
-            if ( !serverBootstrapper.validateBootstrap(serverNode) ){
+            if ( !serverBootstrapper.validateBootstrap( serverNode ) ){
                 logger.info( "found a dead server [{}] I should destroy this server..", serverNode );
                 destroy( serverNode.getNodeId() );
             }else{
@@ -153,6 +155,19 @@ public class ServerPoolImpl implements ServerPool
             Ebean.delete(failedBootstraps);
         }
     }
+
+    public ServerNodesPoolStats getStats(){
+        ServerNodesPoolStats stats = new ServerNodesPoolStats();
+
+        List<ServerNode> all = ServerNode.all();
+        stats.all = CollectionUtils.size( all );
+        stats.nonRemote = CollectionUtils.size(  CollectionUtils.select( all, nonRemotePredicate ) );
+        stats.busyServers = CollectionUtils.size( CollectionUtils.select( all, busyServerPredicate ) );
+        stats.nonBusyServers = CollectionUtils.size( CollectionUtils.select( all, nonBusyServerPredicate ) );
+        stats.minLimit = conf.server.pool.minNode;
+        stats.maxLimit = conf.server.pool.maxNodes;
+        return stats;
+    }
 	
 	/** @return a ServerNode from the pool, otherwise <code>null</code> if no free server available */
     @Override
@@ -170,7 +185,7 @@ public class ServerPoolImpl implements ServerPool
 			expiredServerCollector.scheduleToDestroy(freeServer);
 
 		}else{
-            logger.info( "freeServer is null, adding a new server" );
+            logger.info( "freeServer is null, adding a new server. pool status is [{}]", getStats() );
         }
 
 		addNewServerToPool();

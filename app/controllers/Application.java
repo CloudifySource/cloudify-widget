@@ -68,12 +68,7 @@ public class Application extends Controller
 	{
 		try
 		{
-            // guy - todo - get rid of the "exception/catch" flow and use simple return result statements instead.
-            // don't allow for 30 seconds to start the widget again
-            Long timeLeft = (Long) Cache.get(Controller.request().remoteAddress());
-            if (timeLeft != null) {
-                throw new ServerException(Messages.get("please.wait.x.sec", (timeLeft - System.currentTimeMillis()) / 1000));
-            }
+
 
 			logger.info("starting widget with [apiKey, hpcsKey, hpcsSecretKey] = [{},{},{}]", new Object[]{apiKey, hpcsKey, hpcsSecretKey} );
  			Widget widget = Widget.getWidget( apiKey );
@@ -113,7 +108,12 @@ public class Application extends Controller
             }else{
                 serverNode = ApplicationContext.get().getServerPool().get(widget.getLifeExpectancy());
                 if (serverNode == null) {
-                    ApplicationContext.get().getMailSender().sendPoolIsEmptyMail();
+                    // if the user clicked another play in the last 30 seconds, we allow ourselves to tell them to wait..
+                    Long timeLeft = (Long) Cache.get(Controller.request().remoteAddress());
+                    if (timeLeft != null) {
+                        throw new ServerException(Messages.get("please.wait.x.sec", (timeLeft - System.currentTimeMillis()) / 1000));
+                    }
+                    ApplicationContext.get().getMailSender().sendPoolIsEmptyMail( ApplicationContext.get().getServerPool().getStats().toString() );
                     throw new ServerException(Messages.get("no.available.servers"));
                 }
             }

@@ -16,6 +16,7 @@
 
 package server;
 
+import beans.ServerNodesPoolStats;
 import models.ServerNode;
 
 /**
@@ -29,5 +30,7 @@ public interface ServerPool
 
     public void destroy( String serverId );
 
-    void init();
+    public void init();
+
+    public ServerNodesPoolStats getStats();
 }

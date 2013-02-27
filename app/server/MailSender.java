@@ -10,5 +10,5 @@ import models.User;
 public interface MailSender {
     public void resetPasswordMail( User user );
 
-    public void sendPoolIsEmptyMail();
+    public void sendPoolIsEmptyMail( String stats );
 }

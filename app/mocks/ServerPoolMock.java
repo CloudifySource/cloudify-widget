@@ -16,6 +16,7 @@
 
 package mocks;
 
+import beans.ServerNodesPoolStats;
 import models.ServerNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,12 @@ public class ServerPoolMock implements ServerPool
     public void init()
     {
 
+    }
+
+    @Override
+    public ServerNodesPoolStats getStats()
+    {
+        return new ServerNodesPoolStats();
     }
 
     public ServerNode get( long lifeExpectancy )

@@ -91,6 +91,8 @@ public class WidgetServerImpl implements WidgetServer
 	
 	public WidgetInstance deploy( Widget widget, ServerNode server )
 	{
+        // keep the user for 30 seconds by IP, to avoid immediate widget start after stop
+        Cache.set(Controller.request().remoteAddress(), new Long(System.currentTimeMillis() + WIDGET_STOP_TIMEOUT*1000), WIDGET_STOP_TIMEOUT );
 		File unzippedDir = Utils.downloadAndUnzip( widget.getRecipeURL(), widget.getApiKey() );
         File recipeDir = unzippedDir;
         if ( widget.getRecipeRootPath() != null  ){
@@ -104,9 +106,6 @@ public class WidgetServerImpl implements WidgetServer
 	
 	public void undeploy( String instanceId )
 	{
-		// keep the user for 30 seconds by IP, to avoid immediate widget start after stop
-		Cache.set(Controller.request().remoteAddress(), new Long(System.currentTimeMillis() + WIDGET_STOP_TIMEOUT*1000), WIDGET_STOP_TIMEOUT ); 
-		
 		serverPool.destroy(instanceId);
 	}
 
