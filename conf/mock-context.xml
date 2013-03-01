@@ -11,7 +11,8 @@
     <bean id="serverBootstrapper" class="mocks.ServerBootstrapperMock"/>
     <bean id="serverPool" class="mocks.ServerPoolMock"/>
     <bean id="widgetServer" class="mocks.WidgetServerMock"/>
-    <bean id="eventMonitor" class="mocks.EventMonitorMock"/>
+    <bean id="mailSender" class="mocks.MailSenderMock"/>
+    <!--<bean id="eventMonitor" class="mocks.EventMonitorMock"/>-->
     <context:annotation-config />
     <context:component-scan base-package="mocks" />
 

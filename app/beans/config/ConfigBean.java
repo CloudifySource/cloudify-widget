@@ -54,8 +54,6 @@ public class ConfigBean {
         handlers.put( String.class, new StringHandler() );
 
         handlers.put( File.class, new FileHandler() );
-
-
     }
 
 
