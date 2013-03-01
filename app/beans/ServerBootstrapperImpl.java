@@ -90,6 +90,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	private RestContext<NovaApi, NovaAsyncApi> _nova;
 
     private int retries = 2;
+    private int bootstrapRetries = 2;
 
     @Inject
     private Conf conf;
@@ -224,11 +225,16 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     }
 
 
+    public ServerApi getApi(){
+        return _nova.getApi().getServerApiForZone(conf.server.bootstrap.zoneName);
+    }
+
+
 	private ServerNode createServerNode() throws RunNodesException, TimeoutException
 	{
 		logger.info( "Starting to create new Server [imageId={}, flavorId={}]", conf.server.bootstrap.imageId, conf.server.bootstrap.flavorId );
 
-		ServerApi serverApi = _nova.getApi().getServerApiForZone(conf.server.bootstrap.zoneName);
+		ServerApi serverApi = getApi();
 		CreateServerOptions serverOpts = new CreateServerOptions();
 
         Map<String,String> metadata = new HashMap<String, String>();
@@ -262,8 +268,34 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		logger.info("Server created, wait 10 seconds before starting to bootstrap machine: {}" ,  serverNode.getPublicIP() );
 		Utils.threadSleep(10000); // need for a network interfaces initialization
 
-		// bootstrap machine: firewall, jvm, start cloudify
-		bootstrapMachine( serverNode );
+
+        boolean bootstrapSuccess = false;
+        Exception lastBootstrapException = null;
+        for ( int i = 0; i < bootstrapRetries && !bootstrapSuccess ; i ++ ){
+		    // bootstrap machine: firewall, jvm, start cloudify
+            logger.info( "bootstrapping machine try #[{}]", i );
+		    try{
+                bootstrapMachine( serverNode );
+                BootstrapValidationResult bootstrapValidationResult = validateBootstrap( serverNode );
+                if ( bootstrapValidationResult.getResult() ) {
+                    bootstrapSuccess = true;
+                }else{
+                    logger.info( "machine [{}] did not bootstrap successfully [{}] retrying", serverNode, bootstrapValidationResult );
+                    logger.info( "rebuilding machine" );
+                    try{
+                        serverApi.rebuild( serverNode.getNodeId() );
+                    }catch(RuntimeException e){
+                        logger.error( "error while rebuilding machine [{}]", serverNode ,e );
+                    }
+                }
+            }catch(RuntimeException e){
+                 lastBootstrapException = e;
+            }
+        }
+
+        if ( !bootstrapSuccess ){
+            logger.error( "unable to bootstrap machine", lastBootstrapException );
+        }
 
 		logger.info("Server created.{} " , server.getAddresses() );
 
@@ -466,5 +498,10 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     public void setRetries( int retries )
     {
         this.retries = retries;
+    }
+
+    public void setBootstrapRetries( int bootstrapRetries )
+    {
+        this.bootstrapRetries = bootstrapRetries;
     }
 }
