@@ -18,6 +18,7 @@ package mocks;
 
 import java.util.List;
 
+import beans.BootstrapValidationResult;
 import models.ServerNode;
 
 import org.slf4j.Logger;
@@ -51,8 +52,8 @@ public class ServerBootstrapperMock implements ServerBootstrapper
     }
 
     @Override
-    public boolean validateBootstrap( ServerNode serverNode )
+    public BootstrapValidationResult validateBootstrap( ServerNode serverNode )
     {
-        return true;
+        return new BootstrapValidationResult();
     }
 }

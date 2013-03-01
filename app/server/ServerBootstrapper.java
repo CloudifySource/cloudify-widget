@@ -18,6 +18,7 @@ package server;
 
 import java.util.List;
 
+import beans.BootstrapValidationResult;
 import models.ServerNode;
 
 /**
@@ -41,10 +42,11 @@ public interface ServerBootstrapper
 
     /**
      *
+     *
      * @param serverNode - the server we need to check
      * @return true iff bootstrap was a success
      */
-    public boolean validateBootstrap( ServerNode serverNode );
+    public BootstrapValidationResult validateBootstrap( ServerNode serverNode );
 
     public void close();
     

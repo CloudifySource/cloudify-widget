@@ -62,6 +62,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -146,11 +147,32 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         return null;
     }
 
+    // guy - todo - need to ping machine first. If machine is down, we cannot validate - throw exception.
+    // guy - todo - if machine is up we do the same thing we do today.
     @Override
-    public boolean validateBootstrap( ServerNode serverNode )
+    public BootstrapValidationResult validateBootstrap( ServerNode serverNode )
     {
-        return isManagementAvailable( serverNode );
+        BootstrapValidationResult result = new BootstrapValidationResult();
+        try{
+        result.machineReachable = isMachineReachable( serverNode );
+        }catch(Exception e){
+            result.machineReachableException = e;
+        }
+
+        if ( result.machineReachable == Boolean.TRUE ){
+            result.managementAvailable = isManagementAvailable( serverNode );
+        }
+        return result;
     }
+
+    private boolean isMachineReachable( ServerNode serverNode ) throws Exception
+    {
+
+        String publicIP = serverNode.getPublicIP();
+        InetAddress byName = InetAddress.getByName( publicIP );
+        return byName.isReachable( 5000 );
+    }
+
 
     private boolean isManagementAvailable( ServerNode serverNode )
       {
@@ -175,7 +197,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                   logger.info( "parsed json to [{}]", parse );
               }
 
-          } catch ( Exception e ) {  // guy - don't ask me how but compiler does not pick this up.. maybe because it is scala.
+          } catch ( Exception e ) {  // guy - don't ask me how but compiler does not pick the real exception up.. maybe because it is scala.
               logger.error( "unable to check if serverNode [{}] is up", serverNode, e );
           }
           return false;

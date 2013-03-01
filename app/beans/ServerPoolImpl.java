@@ -30,6 +30,7 @@ import server.*;
 import utils.CollectionUtils;
 
 import javax.inject.Inject;
+import javax.persistence.OptimisticLockException;
 
 
 /**
@@ -95,12 +96,16 @@ public class ServerPoolImpl implements ServerPool
             return new LinkedList<ServerNode>(  );
         }
 
-
         List<ServerNode> cleanPool = new LinkedList<ServerNode>(  );
         for ( ServerNode serverNode : pool ) {
-            if ( !serverBootstrapper.validateBootstrap( serverNode ) ){
-                logger.info( "found a dead server [{}] I should destroy this server..", serverNode );
-                destroy( serverNode.getNodeId() );
+            BootstrapValidationResult bootstrapValidationResult = serverBootstrapper.validateBootstrap( serverNode );
+            if ( !bootstrapValidationResult.getResult() ){
+                if ( bootstrapValidationResult.testCompleted() ){
+                    logger.info( "found a bad bootstrap on server [{}] I should destroy this server..", serverNode );
+                    destroy( serverNode.getNodeId() );
+                }else{
+                    logger.error("unable to complete bootstrap test on [{}], nothing to do", bootstrapValidationResult );
+                }
             }else{
                 logger.info( "Found a working management server [{}], adding to clean pool", serverNode );
                 cleanPool.add( serverNode );
@@ -174,26 +179,58 @@ public class ServerPoolImpl implements ServerPool
 	synchronized public ServerNode get( long lifeExpectancy )
 	{
         logger.info( "getting a server node with lifeExpectancy [{}]", lifeExpectancy );
-		ServerNode freeServer = CollectionUtils.first(ServerNode.findByCriteria(new ServerNode.QueryConf().setMaxRows(1).criteria().setBusy(false).setRemote(false).done()));
-		if ( freeServer != null)
-		{
-		    // guy : todo : need to lock this somehow
-			freeServer.setBusy(true);
-			freeServer.setExpirationTime( lifeExpectancy + System.currentTimeMillis() );
-			// schedule to destroy after time expiration 
-			// TODO when unlimited server will support uncomment this line if ( freeServer.isTimeLimited() )
-			expiredServerCollector.scheduleToDestroy(freeServer);
 
-		}else{
-            logger.info( "freeServer is null, adding a new server. pool status is [{}]", getStats() );
+        List<ServerNode> freeServers = null;
+        freeServers = ServerNode.findByCriteria( new ServerNode.QueryConf().setMaxRows( 10 ).criteria().setBusy( false ).setRemote( false ).done() );
+        ServerNode selectedServer = null;
+        if ( !CollectionUtils.isEmpty( freeServers )){
+            for ( ServerNode freeServer : freeServers ) {
+                if ( tryToGetFreeServer( freeServer, lifeExpectancy )){
+                    logger.info( "successfully got a free server [{}]", freeServer );
+                    selectedServer = freeServer;
+                }
+            }
+        }else{
+            logger.info( "freeServers is empty, adding a new server. pool status is [{}]", getStats() );
         }
 
 		addNewServerToPool();
 
-		return freeServer;
+		return selectedServer;
 	}
-	
-	public void destroy(String serverId)
+
+    /**
+     * <p>
+     * This method checks the serverNode is accessible.<br/>
+     * If the serverNode is accessible it will try to mark it as "busy" which will effectively
+     * get it out of the pool.<br/>
+     * </p>
+     *
+     * @param serverNode - the server node we are trying to get
+     * @return - true iff successfully got the serverNode
+     */
+    private boolean tryToGetFreeServer( ServerNode serverNode, long lifeExpectancy )
+    {
+        try{
+            BootstrapValidationResult result = serverBootstrapper.validateBootstrap( serverNode );
+            if ( result.getResult() ) {
+                serverNode.setBusy( true );
+                serverNode.setExpirationTime( lifeExpectancy + System.currentTimeMillis() );
+                serverNode.save(); // optimistic locking
+                // schedule to destroy after time expiration
+                // TODO when unlimited server will support uncomment this line if ( serverNode.isTimeLimited() )
+                expiredServerCollector.scheduleToDestroy( serverNode );
+                return true;
+            } else {
+                logger.info( "serverNode[{}] has an invalid bootstrap", result );
+            }
+        }catch(OptimisticLockException e){
+            logger.info( "server [{}] already caught by another thread, could not get it", serverNode );
+        }
+        return false;
+    }
+
+    public void destroy(String serverId)
 	{
         if ( serverId == null ){
             return; // nothing to do.

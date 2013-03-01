@@ -30,6 +30,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.OneToOne;
+import javax.persistence.Version;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,6 +85,9 @@ extends Model
 
     @OneToOne( cascade = CascadeType.REMOVE )
     WidgetInstance widgetInstance = null;
+
+    @Version
+    private long version = 0;
 	
 	public static Finder<Long,ServerNode> find = new Finder<Long,ServerNode>(Long.class, ServerNode.class); 
 
@@ -132,7 +136,6 @@ extends Model
 	public void setExpirationTime(Long expirationTime)
 	{
 		this.expirationTime = expirationTime;
-		save();
 	}
 
 	public long getElapsedTime()
@@ -153,7 +156,6 @@ extends Model
 	public void setBusy( boolean isBusy )
 	{
 		this.busy = isBusy;
-		save();
 	}
 
 	static public int count()
