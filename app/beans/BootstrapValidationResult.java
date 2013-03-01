@@ -6,7 +6,7 @@ package beans;
  * Time: 3:59 AM
  */
 public class BootstrapValidationResult {
-    Boolean machineReachable = false;
+    Boolean machineReachable = true;
     Boolean managementAvailable = null;
     public Exception machineReachableException = null;
 

@@ -168,13 +168,14 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
     private boolean isMachineReachable( ServerNode serverNode ) throws Exception
     {
-        logger.info( "pinging machine [{}]", serverNode );
-        String publicIP = serverNode.getPublicIP();
-        InetAddress byName = InetAddress.getByName( publicIP );
-
-        boolean reachable = byName.isReachable( 5000 );
-        logger.info( "machine is reachable [{}]", reachable );
-        return reachable;
+//        logger.info( "pinging machine [{}]", serverNode );
+//        String publicIP = serverNode.getPublicIP();
+//        InetAddress byName = InetAddress.getByName( publicIP );
+//
+//        boolean reachable = byName.isReachable( 5000 );
+//        logger.info( "machine is reachable [{}]", reachable );
+//        return reachable;
+        return true; // guy - there's a problem pinging machines.
     }
 
 
