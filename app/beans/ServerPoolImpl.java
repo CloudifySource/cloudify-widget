@@ -188,6 +188,7 @@ public class ServerPoolImpl implements ServerPool
                 if ( tryToGetFreeServer( freeServer, lifeExpectancy )){
                     logger.info( "successfully got a free server [{}]", freeServer );
                     selectedServer = freeServer;
+                    break;
                 }
             }
         }else{
