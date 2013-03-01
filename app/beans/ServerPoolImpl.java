@@ -104,7 +104,7 @@ public class ServerPoolImpl implements ServerPool
                     logger.info( "found a bad bootstrap on server [{}] I should destroy this server..", serverNode );
                     destroy( serverNode.getNodeId() );
                 }else{
-                    logger.error("unable to complete bootstrap test on [{}], nothing to do", bootstrapValidationResult );
+                    logger.error("unable to complete bootstrap test on [{}], result is [{}], nothing to do",serverNode, bootstrapValidationResult );
                 }
             }else{
                 logger.info( "Found a working management server [{}], adding to clean pool", serverNode );
