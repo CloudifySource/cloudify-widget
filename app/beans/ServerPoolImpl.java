@@ -122,7 +122,9 @@ public class ServerPoolImpl implements ServerPool
         List<ServerNode> lostMachines = serverBootstrapper.recoverUnmonitoredMachines();
         if ( !CollectionUtils.isEmpty( lostMachines )){
             logger.info( "found [{}] lost machines", CollectionUtils.size( lostMachines ) );
-            Ebean.save( lostMachines );
+            for ( ServerNode lostMachine : lostMachines ) {
+                lostMachine.save(  );
+            }
         }else{
             logger.info( "no lost machines found" );
         }
