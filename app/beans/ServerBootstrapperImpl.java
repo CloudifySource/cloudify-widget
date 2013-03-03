@@ -70,7 +70,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
-
+import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
@@ -97,6 +97,10 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
     @Inject
     private ExecutorFactory executorFactory;
+
+    // this is an incrementing ID starting from currentMilliTime..
+    // resolves issue where we got "Server by this name already exists"
+    private AtomicLong incNodeId = new AtomicLong(  System.currentTimeMillis() );
 
     @Inject
     private DeployManager deployManager;
@@ -142,8 +146,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             // failed to boostrap machine, nothing to do - let destroy :(
             if ( srvNode != null ) {
                 destroyServer( srvNode.getNodeId() );
+                logger.error( "Failed to create machine.", e );
             }
-            logger.error( "Failed to bootstrap machine. [{}]", srvNode, e );
+
         }
         return null;
     }
@@ -233,7 +238,6 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         return _nova.getApi().getServerApiForZone(conf.server.bootstrap.zoneName);
     }
 
-
 	private ServerNode createServerNode() throws RunNodesException, TimeoutException
 	{
 		logger.info( "Starting to create new Server [imageId={}, flavorId={}]", conf.server.bootstrap.imageId, conf.server.bootstrap.flavorId );
@@ -263,7 +267,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		serverOpts.keyPairName( conf.server.bootstrap.keyPair );
 		serverOpts.securityGroupNames(conf.server.bootstrap.securityGroup);
 
-		ServerCreated serverCreated = serverApi.create( conf.server.bootstrap.serverNamePrefix + System.currentTimeMillis(), conf.server.bootstrap.imageId , conf.server.bootstrap.flavorId, serverOpts);
+		ServerCreated serverCreated = serverApi.create( conf.server.bootstrap.serverNamePrefix + incNodeId.incrementAndGet(), conf.server.bootstrap.imageId , conf.server.bootstrap.flavorId, serverOpts);
 		blockUntilServerInState(serverCreated.getId(), Server.Status.ACTIVE, 1000, 5, serverApi);
 		Server server = serverApi.get(serverCreated.getId());
 
