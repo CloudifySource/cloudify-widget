@@ -4,6 +4,7 @@ import beans.config.Conf;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.modules.spring.Spring;
 import server.EventMonitor;
 
 import javax.inject.Inject;
@@ -24,14 +25,19 @@ public class BeansFactory {
 
     @Inject
     private EventMonitor eventMonitorMock;
-
+//
     public EventMonitor getEventMonitor(){
+//        logger.info( "bean factory - getEventMonitor is invoked with mock [{}] and impl [{}] ", eventMonitorMock, eventMonitorImpl );
+
+        // GUY _ NOTE _ VERY IMPORTANT - the "@Inject"ed fields for eventMonitorImpl and eventMonitorMock are null.
+        // please refer to stackoverflow's question : http://stackoverflow.com/questions/15183145/autowiring-factory-bean
+        // to read more about this.
         if ( StringUtils.isEmpty(conf.mixpanelApiKey) ){
           logger.info( "using mock eventMonitor" );
-            return eventMonitorMock;
+            return ( EventMonitor ) Spring.getBean( "eventMonitorMock" );// eventMonitorMock;
         }else{
             logger.info( "using impl eventMonitor" );
-            return eventMonitorImpl;
+            return ( EventMonitor ) Spring.getBean( "eventMonitorImpl" ); // eventMonitor
         }
     }
 
