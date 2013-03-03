@@ -17,7 +17,7 @@ package beans;
 
 import beans.api.ExecutorFactory;
 import beans.config.Conf;
-import com.google.common.collect.FluentIterable;
+import com.google.common.base.Predicate;
 import com.google.common.net.HostAndPort;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -231,51 +231,55 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
      *
      * Use a different confTags for each server instance you have - so you can tell which machine is in which pool.
        This function in turn should get all machines in the pool.
-     * @param confTags - the confTags
      * @return - all machines that contain all these tags.
      */
-    public List<Server> getAllMachinesWithTag( String confTags ){
+    public List<Server> getAllMachinesWithTag(){
+        String confTags =  conf.server.bootstrap.tags;
         logger.info( "getting all machines with tag [{}]", confTags );
-        LinkedList<Server> servers = new LinkedList<Server>();
+        List<Server> servers = new LinkedList<Server>();
         if ( StringUtils.isEmpty( confTags ) ){
             logger.info( "confTags is null, not finding all machines" );
             return servers;
         }
 
         else{ // get all servers with tags matching my configuration.
-            FluentIterable<? extends Server> allServers = getApi().listInDetail().concat();
-            if ( allServers != null && !allServers.isEmpty() ){
-                logger.info( "got [{}] machines from API, iterating over them", allServers.size() );
-                for ( Server server : allServers ) {
-                    Map<String, String> metadata = server.getMetadata();
-                    if ( !CollectionUtils.isEmpty(metadata) && metadata.containsKey( "tags" )){
-                        String tags = metadata.get("tags");
-                        if ( !StringUtils.isEmpty( tags ) && !StringUtils.isEmpty( confTags ) ) {
-                            logger.info( "comparing tags [{}] with confTags [{}]", tags, confTags );
-                            List<String> tagList = Arrays.asList( StringUtils.stripAll( tags.split( "," ) ) );
-                            List<String> confTagsList = Arrays.asList( StringUtils.stripAll( confTags.split( "," ) ) );
-                            if ( CollectionUtils.isSubCollection( confTagsList, tagList )){
-                                logger.info( "found a match, saving to server list" );
-                                servers.add( server );
-                            }else{
-                                logger.info( "not a match, not saving" );
-                            }
-                        }
-                    }
-
-                }
-            }else{
-                logger.info( "allServer is null - nothing to check" );
-            }
+            servers = ( List<Server> ) getApi().listInDetail().concat()
+                    .filter( new ServerTagPredicate() )
+                    .toImmutableList(); // guy - consider using filter here instead of looping
         }
         return servers;
+    }
+
+    class ServerTagPredicate implements Predicate<Server> {
+
+        @Override
+        public boolean apply( Server server )
+        {
+            if ( server == null ) {
+                return false;
+            }
+
+            String confTags = conf.server.bootstrap.tags;
+            Map<String, String> metadata = server.getMetadata();
+            if ( !CollectionUtils.isEmpty( metadata ) && metadata.containsKey( "tags" ) ) {
+                String tags = metadata.get( "tags" );
+                if ( !StringUtils.isEmpty( tags ) && !StringUtils.isEmpty( confTags ) ) {
+                    logger.info( "comparing tags [{}] with confTags [{}]", tags, confTags );
+                    List<String> tagList = Arrays.asList( StringUtils.stripAll( tags.split( "," ) ) );
+                    List<String> confTagsList = Arrays.asList( StringUtils.stripAll( confTags.split( "," ) ) );
+                    return CollectionUtils.isSubCollection( confTagsList, tagList );
+                }
+            }
+
+            return false;
+        }
     }
 
     @Override
     public List<ServerNode> recoverUnmonitoredMachines(){
         List<ServerNode> result = new ArrayList<ServerNode>(  );
         logger.info( "recovering all list machines" );
-        List<Server> allMachinesWithTag = getAllMachinesWithTag( conf.server.bootstrap.tags );
+        List<Server> allMachinesWithTag = getAllMachinesWithTag();
         logger.info( "found [{}] total machines with matching tags filtering lost", CollectionUtils.size( allMachinesWithTag )  );
         if ( !CollectionUtils.isEmpty( allMachinesWithTag )){
             for ( Server server : allMachinesWithTag ) {
