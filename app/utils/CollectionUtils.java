@@ -3,6 +3,7 @@ package utils;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: guym
@@ -50,5 +51,10 @@ public class CollectionUtils extends org.apache.commons.collections.CollectionUt
             return (T) collection.iterator().next();
         }
         return null;
+    }
+
+    public static boolean isEmpty( Map metadata )
+    {
+        return metadata == null || metadata.isEmpty();
     }
 }

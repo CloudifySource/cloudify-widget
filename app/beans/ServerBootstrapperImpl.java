@@ -17,6 +17,7 @@ package beans;
 
 import beans.api.ExecutorFactory;
 import beans.config.Conf;
+import com.google.common.collect.FluentIterable;
 import com.google.common.net.HostAndPort;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -56,15 +57,16 @@ import server.ProcExecutor;
 import server.ServerBootstrapper;
 import server.exceptions.ServerException;
 import utils.CloudifyUtils;
+import utils.CollectionUtils;
 import utils.Utils;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -220,6 +222,69 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	   deleteServer(serverId);
        ServerNode.deleteServer(serverId);
 	}
+
+    /**
+     * We encourage using conf.server.bootstrap.tags
+     * This will tag all created machines.
+     *
+     * For example - use tag "managed-by-my-cloudify-widget-instance"
+     *
+     * Use a different confTags for each server instance you have - so you can tell which machine is in which pool.
+       This function in turn should get all machines in the pool.
+     * @param confTags - the confTags
+     * @return - all machines that contain all these tags.
+     */
+    public List<Server> getAllMachinesWithTag( String confTags ){
+        logger.info( "getting all machines with tag [{}]", confTags );
+        LinkedList<Server> servers = new LinkedList<Server>();
+        if ( StringUtils.isEmpty( confTags ) ){
+            logger.info( "confTags is null, not finding all machines" );
+            return servers;
+        }
+
+        else{ // get all servers with tags matching my configuration.
+            FluentIterable<? extends Server> allServers = getApi().listInDetail().concat();
+            if ( !allServers.isEmpty() ){
+                for ( Server server : allServers ) {
+                    Map<String, String> metadata = server.getMetadata();
+                    if ( !CollectionUtils.isEmpty(metadata) && metadata.containsKey( "tags" )){
+                        String tags = metadata.get("tags");
+                        if ( !StringUtils.isEmpty( tags ) && !StringUtils.isEmpty( confTags ) ) {
+                            logger.info( "comparing tags [{}] with confTags [{}]", tags, confTags );
+                            List<String> tagList = Arrays.asList( StringUtils.stripAll( tags.split( "," ) ) );
+                            List<String> confTagsList = Arrays.asList( StringUtils.stripAll( confTags.split( "," ) ) );
+                            if ( CollectionUtils.isSubCollection( confTagsList, tagList )){
+                                logger.info( "found a match, saving to server list" );
+                                servers.add( server );
+                            }else{
+                                logger.info( "not a match, not saving" );
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+        return servers;
+    }
+
+    @Override
+    public List<ServerNode> recoverUnmonitoredMachines(){
+        List<ServerNode> result = new ArrayList<ServerNode>(  );
+        logger.info( "recovering all servers" );
+        List<Server> allMachinesWithTag = getAllMachinesWithTag( conf.server.bootstrap.tags );
+        logger.info( "found [{}] machines", CollectionUtils.size( allMachinesWithTag )  );
+        if ( !CollectionUtils.isEmpty( allMachinesWithTag )){
+            for ( Server server : allMachinesWithTag ) {
+                ServerNode serverNode = ServerNode.getServerNode( server.getId() );
+                if ( serverNode == null ){
+                    logger.info( "found an unmonitored machine - I should add it to the DB [{}]", new ServerNode(server)  );
+                    result.add( serverNode );
+                }
+            }
+        }
+        return result;
+    }
 
     public void init(){
         String cloudProvider = conf.server.bootstrap.cloudProvider;

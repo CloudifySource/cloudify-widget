@@ -117,7 +117,16 @@ public class ServerPoolImpl implements ServerPool
 	@Override
     public void init()
 	{
-		logger.info( "Started to initialize ServerPool, cold-init={}", conf.server.pool.coldInit );
+
+        logger.info( "recovering lost machines" );
+        List<ServerNode> lostMachines = serverBootstrapper.recoverUnmonitoredMachines();
+        if ( !CollectionUtils.isEmpty( lostMachines )){
+            logger.info( "found [{}] lost machines, beta testing not saving", CollectionUtils.size( lostMachines ) ); // guy - todo - save lost machines
+        }else{
+            logger.info( "no lost machines found" );
+        }
+
+        logger.info( "Started to initialize ServerPool, cold-init={}", conf.server.pool.coldInit );
 		// get all available running servers
         List<ServerNode> servers = ServerNode.all();
 

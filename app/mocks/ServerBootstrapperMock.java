@@ -52,6 +52,13 @@ public class ServerBootstrapperMock implements ServerBootstrapper
     }
 
     @Override
+    public List<ServerNode> recoverUnmonitoredMachines()
+    {
+        logger.info( "recovering lost machines" );
+        return null;
+    }
+
+    @Override
     public BootstrapValidationResult validateBootstrap( ServerNode serverNode )
     {
         return new BootstrapValidationResult();

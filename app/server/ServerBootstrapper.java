@@ -51,4 +51,6 @@ public interface ServerBootstrapper
     public void close();
     
     public ServerNode bootstrapCloud( ServerNode serverNode );
+
+    public List<ServerNode> recoverUnmonitoredMachines();
 }
