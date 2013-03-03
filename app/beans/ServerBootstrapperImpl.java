@@ -285,8 +285,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             for ( Server server : allMachinesWithTag ) {
                 ServerNode serverNode = ServerNode.getServerNode( server.getId() );
                 if ( serverNode == null ){
-                    logger.info( "found an unmonitored machine - I should add it to the DB [{}]", new ServerNode(server)  );
-                    result.add( serverNode );
+                    ServerNode newServerNode = new ServerNode( server );
+                    logger.info( "found an unmonitored machine - I should add it to the DB [{}]", newServerNode );
+                    result.add( newServerNode );
                 }
             }
         }
