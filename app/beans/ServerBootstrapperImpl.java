@@ -244,7 +244,8 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
         else{ // get all servers with tags matching my configuration.
             FluentIterable<? extends Server> allServers = getApi().listInDetail().concat();
-            if ( !allServers.isEmpty() ){
+            if ( allServers != null && !allServers.isEmpty() ){
+                logger.info( "got [{}] machines from API, iterating over them", allServers.size() );
                 for ( Server server : allServers ) {
                     Map<String, String> metadata = server.getMetadata();
                     if ( !CollectionUtils.isEmpty(metadata) && metadata.containsKey( "tags" )){
@@ -263,6 +264,8 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                     }
 
                 }
+            }else{
+                logger.info( "allServer is null - nothing to check" );
             }
         }
         return servers;
@@ -271,9 +274,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     @Override
     public List<ServerNode> recoverUnmonitoredMachines(){
         List<ServerNode> result = new ArrayList<ServerNode>(  );
-        logger.info( "recovering all servers" );
+        logger.info( "recovering all list machines" );
         List<Server> allMachinesWithTag = getAllMachinesWithTag( conf.server.bootstrap.tags );
-        logger.info( "found [{}] machines", CollectionUtils.size( allMachinesWithTag )  );
+        logger.info( "found [{}] total machines with matching tags filtering lost", CollectionUtils.size( allMachinesWithTag )  );
         if ( !CollectionUtils.isEmpty( allMachinesWithTag )){
             for ( Server server : allMachinesWithTag ) {
                 ServerNode serverNode = ServerNode.getServerNode( server.getId() );
