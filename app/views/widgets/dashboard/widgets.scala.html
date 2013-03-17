@@ -96,6 +96,7 @@
                      <li><a class="delete_widget_btn" href="javascript:void(0)">Delete</a> </li>
                      <li><a class="edit_widget_btn"  href="javascript:void(0)">Edit</a> </li>
                      <li><a class="require_login_btn" href="javascript:void(0)">Require Login</a></li>
+                     <li><a class="edit_description_btn" href="javascript:void(0)">Edit Description</a></li>
                      <li><a href="#widget_${id}_get_embed_modal" data-toggle="modal">Get Embed Code</a></li>
                      <li><a class="preview_widget_btn" href="/widget/previewWidget?apiKey=${apiKey}" target="_blank">Show Preview</a> </li>
                    </ul>
@@ -161,6 +162,31 @@
               @field("requireLogin", "Require Login", required = false, fType="checkbox" )
               @field("loginVerificationUrl", "Verification URL", required = false )
               @field("webServiceKey", "Web Service Private Key", required = false )
+          </fieldset>
+        </div>
+        <div class="modal-footer">
+          <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+          <input type="submit" class="btn btn-primary" value="Create">
+        </div>
+      </form>
+</div>
+
+
+<div id="edit_description_modal" class="modal-window modal hide fade" tabindex="-1" role="dialog" aria-labelledby="edit_description_label" aria-hidden="true">
+    <form id="edit_description_form" class="form-horizontal">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+          <h3 id="edit_description_label">Edit Widget Description</h3>
+        </div>
+        <div class="modal-body">
+          <fieldset>
+              <input type="hidden" id="widgetId" name="widgetId" value=""/>
+              <div class="control-group">
+                  <label class="control-label" for="description">Description{<abbr class="required_mark">*</abbr>}</label>
+                  <div class="controls">
+                      <textarea id="description" name="description"></textarea>
+                  </div>
+              </div>
           </fieldset>
         </div>
         <div class="modal-footer">

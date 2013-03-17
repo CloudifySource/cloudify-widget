@@ -1,6 +1,7 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
+POST     /widget/description            controllers.WidgetAdmin.postWidgetDescription(authToken:String, widgetId:Long, description:String ?="")
 POST     /widget/requireLogin            controllers.WidgetAdmin.postRequireLogin(authToken:String, widgetId:Long, requireLogin:Boolean, loginVerificationUrl:String ?="", webServicePrivateKey:String?="")
 GET     /exportSchema                   controllers.Application.generateDDL
 GET     /javascriptRoutes               controllers.Application.javascriptRoutes

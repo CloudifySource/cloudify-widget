@@ -207,6 +207,30 @@ $( function ()
 
     } );
 
+    $("#edit_description_form" ).submit( function(e){
+
+        try{
+            var $me = $(this);
+            debugger;
+            var data = $me.formParams();
+            var widget = widgetsModel.getWidgetById( data.widgetId );
+            jsRoutes.controllers.WidgetAdmin.postWidgetDescription( authToken, data.widgetId, data.description ).ajax({
+
+                form:this,
+                success:function(){
+                    $me[0].reset();
+                    $me.closest(".modal" ).modal("hide");
+                    widget.description = data.description;
+                }
+
+            });
+        }finally{
+            e.stopPropagation();
+            return false;
+        }
+
+    });
+
     $("#require_login_form").submit(function (e) {
         try {
             var $me = $(this);
@@ -279,19 +303,32 @@ $( function ()
         return widgetsModel.getWidgetById( $(target).parents( "tr.widget ").attr("data-widget_id") )
     }
 
+    function populateFormFromWidget( widget, $form ){
+        $form.find(".controls [name]").each( function(index, item){
+                    var $input = $(item);
+                    if ( $input.attr("type") == "checkbox"){
+                        $input.attr("checked", widget[$input.attr("name")] ? "checked":null);
+                    }else{
+                        $input.val( widget[$input.attr("name")]);
+                    }
+
+                });
+        $form.find("[name=widgetId]").val( widget.id );
+    }
+
+    $(".edit_description_btn" ).live( "click", function(e){
+
+        var widget = getWidgetByTarget( e.target );
+        var $form = $("#edit_description_form");
+        populateFormFromWidget(widget, $form);
+        $("#edit_description_modal" ).modal("show");
+
+    });
+
     $(".require_login_btn").live("click", function( e ) {
         var widget = getWidgetByTarget( e.target );
         var $form = $("#require_login_form");
-        $form.find(".controls [name]").each( function(index, item){
-            var $input = $(item);
-            if ( $input.attr("type") == "checkbox"){
-                $input.attr("checked", widget[$input.attr("name")] ? "checked":null);
-            }else{
-                $input.val( widget[$input.attr("name")]);
-            }
-
-        });
-        $form.find("[name=widgetId]").val( widget.id );
+         populateFormFromWidget(widget, $form);
         $("#require_login_modal").modal("show");
     });
 

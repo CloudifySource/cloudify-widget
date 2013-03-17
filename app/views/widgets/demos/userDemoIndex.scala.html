@@ -42,6 +42,12 @@
         {{each(i,widget) widgets }}
             <div class="recipe" class="${productName}" data-api-key="${apiKey}">
                 <iframe src="/demos/${userId}/${apiKey}"></iframe>
+                {{if widget.description}}
+                <div class="description">
+                    ${widget.description}
+                </div>
+                {{/if}}
+
             </div>
         {{/each}}
         </div>

@@ -83,13 +83,15 @@ public class Widget
     @ManyToOne( optional = false )
     private User user;
 
+    @Lob
+    private String description;
+
 
     @JsonIgnore
 	@OneToMany(cascade=CascadeType.ALL, mappedBy = "widget")
 	private List<WidgetInstance> instances;
 
 	public static Finder<Long,Widget> find = new Finder<Long,Widget>(Long.class, Widget.class);
-
 
     @XStreamAlias("status")
     @JsonRootName("status")
@@ -545,5 +547,15 @@ public class Widget
 
     public void setWebServiceKey(String webServiceKey) {
         this.webServiceKey = webServiceKey;
+    }
+
+    public void setDescription( String description )
+    {
+        this.description = description;
+    }
+
+    public String getDescription()
+    {
+        return description;
     }
 }

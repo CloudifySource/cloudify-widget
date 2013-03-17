@@ -373,6 +373,15 @@ public class WidgetAdmin extends Controller
         return enableDisableWidget( authToken, apiKey, true );
 	}
 
+    private static Widget getWidgetSafely( String authToken, Long widgetId, boolean allowAdmin ){
+        User user = User.validateAuthToken( authToken );
+        if ( allowAdmin && user.isAdmin()){
+            return Widget.find.byId( widgetId );
+        }else{
+            return Widget.findByUserAndId( user, widgetId );
+        }
+    }
+
     private static Widget getWidgetSafely( String authToken, String apiKey )
     {
 
@@ -452,8 +461,7 @@ public class WidgetAdmin extends Controller
 
     public static Result postRequireLogin( String authToken, Long widgetId, boolean requireLogin,  String loginVerificationUrl, String webServiceKey ){
 
-        User user = User.validateAuthToken( authToken );
-        Widget widget = Widget.findByUserAndId( user, widgetId );
+        Widget widget = getWidgetSafely( authToken, widgetId, false );
         if ( widget == null ){
             new HeaderMessage().setError(" User is not allowed to edit this widget ").apply(response().getHeaders());
             return badRequest();
@@ -469,5 +477,19 @@ public class WidgetAdmin extends Controller
         widget.setWebServiceKey( webServiceKey );
         widget.save();
         return ok();
+    }
+
+    public static Result postWidgetDescription( String authToken, Long widgetId, String description ){
+
+        Widget widget = getWidgetSafely( authToken, widgetId, false );
+        if ( widget == null ){
+            new HeaderMessage().setError(" User is not allowed to edit this widget ").apply(response().getHeaders());
+            return badRequest();
+        }
+
+        widget.setDescription( description );
+        widget.save(  );
+        return ok(  );
+
     }
 }
