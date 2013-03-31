@@ -67,6 +67,10 @@ public class Widget
     @JsonProperty(value="consolename")
 	private String consoleName;
 
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private WidgetIcon icon;
+
     @JsonProperty(value="consoleurl")
 	private String consoleURL;
 
@@ -517,7 +521,7 @@ public class Widget
     // guy - for display properties only!
     @JsonProperty
     public String getUsername(){
-        return user.getEmail();
+        return user == null ? "null" : user.getEmail();
     }
 
 
@@ -558,4 +562,13 @@ public class Widget
     {
         return description;
     }
+
+    public boolean isHasIcon(){
+        return icon != null; // todo: verify this does not load "WidgetIcon" lazily.
+    }
+
+    public void setIcon( WidgetIcon icon ){
+        this.icon = icon;
+    }
+
 }

@@ -1,0 +1,62 @@
+{ "users": {
+    "default_demo@gigaspaces.com": {
+        "widgets": {
+            "MongoDB": {
+                "version": "2.0.4",
+                "title": "Launch MongoDB",
+                "youtube": "http://www.youtube.com/embed/w5qr4sx5Vt0",
+                "provider": "http://www.mongodb.org",
+                "recipe": "https://dl.dropbox.com/u/5682483/mongodb.zip",
+                "console": {
+                    "title": "Mongo Web Console",
+                    "link": "http://$HOST:11001"
+                },
+                "path": "",
+                "image": {
+                    "selected": "MongoDB.png"
+                },
+                "description": "This is description for Mongo player"
+            },
+
+
+            "Petclinic-Simple": {
+                "version": "0.1",
+                "title": "Petclinic simple application example",
+                "youtube": "http://www.youtube.com/embed/anvYieQij94",
+                "provider": "http://www.cloudifysource.org/",
+                "recipe": "https://s3.amazonaws.com/widget_rep/petclinic-simple.zip",
+                "console": {
+                    "title": "PetClinic",
+                    "link": "http://$HOST:8080/petclinic"
+                },
+                "path": "",
+                "image": {
+                    "selected": "Petclinic.png"
+                },
+                "description":"this is a description for petclinic player"
+            },
+            "Couchbase": {
+                "version": "2.0.0",
+                "title": "Launch Couchbase",
+                "youtube": "http://www.youtube.com/embed/VkQ3ppHeGX4",
+                "provider": "http://www.couchbase.com",
+                "recipe": "http://s3.amazonaws.com/cloudify-widget/couchbase-2.0.zip",
+                "console": {
+                    "title": "Couchbase Console",
+                    "link": "http://$HOST:8091"
+                },
+                "path": "",
+                "image": {
+                    "selected": "Couchbase.png"
+                },
+                "login": {
+                    "require": true,
+                    "url": "",
+                    "token": ""
+                },
+                "description" : "this is a description for couchbase player"
+            }
+        }
+    }
+}
+}

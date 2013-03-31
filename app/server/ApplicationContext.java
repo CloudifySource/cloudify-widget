@@ -18,6 +18,7 @@ package server;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import bootstrap.InitialData;
 import mocks.EventMonitorMock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,7 @@ public class ApplicationContext
     @Inject private HmacImpl hmac;
     @Inject private EventMonitor eventMonitor;
     @Inject private Conf conf;
+    @Inject private InitialData initialData;
 
     private static ApplicationContext instance;
 
@@ -168,5 +170,15 @@ public class ApplicationContext
     public void setEventMonitor( EventMonitor eventMonitor )
     {
         this.eventMonitor = eventMonitor;
+    }
+
+    public InitialData getInitialData()
+    {
+        return initialData;
+    }
+
+    public void setInitialData( InitialData initialData )
+    {
+        this.initialData = initialData;
     }
 }

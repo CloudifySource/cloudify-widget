@@ -15,6 +15,9 @@
  *******************************************************************************/
 package controllers;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +25,15 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import beans.ServerNodesPoolStats;
+import com.avaje.ebean.Ebean;
 import data.validation.GsConstraints;
 import models.ServerNode;
 import models.Summary;
 import models.User;
 import models.Widget;
+import models.WidgetIcon;
 import models.WidgetInstance;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -41,15 +47,20 @@ import server.ApplicationContext;
 import server.HeaderMessage;
 import server.exceptions.ServerException;
 import utils.CollectionUtils;
-import utils.Utils;
 import utils.RestUtils;
 
 import static utils.RestUtils.*;
 
 import views.html.common.linkExpired;
-import views.html.widgets.*;
-import views.html.widgets.admin.*;
-import views.html.widgets.dashboard.*;
+import views.html.widgets.admin.newPassword;
+import views.html.widgets.admin.resetPassword;
+import views.html.widgets.admin.signin;
+import views.html.widgets.admin.signup;
+import views.html.widgets.dashboard.account;
+import views.html.widgets.dashboard.angularjs_widget;
+import views.html.widgets.dashboard.previewWidget;
+import views.html.widgets.dashboard.widgets;
+import views.html.widgets.widget;
 
 
 /**
@@ -69,6 +80,15 @@ public class WidgetAdmin extends Controller
         }
         return ok(widget.render(ApplicationContext.get().conf().mixpanelApiKey, widgetItem));
     }
+
+    public static Result icon( String apiKey ){
+        WidgetIcon widgetItem = WidgetIcon.findByWidgetApiKey( apiKey );
+        if ( widgetItem == null ){
+            return ok(  );
+        }
+        return ok( widgetItem.getData() ).as( widgetItem.getContentType() );
+    }
+
 	/*
 	 * Creates new account.
 	 */
@@ -393,6 +413,9 @@ public class WidgetAdmin extends Controller
         }
     }
 
+    public static Result getUserWidgetTemplate(){
+        return ok( views.html.widgets.userWidgets.render() ); // we do this so we can get the embed code.. we cannot use angularJS as we might want to email it too..
+    }
 
     public static Result summary( String authToken )
 	{
@@ -431,7 +454,7 @@ public class WidgetAdmin extends Controller
     public static Result previewWidget( String apiKey ){
         String authToken = request().cookies().get("authToken").value();
         Widget widget = getWidgetSafely( authToken, apiKey );
-        return ok( previewWidget.render(widget, request().host()));
+        return ok( previewWidget.render( widget, request().host() ));
     }
 	
 	public static Result regenerateWidgetApiKey( String authToken, String apiKey )
@@ -491,5 +514,56 @@ public class WidgetAdmin extends Controller
         widget.save(  );
         return ok(  );
 
+    }
+
+    public static Result newWidgetsPage(){
+        return ok( angularjs_widget.render() );
+    }
+
+    public static Result addIcon()
+    {
+        try {
+
+            Http.MultipartFormData body = request().body().asMultipartFormData();
+
+            Long widgetId = Long.parseLong( body.asFormUrlEncoded().get( "widgetId" )[0] );
+            String authToken = body.asFormUrlEncoded().get( "authToken" )[0];
+
+            Widget w = getWidgetSafely( authToken, widgetId, false );
+            WidgetIcon icon = WidgetIcon.findByWidgetApiKey( w.getApiKey() );
+
+            if ( icon == null ){
+                icon = new WidgetIcon();
+            }
+
+
+            Http.MultipartFormData.FilePart picture = body.getFile( "icon" );
+            if ( picture != null ) {
+                String fileName = picture.getFilename();
+                String contentType = picture.getContentType();
+
+                File file = picture.getFile();
+                byte[] iconData = IOUtils.toByteArray( new FileInputStream( file ) );
+
+                icon.setName( fileName );
+                icon.setContentType( contentType );
+                icon.setData( iconData );
+                Ebean.save( icon ); // supports both save and update.
+                w.setIcon( icon );
+                w.save(  );
+                return ok( "Added icon successfully" );
+            } else {
+                return ok( "Error: no file" );
+            }
+        } catch ( Exception e ) {
+            return ok( "Error: " + e.getMessage() );
+        }
+    }
+
+    public static Result removeIcon ( String authToken, Long widgetId ){
+        Widget w = getWidgetSafely( authToken, widgetId, false );
+        WidgetIcon icon = WidgetIcon.findByWidgetApiKey( w.getApiKey() );
+        icon.delete(  );
+        return ok(  );
     }
 }

@@ -1,4 +1,4 @@
-@(userId:Long)
+@(email:String)
 <!DOCTYPE HTML>
 <!--
   ~ Copyright (c) 2013 GigaSpaces Technologies Ltd. All rights reserved
@@ -10,55 +10,30 @@
 
 <html>
 <head>
-    <title>Test Page For Cloudify Widget</title>
     <script src="/public/js/jquery.min.js"></script>
-    <script src="/public/js/bootstrap.min.js"></script>
-    <script src="/public/js/jquery.tmpl.min.js"></script>
-    <script type="text/javascript" src="/public/js/demo.js"></script>
+
     <link href="/public/style/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
-    <link href="/public/style/demos.css" rel="stylesheet"/>
-    <script src="@routes.Application.javascriptRoutes()" type="text/javascript"></script>
+        <link href="/public/style/demos.css" rel="stylesheet"/>
+<style>
+* { padding:0; margin:0;}
+body{ font-family: arial, serif; padding: 0; margin: 0; background: url('/public/img/demo/bgTopX.png') repeat-x; }
+html,body, body>div, .container, .content,.content>iframe{ height :100% }
+.content { padding: 100px 10px 10px; margin: auto; width: 1037px; }
+.container { background: url('/public/img/demo/background.png') no-repeat; width: 1600px; margin-left: auto; margin-right: auto; }
+iframe{ width:985px; margin-left: 26px; margin-top: 0; }
+.container, .content , img{ max-width:none; }
+</style>
 </head>
-<body data-user-id="@{userId}">
-
-    <script id="widget_nav" type="text/x-jquery-tmpl">
-        <div class="nav-links btn-group-vertical" data-toggle="buttons-radio">
-              {{each(i,widget) widgets}}
-                    <div class="btn demo-link" data-api-key="${apiKey}">
-                        <div class="product-name">${productName}</div>
-                        <div class="product-version">${productVersion}</div>
-                    </div>
-              {{/each}}
-        </div>
-    </script>
-
-
-
-    <script id="widget_record" type="text/x-jquery-tmpl">
-    </script>
-
-    <script id="widgets_list" type="text/x-jquery-tmpl">
-        <div class="widgets">
-        {{each(i,widget) widgets }}
-            <div class="recipe" class="${productName}" data-api-key="${apiKey}">
-                <iframe src="/demos/${userId}/${apiKey}"></iframe>
-                {{if widget.description}}
-                <div class="description">
-                    ${widget.description}
-                </div>
-                {{/if}}
-
-            </div>
-        {{/each}}
-        </div>
-    </script>
-
+<body>
     <div>
         <div class="container">
-            <div class="demo-content">
-
+            <div class="content">
+                <img src="/public/demos/container_navbar_mock.png"/>
+                <iframe src="/demos/embedded/@email"></iframe>
             </div>
         </div>
     </div>
+
+
 </body>
 </html>

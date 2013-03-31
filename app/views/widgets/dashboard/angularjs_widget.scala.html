@@ -1,0 +1,16 @@
+@import tags._
+
+@context.set("head"){
+        <script src="/public/js/angularjs/angular.js"></script>
+        <script src="/public/js/widgets/WidgetApp.js"></script>
+        <link href="/public/style/widgets_angularjs.css" rel="stylesheet">
+}
+
+@context.set("body"){
+    <div ng-view>
+    </div>
+}
+
+@context.set("ng-app"){WidgetApp}
+
+@templates.page()

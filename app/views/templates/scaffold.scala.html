@@ -14,7 +14,7 @@
    all templates should inherit this one unless some other
 *@
 @args() =@{play.mvc.Http.Context.current().args}
-<html itemscope itemtype="http://schema.org/Product">
+<html itemscope itemtype="http://schema.org/Product" @if(context.get("ng-app") != null ){ng-app=@context.get("ng-app")}>
 <head>
     <title>@context.get("title")</title>
 

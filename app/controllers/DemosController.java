@@ -7,6 +7,8 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import server.ApplicationContext;
+import views.html.widgets.demos.userDemoIndex;
+import views.html.widgets.demos.userDemoIndexEmbeddable;
 
 /**
  * User: guym
@@ -16,13 +18,18 @@ import server.ApplicationContext;
 public class DemosController extends Controller {
 
     public static Result getDemoPageForUser( String email ){
-        if (email.endsWith(ApplicationContext.get().conf().demoUserEmailSuffix )){
-            User user = User.find.where().eq("email",email).findUnique();
-            if ( user != null ){
-                return ok(views.html.widgets.demos.userDemoIndex.render( user.getId() ));
+        return ok( userDemoIndex.render( email ) );
+    }
+
+    public static Result getEmbeddedDemoPage( String email ){
+        if ( email.endsWith( ApplicationContext.get().conf().demoUserEmailSuffix ) ) {
+            User user = User.find.where().eq( "email", email ).findUnique();
+            if ( user != null ) {
+                return ok( userDemoIndexEmbeddable.render( user.getId() ) );
             }
         }
-        return badRequest("User does not qualify as demo user");
+
+        return ok(  );
     }
 
     public static Result listWidgetForDemoUser( Long userId ){

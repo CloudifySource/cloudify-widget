@@ -1,28 +1,19 @@
-body {
-  font-family: arial, serif;
-  padding: 0;
-  margin: 0;
-  background: url('/public/img/demo/bgTopX.png') repeat-x;
 
+@import "../../bourbon/bourbon";
+
+html,body,body>div, .nav-links{
+  height:100%;
 }
 
-.content {
-  padding: 145px 10px 10px;
-  margin: auto;
-  width: 1015px;
+body{
+  background-color:#f7f7f7;
 }
 
-.recipe {
-  margin: auto;
-  width: 600px;
-  display:none;
-}
 
-.container {
-  background: url('/public/img/demo/background.png') no-repeat;
-  width: 1600px;
-  margin-left: auto;
-  margin-right: auto;
+.recipe{
+  right:65px;
+  top:65px;
+  position:absolute;
 }
 
 iframe {
@@ -39,24 +30,53 @@ iframe {
   height: 90px;
 }
 
-.demo-content {
-  padding: 101px 10px 10px;
-  margin: 35px 119px;
-  width: 1015px;
+.description{
+  color:#231f20;
+  font-size:14px;
 }
 
 .nav-links{
-  border-radius: 20px;
-  margin-right: -71px;
-  float:right;
+  margin-right: 100px;
+  padding-right:5px;
 
-  width: 200px;
+  background-color:white;
+  box-shadow: 0 10px 10px 5px #EAEAEA;
+  width: 251px;
   white-space: nowrap;
 
   .demo-link{
+    &.btn{ padding-right:0; padding-left:0; border-radius: 0;}
+    color:#213540;
+    font-size:18px;
+    &.selected{
+      color:#1181bf;
+      font-size:18px;
+      @include background-image( linear-gradient( left, #F2F2F2 95%, #D4D4D4 100% ));
+      background-color:#f7f7f7;
+    }
       text-align: left;
-    padding-top:20px;
+      padding-top:20px;
+      height:56px;
+      border-bottom:2px solid #DEDEDE;
+      border-top: 1px solid #EDEDED;
+      background:white;
       cursor: pointer;
+
+    .product-icon{
+      background-repeat: no-repeat;
+      display:inline-block;
+      margin-left:20px;
+      width:40px;
+      height:40px;
+    }
+
+    .product-name{
+      width:140px;
+      text-overflow: ellipsis;
+      padding-bottom:10px;
+      display:inline-block;
+      margin-left:18px;
+    }
       .product-name, .product-version {
         text-overflow: ellipsis;
         overflow: hidden;

@@ -211,7 +211,7 @@ $( function ()
 
         try{
             var $me = $(this);
-            debugger;
+
             var data = $me.formParams();
             var widget = widgetsModel.getWidgetById( data.widgetId );
             jsRoutes.controllers.WidgetAdmin.postWidgetDescription( authToken, data.widgetId, data.description ).ajax({
@@ -313,8 +313,31 @@ $( function ()
                     }
 
                 });
+        $form.find("[name=authToken]" ).val( authToken );
+
         $form.find("[name=widgetId]").val( widget.id );
     }
+
+    $(".add_icon_btn btn-danger" ).click(function(e){
+        $.ajax({
+
+            url:'/widget/removeIcon?' + toUrlParams({"authToken":authToken, "widgetId":$(this ).closest("form" ).find("[name=widgetId]" ).val()}),
+            success:function(){
+                $("#file_upload_form_result" ).html("Icon removed successfully");
+            }
+
+        });
+
+    });
+
+    $(".add_icon_btn" ).live( "click", function(e){
+        var widget = getWidgetByTarget( e.target );
+        var $form = $("#add_icon_form");
+        $("#file_upload_form_result" ).html("");
+        populateFormFromWidget(widget, $form);
+        $("#add_icon_modal" ).modal("show");
+
+    });
 
     $(".edit_description_btn" ).live( "click", function(e){
 
@@ -332,6 +355,12 @@ $( function ()
         $("#require_login_modal").modal("show");
     });
 
+    // copy contents of iframe after file upload
+    $("#file_upload").load(function () {
+       var iframeContents = $("#file_upload")[0].contentWindow.document.body.innerHTML;
+       $("#file_upload_form_result").html(iframeContents);
+    });
+
 
     $( ".edit_widget_btn" ).live( "click", function ( e )
     {
@@ -344,6 +373,7 @@ $( function ()
             $input.val( widget[$input.attr("name")] );
         });
         $form.find("[name=widgetId]" ).val( widget.id );
+
         $( '#new_widget_modal' ).modal( 'show' );
 
     } );

@@ -175,16 +175,18 @@ public class User
         // guy - removing "setUsername" - it is unclear what that was..
         // if we want Widget to refer to a user, we should use a foreign key..
 
-
-		if (widgets == null)
-			widgets = new ArrayList<Widget>();
-
-		widgets.add( widget );
-		
-		save();
-		
-		return widget;
+        return addNewWidget( widget );
 	}
+
+    public Widget addNewWidget( Widget widget ){
+        if ( widgets == null ){
+            widgets = new ArrayList<Widget>(  );
+        }
+        widgets.add( widget );
+        save(  );
+        widget.refresh();
+        return widget;
+    }
 
 	
 	/**

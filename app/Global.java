@@ -1,8 +1,12 @@
 import beans.config.Conf;
 import models.User;
+import models.Widget;
+import org.apache.commons.io.FileUtils;
+import org.codehaus.jackson.JsonNode;
 import org.slf4j.LoggerFactory;
 import play.Application;
 import play.GlobalSettings;
+import play.api.Play;
 import play.api.mvc.Results;
 import play.api.mvc.SimpleResult;
 import play.core.j.JavaResults;
@@ -16,6 +20,8 @@ import server.exceptions.ExceptionResponse;
 import server.exceptions.ExceptionResponseDetails;
 import utils.Utils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -27,12 +33,13 @@ import java.util.ArrayList;
 public class Global extends GlobalSettings
 {
     private static org.slf4j.Logger logger = LoggerFactory.getLogger( Global.class );
+
+    private Conf conf;
 	@Override
 	public void onStart(Application app)
 	{
 		// print cloudify configuration
-        Conf conf = ApplicationContext.get().conf();
-
+        conf = ApplicationContext.get().conf();
         logger.info( Json.stringify( Json.toJson( conf ) ) );
 
         // initialize the server pool.
@@ -46,8 +53,6 @@ public class Global extends GlobalSettings
             }
         }).start();
 
-
-
         // create Admin user if not exists
 		if ( User.find.where().eq("admin", Boolean.TRUE ).findRowCount() <= 0 )
 		{
@@ -60,7 +65,26 @@ public class Global extends GlobalSettings
 		}else{
             logger.info( "found admin user" );
         }
+
+        uploadInitialData( app );
 	}
+
+    private void uploadInitialData( Application app )
+    {
+        if ( !conf.settings.initialData.load ) {
+            logger.info( "configuration set to not load initial data. skipping initial data" );
+            return;
+        }
+
+        File file = app.getFile( "conf/initialData/initial-data.json" );
+
+        try {
+            ApplicationContext.get().getInitialData().load( FileUtils.readFileToString( file ) );
+
+        } catch ( Exception e ) {
+            logger.info( "unable to read initial data from : " + file );
+        }
+    }
 
     @Override
     public Result onError( Http.RequestHeader requestHeader, Throwable throwable )

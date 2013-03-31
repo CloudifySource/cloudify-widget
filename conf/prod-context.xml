@@ -21,11 +21,12 @@
     <bean id="hmac" class="beans.HmacImpl"/>
 
     <bean id="mailSender" class="beans.MailSenderImpl"/>
+    <bean id="initialData" class="bootstrap.JsonInitialData"/>
 
     <bean id="eventMonitorImpl" class="beans.EventMonitorMixpanel" p:apiKey="#{conf.mixpanelApiKey}" init-method="init"/>
     <bean id="eventMonitorMock" class="mocks.EventMonitorMock"/>
     <bean id="beansFactory" class="beans.BeansFactory"/>
-    <bean id="eventMonitor" class="server.EventMonitor" factory-bean="beansFactory" factory-method="getEventMonitor"/>
+    <bean id="eventMonitor" factory-bean="beansFactory" factory-method="getEventMonitor"/>
 
     <bean id="serverPool" class="beans.ServerPoolImpl"/>
     <bean id="widgetServer" class="beans.WidgetServerImpl"/>

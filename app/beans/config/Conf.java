@@ -42,6 +42,20 @@ public class Conf {
     public static class SettingsConfig{
         @Config( ignoreNullValues = true )
         public boolean expireSession = false; // do not use the session expired mechanism.
+
+        public InitialData initialData = new InitialData();
+
+
+    }
+
+    public static class InitialData{
+        @Config( ignoreNullValues = true )
+        public boolean load = true ;
+
+        public String defaultPassword = "Initial4657"; // if we need to create users, we will use this password by default.
+
+        @Config( ignoreNullValues = true )
+        public boolean override = true; // true iff we want to write over existing objects
     }
 
     public static class FeaturesConfigItem {
