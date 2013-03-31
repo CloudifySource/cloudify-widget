@@ -3,8 +3,8 @@ create table widget_icon (
   data                      longblob,
   name                      varchar(255),
   content_type               varchar(255),
-  constraint pk_widget_icon primary key (id))
-;
+  constraint pk_widget_icon primary key (id)
+)ENGINE=InnoDB AUTO_INCREMENT=234 DEFAULT CHARSET= utf8 ;
 
 
 alter table widget add column icon_id bigint;
