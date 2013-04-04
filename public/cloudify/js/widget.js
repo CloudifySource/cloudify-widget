@@ -385,14 +385,14 @@ $(function () {
 
 
     function show_custom_link( enabled ) {
-        var custom_link = get_custom_link();
-        if ( $( "#custom_link" ).get( 0 ) ) {
-            $( "#custom_link" ).replaceWith( $( custom_link ) );
-        }
-        else {
-            $( "#links" ).append( $( custom_link ) );
-        }
-        if ( enabled ){
+        if ( enabled ) {
+            var custom_link = get_custom_link();
+            if ( $( "#custom_link" ).get( 0 ) ) {
+                $( "#custom_link" ).replaceWith( $( custom_link ) );
+            }
+            else {
+                $( "#links" ).append( $( custom_link ) );
+            }
           $("#custom_link" ).removeClass("mock");
         }else{
             $("#custom_link" ).addClass("mock");
