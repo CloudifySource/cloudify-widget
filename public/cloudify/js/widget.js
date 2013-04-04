@@ -1,6 +1,34 @@
 $(function () {
 
 
+
+    function show_walkthrough(){
+
+        var polling_ptr = null;
+
+        function show_walkthrough(){
+            $("#walkthrough" ).show();
+        }
+
+        function dismiss(){
+            $.cookie("walkthrough", "walkthrough", {"path":"/"});
+
+            $("#walkthrough" ).hide();
+        }
+
+        function poll_is_dismissed(){
+           clearInterval(polling_ptr);
+        }
+
+        function is_dismissed(){
+            return $.cookie("walkthrough", {path:"/"}) != null;
+        }
+
+        setInterval(poll_is_dismissed,1000);
+
+    }
+
+
     function is_requires_login(){
         return $("body").is("[data-requires-login]");
     }
@@ -181,7 +209,7 @@ $(function () {
 
     function get_custom_link(  ){
         var link_info = widgetState.customLink();
-        return $("<li></li>", {"id":"custom_link"}).append($("<a></a>", {"href": link_info.url, "target": "_blank", "text": link_info.title}));
+        return $("<li></li>", {"id":"custom_link", "class":"mock"}).append($("<span></span>", {"text":link_info.title, "class":"mock_text"})).append($("<a></a>", {"href": link_info.url, "target": "_blank", "text": link_info.title}));
     }
 
     function handleUpdateStatusSuccess( data )
@@ -210,12 +238,14 @@ $(function () {
 
         if ( data.status.instanceIsAvailable ){
             console.log(["installation finished", data]);
-            if (data.status.consoleLink) {
-                var link_info = data.status.consoleLink;
-                widgetState.customLink( link_info );
-                show_custom_link(true);
-            }
-       }
+        }
+
+        if ( data.status.consoleLink ) {
+            var link_info = data.status.consoleLink;
+            widgetState.customLink( link_info );
+            show_custom_link( data.status.instanceIsAvailable );
+
+        }
 
 
         var state = data.status.state.toLocaleLowerCase();
@@ -346,25 +376,26 @@ $(function () {
 
   function show_cloudify_ui_link( show ){
       if ( show ){
-        $("#links").find("li").show();
+        $("#links").find("li").removeClass("mock");
         $("#cloudify_dashboard_link").attr("href", "http://" + widgetState.publicIp() + ":8099/");
       }else{
-          $("#links").find("li").hide();
+          $("#links").find("li").addClass("mock");
       }
   }
 
 
-    function show_custom_link( show ) {
-        if ( show ){
-            var custom_link = get_custom_link();
-            if ($("#custom_link").get(0)){
-                $("#custom_link").replaceWith($(custom_link));
-            }
-            else{
-                $("#links").append($(custom_link));
-            }
+    function show_custom_link( enabled ) {
+        var custom_link = get_custom_link();
+        if ( $( "#custom_link" ).get( 0 ) ) {
+            $( "#custom_link" ).replaceWith( $( custom_link ) );
+        }
+        else {
+            $( "#links" ).append( $( custom_link ) );
+        }
+        if ( enabled ){
+          $("#custom_link" ).removeClass("mock");
         }else{
-            $("#custom_link").remove();
+            $("#custom_link" ).addClass("mock");
         }
     }
 
@@ -431,4 +462,38 @@ $(function () {
     window.open($(e.target).parents("a").attr("href"), '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600,left='+ leftvar +',top=' + topvar);
 
   });
+
+    var checkWTInterval = null;
+//    debugger;
+    // handle walkthrough
+    function shouldShowWalkthrough(){
+           return $.cookie("dismissWT") != "true";
+       }
+
+    function hideWT(){
+        $.cookie("dismissWT",true, {path:"/"});
+        console.log("hiding walkthrough");
+        $("#walkthrough" ).remove();
+        if ( checkWTInterval != null ){
+            clearInterval(checkWTInterval);
+        }
+    }
+       function checkWalkthrough(){
+           if ( !shouldShowWalkthrough() ){
+               hideWT();
+           }
+       }
+
+       if ( shouldShowWalkthrough() ){
+           $("#walkthrough" ).show();
+           $("#walkthrough" ).click(function(){
+               hideWT();
+
+               });
+           checkWTInterval = setInterval( checkWalkthrough , 1000 );
+       } else{
+           hideWT();
+       }
+
+
 });

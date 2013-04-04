@@ -21,32 +21,34 @@
   <body @if(widget.isRequiresLogin()){data-requires-login="requires-login"} >
     <img src="/img/beta.png" class="beta-ribbon"/>
     <span id="title"></span>
-    <a herf="#" id="start_btn" class="button"></a>
-    <a herf="#" id="stop_btn" class="button" style="display:none;"></a>
+    <a herf="javascript:void(0)" id="start_btn" class="button"></a>
+    <a herf="javascript:void(0)" id="stop_btn" class="button" style="display:none;"></a>
     <ul id="log"></ul>
     <ul id="links">
-      <li style="display:none;"><a id="cloudify_dashboard_link" href="#" target="_blank">Cloudify Dashboard</a></li>
+      <li class="mock"><span class="mock_text">Manage Your App</span><a id="cloudify_dashboard_link" href="#" target="_blank">Manage Your App</a></li>
+      <li class="mock" id="custom_link"><span class="mock_text">@widget.getConsoleName</span></li>
     </ul>
     <span id="time_left" style="display:none;">Time left: <span id="time_left_counter"></span></span>
     <div id="video_container"></div>
-    <a id="show_advanced" href="#"><img src="/img/widget_advanced_collapsed.png"></a>
+    <a id="show_advanced" href="javascript:void(0)"><img src="/img/widget_advanced_collapsed.png"></a>
     <a id="pemFileLink" class="download-link" href="javascript:void(0)">PEM</a>
     <div id="advanced" style="display:none;">
-      <a id="hide_advanced" href="#"><img src="/img/widget_advanced_head.png"></a>
+      <a id="hide_advanced" href="javascript:void(0)"><img src="/img/widget_advanced_head.png"></a>
       <form>
-        <input name="hpcs_key" placeholder="HPCS Key">
-        <input name="hpcs_secret_key" placeholder="HPCS Secret Key">
+        <input name="hpcs_key" placeholder="myuser@@mydomain.com-tenant1:66579898000" title="<tenant-name>:<access-key>">
+        <input name="hpcs_secret_key" placeholder="HPCS Secret Key" title="<secret-key>">
       </form>
     </div>
     <div id="footer">
       Powered by: <a href="http://hpcloud.com" target="_blank"><img class="brand_btns" src="/img/hp_cloud_icon.png"></a>
       <a href="http://cloudifysource.org" target="_blank"><img class="brand_btns" src="/img/cloudify_icon.png"></a>
-      <a herf="#" id="patent_pending">&nbsp;&nbsp;(Patent Pending)</a>
+      <a herf="javascript:void(0)" id="patent_pending">&nbsp;&nbsp;(Patent Pending)</a>
       <div class="put_left">
         <a class="share_link" id="facebook_share_link"  href="#"><img src="/img/share_facebook.png"></a>
         <a class="share_link" id="google_plus_share_link" href="#"><img src="/img/share_google.png"></a>
         <a class="share_link" id="twitter_share_link" href="#"><img src="/img/share_twitter.png"></a>
       </div>
     </div>
+    <div id="walkthrough" style="display:none">&nbsp; <a href="javascript:void(0)">Click to close</a> </div>
   </body>
 </html>

@@ -88,18 +88,21 @@ body {
   top: 185px;
   left: -9px;
   font-size: 14px;
-}
+  a{ color: black; }
+  li{
+      float: left;
+      margin-right: 9px;
+      background: url("/img/arrow.png") no-repeat left top;
+      background-position-y: 2px;
+      padding: 0px 0px 0px 14px;
 
-#links a {
-  color: black;
-}
-
-#links li {
-  float: left;
-  margin-right: 9px;
-  background: url("/img/arrow.png") no-repeat left top;
-  background-position-y: 2px;
-  padding: 0px 0px 0px 14px;
+    &.mock {
+      .mock_text{ display:inline; }
+      a{ display:none; }
+    }
+    .mock_text{ display:none; }
+    a { display:inline; }
+  }
 }
 
 #footer {
@@ -202,4 +205,27 @@ body {
 #advanced form input[name="hpcs_secret_key"] {
   top: 96px;
   left: 15px;
+}
+
+
+#walkthrough {
+  position: absolute;
+  background: url('/public/img/demo/walkthrough.png') -10px -15px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  //opacity: 0.5;
+
+  &.no_link{
+    background: url('/public/img/demo/walkthrough-no-link.png') -10px -15px;
+  }
+
+  a{
+    color:white;
+    position:absolute;
+    left:10px;
+    top:10px;
+
+  }
 }

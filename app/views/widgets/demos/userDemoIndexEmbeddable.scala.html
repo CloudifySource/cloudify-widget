@@ -10,7 +10,9 @@
 <html ng-app="DemoApp" ng-init="userId = @{userId}">
 <head>
     <title>Test Page For Cloudify Widget</title>
-    <script src="/public/js/angularjs/angular.js"></script>
+    <script src="/public/js/jquery.min.js"></script>
+    <script src="/public/js/angularjs/angular.min.js"></script>
+    <script src="/public/js/angularjs/angular-cookies.min.js"></script>
     <script type="text/javascript" src="/public/js/demo.js"></script>
     <link href="/public/style/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="/public/style/demos.css" rel="stylesheet"/>
@@ -29,7 +31,6 @@
     </div>
 
     <div class="widgets">
-
         <div class="recipe" ng-show="selectedWidget == widget" class="{{widget.productName}}" data-api-key="{{widget.apiKey}}" ng-repeat="widget in widgets">
             <iframe src="/demos/{{userId}}/{{widget.apiKey}}"></iframe>
             <div class="description" ng-show="widget.description"> {{widget.description}} </div>
