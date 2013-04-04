@@ -376,10 +376,10 @@ $(function () {
 
   function show_cloudify_ui_link( show ){
       if ( show ){
-        $("#links").find("li").removeClass("mock");
+        $("#links").find("li:first").removeClass("mock");
         $("#cloudify_dashboard_link").attr("href", "http://" + widgetState.publicIp() + ":8099/");
       }else{
-          $("#links").find("li").addClass("mock");
+          $("#links").find("li:first").addClass("mock");
       }
   }
 
