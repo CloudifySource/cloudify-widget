@@ -168,10 +168,16 @@ body {
   right: 20px;
 }
 
-#youtube_iframe {
-  position: absolute;
-  left: 20px;
-  bottom: 65px;
+#video_container{
+  object{
+    position: absolute;
+    left: 20px;
+    bottom: 65px;
+  }
+  object,embed{
+    height:160px;
+    width:270px;
+  }
 }
 
 #advanced form input {

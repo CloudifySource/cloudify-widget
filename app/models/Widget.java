@@ -28,6 +28,8 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import org.codehaus.jackson.map.annotate.JsonRootName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.db.ebean.Model;
 import play.i18n.Messages;
 import server.ApplicationContext;
@@ -37,6 +39,7 @@ import utils.CollectionUtils;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import controllers.WidgetAdmin;
+import utils.StringUtils;
 
 /**
  * This class represents a widget metadata and relates to a specific {@link User}.
@@ -96,6 +99,8 @@ public class Widget
 	private List<WidgetInstance> instances;
 
 	public static Finder<Long,Widget> find = new Finder<Long,Widget>(Long.class, Widget.class);
+
+    private static Logger logger = LoggerFactory.getLogger( Widget.class );
 
     @XStreamAlias("status")
     @JsonRootName("status")
@@ -433,6 +438,24 @@ public class Widget
 	{
 		this.title = title;
 	}
+
+    public String getYoutubeVideoKey(){
+        try{
+        if ( StringUtils.isEmpty( youtubeVideoUrl )){
+            return null;
+        }else if ( StringUtils.contains( youtubeVideoUrl, "/embed/" ) ){
+
+            return youtubeVideoUrl.split( "/embed/" )[1];
+
+        }else{
+            logger.error( "unable to get youtube key from [{}]", youtubeVideoUrl );
+            return null;
+        }
+        }catch(Exception e){
+            logger.error( "error while getting youtube key from [{}]", youtubeVideoUrl );
+            return null;
+        }
+    }
 
 	public String getYoutubeVideoUrl()
 	{

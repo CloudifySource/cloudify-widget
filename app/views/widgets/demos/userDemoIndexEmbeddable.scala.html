@@ -30,11 +30,22 @@
         </div>
     </div>
 
-    <div class="widgets">
-        <div class="recipe" ng-show="selectedWidget == widget" class="{{widget.productName}}" data-api-key="{{widget.apiKey}}" ng-repeat="widget in widgets">
-            <iframe src="/demos/{{userId}}/{{widget.apiKey}}"></iframe>
-            <div class="description" ng-show="widget.description"> {{widget.description}} </div>
+    <div class="wt-info" ng-click="$showWT()"> &nbsp; </div>
+    <div class="widgets"  ng-show="selectedWidget" >
+        <div class="recipe" class="{{selectedWidget.productName}}" data-api-key="{{selectedWidget.apiKey}}">
+            <iframe ng-src="/demos/{{userId}}/{{selectedWidget.apiKey}}"></iframe>
+            <div class="description" ng-show="selectedWidget.description"> {{selectedWidget.description}} </div>
         </div>
+    </div>
+
+    <div class="walkthrough" ng-click="dismissWalkthrough()" ng-hide="hideWT">
+        <div class="wt-close" ng-click="$hideWT()"></div>
+        <div class="wt-tooltip arrow1 manage"></div>
+        <div class="wt-tooltip arrow2 view"></div>
+        <div class="wt-tooltip arrow3 start"></div>
+        <div class="wt-tooltip arrow4 learn"></div>
+        <div class="wt-tooltip arrow5 login"></div>
+        <div class="wt-tooltip arrow6 share"></div>
     </div>
         </script>
 </body>

@@ -9,6 +9,57 @@ body{
   background-color:#f7f7f7;
 }
 
+.walkthrough{
+  position:absolute;
+  z-index: 2000;
+  top:55px;
+  right:30px;
+  height:473px;
+  width:600px;
+  padding-left:40px;
+  padding-right:33px;
+  padding-bottom:172px;
+  padding-top:10px;
+  background: url('/public/img/demo/tooltipBG.png') no-repeat;
+  //background: url('/public/img/demo/walkthrough.png') -10px -15px no-repeat;
+  .wt-tooltip{ z-index: 2000; text-shadow:2px 1px #000; position:absolute; color:#00D8FF; font-size:18px; font-weight: bolder;  &:before{ display: inline-block; position: absolute; text-align: center; }}
+  .arrow1{ background:url('/public/img/demo/arrow1.png') no-repeat; display:inline-block; width:41px; height:57px; }
+  .arrow2{ background:url('/public/img/demo/arrow2.png') no-repeat; display:inline-block; width:41px; height:57px; }
+  .arrow3{ background:url('/public/img/demo/arrow3.png') no-repeat; display:inline-block; width:33px; height:57px; }
+  .arrow4{ background:url('/public/img/demo/arrow4.png') no-repeat; display:inline-block; width:39px; height:79px; }
+  .arrow5{ background:url('/public/img/demo/arrow5.png') no-repeat; display:inline-block; width:43px; height:60px; }
+  .arrow6{ background:url('/public/img/demo/arrow6.png') no-repeat; display:inline-block; width:47px; height:41px; }
+
+  .manage{ margin-left: 73px; margin-top: 132px; &:before{ content: "Manage & Monitor Your App Or Service"; margin-top: -63px; width: 133px; margin-left: -45px; }  }
+  .view{ margin-left: 220px; margin-top: 132px; &:before{   content: "View the Deployed App or Service"; margin-top: -63px; width: 133px; margin-left: -45px; } }
+  .start{ margin-left: 508px; margin-top: 105px; &:before{  content: "Start / Play"; margin-top: -33px; width: 133px; margin-left: -45px; } }
+  .learn{ margin-left: 100px; margin-top: 320px; &:before{  content: "Click here to learn more about the App"; margin-top: 75px; width: 133px; margin-left: -45px; } }
+  .share{ margin-left: 455px; margin-top: 440px; &:before{  content: "Share the App"; margin-top: 45px; width: 133px; margin-left: -45px; } }
+  .login{ margin-left: 332px; margin-top: 266px; &:before{  content: "Login to run ultimate full production"; margin-top: 20px; width: 133px; margin-left: 42px; } }
+
+  .wt-close{
+    background:url('/public/img/demo/close_tooltip.png');
+    display:inline-block;
+    position:absolute;
+    right:0;
+    top:0;
+    height:49px;
+    width:49px;
+    margin-top:-22px;
+    margin-right:-22px;
+  }
+
+}
+
+.wt-info{
+  display:inline-block;
+  height:22px;
+  width:22px;
+  background:url('/public/img/demo/info_tooltip.png') no-repeat;
+  position:absolute;
+  top:42px;
+  right:22px;
+}
 
 .recipe{
   right:65px;

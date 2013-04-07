@@ -413,10 +413,16 @@ $(function () {
 
 
 
-  if (params["video_url"]) {
-    $("#video_container").append($("<iframe id='youtube_iframe' width='270' height='160' frameborder='0' allowfullscreen></iframe>"));
-    $("#youtube_iframe").attr("src", decodeURIComponent(params["video_url"]));
-  }
+    // moved to template instead.
+//  if (params["video_url"]) {
+////    $("#video_container").append($("<iframe id='youtube_iframe' width='270' height='160' wmode='transparent' frameborder='0' allowfullscreen></iframe>"));
+////    $("#youtube_iframe").attr("src", decodeURIComponent(params["video_url"]));
+//
+////      debugger;
+////      var videoUrl =  decodeURIComponent(params["video_url"]);
+////      var utube = '<object width="420" height="315"><param name="movie" value="' + videoUrl + '?version=3&amp;hl=en_US"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="' + videoUrl + '?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="420" height="315" allowscriptaccess="always" allowfullscreen="true"></embed></object>'
+////      $("#video_container" ).append($(utube));
+//  }
 
   if (widgetState.instanceId()) {
         widgetState.showStopButton();
@@ -463,37 +469,38 @@ $(function () {
 
   });
 
-    var checkWTInterval = null;
-//    debugger;
-    // handle walkthrough
-    function shouldShowWalkthrough(){
-           return $.cookie("dismissWT") != "true";
-       }
-
-    function hideWT(){
-        $.cookie("dismissWT",true, {path:"/"});
-        console.log("hiding walkthrough");
-        $("#walkthrough" ).remove();
-        if ( checkWTInterval != null ){
-            clearInterval(checkWTInterval);
-        }
-    }
-       function checkWalkthrough(){
-           if ( !shouldShowWalkthrough() ){
-               hideWT();
-           }
-       }
-
-       if ( shouldShowWalkthrough() ){
-           $("#walkthrough" ).show();
-           $("#walkthrough" ).click(function(){
-               hideWT();
-
-               });
-           checkWTInterval = setInterval( checkWalkthrough , 1000 );
-       } else{
-           hideWT();
-       }
+    // code for walkthrough on the widget end.
+//    var checkWTInterval = null;
+////    debugger;
+//    // handle walkthrough
+//    function shouldShowWalkthrough(){
+//           return $.cookie("dismissWT") != "true";
+//       }
+//
+//    function hideWT(){
+//        $.cookie("dismissWT",true, {path:"/"});
+//        console.log("hiding walkthrough");
+//        $("#walkthrough" ).remove();
+//        if ( checkWTInterval != null ){
+//            clearInterval(checkWTInterval);
+//        }
+//    }
+//       function checkWalkthrough(){
+//           if ( !shouldShowWalkthrough() ){
+//               hideWT();
+//           }
+//       }
+//
+//       if ( shouldShowWalkthrough() ){
+//           $("#walkthrough" ).show();
+//           $("#walkthrough" ).click(function(){
+//               hideWT();
+//
+//               });
+//           checkWTInterval = setInterval( checkWalkthrough , 1000 );
+//       } else{
+//           hideWT();
+//       }
 
 
 });
