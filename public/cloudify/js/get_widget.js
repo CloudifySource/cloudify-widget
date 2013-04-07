@@ -1,6 +1,5 @@
 function cloudifyWidgetInitialization(){
     function cloudifyWidgetOnLoadHandler(){
-        debugger;
         var element = document.getElementById("cloudify-widget");
         var api_key = element.getAttribute("data-api-key");
         var host = element.getAttribute("data-host") || "launch.cloudifysource.org";  // backward compatibility

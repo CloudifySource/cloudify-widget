@@ -38,7 +38,6 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
     };
 
     $scope.checkWalkthrough = function(){
-        debugger;
         if ( !$scope.shouldShowWalkthrough() ){
             $scope.dismissWalkthrough();
             clearInterval(walkthroughChecker);

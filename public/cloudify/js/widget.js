@@ -418,7 +418,6 @@ $(function () {
 ////    $("#video_container").append($("<iframe id='youtube_iframe' width='270' height='160' wmode='transparent' frameborder='0' allowfullscreen></iframe>"));
 ////    $("#youtube_iframe").attr("src", decodeURIComponent(params["video_url"]));
 //
-////      debugger;
 ////      var videoUrl =  decodeURIComponent(params["video_url"]);
 ////      var utube = '<object width="420" height="315"><param name="movie" value="' + videoUrl + '?version=3&amp;hl=en_US"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="' + videoUrl + '?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="420" height="315" allowscriptaccess="always" allowfullscreen="true"></embed></object>'
 ////      $("#video_container" ).append($(utube));
@@ -471,7 +470,6 @@ $(function () {
 
     // code for walkthrough on the widget end.
 //    var checkWTInterval = null;
-////    debugger;
 //    // handle walkthrough
 //    function shouldShowWalkthrough(){
 //           return $.cookie("dismissWT") != "true";
