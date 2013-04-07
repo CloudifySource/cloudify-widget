@@ -2,7 +2,7 @@
 'use strict';
 var widgetConfig = function($routeProvider){ $routeProvider.when( '/', { controller: 'DemoController', templateUrl: 'widgetTemplate' } ) };
 var WidgetApp = angular.module( 'DemoApp', ['ngCookies'] ).config( widgetConfig );
-WidgetApp.controller('DemoController', function($scope, $location, $routeParams, $http, $cookieStore ){
+WidgetApp.controller('DemoController', function($scope, $location, $routeParams, $http, $cookieStore, $timeout ){
     $scope["widgets"] = $http.get(jsRoutes.controllers.DemosController.listWidgetForDemoUser( $scope["userId"] ).url ).then(function(data){
         var searchWidgetId = $cookieStore.get("widgetId");
         var cachedWidget = $( data.data ).filter(function(index,value){ return value.id == searchWidgetId })[0];
@@ -18,18 +18,22 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
 
     /////////////// Walkthrough!
     var walkthroughChecker = null;
-
+    $scope.hideWT = true; // default
     $scope.$showWT = function(){
+        debugger;
         $scope.hideWT = false;
+        $(".walkthrough" ).fadeIn();
     };
 
     $scope.$hideWT = function(){
         $scope.hideWT = true;
+        $(".walkthrough" ).fadeOut();
     };
 
+
     $scope.dismissWalkthrough = function(){
-        $cookieStore.put("dismissWT",true);
-        $scope.$hideWT();
+            $cookieStore.put("dismissWT",true);
+            $scope.$hideWT();
     };
 
     $scope.shouldShowWalkthrough = function(){
@@ -45,8 +49,12 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
     };
 
     if ( $scope.shouldShowWalkthrough() ){
-        walkthroughChecker = setInterval( function(){$scope.checkWalkthrough(); $scope.$apply() }, 1000 );
+        $timeout(function(){
+            $scope.$showWT();
+        walkthroughChecker = setInterval( function(){  $scope.checkWalkthrough(); $scope.$apply() }, 1000 );
+        }, 2000);
     }else{
         $scope.$hideWT();
     }
 });
+
