@@ -34,8 +34,8 @@ body{
   .view{ margin-left: 220px; margin-top: 132px; &:before{   content: "Open the app home page or the service's management console"; margin-top: -70px; width: 180px; margin-left: -13px; } }
   .start{ margin-left: 508px; margin-top: 105px; &:before{  content: "Launch the application or service defined for this player"; margin-top: -86px; width: 142px; margin-left: -67px; } }
   .learn{ margin-left: 100px; margin-top: 320px; &:before{  content: "Learn more about the app or service defined for this player"; margin-top: 75px; width: 133px; margin-left: -45px; } }
-  .share{ margin-left: 455px; margin-top: 440px; &:before{  content: "Share this player via your favorite social network"; margin-top: 45px; width: 238px; margin-left: -45px; } }
-  .login{ margin-left: 332px; margin-top: 266px; &:before{  content: "(Optional) Use your HPCS credentials to launch the app or service under your account with no instance or time restrictions"; margin-top: 20px; width: 133px; margin-left: 42px; } }
+  .share{ margin-left: 455px; margin-top: 440px; &:before{  content: "Share this player via your favorite social network"; margin-top: 45px; width: 145px; margin-left: -45px; } }
+  .login{ margin-left: 332px; margin-top: 266px; &:before{  content: "(Optional) Use your HPCS credentials to launch the app or service under your account with no instance or time restrictions"; margin-top: 20px; width: 255px; margin-left: 42px; } }
 
   .wt-close{
     background:url('/public/img/demo/close_tooltip.png');
