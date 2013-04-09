@@ -1,8 +1,11 @@
 $(function(){
     $("body").live("requireLogin", function(){
               console.log(["parent got play widget message, forcing user to login"]);
-              var maxHeight = $(window.top).height();
-                var maxWidth = $(window.top).width();
+                // can't get height/width if I am cross domain
+              //var maxHeight = $(window.top).height();
+              //  var maxWidth = $(window.top).width();
+                var maxHeight = 400;
+                var maxWidth = 800;
               var windowWidth = Math.min(1000, maxWidth);
               var windowHeight = Math.min(600,maxHeight) ;
               var windowLeft = ( maxWidth - windowWidth ) / 2;
