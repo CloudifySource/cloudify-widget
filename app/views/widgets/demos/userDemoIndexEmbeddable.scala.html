@@ -31,10 +31,12 @@
     </div>
 
     <div class="wt-info" ng-click="$showWT()"> &nbsp; </div>
-    <div class="widgets"  ng-show="selectedWidget" >
-        <div class="recipe" class="{{selectedWidget.productName}}" data-api-key="{{selectedWidget.apiKey}}">
+    <div class="widgets"  ng-switch on="!!selectedWidget">
+        <div class="recipe" class="{{selectedWidget.productName}}" data-api-key="{{selectedWidget.apiKey}}" ng-switch-when="true">
             <iframe ng-src="/demos/{{userId}}/{{selectedWidget.apiKey}}"></iframe>
             <div class="description" ng-show="selectedWidget.description"> {{selectedWidget.description}} </div>
+        </div>
+        <div ng-switch-default="">
         </div>
     </div>
 

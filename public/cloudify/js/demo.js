@@ -20,7 +20,6 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
     var walkthroughChecker = null;
     $scope.hideWT = true; // default
     $scope.$showWT = function(){
-        debugger;
         $scope.hideWT = false;
         $(".walkthrough" ).fadeIn();
     };
