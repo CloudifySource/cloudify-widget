@@ -35,15 +35,34 @@
             <object width="270" height="160"><param name="movie" value="http://www.youtube.com/v/@widget.getYoutubeVideoKey()?version=3&amp;hl=en_US"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/@widget.getYoutubeVideoKey()?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="270" height="160" allowscriptaccess="always" wmode="transparent" allowfullscreen="true"></embed></object>
         }
     </div>
-    <a id="show_advanced" href="javascript:void(0)"><img src="/img/widget_advanced_collapsed.png"></a>
-    <a id="pemFileLink" class="download-link" href="javascript:void(0)">PEM</a>
-    <div id="advanced" style="display:none;">
-      <a id="hide_advanced" href="javascript:void(0)"><img src="/img/widget_advanced_head.png"></a>
-      <form>
-        <input name="hpcs_key" placeholder="myuser@@mydomain.com-tenant1:66579898000" title="<tenant-name>:<access-key>">
+
+<div class="advanced_section">
+    <div class="advanced_header">
+            <a href="javascript:void(0)" class="advanced_title" onclick="$(this).closest('.advanced_section').toggleClass('collapsed');">Advanced</a>
+            <a id="pemFileLink" class="download-link download-pem-link" href="javascript:void(0)"> PEM </a>
+    </div>
+    <div class="advanced_form">
+        <input name="hpcs_key" placeholder="myuser @@ mydomain.com:66579898000" title="<project-name>:<access-key>"/>
+        <input name="hpcs_secret_key" placeholder="HPCS Secret Key" title="<secret-key>"/>
+        <div class="form-footer-links">
+            <a class="form-footer-links" href="">help</a>
+        </div>
+    </div>
+</div>
+
+<div style="display:none" class="previous_advanced_section">
+//    <a id="show_advanced" href="javascript:void(0)"><img src="/img/widget_advanced_collapsed.png"></a>
+@**@
+//    <a id="pemFileLink" class="download-link" href="javascript:void(0)">PEM</a>
+//    <div id="advanced" style="display:none;">
+//      <a id="hide_advanced" href="javascript:void(0)"><img src="/img/widget_advanced_head.png"></a>
+//      <form>
+        <input name="hpcs_key" placeholder="myuser@@mydomain.com:66579898000" title="<project-name>:<access-key>">
         <input name="hpcs_secret_key" placeholder="HPCS Secret Key" title="<secret-key>">
       </form>
     </div>
+</div>
+
     <div id="footer">
       Powered by: <a href="http://hpcloud.com" target="_blank"><img class="brand_btns" src="/img/hp_cloud_icon.png"></a>
       <a href="http://cloudifysource.org" target="_blank"><img class="brand_btns" src="/img/cloudify_icon.png"></a>
