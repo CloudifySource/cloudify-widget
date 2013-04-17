@@ -22,7 +22,7 @@ NGINX_CONF_TARGET=/etc/nginx/nginx.conf
 echo "copying nginx configurations"
 
 cmp  -s ${NGINX_CONF_SRC} ${NGINX_CONF_TARGET}
-if [ $? -eq 1 ]; then
+if [ $? -ne 0 ]; then
     \cp -f ${NGINX_CONF_SRC} ${NGINX_CONF_TARGET}
     service nginx restart
 else
