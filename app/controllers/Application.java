@@ -69,7 +69,6 @@ public class Application extends Controller
 		try
 		{
 
-
 			logger.info("starting widget with [apiKey, hpcsKey, hpcsSecretKey] = [{},{},{}]", new Object[]{apiKey, hpcsKey, hpcsSecretKey} );
  			Widget widget = Widget.getWidget( apiKey );
             ServerNode serverNode = null;
@@ -170,7 +169,7 @@ public class Application extends Controller
 		return !StringUtils.isEmpty(hpcsKey) && !StringUtils.isEmpty(hpcsSecretKey)
 				&& hpcsKey.contains(":") && !hpcsKey.startsWith(":") && !hpcsKey.endsWith(":");
 	}
-	
+
 	public static Result stop( String apiKey, String instanceId )
 	{
 		ServerNode serverNode = ServerNode.find.byId(Long.parseLong(instanceId));
@@ -192,7 +191,7 @@ public class Application extends Controller
 		}
 	}
 
-	
+
 	public static Result getWidgetStatus( String apiKey, String instanceId )
 	{
 		try
