@@ -9,6 +9,7 @@ dist
 .project
 .idea/
 *.iml
+*.log
 .settings/
 .target/
 */.DS_Store
