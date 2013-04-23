@@ -89,6 +89,7 @@ iframe {
 .nav-links{
   margin-right: 100px;
   padding-right:5px;
+  overflow-y:auto;    /* Required by Tamir - by design for the public cloudifysource.org page*/
 
   background-color:white;
   box-shadow: 0 10px 10px 5px #EAEAEA;
