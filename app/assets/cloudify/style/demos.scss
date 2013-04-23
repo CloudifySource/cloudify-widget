@@ -107,8 +107,9 @@ iframe {
       background-color:#f7f7f7;
     }
       text-align: left;
-      padding-top:20px;
-      height:56px;
+      padding-top:10px;
+      padding-bottom:5px;
+      height:41px;
       border-bottom:2px solid #DEDEDE;
       border-top: 1px solid #EDEDED;
       background:white;
@@ -135,7 +136,7 @@ iframe {
         text-overflow: ellipsis;
         overflow: hidden;
       }
-      .product-name{ font-size:20px; }
+      .product-name{ font-size:18px; }
       .product-version{ color:grey;}
   }
 
