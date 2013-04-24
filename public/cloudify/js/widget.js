@@ -1,6 +1,18 @@
 $(function () {
 
+    function advanced( username, password ){
+        var $advanced = $("#advanced");
+        var $username = $advanced.find("[name=hpcs_key]");
+        var $password = $advanced.find("[name=hpcs_secret_key]");
 
+        if ( username && password )
+        {
+            $username.val(username);
+            $password.val(password);
+        }else{
+            return { username : $username.val(), password : $password.val()}
+        }
+    }
 
     function show_walkthrough(){
 
@@ -297,10 +309,12 @@ $(function () {
                 return;
             }
             if ( msg.advanced ){
-                $("#advanced [name=hpcs_key]").val( msg.advanced.hpcs_key );
-                $("#advanced [name=hpcs_secret_key]").val( msg.advanced.hpcs_secret_key );
+                advanced( msg.advanced.hpcs_key, msg.advanced.hpcs_secret_key);
+//                $("#advanced [name=hpcs_key]").val( msg.advanced.hpcs_key );
+//                $("#advanced [name=hpcs_secret_key]").val( msg.advanced.hpcs_secret_key );
             }else{
-                $("#advanced [name=hpcs_key], #advanced [name=hpcs_secret_key]").val("");
+                advanced("","");
+//                $("#advanced [name=hpcs_key], #advanced [name=hpcs_secret_key]").val("");
             }
            widgetState.onPlay();
         } else if ( msg.name == "stopwidget"){
@@ -325,7 +339,8 @@ $(function () {
         widgetState.isPlaying(true);
         widgetState.showStopButton();
         if ( !widgetState.isValid() ) {
-			var playData = { apiKey : params["apiKey"], "hpcsKey" : $("#advanced [name=hpcs_key]").val(), "hpcsSecretKey":$("#advanced [name=hpcs_secret_key]").val() };
+            var advancedData = advanced();
+			var playData = { apiKey : params["apiKey"], "hpcsKey" : advancedData.username, "hpcsSecretKey":advancedData.password };
             $.ajax(
                 { type:"POST",
                   url : "/widget/start?" + $.param(playData),
