@@ -64,18 +64,19 @@ public class Application extends Controller
     private static Logger logger = LoggerFactory.getLogger(Application.class);
     // guy - todo - apiKey should be an encoded string that contains the userId and widgetId.
     //              we should be able to decode it, verify user's ownership on the widget and go from there.
-    **
+    /**
      * Start does 2 things:
      *  - gets a server node
      *           - if remote bootstrap we need to bootstrap one from scratch
      *           - otherwise we take one from the pool.
      *
      *  - installs the widget recipe
-     * @param apiKey
-     * @param hpcsKey
-     * @param hpcsSecretKey
-     * @param userId
-     * @return
+     * @param apiKey - user api key
+     * @param project - the HP project API data
+     * @param key - the HP key API data
+     * @param secretKey - the HP secret key API data
+     * @param userId - in case required login authentication is used
+     * @return - result
      */
 	public static Result start( String apiKey, String project, String key, String secretKey, String userId )
 	{
