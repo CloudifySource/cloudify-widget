@@ -1,16 +1,17 @@
 $(function () {
 
-    function advanced( username, password ){
+    function advanced( project, key, secretKey ){
         var $advanced = $("#advanced");
-        var $username = $advanced.find("[name=hpcs_key]");
-        var $password = $advanced.find("[name=hpcs_secret_key]");
+        var $project = $advanced.find("[name=project_name]");
+        var $key = $advanced.find("[name=hpcs_key]");
+        var $secretKey = $advanced.find("[name=hpcs_secret_key]");
 
-        if ( username && password )
+        if ( project && key && secretKey )
         {
-            $username.val(username);
-            $password.val(password);
+            $project.val(project);
+            $key.val(key);
         }else{
-            return { username : $username.val(), password : $password.val()}
+            return { project : $project.val(), key : $key.val(), secretKey : $secretKey.val()}
         }
     }
 
@@ -309,12 +310,9 @@ $(function () {
                 return;
             }
             if ( msg.advanced ){
-                advanced( msg.advanced.hpcs_key, msg.advanced.hpcs_secret_key);
-//                $("#advanced [name=hpcs_key]").val( msg.advanced.hpcs_key );
-//                $("#advanced [name=hpcs_secret_key]").val( msg.advanced.hpcs_secret_key );
+                advanced( msg.advanced.project, msg.advanced.key , msg.advanced.secretKey);
             }else{
-                advanced("","");
-//                $("#advanced [name=hpcs_key], #advanced [name=hpcs_secret_key]").val("");
+                advanced("","","");
             }
            widgetState.onPlay();
         } else if ( msg.name == "stopwidget"){
@@ -340,7 +338,7 @@ $(function () {
         widgetState.showStopButton();
         if ( !widgetState.isValid() ) {
             var advancedData = advanced();
-			var playData = { apiKey : params["apiKey"], "hpcsKey" : advancedData.username, "hpcsSecretKey":advancedData.password };
+			var playData = { apiKey : params["apiKey"], "project" : advancedData.project, "key" : advancedData.key, "secretKey":advancedData.secretKey };
             $.ajax(
                 { type:"POST",
                   url : "/widget/start?" + $.param(playData),
@@ -455,12 +453,6 @@ $(function () {
 
     widgetState.onPlay( start_instance_btn_handler );
     widgetState.onStop( stop_instance_btn_handler );
-
-
-  $("#show_advanced, #hide_advanced").click(function () {
-    $("#advanced").toggle();
-  });
-
 
         $(".download_link" ).live("click",function(){
             mixpanel.track("Download Button Clicks",{'page name' : $("#title" ).text(), 'url' : origin_page_url});

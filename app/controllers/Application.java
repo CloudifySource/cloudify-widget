@@ -64,13 +64,11 @@ public class Application extends Controller
     private static Logger logger = LoggerFactory.getLogger(Application.class);
     // guy - todo - apiKey should be an encoded string that contains the userId and widgetId.
     //              we should be able to decode it, verify user's ownership on the widget and go from there.
-	public static Result start( String apiKey, String hpcsKey, String hpcsSecretKey, String userId )
+	public static Result start( String apiKey, String project, String key, String secretKey, String userId )
 	{
 		try
 		{
-
-
-			logger.info("starting widget with [apiKey, hpcsKey, hpcsSecretKey] = [{},{},{}]", new Object[]{apiKey, hpcsKey, hpcsSecretKey} );
+			logger.info("starting widget with [apiKey, key, secretKey] = [{},{},{}]", new Object[]{apiKey, key, secretKey} );
  			Widget widget = Widget.getWidget( apiKey );
             ServerNode serverNode = null;
            	if ( widget == null || !widget.isEnabled()) {
@@ -95,16 +93,16 @@ public class Application extends Controller
              ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ) );
 
             //TODO[adaml]: add proper input validation response
-            if ( !StringUtils.isEmpty(hpcsKey) && !StringUtils.isEmpty( hpcsSecretKey ) ){
-                if ( !isValidInput(hpcsKey, hpcsSecretKey) ) {
+            if ( !StringUtils.isEmpty( project ) && !StringUtils.isEmpty( key ) && !StringUtils.isEmpty( secretKey ) ){
+                if ( !isValidInput( key, secretKey ) ) {
                     new HeaderMessage().setError(Messages.get("invalid.hpcs.credentials")).apply(response().getHeaders());
                     return badRequest();
                 }
 
                 serverNode = new ServerNode();
-                serverNode.setUserName( hpcsKey );
+                serverNode.setUserName( key );
                 serverNode.setRemote(true);
-                serverNode.setApiKey( hpcsSecretKey );
+                serverNode.setApiKey( secretKey );
                 serverNode.save();
             }else{
                 serverNode = ApplicationContext.get().getServerPool().get(widget.getLifeExpectancy());
