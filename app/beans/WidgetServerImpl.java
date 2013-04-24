@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import beans.config.Conf;
 import controllers.WidgetAdmin;
 
+import models.ServerNodeEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,6 +129,16 @@ public class WidgetServerImpl implements WidgetServer
         }
 
         result.setRemote( server.isRemote() ).setHasPemFile( !StringUtils.isEmpty(server.getPrivateKey()) ); // let UI know this is a remote bootstrap.
+
+        if ( !CollectionUtils.isEmpty(server.events) ){
+            for (ServerNodeEvent event : server.events) {
+                if ( event.getEventType() == ServerNodeEvent.Type.ERROR){
+                    result.setState(Status.State.STOPPED);
+                    result.setMessage(event.getMsg());
+                    return result;
+                }
+            }
+        }
 
         String cachedOutput = Utils.getCachedOutput( server );// need to sort out the cache before we decide if the installation finished.
         output.addAll(Utils.formatOutput(cachedOutput, server.getPrivateIP() + "]", filterOutputLines, filterOutputStrings));

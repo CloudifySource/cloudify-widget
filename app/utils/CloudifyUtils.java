@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.io.FileUtils;
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeServiceContext;
@@ -35,6 +36,8 @@ import org.jclouds.openstack.nova.v2_0.extensions.KeyPairApi;
 import org.jclouds.openstack.nova.v2_0.extensions.SecurityGroupApi;
 import org.jclouds.rest.RestContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import server.ApplicationContext;
 import server.exceptions.ServerException;
 import beans.config.ServerConfig.CloudBootstrapConfiguration;
@@ -60,7 +63,7 @@ public class CloudifyUtils {
 	 * @throws IOException
 	 */
 	public static File createCloudFolder(String userName, String apiKey, ComputeServiceContext context) throws IOException {
-		
+
 		CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
 		String cloudifyBuildFolder = ApplicationContext.get().conf().server.environment.cloudifyHome;
 		File cloudifyEscFolder = new File(cloudifyBuildFolder, cloudConf.cloudifyEscDirRelativePath);
@@ -122,17 +125,19 @@ public class CloudifyUtils {
 		}
 		return FileUtils.readFileToString(pemFile);
 	}
-	
+
+    private static Logger logger = LoggerFactory.getLogger(CloudifyUtils.class);
+
 	// creates a new pem file for a given hp cloud account.
 	private static File createPemFile( ComputeServiceContext context ){
 		CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
-		try {
+        try {
 			RestContext<NovaApi, NovaAsyncApi> novaClient = context.unwrap();
-			NovaApi api = novaClient.getApi();
-			KeyPairApi keyPairApi = api.getKeyPairExtensionForZone( cloudConf.zoneName ).get();
-			KeyPair keyPair = keyPairApi.create( cloudConf.keyPairName + getTempSuffix()); 
+            NovaApi api = novaClient.getApi();
+            KeyPairApi keyPairApi = api.getKeyPairExtensionForZone( cloudConf.zoneName ).get();
+			KeyPair keyPair = keyPairApi.create( cloudConf.keyPairName + getTempSuffix());
 
-			File pemFile = new File(System.getProperty("java.io.tmpdir"), keyPair.getName());
+            File pemFile = new File(System.getProperty("java.io.tmpdir"), keyPair.getName());
 			pemFile.createNewFile();
 			FileUtils.writeStringToFile(pemFile, keyPair.getPrivateKey());
 			return pemFile;

@@ -168,11 +168,12 @@ public class Utils
 			}
 		}// for
 
+        logger.debug("starting output format phase 2");
 		// trim empty lines or with a single dot
 		List<String> newList = new ArrayList<String>();
 		for( String s : list )
 		{
-
+			logger.debug("handling line [{}]", s);
             if ( s.toLowerCase().contains("operation failed")){
                 logger.debug("detected operation failed");
                 newList.add("Operation Failed");
@@ -185,8 +186,9 @@ public class Utils
                     continue;
                 }
             }
-			if ( !s.equals("") && !s.equals(".") )
+			if ( !s.equals("") && !s.equals(".") ){
 				newList.add( s );
+            }
 		}
 
 		return newList;

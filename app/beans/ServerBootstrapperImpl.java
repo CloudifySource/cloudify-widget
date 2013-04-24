@@ -22,6 +22,7 @@ import com.google.common.net.HostAndPort;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import models.ServerNode;
+import models.ServerNodeEvent;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.io.FileUtils;
@@ -447,7 +448,8 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             serverNode.save();
             logger.info("server node updated and saved");
 			return serverNode;
-		} catch(Exception e) {
+		}catch(Exception e) {
+            serverNode.errorEvent("Invalid Credentials").save();
 			throw new RuntimeException("Unable to bootstrap cloud", e);
 		} finally {
 			if (cloudFolder != null) {

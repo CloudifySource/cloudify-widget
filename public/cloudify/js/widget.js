@@ -5,7 +5,6 @@ $(function () {
         var $project = $advanced.find("[name=project_name]");
         var $key = $advanced.find("[name=hpcs_key]");
         var $secretKey = $advanced.find("[name=hpcs_secret_key]");
-
         if ( project && key && secretKey )
         {
             $project.val(project);

@@ -174,7 +174,7 @@ public class JsonInitialData implements InitialData {
     public User findOrCreateUser ( String username ){
         User u = User.find.where(  ).eq( "email", username ).findUnique();
         if ( u == null ){
-            u = new User( username, conf.settings.initialData.defaultPassword );
+            u = User.newUser(null, null, username, conf.settings.initialData.defaultPassword);
             u.save(  );
         }
         return u;
