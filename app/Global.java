@@ -1,3 +1,4 @@
+import annotations.AnonymousUsers;
 import beans.config.Conf;
 import models.User;
 import models.Widget;
@@ -11,6 +12,7 @@ import play.api.mvc.Results;
 import play.api.mvc.SimpleResult;
 import play.core.j.JavaResults;
 import play.libs.Json;
+import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
 import scala.Tuple2;
@@ -22,6 +24,7 @@ import utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 
@@ -130,10 +133,23 @@ public class Global extends GlobalSettings
 
     }
 
+    @Override
+    public Action onRequest( Http.Request request, Method actionMethod )
+    {
+        if( conf.settings.globalSecurityCheck ){
+            if ( !actionMethod.isAnnotationPresent( AnonymousUsers.class ) ){
+                // must verify login
+                String authToken = request.queryString().get("authToken")[0];
+                User.validateAuthToken( authToken );
+
+            }
+        }
+        return super.onRequest( request, actionMethod );
+    }
 
 
 
-	@Override
+    @Override
 	public void onStop(Application app)
 	{
 		ApplicationContext.get().getServerBootstrapper().close();

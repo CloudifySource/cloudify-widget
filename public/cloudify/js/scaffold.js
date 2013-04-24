@@ -8,6 +8,9 @@
 
 $( function ()
 {
+
+
+
     $( document ).ajaxError(function ( event, jqXHR, ajaxSettings, thrownError )
     {
         console.log( ["handling error", jqXHR.getAllResponseHeaders(), jqXHR.getResponseHeader( "session-expired" )] );

@@ -1,9 +1,31 @@
 @import tags._
 
 @context.set("head"){
-        <script src="/public/js/angularjs/angular.js"></script>
+
+        <script src="/public/js/i18next/i18next-1.6.0.@js()"></script>
+        <script src="/public/js/angularjs/angular.@js()"></script>
+        <script src="/public/js/angularjs/angular-ui.@js()"></script>
+        <script src="/public/js/angularjs/ui-bootstrap-0.2.0.@js()"></script>
+        <script src="/public/js/codemirror/codemirror.js"></script>
+        <script src="/public/js/codemirror/modes/htmlmixed.js"></script>
+        <script src="/public/js/codemirror/modes/css.js"></script>
+        <script src="/public/js/codemirror/modes/javascript.js"></script>
+        <script src="/public/js/codemirror/modes/xml.js"></script>
+        <script src="/public/js/angularjs/ui-bootstrap-tpls-0.2.0.@js()"></script>
+        <script src="/public/js/angularjs/gs-overrides.js"></script>
         <script src="/public/js/widgets/WidgetApp.js"></script>
-        <link href="/public/style/widgets_angularjs.css" rel="stylesheet">
+        <link href="/public/style/widgets_angularjs.@css()" rel="stylesheet"/>
+        <link href="/public/style/codemirror/codemirror.css" rel="stylesheet"/>
+        <link href="/public/style/codemirror/themes/monokai.css" rel="stylesheet"/>
+<!--[if lte IE 8]>
+   <script src="/public/js/angaulrjs/angular-ui-ieshiv.js"></script>
+<![endif]-->
+
+        <link href="/public/style/fontawesome/css/font-awesome.@css()" rel="stylesheet"/>
+
+<!--[if lte IE 7]>
+        <link href="/public/style/fontawesome/css/font-awesome-ie7.min.css" rel="stylesheet"/>
+<![endif]-->
 }
 
 @context.set("body"){
@@ -12,5 +34,4 @@
 }
 
 @context.set("ng-app"){WidgetApp}
-
 @templates.page()
