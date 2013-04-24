@@ -109,7 +109,7 @@ public class Application extends Controller
             // credentials validation is made when we attempt to create a PEM file. if credentials are wrong, it will fail.
             if ( !StringUtils.isEmpty( project ) && !StringUtils.isEmpty( key ) && !StringUtils.isEmpty( secretKey ) ){
                 serverNode = new ServerNode();
-                serverNode.setUserName( key );
+                serverNode.setUserName( project + ":" +  key );
                 serverNode.setRemote(true);
                 serverNode.setApiKey( secretKey );
                 serverNode.save();
