@@ -13,7 +13,7 @@
                 },
                 "path": "",
                 "image": {
-                    "selected": "MongoDB.png"
+                    "selected": "MongoDBSelected.png"
                 },
                 "description": "This is description for Mongo player"
             },
@@ -31,7 +31,7 @@
                 },
                 "path": "",
                 "image": {
-                    "selected": "Petclinic.png"
+                    "selected": "PetclinicSelected.png"
                 },
                 "description":"this is a description for petclinic player"
             },
@@ -47,7 +47,7 @@
                 },
                 "path": "",
                 "image": {
-                    "selected": "Couchbase.png"
+                    "selected": "CouchbaseSelected.png"
                 },
                 "login": {
                     "require": true,
@@ -86,7 +86,7 @@
                 },
                 "path": "",
                 "image": {
-                    "selected": "JBoss.png"
+                    "selected": "jbossSelected.png"
                 },
                 "description": "A recipe for JBoss 7.1.0.Final"
             },
@@ -103,7 +103,7 @@
                 },
                 "path": "",
                 "image": {
-                    "selected": "Memcached.png"
+                    "selected": "MemcachedSelected.png"
                 },
                 "description": "A recipe for MemcacheD which is an open source, distributed memory object caching system. "
             },
@@ -120,13 +120,68 @@
                 },
                 "path": "apps/computers",
                 "image": {
-                    "selected": "PlayFramework.png"
+                    "selected": "PlayComputersSelected.png"
                 },
                 "description": "A recipe for the Play framework which is an open source web application framework."
+            },
+
+            "Vertx": {
+                "version": "1.2.3",
+                "title": "Vertx",
+                "youtube": "",
+                "provider": "http://vertx.io",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/vertx.zip",
+                "console": {
+                    "title": "Vertx Console",
+                    "link": "http://$HOST:8080/"
+                },
+                "path": "",
+                "image": {
+                    "selected": "vertxSelected.png"
+                },
+                "description": "A recipe for Vert.x which is an event driven application framework"
+            },
+
+            "Drupal": {
+                "version": "7.*",
+                "title": "Drupal",
+                "youtube": "",
+                "provider": "http://drupal.org",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/drupal.zip",
+                "console": {
+                    "title": "Drupal site",
+                    "link": "http://$HOST:8080"
+                },
+                "path": "apps/drupal-babies",
+                "image": {
+                    "selected": "drupalSelected.png"
+                },
+                "description": "A recipe for Drupal which is an open source content management platform"
+            },
+            "Cassandra": {
+                "version": "0.8.7",
+                "title": "Cassandra",
+                "youtube": "",
+                "provider": "http://cassandra.apache.org/",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/cassandra.zip",
+                "console": {
+                    "title": "Cassandra",
+                    "link": "http://$HOST:9160"
+                },
+                "path": "",
+                "image": {
+                    "selected": "CassandraSelected.png"
+                },
+                "description": "A recipe for Cassandra which is a scalable and ha database."
             }
 
 
+
         }
+
+
+
+
     }
 }
 }
