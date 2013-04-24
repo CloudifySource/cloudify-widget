@@ -106,13 +106,8 @@ public class Application extends Controller
 
              ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ) );
 
-            //TODO[adaml]: add proper input validation response
+            // credentials validation is made when we attempt to create a PEM file. if credentials are wrong, it will fail.
             if ( !StringUtils.isEmpty( project ) && !StringUtils.isEmpty( key ) && !StringUtils.isEmpty( secretKey ) ){
-                if ( !isValidInput( key, secretKey ) ) {
-                    new HeaderMessage().setError(Messages.get("invalid.hpcs.credentials")).apply(response().getHeaders());
-                    return badRequest();
-                }
-
                 serverNode = new ServerNode();
                 serverNode.setUserName( key );
                 serverNode.setRemote(true);
@@ -179,10 +174,6 @@ public class Application extends Controller
         return ok( Json.toJson( result ));
     }
 
-	private static boolean isValidInput(String hpcsKey, String hpcsSecretKey) {
-		return !StringUtils.isEmpty(hpcsKey) && !StringUtils.isEmpty(hpcsSecretKey)
-				&& hpcsKey.contains(":") && !hpcsKey.startsWith(":") && !hpcsKey.endsWith(":");
-	}
 
 	public static Result stop( String apiKey, String instanceId )
 	{
