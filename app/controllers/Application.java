@@ -64,6 +64,20 @@ public class Application extends Controller
     private static Logger logger = LoggerFactory.getLogger(Application.class);
     // guy - todo - apiKey should be an encoded string that contains the userId and widgetId.
     //              we should be able to decode it, verify user's ownership on the widget and go from there.
+
+    /**
+     * Start does 2 things:
+     *  - gets a server node
+     *           - if remote bootstrap we need to bootstrap one from scratch
+     *           - otherwise we take one from the pool.
+     *
+     *  - installs the widget recipe
+     * @param apiKey
+     * @param hpcsKey
+     * @param hpcsSecretKey
+     * @param userId
+     * @return
+     */
 	public static Result start( String apiKey, String hpcsKey, String hpcsSecretKey, String userId )
 	{
 		try
@@ -131,7 +145,7 @@ public class Application extends Controller
                                 logger.info("bootstrapping remote cloud");
                                 ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode);
                             }
-                            logger.info("installing widget on remote cloud");
+                            logger.info("installing widget on cloud");
                             ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress );
                         }
                     });
@@ -162,6 +176,7 @@ public class Application extends Controller
     private static Result statusToResult( Widget.Status status ){
         Map<String,Object> result = new HashMap<String, Object>();
         result.put("status", status );
+        logger.info("statusToResult > result: [{}]", result);
         return ok( Json.toJson( result ));
     }
 

@@ -173,7 +173,7 @@ public class Utils
 		List<String> newList = new ArrayList<String>();
 		for( String s : list )
 		{
-           logger.debug("handling line [{}]", s);
+			logger.debug("handling line [{}]", s);
             if ( s.toLowerCase().contains("operation failed")){
                 logger.debug("detected operation failed");
                 newList.add("Operation Failed");

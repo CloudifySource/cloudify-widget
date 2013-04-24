@@ -22,15 +22,11 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.jclouds.openstack.nova.v2_0.domain.Address;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.db.ebean.Model;
-import utils.Utils;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.OneToOne;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,6 +44,9 @@ import java.util.concurrent.TimeUnit;
 public class ServerNode
 extends Model
 {
+
+    private static Logger logger = LoggerFactory.getLogger(ServerNode.class);
+
 	@Id
 	@XStreamOmitField
 	private Long id;
@@ -88,6 +87,9 @@ extends Model
 
     @Version
     private long version = 0;
+
+    @OneToMany(mappedBy="serverNode", cascade = CascadeType.REMOVE)
+    public List<ServerNodeEvent> events = new LinkedList<ServerNodeEvent>();
 	
 	public static Finder<Long,ServerNode> find = new Finder<Long,ServerNode>(Long.class, ServerNode.class); 
 
@@ -274,6 +276,14 @@ extends Model
 
     public void setWidgetInstance(WidgetInstance widgetInstance) {
         this.widgetInstance = widgetInstance;
+    }
+
+    public ServerNodeEvent errorEvent(String message) {
+        logger.info("adding error event [{}]",message);
+        return new ServerNodeEvent()
+                .setServerNode(this)
+                .setMsg(message)
+                .setEventType(ServerNodeEvent.Type.ERROR);
     }
 
 
