@@ -1,7 +1,7 @@
 $(function () {
 
     function advanced( project, key, secretKey ){
-        var $advanced = $("#advanced");
+        var $advanced = $(".advanced_section");
         var $project = $advanced.find("[name=project_name]");
         var $key = $advanced.find("[name=hpcs_key]");
         var $secretKey = $advanced.find("[name=hpcs_secret_key]");
