@@ -7,9 +7,6 @@
   &.widgets-dashboard {
     #summary { display:table };
     #user_name_column{ display:block };
-    #welcome_window {
-      display: none;
-    }
 
     &.empty-list {
       #welcome_window {
@@ -30,6 +27,13 @@
     }
 
   }
+}
+
+.form-horizontal textarea#description{
+  width:95%;
+  height:200px;
+  display:block;
+  margin:auto;
 }
 
 #edit_description_modal, #require_login_modal , #new_widget_modal{  form { margin: 0px;} }
@@ -111,14 +115,8 @@ td.action_col {
   margin-left: 2px;
 }
 
-.modal-body {
-  max-height: 450px;
-}
-
-@media all and (min-height: 699px) {
-  .modal-body {
-    max-height: 500px;
-  }
+.modal-body{
+  max-height: none;
 }
 
 @media all and (max-height: 699px) and (min-height: 675px) {
@@ -135,3 +133,42 @@ td.action_col {
   cursor: text !important;
 }
 
+.action-panel{
+  background-color:white;
+  width:80%;
+  margin-left:auto;
+  margin-right:auto;
+  border:1px solid black;
+  border-radius: 5px;
+  box-shadow: 10px 10px 28px #888;
+}
+
+.dialog-switch{
+  width:200px;
+  margin-right: auto;
+  margin-left: auto;
+  margin-bottom: auto;
+  margin-top:10px;
+  display:block;
+  button{
+    width:100px;
+  }
+}
+
+#editWidget{
+  h1,h2,h3{text-align: center;}
+}
+
+.action_col i{
+  font-size:1em;
+}
+
+@media (min-width:1400px){
+.action_col i{
+    font-size:2em;
+  }
+}
+
+.fixed-width-column{
+  overflow:hidden; white-space: nowrap; text-overflow: ellipsis; width:100px
+}

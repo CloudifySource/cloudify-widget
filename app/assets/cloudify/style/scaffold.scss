@@ -1,3 +1,13 @@
+body{
+  background-image:url('/public/img/bg/white_wall_hash.png');
+}
+
+th,
+.table-striped tbody > tr:nth-child(even) > td,
+.table-striped tbody > tr:nth-child(even) > th {
+  background-color: #ffffff;
+}
+
 .controls { .tooltip { line-height:14px;}}
 .info-icon {
   margin-left: 10px;
@@ -14,3 +24,7 @@
   background-position-y: -20px;
   &:hover{ background-position-y: 0px }
 }
+
+
+/** when i must hide something - for example, popovers with no content**/
+.forceHide{ display:none !important; }

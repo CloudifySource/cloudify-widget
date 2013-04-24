@@ -297,10 +297,10 @@ $(function () {
                 return;
             }
             if ( msg.advanced ){
-                $(".advanced_section ,#advanced").find("[name=hpcs_key]").val( msg.advanced.hpcs_key );
-                $(".advanced_section, #advanced").find("[name=hpcs_secret_key]").val( msg.advanced.hpcs_secret_key );
+                $("#advanced [name=hpcs_key]").val( msg.advanced.hpcs_key );
+                $("#advanced [name=hpcs_secret_key]").val( msg.advanced.hpcs_secret_key );
             }else{
-                $(".advanced_section , #advanced ").find("[name=hpcs_key],[name=hpcs_secret_key]").val("");
+                $("#advanced [name=hpcs_key], #advanced [name=hpcs_secret_key]").val("");
             }
            widgetState.onPlay();
         } else if ( msg.name == "stopwidget"){
@@ -325,7 +325,7 @@ $(function () {
         widgetState.isPlaying(true);
         widgetState.showStopButton();
         if ( !widgetState.isValid() ) {
-			var playData = { apiKey : params["apiKey"], "hpcsKey" : $(".advanced_section,#advanced").find("[name=hpcs_key]").val(), "hpcsSecretKey":$(".advanced_section,#advanced").find("[name=hpcs_secret_key]").val() };
+			var playData = { apiKey : params["apiKey"], "hpcsKey" : $("#advanced [name=hpcs_key]").val(), "hpcsSecretKey":$("#advanced [name=hpcs_secret_key]").val() };
             $.ajax(
                 { type:"POST",
                   url : "/widget/start?" + $.param(playData),

@@ -15,7 +15,10 @@ import java.util.Map;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
+import play.data.Form;
+import play.data.validation.ValidationError;
 import play.libs.Json;
+import utils.CollectionUtils;
 
 /**
  * User: guym
@@ -54,6 +57,23 @@ public class HeaderMessage<T extends HeaderMessage> {
         formErrors.put(fieldName,message);
         return (T) this;
     }
+
+    // guy - copied this code from Form..
+    // it seems ridiculous to me that Form is responsible to build my response. wrong design.
+    // the header message is better since we decided it should construct messages transferred on the header.
+    // plus - since we use angularJS, I'd rather have my I18N on the client side.
+    // so instead of referring to the language here, I will send the key.
+    // we cannot send anything else other than ASCII in a header anyway.
+    public T populateFormErrors( Form f ){
+        Map<String, List<ValidationError>> errors = f.errors();
+        for ( String s : errors.keySet() ) {
+            List<ValidationError> validationErrors = errors.get( s );
+            ValidationError first = CollectionUtils.first( validationErrors );
+            addFormError( s, first.message()  );
+        }
+        return (T) this;
+    }
+
 
 
     public T addFormError( String fieldName, String message ){

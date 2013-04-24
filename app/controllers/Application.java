@@ -249,6 +249,7 @@ public class Application extends Controller
                         // Routes for Projects
                         routes.javascript.WidgetAdmin.getAllWidgets(),
                         routes.javascript.WidgetAdmin.summary(),
+                        routes.javascript.WidgetAdmin.postWidget(),
                         routes.javascript.WidgetAdmin.checkPasswordStrength(),
                         routes.javascript.WidgetAdmin.postChangePassword(),
                         routes.javascript.WidgetAdmin.getPasswordMatch(),
@@ -256,7 +257,9 @@ public class Application extends Controller
                         routes.javascript.WidgetAdmin.deleteWidget(),
                         routes.javascript.WidgetAdmin.postRequireLogin(),
                         routes.javascript.Application.downloadPemFile(),
-
+                        routes.javascript.WidgetAdmin.regenerateWidgetApiKey(),
+                        routes.javascript.WidgetAdmin.enableWidget(),
+                        routes.javascript.WidgetAdmin.disableWidget(),
                         routes.javascript.DemosController.listWidgetForDemoUser()
 
                 )

@@ -1,0 +1,4 @@
+{
+    "guy" : "this is an i18n value!" ,
+    "error" : { "required":"This field is required" }
+}

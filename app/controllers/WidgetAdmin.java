@@ -18,6 +18,8 @@ package controllers;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -36,8 +38,11 @@ import models.WidgetInstance;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.data.Form;
 import play.data.validation.Constraints;
 import play.libs.Json;
 import play.mvc.Controller;
@@ -309,6 +314,56 @@ public class WidgetAdmin extends Controller
 		return resultAsJson(users);
 	}
 
+    public static Result postWidget( String authToken ){
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = request().body().asJson();
+
+        User user = null;
+        Widget w = null;
+        if ( jsonNode.has( "id" ) ){
+            String widgetApiKey = jsonNode.get("apiKey").asText();
+            w = getWidgetSafely( authToken, widgetApiKey );
+
+
+        }else{
+            user = User.validateAuthToken( authToken );
+        }
+
+        String bodyRequest = jsonNode.toString();
+
+        Form<Widget> validator = form( Widget.class ).bind( jsonNode );
+        if ( validator.hasErrors() ){
+            new HeaderMessage().populateFormErrors( validator ).apply( response().getHeaders() );
+            return badRequest( );
+        }
+
+        try {
+            if ( w == null ){
+                w = mapper.treeToValue( jsonNode, Widget.class );
+            }else{
+                mapper.readerForUpdating( w ).treeToValue( jsonNode, Widget.class );
+            }
+            logger.info( "successfully turned json to widget [{}]", w );
+
+            if ( user != null ){
+                user.addNewWidget( w );
+            }
+
+
+
+            w.save(  );
+            w.refresh( );
+
+
+
+            return ok(  Json.toJson( w ) );
+        } catch ( IOException e ) {
+            logger.error( "unable to turn body to Json",e  );
+        }
+        logger.info( "saving widget [{}]", bodyRequest );
+        return ok(  );
+    }
+
 
 	public static Result createNewWidget( String widgetId, String authToken,  String productName, String productVersion,
 										  String title, String youtubeVideoUrl, String providerURL,
@@ -334,7 +389,7 @@ public class WidgetAdmin extends Controller
             widget.setConsoleName( consolename );
             widget.setConsoleURL( consoleurl );
             widget.setRecipeRootPath( rootpath );
-            widget.save(  );
+            widget.save();
         }
 
         logger.info( "edited widget : " + widget.toString() );
@@ -383,7 +438,7 @@ public class WidgetAdmin extends Controller
 
     private static Result enableDisableWidget( String authToken, String apiKey, boolean enabled )
     {
-        getWidgetSafely( authToken, apiKey ).setEnabled( enabled );
+        getWidgetSafely( authToken, apiKey ).setEnabled( enabled ).save();
         return ok(OK_STATUS).as("application/json");
     }
 
@@ -446,6 +501,7 @@ public class WidgetAdmin extends Controller
 	}
 
     public static Result deleteWidget( String authToken, String apiKey ){
+        logger.info( "got a request to delete widget [{}]", apiKey );
         Widget widget = getWidgetSafely( authToken, apiKey );
         widget.delete(  );
         return ok( );
@@ -459,10 +515,11 @@ public class WidgetAdmin extends Controller
 	
 	public static Result regenerateWidgetApiKey( String authToken, String apiKey )
 	{
-        User user = User.validateAuthToken( authToken );
-        Widget widget = Widget.regenerateApiKey(user, apiKey);
-        logger.info( "regenerated api key to [{}]", widget );
-		return resultAsJson(widget);
+        Widget w = getWidgetSafely( authToken, apiKey ).regenerateApiKey();
+        logger.info( "regenerated api key to [{}]", w );
+        Map<String, Object> result = new HashMap<String, Object>(  );
+        result.put("widget", w);
+		return ok( Json.toJson( result ) );
 	}
 
 	public static Result headers()

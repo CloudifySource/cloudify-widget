@@ -25,7 +25,7 @@ echo -e "\n" > ~/input.txt
 echo Installing JDK
 ./java.bin < ~/input.txt > /dev/null
 rm -f ~/input.txt
-rm ~/java.bin
+rm -f ~/java.bin
 
 echo Exporing JAVA_HOME
 # export JAVA_HOME="`pwd`/jdk1.6.0_32"

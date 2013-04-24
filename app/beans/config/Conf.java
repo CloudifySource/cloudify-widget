@@ -45,6 +45,8 @@ public class Conf {
 
         public InitialData initialData = new InitialData();
 
+        public Boolean globalSecurityCheck = false; // todo : switch this on once feature is completed.
+
 
     }
 

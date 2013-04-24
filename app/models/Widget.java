@@ -22,6 +22,7 @@ import javax.persistence.*;
 
 import beans.Recipe;
 import beans.config.ServerConfig;
+import com.avaje.ebean.Ebean;
 import org.apache.commons.collections.Predicate;
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -30,6 +31,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonRootName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.data.validation.Constraints;
 import play.db.ebean.Model;
 import play.i18n.Messages;
 import server.ApplicationContext;
@@ -56,6 +58,8 @@ public class Widget
 {
 	@Id
 	private Long id;
+
+    @Constraints.Required
 	private String productName;
 	private String providerURL;
 	private String productVersion;
@@ -64,6 +68,8 @@ public class Widget
 	private String recipeURL;
 	private Boolean allowAnonymous;
 	private String apiKey;
+
+    @JsonIgnore
 	private Integer launches;
 	private Boolean enabled;
 
@@ -230,6 +236,12 @@ public class Widget
         }
     }
 
+
+    // for serialization
+    public Widget(){
+
+    }
+
     public Widget( String productName, String productVersion, String title, String youtubeVideoUrl,
 					String providerURL, String recipeURL, String consoleName, String consoleURL, String recipeRootPath )
 	{
@@ -304,15 +316,12 @@ public class Widget
 		return widget;
 	}
 	
-	static public Widget regenerateApiKey( User user, String oldApiKey )
+	public Widget regenerateApiKey( )
 	{
-		Widget widget = getWidgetByApiKey( user, oldApiKey );
-		widget.apiKey = UUID.randomUUID().toString();
-		widget.save();
-		
-		widget.setInstances(null);
-		
-		return widget;
+		apiKey = UUID.randomUUID().toString();
+		save();
+        refresh();
+        return this;
 	}
 	
 	public Long getId()
@@ -359,6 +368,7 @@ public class Widget
 		return instances;
 	}
 
+    @JsonIgnore
 	public void setInstances(List<WidgetInstance> instances)
 	{
 		this.instances = instances;
@@ -384,6 +394,7 @@ public class Widget
         this.recipeRootPath = recipeRootPath;
     }
 
+    @JsonIgnore
     public void setLaunches(int launches)
 	{
 		this.launches = launches;
@@ -439,6 +450,7 @@ public class Widget
 		this.title = title;
 	}
 
+    @JsonIgnore
     public String getYoutubeVideoKey(){
         try{
         if ( StringUtils.isEmpty( youtubeVideoUrl )){
@@ -477,6 +489,7 @@ public class Widget
 		this.allowAnonymous = allowAnonymous;
 	}
 
+    @JsonIgnore
 	public void setLaunches(Integer launches)
 	{
 		this.launches = launches;
@@ -487,10 +500,10 @@ public class Widget
 		return enabled;
 	}
 
-	public void setEnabled(Boolean enabled)
+	public Widget setEnabled( Boolean enabled )
 	{
 		this.enabled = enabled;
-		save();
+        return this;
 	}
 
     public String getRecipeRootPath()
@@ -547,6 +560,26 @@ public class Widget
         return user == null ? "null" : user.getEmail();
     }
 
+    @JsonIgnore
+    public void setUsername( String username ){
+
+    }
+
+    @JsonIgnore
+    public void setNumOfInstances( int i){
+
+    }
+
+
+    @Transient
+    @JsonProperty
+    public int getNumOfInstances(){
+        return instances.size();
+    }
+
+    public void setRequiresLogin( boolean requires ){
+        requireLogin = requires;
+    }
 
     public boolean isRequiresLogin() {
         return requireLogin == Boolean.TRUE; // solves NPE
@@ -584,6 +617,11 @@ public class Widget
     public String getDescription()
     {
         return description;
+    }
+
+    @JsonIgnore
+    public void setHasIcon( boolean hasIcon ){
+
     }
 
     public boolean isHasIcon(){

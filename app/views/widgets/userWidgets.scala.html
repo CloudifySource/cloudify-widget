@@ -1,25 +1,25 @@
 @field( id:String, title:String, required:Boolean, value:String, fType:String="text"  )={
-<div class="control-group">
+<div class="control-group" ng-class="{'error': formErrors['@id'] != null }">
     <label class="control-label" for="@id">@title @if(required){<abbr class="required_mark">*</abbr>}</label>
     <div class="controls">
-        <input type="@fType" id="@id" name="@id" value="@value" class="@if(required){required}">
+        <input ng-model="@value" type="@fType" id="@id" name="@id" class="@if(required){required}" popover="{{formErrors['@id'] | i18n }}" popover-placement="right"/>
+        <i ui-if="infoTooltips['@id']" title="{{infoTooltips['@id']}}" class='info-icon' ui-jq="tooltip"></i>
     </div>
 </div>
 }
 
-<div id="main" class="widgets-dashboard">
-    <div class="hero-unit" id="welcome_window" ng-show="!widgets.length">
+<div id="main" class="widgets-dashboard" ui-if="!actions">
+    <div class="hero-unit" id="welcome_window" ui-if="!widgets.length && angular.isDefined(widgets)">
         <h1>Welcome to the Cloudify Widget Dashboard!</h1>
         <p>We are thrilled to have you on board. This dashboard helps you to create a new Widget, embed the widget into your website and then monitor and administrate the running widget instances.</p>
         <p>
-            <a class="btn btn-primary" role="button" data-toggle="modal" href="#new_widget_modal">
+            <a class="btn btn-primary" ng-click="newWidget()">
                 Create new widget
             </a>
         </p>
     </div>
 
-
-    <div class="" ng-show="widgets.length">
+    <div class="" ui-if="widgets.length">
         <div class="row" id="search_panel">
             <div class="span1">
                 <form class="form-search">
@@ -27,13 +27,13 @@
                 </form>
             </div>
             <div class="pull-right">
-                <a class="btn btn-primary" role="button" data-toggle="modal" href="#new_widget_modal">
+                <a class="btn btn-primary" ng-click="newWidget()">
                     Create new widget
                 </a>
             </div>
         </div>
 
-        <div id="summary" class="well summary" ng-show="admin">
+        <div id="summary" class="well summary" ui-if="admin">
             <ul>
                 <li ng-repeat="attr in summary.attributes"><span class='count'> {{attr.value}} </span> {{attr.name}}</li>
             </ul>
@@ -43,7 +43,7 @@
             <table class="table table-bordered table-striped">
                 <thead class="list_head">
                 <tr>
-                    <th id="user_name_column" ng-show="admin">User name</th>
+                    <th id="user_name_column" ui-if="admin">User name</th>
                     <th>Product name</th>
                     <th>Product version</th>
                     <th>Provider URL</th>
@@ -53,50 +53,30 @@
                     <th>Launches</th>
                     <th>API Key</th>
                     <th></th>
-                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
                 <!-- Use this to use enable/disable options in CSS {{widget.enabled && 'enabled-widget' || 'disabled-widget'}}-->
                 <tr ng-repeat="widget in widgets" class="widget"  data-widget_id="{{widget.id}}" data-api_key="{{widget.apiKey}}" id="widget_{{widget.id}}">
-                    <td ng-show="admin">{{widget.username}}</td>
+                    <td ui-if="admin">{{widget.username}}</td>
                     <td>{{widget.productName}}</td>
                     <td>{{widget.productVersion}}</td>
                     <td><a href="{{widget.providerURL}}">{{widget.providerURL}}</a></td>
-                    <td>{{widget.title}}</td>
+                    <td><div class="fixed-width-column">{{widget.title}}</div></td>
                     <td>
-                        <a ng-show="{{widget.youtubeVideoUrl}}" href="{{widget.youtubeVideoUrl}}" target="_blank">View</a>
-                        <span ng-show="{{!widget.youtubeVideoUrl}}">N/A</span>
+                        <a ui-if="widget.youtubeVideoUrl" href="{{widget.youtubeVideoUrl}}" target="_blank">View</a>
+                        <span ui-if="!widget.youtubeVideoUrl">N/A</span>
                     </td>
                     <td><a href="{{widget.recipeURL}}">Download</a></td>
-                    <td><span class="badge">{{widget.launches}}</span></td>
-                    <td>{{widget.apiKey}}</td>
+                    <td><i title="view instances" class="icon-cog " ng-click="viewInstances(widget)"></i> <span class="badge">{{widget.numOfInstances}} / {{widget.launches}}</span></td>
+                    <td><div class="fixed-width-column">{{widget.apiKey}}</div></td>
                     <td class="action_col">
-                        <div class="btn-group">
-                            <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                                Action
-                                <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="regenerate_key_btn" href="#" ng-click="regenerateKey(widget)">Regenerate Key</a></li>
-                                <li><a class="disable_widget_btn" href="#" ng-show="widget.enabled" ng-click="disable(widget)">Disable</a></li>
-                                <li><a class="enable_widget_btn" href="#" ng-show="!widget.enabled" ng-click="enable(widget)">Enable</a></li>
-                                <li><a class="delete_widget_btn" href="javascript:void(0)" ng-click="delete(widget)">Delete</a></li>
-                                <li><a class="edit_widget_btn" href="javascript:void(0)" ng-click="editWidget(widget)">Edit</a></li>
-                                <li><a class="require_login_btn" href="javascript:void(0)" ng-click="requireLogin(widget)">Require Login</a></li>
-                                <li><a class="edit_description_btn" href="javascript:void(0)" ng-click="editDescription(widget)">Edit Description</a>
-                                </li>
-                                <li><a href="javascript:void(0)" ng-click="getEmbed(widget)" data-toggle="modal">Get Embed Code</a></li>
-
-                                <li><a class="preview_widget_btn" href="/widget/previewWidget?apiKey={{widget.apiKey}}" target="_blank">Show Preview</a></li>
-                            </ul>
-                        </div>
-                    </td>
-                    <td class="instances_col">
-                        <span class="label label-important disabled_marker" ng-show="!widget.enabled">Disabled</span>
-                           <span class="label label-success instances_btn" ng-show="widget.enabled" ng-click="viewInstances(widget)">
-                               <a data-toggle="modal" href="#widget_{{widget.id}}_instances_modal">View Instances</a>
-                           </span>
+                        <a href="/widget/previewWidget?apiKey={{widget.apiKey}}" style="text-decoration: none; color:black;"><i title="preview" class="icon-eye-open"></i></a>
+                        <i title="edit" class="icon-edit" ng-click="editWidget(widget)"></i>
+                        <i title="get embed code" class="icon-share " ng-click="getEmbed(widget)"></i>
+                        <i title="delete" class="icon-trash " ng-click="delete(widget)"></i>
+                        <i title="disabled - click to enable" class="icon-globe" style="color:red" ui-if="!widget.enabled" ng-click="enable(widget)"></i>
+                        <i title="enabled - click to disable" class="icon-globe" style="color:green" ui-if="widget.enabled" ng-click="disable(widget)"></i>
                     </td>
                 </tr>
                 </tbody>
@@ -104,147 +84,128 @@
         </div>
     </div>
     <!-- main -->
+</div>
 
 
-    <!-- dialogs -->
+<!-- dialogs -->
 
-    <!-- running instances dialog -->
-    <div id="running_instances_modal" class="modal-window modal hide fade" tabindex="-1" role="dialog">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
-            </button>
-            <h3>{{selectedWidget.instanceCount}} Running instances</h3>
+<!-- running instances dialog -->
+<div ui-if="actions.viewInstances" class="action-panel">
+    <div class="modal-header">
+        <h3>{{selectedWidget.instanceCount}} Running instances</h3>
+    </div>
+    <div class="modal-body">
+        <form class="form-search pull-left">
+            <input type="text" placeholder="Filter instances"
+                   class="instance_search input-medium search-query">
+        </form>
+        <div class="alert pull-right"><i class="icon-warning-sign" style="padding-right:10px"></i>Not showing instances
+            outside my cloud.
         </div>
-
-
-        <div class="modal-body">
-            <form class="form-search pull-left">
-                <input type="text" placeholder="Filter instances"
-                       class="instance_search input-medium search-query">
-            </form>
-            <div class="alert pull-right"><i class="icon-warning-sign" style="padding-right:10px"></i>Not showing instances
-                outside my cloud.
-            </div>
-            <table class="table table-hover" ng-show="selectedWidget.instances.length">
-                <thead class="list_head">
-                <tr>
-                    <th>Id</th>
-                    <th>Public IP</th>
-                    <th></th>
+        <table class="table table-hover" ui-if="selectedWidget.instances.length">
+            <thead class="list_head">
+            <tr>
+                <th>Id</th>
+                <th>Public IP</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr class="instance" ng-repeat="instance in selectedWidget.instances">
+                    <td>{{instance.instanceId}}</td>
+                    <td>{{instance.publicIP}}</td> <!-- todo : change case to Ip -->
+                    <td><a href="javascript:void(0)" class="btn btn-danger shutdown_instance btn-small" ng-click="shutdown(instance)">Shutdown</a></td>
                 </tr>
-                </thead>
-                <tbody>
-                    <tr class="instance" ng-repeat="instance in selectedWidget.instances">
-                        <td>{{instance.instanceId}}</td>
-                        <td>{{instance.publicIP}}</td> <!-- todo : change case to Ip -->
-                        <td><a href="#" class="btn btn-danger shutdown_instance btn-small" ng-click="shutdown(instance)">Shutdown</a></td>
-                    </tr>
-                </tbody>
-            </table>
-            <div ng-show="!selectedWidget.instances.length">
-                There are no running instances
-            </div>
+            </tbody>
+        </table>
+        <div ui-if="!selectedWidget.instances.length">
+            There are no running instances
         </div>
     </div>
-
-    <!-- get embed code modal -->
-    <div id="get_embed_modal" class="modal-window modal hide fade"
-         tabindex="-1" role="dialog" aria-labelledby="widget_{{selectedWidget.id}}_get_embed_label"
-         aria-hidden="true">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×
-            </button>
-            <h3 id="widget_{{selectedWidget.id}}_get_embed_label">Embed Code</h3>
-        </div>
-        <div class="modal-body">
-            <textarea autofocus readonly class="code">@views.html.widgets.dashboard.embedCode( "{{selectedWidget.apiKey}}", "{{selectedWidget.title}}","{{selectedWidget.youtubeVideoUrl}}","{{host}}" ).toString()</textarea></div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="goBack()">Done</button>
     </div>
+</div>
 
 
-    <!-- require login modal -->
-    <div id="require_login_modal" class="modal-window modal hide fade" tabindex="-1" role="dialog" aria-labelledby="require_login_label" aria-hidden="true">
-        <form id="require_login_form" class="form-horizontal">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-              <h3 id="require_login_label">Make Widget Require Login</h3>
-            </div>
-            <div class="modal-body">
-              <fieldset>
-                  <input type="hidden" id="widgetId" name="widgetId" value=""/>
-                  @field("requireLogin", "Require Login", required = false, value="{{selectedWidget.requireLogin}}", fType="checkbox" )
-                  @field("loginVerificationUrl", "Verification URL",  required = false, value="{{selectedWidget.loginVerificationUrl}}" )
-                  @field("webServiceKey", "Web Service Private Key",  required = false, value="{{selectedWidget.webServiceKey}}"  )
-              </fieldset>
-            </div>
-            <div class="modal-footer">
-              <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-              <input type="submit" class="btn btn-primary" value="Create">
-            </div>
-          </form>
-    </div>
-
-
-    <div id="edit_description_modal" class="modal-window modal hide fade" tabindex="-1" role="dialog" aria-labelledby="edit_description_label" aria-hidden="true">
-        <form id="edit_description_form" class="form-horizontal">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-              <h3 id="edit_description_label">Edit Widget Description</h3>
-            </div>
-            <div class="modal-body">
-              <fieldset>
-                  <input type="hidden" name="widgetId" value="{{selectedWidget.id}}"/>
-                  <div class="control-group">
-                      <label class="control-label" for="description">Description{<abbr class="required_mark">*</abbr>}</label>
-                      <div class="controls">
-                          <textarea id="description" name="description">{{selectedWidget.description}}</textarea>
-                      </div>
-                  </div>
-              </fieldset>
-            </div>
-            <div class="modal-footer">
-              <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-              <input type="submit" class="btn btn-primary" value="Create">
-            </div>
-          </form>
-    </div>
-
-    <div id="edit_widget_modal" class="modal-window modal hide fade" tabindex="-1">
-          <form id="new_widget_form" class="form-horizontal">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-              <h3 id="create_widget_form_label">Create new widget</h3>
-            </div>
-            <div class="modal-body">
-              <fieldset>
-                  <input type="hidden" name="widgetId" value="{{selectedWidget.id}}"/>
-                  @field("productName", "Product Name", required =true, value="{{selectedWidget.productName}}" )
-                  @field("productVersion", "Product Version", required = true, value="{{selectedWidget.productVersion}}"  )
-                  @field("title", "Title", required =true, value="{{selectedWidget.title}}"  )
-                  @field("youtubeVideoUrl", "Youtube Video URL",required = false, value="{{selectedWidget.youtubeVideoUrl}}"  )
-                  @field("providerURL", "Provider URL",required = true, value="{{selectedWidget.providerURL}}"  )
-                  @field("recipeURL", "Recipe URL", required =true, value="{{selectedWidget.recipeURL}}"  )
-                  @field("consolename", "Console Link Title", required =false, value="{{selectedWidget.consolename}}"  )
-                  @field("consoleurl", "Console Link URL", required =false, value="{{selectedWidget.consoleurl}}"  )
-                  @field("rootpath", "Recipe Root Path", required =false, value="{{selectedWidget.rootpath}}"  )
-                <div class="control-group">
-                  <div class="control-label">
-                    <abbr style="color:red">*</abbr> Mandatory fields
-                  </div>
-                </div>
-              </fieldset>
-            </div>
-            <div class="modal-footer">
-              <a class="btn" aria-hidden="true" href="http://www.cloudifysource.org/guide/2.2/developing/recipes_overview" target="_blank">Help</a>
-              <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-              <input type="submit" class="btn btn-primary" value="Create">
-            </div>
-          </form>
-        </div><!-- new_widget_modal -->
-
-
-
+<div modal="" close="goBack()" >
 
 </div>
+<!-- get embed code modal -->
+<div modal="showEmbedCode" close="goBack()" class="action-panel" options="opts">
+    <div class="modal-header"> <h3> Embed Code</h3> </div>
+    <div class="modal-body">
+        <textarea ui-codemirror="{theme:'monokai'}" autofocus readonly class="code">@views.html.widgets.dashboard.embedCode( "{{showEmbedCode.apiKey}}", "{{showEmbedCode.title}}","{{showEmbedCode.youtubeVideoUrl}}","{{host}}" ).toString()</textarea>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="goBack()">Done</button>
+    </div>
+</div>
+
+<!-- require login modal -->
+<div ui-if="actions.editWidget" id="editWidget" class="action-panel">
+    <div class="modal-header"><h1>Edit Widget</h1><h2> {{editSection}} </h2><h3> {{actions.editWidget.productName}} - {{actions.editWidget.productVersion}}</h3></div>
+
+    <div class="btn-group dialog-switch" data-toggle="buttons-checkbox">
+        <button type="button" class="btn btn-primary" ng-model="editSection" btn-radio="'Details'">Details</button>
+        <button type="button" class="btn btn-primary" ng-model="editSection" btn-radio="'Description'">Description</button>
+    </div>
+    <form name="widgetForm" class="form-horizontal" style="margin-bottom:0;">
+        <div class="modal-body" ng-switch="editSection" style="overflow:hidden">
+
+            <fieldset ng-switch-default>
+                <div class="container-fluid" style="display:block; width:965px;margin:auto;">
+                    <div class="span6" style="border-right:1px solid #EEE">
+                        <div>
+                            <input type="hidden" name="widgetId" value="actions.editWidget.id"/>
+                            @field("productName", "Product Name", required = true, value = "actions.editWidget.productName")
+                            @field("productVersion", "Product Version", required = true, value = "actions.editWidget.productVersion")
+                            @field("title", "Title", required = true, value = "actions.editWidget.title")
+                            @field("providerURL", "Provider URL", required = true, value = "actions.editWidget.providerURL")
+                            @field("recipeURL", "Recipe URL", required = true, value = "actions.editWidget.recipeURL")
+                        </div>
+                        <div style="border-bottom:1px solid #EEE; height:0">&nbsp;</div>
+                        <div>
+                            <input type="hidden" id="widgetId" name="widgetId" value=""/>
+                            @field("requireLogin", "Require Login", required = false, value = "actions.editWidget.requireLogin", fType = "checkbox")
+                            @field("loginVerificationUrl", "Verification URL", required = false, value = "actions.editWidget.loginVerificationUrl")
+                            @field("webServiceKey", "Web Service Private Key", required = false, value = "actions.editWidget.webServiceKey")
+                        </div>
+                    </div>
+                    <div class="span6">
+                        @field("youtubeVideoUrl", "Youtube Video URL", required = false, value = "actions.editWidget.youtubeVideoUrl")
+                        @field("consolename", "Console Link Title", required = false, value = "actions.editWidget.consolename")
+                        @field("consoleurl", "Console Link URL", required = false, value = "actions.editWidget.consoleurl")
+                        @field("rootpath", "Recipe Root Path", required = false, value = "actions.editWidget.rootpath")
+                        <div class="control-group">
+                            <label class="control-label" for="apiKey">API Key</label>
+                            <div class="controls">
+                                <input type="text" disabled="disabled" id="apiKey" name="apiKey" value="{{actions.editWidget.apiKey}}">
+                                <i style="margin-left:10px;" title="Click to regenerate key" class='icon-refresh' ui-jq="tooltip" ng-click="regenerateKey(actions.editWidget)"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset ng-switch-when="Description">
+            <textarea  ui-codemirror="{theme:'monokai'}" ng-model="actions.editWidget.description" id="description" name="description"></textarea>
+            </fieldset>
+
+        </div>
+        <div class="modal-footer">
+
+            <div class="control-label"> <abbr style="color:red"> * </abbr> Mandatory fields </div>
+            <button class="btn" ng-click="goBack()">Cancel</button>
+            <input type="submit" class="btn btn-primary" ng-disabled="!widgetForm.$dirty" value="Save" ng-click="saveWidget(actions.editWidget)"/>
+            <button class="btn btn-primary" ng-disabled="!widgetForm.$dirty" ng-click="saveWidget(actions.editWidget, true)"> Save and Done</button>
+        </div>
+      </form>
+</div>
+
+
+
+
 
 
 
