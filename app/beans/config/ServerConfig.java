@@ -140,6 +140,7 @@ public class ServerConfig {
         public String securityGroup = "cloudifySecurityGroup";
         public String cloudProvider = "hpcloud-compute";
         public String cloudifyEscDirRelativePath = "tools/cli/plugins/esc/";
+        public String existingManagementMachinePrefix = "cloudify-manager";
     }
 
     public static class SshConfiguration{

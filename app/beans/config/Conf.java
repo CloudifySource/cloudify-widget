@@ -57,7 +57,7 @@ public class Conf {
         public String defaultPassword = "Initial4657"; // if we need to create users, we will use this password by default.
 
         @Config( ignoreNullValues = true )
-        public boolean override = true; // true iff we want to write over existing objects
+        public boolean override = false; // true iff we want to write over existing objects
     }
 
     public static class FeaturesConfigItem {
@@ -87,6 +87,10 @@ public class Conf {
         public long bootstrapCloudWatchDogProcessTimeoutMillis = Utils.parseTimeToMillis( "2mn" );
 
         public File deployScript=Utils.getFileByRelativePath( "/bin/deployer.sh" );
+
+        public File uninstallServiceScript = Utils.getFileByRelativePath( "/bin/uninstall_service.sh" );
+
+        public File uninstallApplicationScript = Utils.getFileByRelativePath( "/bin/uninstall_application.sh" );
 
         public String removeOutputLines = "";
 

@@ -170,27 +170,31 @@ public class Application extends Controller
 		return !StringUtils.isEmpty(hpcsKey) && !StringUtils.isEmpty(hpcsSecretKey)
 				&& hpcsKey.contains(":") && !hpcsKey.startsWith(":") && !hpcsKey.endsWith(":");
 	}
-	
-	public static Result stop( String apiKey, String instanceId )
-	{
-		ServerNode serverNode = ServerNode.find.byId(Long.parseLong(instanceId));
-        if ( serverNode != null ){
-            Utils.deleteCachedOutput(serverNode);
-        }
-		if (serverNode.isRemote()) {
-			return ok(); // lets assume
-		}else {
-			Widget widget = Widget.getWidget( apiKey );
-			if ( widget != null ){
-				ApplicationContext.get().getEventMonitor().eventFired( new Events.StopWidget( request().remoteAddress(), widget ) );
-			}
-			if ( instanceId != null ){
-				ApplicationContext.get().getWidgetServer().undeploy(instanceId);
-			}
 
-			return ok(OK_STATUS).as("application/json");
-		}
-	}
+    public static Result stop( final String apiKey, final String instanceId )
+    {
+        Akka.system().scheduler().scheduleOnce( Duration.create( 0, TimeUnit.SECONDS ),
+                new Runnable() {
+                    @Override
+                    public void run()
+                    {
+                        logger.info( "uninstalling [{}], [{}]", apiKey, instanceId );
+
+                        Widget widget = Widget.getWidget( apiKey );
+
+                        if ( widget != null ) {
+                            ApplicationContext.get().getEventMonitor().eventFired( new Events.StopWidget( request().remoteAddress(), widget ) );
+                        }
+
+                        if ( instanceId != null ) {
+                            ServerNode serverNode = ServerNode.find.byId( Long.parseLong( instanceId ) );
+                            ApplicationContext.get().getWidgetServer().uninstall( serverNode );
+                            Utils.deleteCachedOutput( serverNode );
+                        }
+                    }
+                } );
+        return ok( OK_STATUS ).as( "application/json" );
+    }
 
 	
 	public static Result getWidgetStatus( String apiKey, String instanceId )

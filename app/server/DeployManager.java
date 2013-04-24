@@ -17,6 +17,8 @@
 package server;
 
 import models.ServerNode;
+import models.Widget;
+import models.WidgetInstance;
 
 import java.io.File;
 
@@ -35,5 +37,7 @@ import java.io.File;
  */
 public interface DeployManager 
 {
-   public ProcExecutor fork( ServerNode server, File recipe );
+   public WidgetInstance fork( ServerNode server, Widget widget );
+
+    public WidgetInstance uninstall( ServerNode server);
 }

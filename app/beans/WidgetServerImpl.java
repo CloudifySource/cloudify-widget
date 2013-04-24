@@ -88,20 +88,24 @@ public class WidgetServerImpl implements WidgetServer
         Utils.addAllTrimmed( filterOutputStrings,  StringUtils.split( conf.cloudify.removeOutputString, "|" ));
     }
 
-	
-	public WidgetInstance deploy( Widget widget, ServerNode server, String remoteAddress  )
+    @Override
+    public void uninstall( ServerNode server )
+    {
+        logger.info( "uninstalling [{}], [{}]", server, server.getWidgetInstance() );
+        if ( server.isRemote() ){
+            deployManager.uninstall( server );
+        }else{
+            undeploy( server.getNodeId() );
+        }
+
+    }
+
+    public WidgetInstance deploy( Widget widget, ServerNode server, String remoteAddress  )
 	{
         // keep the user for 30 seconds by IP, to avoid immediate widget start after stop
         Cache.set( remoteAddress, new Long(System.currentTimeMillis() + WIDGET_STOP_TIMEOUT*1000), WIDGET_STOP_TIMEOUT );
-		File unzippedDir = Utils.downloadAndUnzip( widget.getRecipeURL(), widget.getApiKey() );
-        File recipeDir = unzippedDir;
-        if ( widget.getRecipeRootPath() != null  ){
-            recipeDir = new File( unzippedDir, widget.getRecipeRootPath() );
-        }
-        logger.info("Deploying an instance for recipe at : [{}] ", recipeDir );
 		widget.countLaunch();
-		deployManager.fork(server, recipeDir);
-		return widget.addWidgetInstance( server, recipeDir );
+		return deployManager.fork(server, widget);
 	}
 	
 	public void undeploy( String instanceId )

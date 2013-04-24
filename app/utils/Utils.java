@@ -309,7 +309,9 @@ public class Utils
 	}
 
     public static void deleteCachedOutput( ServerNode serverNode ){
-        Cache.set( "output-" + serverNode.getId() , null );
+        if ( serverNode != null ){
+            Cache.set( "output-" + serverNode.getId() , null );
+        }
     }
 	
 	public static String getCachedOutput( ServerNode serverNode ) {

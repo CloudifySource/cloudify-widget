@@ -20,10 +20,10 @@ import com.avaje.ebean.Junction;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.jclouds.openstack.nova.v2_0.domain.Address;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
 import play.db.ebean.Model;
-import utils.Utils;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -276,6 +276,11 @@ extends Model
         this.widgetInstance = widgetInstance;
     }
 
+    @JsonIgnore
+    public WidgetInstance getWidgetInstance()
+    {
+        return widgetInstance;
+    }
 
     // guy - todo - formalize this for reuse.
     public static class QueryConf {

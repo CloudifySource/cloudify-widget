@@ -57,6 +57,10 @@ public class WidgetInstance
     @ManyToOne
     private Widget widget;
 
+
+    // the name we used when we installed this instance
+    private String installName;
+
 	
 	public static Finder<Long,WidgetInstance> find = new Finder<Long,WidgetInstance>(Long.class, WidgetInstance.class); 
 
@@ -151,6 +155,16 @@ public class WidgetInstance
 
     public String toDebugString() {
         return toString();
+    }
+
+    public String getInstallName()
+    {
+        return installName;
+    }
+
+    public void setInstallName( String installName )
+    {
+        this.installName = installName;
     }
 
     @Override

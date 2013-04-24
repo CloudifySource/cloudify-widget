@@ -16,6 +16,7 @@
 package beans;
 
 import beans.api.ExecutorFactory;
+import beans.cloudify.CloudifyRestClient;
 import beans.config.Conf;
 import com.google.common.base.Predicate;
 import com.google.common.net.HostAndPort;
@@ -47,10 +48,7 @@ import org.jclouds.sshj.config.SshjSshClientModule;
 import org.jclouds.util.Strings2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import play.api.libs.ws.Response;
-import play.api.libs.ws.WS;
 import play.i18n.Messages;
-import play.libs.Json;
 import server.ApplicationContext;
 import server.DeployManager;
 import server.ProcExecutor;
@@ -106,6 +104,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
     @Inject
     private DeployManager deployManager;
+
+    @Inject
+    private CloudifyRestClient cloudifyRestClient;
 
     private Exception lastKnownException = null;
 
@@ -189,30 +190,16 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     private boolean isManagementAvailable( ServerNode serverNode )
       {
           logger.info( "testing if management is available at : {}", serverNode );
+          try{
+            return cloudifyRestClient.testRest( serverNode.getPrivateIP() ).isSuccess();
+          }catch(Exception e){
 
-          try {
-              Response response = WS.url( "http://" + serverNode.getPublicIP() + ":8100/service/testrest" ).get().value().get();
-              String body = response.body();
-              logger.info( "got testrest result with body [{}] ", body );
-              if ( org.apache.commons.lang3.StringUtils.isEmpty( body ) ) {
-                  logger.info( "body is empty" );
-                  return false;
-              } else {
-                  logger.info( "body is not empty, testing if status successful" );
-                  JsonNode parse = Json.parse( body );
-                  if ( parse.has( "status" ) ){
-                      JsonNode nodeValue = parse.get("status");
-                      String textValue = nodeValue == null ? "null" : nodeValue.getTextValue();
-                      logger.info( "response has 'status' key which is equal to [{}]", textValue );
-                      return "success".equals( textValue );
-                  }
-                  logger.info( "parsed json to [{}]", parse );
-              }
+              logger.error( "unable to decide if management is available or not [{}]", serverNode.getPublicIP(), e );
 
-          } catch ( Exception e ) {  // guy - don't ask me how but compiler does not pick the real exception up.. maybe because it is scala.
-              logger.error( "unable to check if serverNode [{}] is up", serverNode, e );
           }
           return false;
+
+
       }
 
 
@@ -243,14 +230,46 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         }
 
         else{ // get all servers with tags matching my configuration.
-            servers = ( List<Server> ) getApi().listInDetail().concat()
-                    .filter( new ServerTagPredicate() )
-                    .toImmutableList(); // guy - consider using filter here instead of looping
+            return getAllMachinesWithPredicate( new ServerTagPredicate() );
         }
-        return servers;
     }
 
+    public List<Server> getAllMachinesWithPredicate( Predicate<Server> predicate ){
+        logger.info( "getting all machine by predicate [{}]", predicate );
+        return ( List<Server> ) getApi().listInDetail().concat()
+                            .filter( new ServerTagPredicate() )
+                            .toImmutableList();
+    }
+
+
+    class ServerNamePrefixPredicate implements Predicate<Server>{
+        String prefix = conf.server.cloudBootstrap.existingManagementMachinePrefix;
+
+
+        @Override
+        public boolean apply( Server server )
+        {
+            // return true iff server is not null, prefix is not empty and prefix is prefix of server.getName
+            return server != null && !StringUtils.isEmpty( prefix ) && server.getName().indexOf( prefix ) == 0;
+
+        }
+
+        public String toString(){
+             return String.format("name has prefix [%s]", prefix);
+        }
+    }
+
+
     class ServerTagPredicate implements Predicate<Server> {
+
+        String confTags =  conf.server.bootstrap.tags;
+        List<String> confTagsList = null;
+
+        public ServerTagPredicate(){
+            if ( !StringUtils.isEmpty( confTags )){
+                confTagsList = Arrays.asList( StringUtils.stripAll( confTags.split( "," ) ) );
+            }
+        }
 
         @Override
         public boolean apply( Server server )
@@ -259,19 +278,22 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                 return false;
             }
 
-            String confTags = conf.server.bootstrap.tags;
             Map<String, String> metadata = server.getMetadata();
             if ( !CollectionUtils.isEmpty( metadata ) && metadata.containsKey( "tags" ) ) {
                 String tags = metadata.get( "tags" );
-                if ( !StringUtils.isEmpty( tags ) && !StringUtils.isEmpty( confTags ) ) {
+                if ( !StringUtils.isEmpty( tags ) && !CollectionUtils.isEmpty( confTagsList ) ) {
                     logger.info( "comparing tags [{}] with confTags [{}]", tags, confTags );
                     List<String> tagList = Arrays.asList( StringUtils.stripAll( tags.split( "," ) ) );
-                    List<String> confTagsList = Arrays.asList( StringUtils.stripAll( confTags.split( "," ) ) );
                     return CollectionUtils.isSubCollection( confTagsList, tagList );
                 }
             }
-
             return false;
+        }
+
+        @Override
+        public String toString()
+        {
+            return String.format("has tags [%s]",confTags);
         }
     }
 
@@ -384,82 +406,102 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	}
 
 
-	@Override
-	public ServerNode bootstrapCloud( ServerNode serverNode )  {
-		File cloudFolder = null;
-		ComputeServiceContext jCloudsContext = null;
-		try{
+    @Override
+    public ServerNode bootstrapCloud( ServerNode serverNode )
+    {
+        serverNode.setRemote( true );
+        // get existing management machine
+        List<Server> existingManagementMachines = getAllMachinesWithPredicate( new ServerNamePrefixPredicate() );
+        logger.info( "found [{}] management machines", CollectionUtils.size( existingManagementMachines ) );
+        if ( !CollectionUtils.isEmpty( existingManagementMachines ) ) {
+            Server managementMachine = CollectionUtils.first( existingManagementMachines );
+            String serverNodeIp = managementMachine.getAccessIPv4();
+            logger.info( "using first machine  [{}] with ip [{}]", managementMachine, serverNodeIp );
+            serverNode.setPublicIP( serverNodeIp );
+            serverNode.save(  );
+            logger.info( "not searching for key - only needed for bootstrap" );
+        } else {
+            logger.info( "did not find an existing management machine, creating new machine" );
+            createNewMachine( serverNode );
+        }
+        return serverNode;
+    }
+
+    private void createNewMachine( ServerNode serverNode )
+    {
+        File cloudFolder = null;
+        ComputeServiceContext jCloudsContext = null;
+        try {
+            // no existing management machine - create new server
             String username = serverNode.getUserName();
             String apiKey = serverNode.getApiKey();
-            logger.info("Creating cloud folder with specific user credentials. User: " + username + ", api key: " + apiKey);
-            jCloudsContext = CloudifyUtils.createJcloudsContext(username, apiKey);
-            cloudFolder = CloudifyUtils.createCloudFolder(username, apiKey, jCloudsContext);
+            logger.info( "Creating cloud folder with specific user credentials. User: " + username + ", api key: " + apiKey );
+            jCloudsContext = CloudifyUtils.createJcloudsContext( username, apiKey );
+            cloudFolder = CloudifyUtils.createCloudFolder( username, apiKey, jCloudsContext );
 
-			logger.info("Creating security group for user.");
-			CloudifyUtils.createCloudifySecurityGroup( jCloudsContext );
+            logger.info( "Creating security group for user." );
+            CloudifyUtils.createCloudifySecurityGroup( jCloudsContext );
 
-			//Command line for bootstrapping remote cloud.
-			CommandLine cmdLine = new CommandLine(conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile());
-			cmdLine.addArgument(cloudFolder.getName());
+            //Command line for bootstrapping remote cloud.
+            CommandLine cmdLine = new CommandLine( conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile() );
+            cmdLine.addArgument( cloudFolder.getName() );
 
-			DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-			ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor( serverNode );
+            DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+            ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor( serverNode );
 
-			logger.info("Executing command line: " + cmdLine);
-			bootstrapExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment() , resultHandler);
-            logger.info("waiting for output");
-			resultHandler.waitFor();
-            logger.info("finished waiting , exit value is [{}]", resultHandler.getExitValue() );
+            logger.info( "Executing command line: " + cmdLine );
+            bootstrapExecutor.execute( cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler );
+            logger.info( "waiting for output" );
+            resultHandler.waitFor();
+            logger.info( "finished waiting , exit value is [{}]", resultHandler.getExitValue() );
 
 
-			String output = Utils.getOrDefault(Utils.getCachedOutput(serverNode), "");
-			if (resultHandler.getException() != null) {
-                logger.info("we have exceptions, checking for known issues");
-				if (output.contains("found existing management machines")) {
-                    logger.info("found 'found existing management machines' - issuing cloudify already exists message");
-					throw new ServerException( Messages.get("cloudify.already.exists") );
-				}
-				logger.info("Command execution ended with errors: {}", output);
-				throw new RuntimeException("Failed to bootstrap cloudify machine: "
-						+ output, resultHandler.getException());
-			}
+            String output = Utils.getOrDefault( Utils.getCachedOutput( serverNode ), "" );
+            if ( resultHandler.getException() != null ) {
+                logger.info( "we have exceptions, checking for known issues" );
+                if ( output.contains( "found existing management machines" ) ) {
+                    logger.info( "found 'found existing management machines' - issuing cloudify already exists message" );
+                    throw new ServerException( Messages.get( "cloudify.already.exists" ) );
+                }
+                logger.info( "Command execution ended with errors: {}", output );
+                throw new RuntimeException( "Failed to bootstrap cloudify machine: "
+                        + output, resultHandler.getException() );
+            }
 
-            logger.info("finished handling errors, extracting IP");
-			String publicIp = Utils.extractIpFromBootstrapOutput(output);
-			if (StringUtils.isEmpty(publicIp)) {
-				logger.warn("No public ip address found in bootstrap output. " + output);
-				throw new RuntimeException( "Bootstrap failed. No IP address found in bootstrap output."
-						+ output, resultHandler.getException() );
-			}
-            logger.info("ip is [{}], saving to serverNode", publicIp);
+            logger.info( "finished handling errors, extracting IP" );
+            String publicIp = Utils.extractIpFromBootstrapOutput( output );
+            if ( StringUtils.isEmpty( publicIp ) ) {
+                logger.warn( "No public ip address found in bootstrap output. " + output );
+                throw new RuntimeException( "Bootstrap failed. No IP address found in bootstrap output."
+                        + output, resultHandler.getException() );
+            }
+            logger.info( "ip is [{}], saving to serverNode", publicIp );
 
-			String privateKey = CloudifyUtils.getCloudPrivateKey(cloudFolder);
-			if (StringUtils.isEmpty(privateKey)) {
-				throw new RuntimeException( "Bootstrap failed. No pem file found in cloud directory." );
-			}
-            logger.info("found PEM string");
-			logger.info("Bootstrap cloud command ended successfully");
+            String privateKey = CloudifyUtils.getCloudPrivateKey( cloudFolder );
+            if ( StringUtils.isEmpty( privateKey ) ) {
+                throw new RuntimeException( "Bootstrap failed. No pem file found in cloud directory." );
+            }
+            logger.info( "found PEM string" );
+            logger.info( "Bootstrap cloud command ended successfully" );
 
-            logger.info("updating server node with new info");
-            serverNode.setPublicIP(publicIp);
-			serverNode.setPrivateKey(privateKey);
-			serverNode.setRemote(true);
+            logger.info( "updating server node with new info" );
+            serverNode.setPublicIP( publicIp );
+            serverNode.setPrivateKey( privateKey );
+
             serverNode.save();
-            logger.info("server node updated and saved");
-			return serverNode;
-		} catch(Exception e) {
-			throw new RuntimeException("Unable to bootstrap cloud", e);
-		} finally {
-			if (cloudFolder != null) {
-				FileUtils.deleteQuietly(cloudFolder);
-			}
-			if (jCloudsContext != null) {
-				jCloudsContext.close();
-			}
-			serverNode.setStopped(true);
-			
-		}
-	}
+            logger.info( "server node updated and saved" );
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Unable to bootstrap cloud", e );
+        } finally {
+            if ( cloudFolder != null ) {
+                FileUtils.deleteQuietly( cloudFolder );
+            }
+            if ( jCloudsContext != null ) {
+                jCloudsContext.close();
+            }
+            serverNode.setStopped( true );
+        }
+    }
 
 	private void deleteServer( String serverId )
 	{
@@ -584,5 +626,10 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     public void setBootstrapRetries( int bootstrapRetries )
     {
         this.bootstrapRetries = bootstrapRetries;
+    }
+
+    public void setCloudifyRestClient( CloudifyRestClient cloudifyRestClient )
+    {
+        this.cloudifyRestClient = cloudifyRestClient;
     }
 }

@@ -236,6 +236,10 @@ $(function () {
             widgetLog.appendOrOverride(data.status.output);
         }
 
+        if ( data.status.remote ){
+            $("#hp_console_link" ).show();
+        }
+
         if ( data.status.publicIp ) {
             widgetState.publicIp(data.status.publicIp);
         }
