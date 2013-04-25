@@ -175,7 +175,7 @@ public class Application extends Controller
     private static Result statusToResult( Widget.Status status ){
         Map<String,Object> result = new HashMap<String, Object>();
         result.put("status", status );
-        logger.info("statusToResult > result: [{}]", result);
+        logger.debug("statusToResult > result: [{}]", result);
         return ok( Json.toJson( result ));
     }
 
