@@ -236,7 +236,7 @@ $(function () {
         }
 
         if ( data.status.output ){
-            data.status.output.push(ellipsis.substring( 0, (ellipsis_iteration++ % 5) + 1) );
+        //    data.status.output.push(ellipsis.substring( 0, (ellipsis_iteration++ % 5) + 1) );
             data.status.output.splice(data.status.output.length - 1, +(data.status.output[data.status.output.length - 1].indexOf('.') != -1), ellipsis.substring( 0, (ellipsis_iteration++ % 5) + 1));
             widgetLog.appendOrOverride(data.status.output);
         }
