@@ -15,9 +15,7 @@
  *******************************************************************************/
 package beans;
 
-import static server.Config.WIDGET_STOP_TIMEOUT;
 
-import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.cache.Cache;
 import play.i18n.Messages;
-import play.mvc.Controller;
 
 import models.ServerNode;
 import models.Widget;
@@ -104,9 +101,9 @@ public class WidgetServerImpl implements WidgetServer
     public WidgetInstance deploy( Widget widget, ServerNode server, String remoteAddress  )
 	{
         // keep the user for 30 seconds by IP, to avoid immediate widget start after stop
-        Cache.set( remoteAddress, new Long(System.currentTimeMillis() + WIDGET_STOP_TIMEOUT*1000), WIDGET_STOP_TIMEOUT );
+        Cache.set( remoteAddress, System.currentTimeMillis() + conf.settings.stopTimeout, ( int ) (conf.settings.stopTimeout / 1000) );
 		widget.countLaunch();
-		return deployManager.fork(server, widget);
+		return deployManager.fork( server, widget );
 	}
 	
 	public void undeploy( String instanceId )
@@ -136,10 +133,25 @@ public class WidgetServerImpl implements WidgetServer
 
         if ( !CollectionUtils.isEmpty(server.events) ){
             for (ServerNodeEvent event : server.events) {
-                if ( event.getEventType() == ServerNodeEvent.Type.ERROR){
-                    result.setState(Status.State.STOPPED);
-                    result.setMessage(event.getMsg());
-                    return result;
+                switch ( event.getEventType() ) {
+
+                    case DONE:
+                        break;
+                    case ERROR:
+                    {
+                        result.setState( Status.State.STOPPED );
+                        result.setMessage( event.getMsg() );
+                        return result;
+                    }
+                    case INFO:
+                    {
+                        output.add( event.getMsg() );
+                    }
+                    break;
+                    default:
+                    {
+                        logger.error( "unknown event type while formatting : [{}]", event.getEventType() );
+                    }
                 }
             }
         }

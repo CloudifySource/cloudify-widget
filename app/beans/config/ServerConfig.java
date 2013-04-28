@@ -80,6 +80,7 @@ public class ServerConfig {
         @Environment( key = "CLOUDIFY_HOME" )
         public String cloudifyHome = Utils.getFileByRelativePath("cloudify-folder").getAbsolutePath();
 
+        public boolean useSystemEnvAsDefault = true;
 
         private Map<String,String> environment = null ;
 
@@ -88,6 +89,11 @@ public class ServerConfig {
             try {
                 if (environment == null) {
                     environment = new HashMap<String, String>();
+
+                    if ( useSystemEnvAsDefault ){
+                        environment.putAll( System.getenv() );
+                    }
+
                     Set<Field> allFields = ReflectionUtils.getAllFields(this.getClass(), new Predicate<Field>() {
                         @Override
                         public boolean apply(Field field) {

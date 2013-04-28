@@ -45,6 +45,9 @@ public class Conf {
 
         public InitialData initialData = new InitialData();
 
+        @Config(ignoreNullValues = true)
+        public long stopTimeout = Utils.parseTimeToMillis( "30s" );
+
         public Boolean globalSecurityCheck = false; // todo : switch this on once feature is completed.
 
 

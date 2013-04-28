@@ -111,10 +111,10 @@ public class Application extends Controller
             if ( !StringUtils.isEmpty( project ) && !StringUtils.isEmpty( key ) && !StringUtils.isEmpty( secretKey ) ){
                 serverNode = new ServerNode();
 
-                serverNode.setUserName( project + ":" +  key );
+                serverNode.setProject( project);
+                serverNode.setKey( key );
+                serverNode.setSecretKey( secretKey );
                 serverNode.setRemote(true);
-
-                serverNode.setApiKey( secretKey );
                 serverNode.save();
             }else{
                 serverNode = ApplicationContext.get().getServerPool().get(widget.getLifeExpectancy());
@@ -184,6 +184,7 @@ public class Application extends Controller
 
     public static Result stop( final String apiKey, final String instanceId )
     {
+        final String remoteAddress = request().remoteAddress();
         Akka.system().scheduler().scheduleOnce( Duration.create( 0, TimeUnit.SECONDS ),
                 new Runnable() {
                     @Override
@@ -194,7 +195,7 @@ public class Application extends Controller
                         Widget widget = Widget.getWidget( apiKey );
 
                         if ( widget != null ) {
-                            ApplicationContext.get().getEventMonitor().eventFired( new Events.StopWidget( request().remoteAddress(), widget ) );
+                            ApplicationContext.get().getEventMonitor().eventFired( new Events.StopWidget( remoteAddress , widget ) );
                         }
 
                         if ( instanceId != null ) {
