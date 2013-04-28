@@ -18,6 +18,7 @@ package models;
 import javax.persistence.*;
 
 import beans.Recipe;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import play.db.ebean.Model;
@@ -91,13 +92,15 @@ public class WidgetInstance
 
 	
 	public WidgetInstance( ) {	}
-	
+
+
     public ConsoleLink getLink() {
         if ( serverNode != null && widget != null ){
             String consoleName = widget.getConsoleName();
             String consoleURL = widget.getConsoleURL();
             String publicIP = serverNode.getPublicIP();
-            return new ConsoleLink( ).setTitle(consoleName).setUrl(consoleURL.replace(HOST_TOKEN,publicIP));
+            // consoleURL might be null
+            return new ConsoleLink( ).setTitle(consoleName).setUrl( StringUtils.isEmpty(consoleURL)  ? null : consoleURL.replace( HOST_TOKEN,publicIP == null ? "" : publicIP) ) ;
         }
         return null;
     }

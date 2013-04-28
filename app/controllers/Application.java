@@ -64,13 +64,26 @@ public class Application extends Controller
     private static Logger logger = LoggerFactory.getLogger(Application.class);
     // guy - todo - apiKey should be an encoded string that contains the userId and widgetId.
     //              we should be able to decode it, verify user's ownership on the widget and go from there.
-	public static Result start( String apiKey, String hpcsKey, String hpcsSecretKey, String userId )
+    /**
+     * Start does 2 things:
+     *  - gets a server node
+     *           - if remote bootstrap we need to bootstrap one from scratch
+     *           - otherwise we take one from the pool.
+     *
+     *  - installs the widget recipe
+     * @param apiKey - user api key
+     * @param project - the HP project API data
+     * @param key - the HP key API data
+     * @param secretKey - the HP secret key API data
+     * @param userId - in case required login authentication is used
+     * @return - result
+     */
+	public static Result start( String apiKey, String project, String key, String secretKey, String userId )
 	{
 		try
 		{
 
-
-			logger.info("starting widget with [apiKey, hpcsKey, hpcsSecretKey] = [{},{},{}]", new Object[]{apiKey, hpcsKey, hpcsSecretKey} );
+			logger.info("starting widget with [apiKey, key, secretKey] = [{},{},{}]", new Object[]{apiKey, key, secretKey} );
  			Widget widget = Widget.getWidget( apiKey );
             ServerNode serverNode = null;
            	if ( widget == null || !widget.isEnabled()) {
@@ -94,17 +107,14 @@ public class Application extends Controller
 
              ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ) );
 
-            //TODO[adaml]: add proper input validation response
-            if ( !StringUtils.isEmpty(hpcsKey) && !StringUtils.isEmpty( hpcsSecretKey ) ){
-                if ( !isValidInput(hpcsKey, hpcsSecretKey) ) {
-                    new HeaderMessage().setError(Messages.get("invalid.hpcs.credentials")).apply(response().getHeaders());
-                    return badRequest();
-                }
-
+            // credentials validation is made when we attempt to create a PEM file. if credentials are wrong, it will fail.
+            if ( !StringUtils.isEmpty( project ) && !StringUtils.isEmpty( key ) && !StringUtils.isEmpty( secretKey ) ){
                 serverNode = new ServerNode();
-                serverNode.setUserName( hpcsKey );
+
+                serverNode.setUserName( project + ":" +  key );
                 serverNode.setRemote(true);
-                serverNode.setApiKey( hpcsSecretKey );
+
+                serverNode.setApiKey( secretKey );
                 serverNode.save();
             }else{
                 serverNode = ApplicationContext.get().getServerPool().get(widget.getLifeExpectancy());
@@ -132,7 +142,8 @@ public class Application extends Controller
                                 logger.info("bootstrapping remote cloud");
                                 ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode);
                             }
-                            logger.info("installing widget on remote cloud");
+
+                            logger.info("installing widget on cloud");
                             ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress );
                         }
                     });
@@ -163,13 +174,13 @@ public class Application extends Controller
     private static Result statusToResult( Widget.Status status ){
         Map<String,Object> result = new HashMap<String, Object>();
         result.put("status", status );
+        logger.debug("statusToResult > result: [{}]", result);
         return ok( Json.toJson( result ));
     }
 
-	private static boolean isValidInput(String hpcsKey, String hpcsSecretKey) {
-		return !StringUtils.isEmpty(hpcsKey) && !StringUtils.isEmpty(hpcsSecretKey)
-				&& hpcsKey.contains(":") && !hpcsKey.startsWith(":") && !hpcsKey.endsWith(":");
-	}
+
+	
+
 
     public static Result stop( final String apiKey, final String instanceId )
     {

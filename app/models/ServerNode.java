@@ -23,6 +23,8 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.jclouds.openstack.nova.v2_0.domain.Address;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.db.ebean.Model;
 
 import javax.persistence.CascadeType;
@@ -48,6 +50,9 @@ import java.util.concurrent.TimeUnit;
 public class ServerNode
 extends Model
 {
+
+    private static Logger logger = LoggerFactory.getLogger(ServerNode.class);
+
 	@Id
 	@XStreamOmitField
 	private Long id;
@@ -88,6 +93,9 @@ extends Model
 
     @Version
     private long version = 0;
+
+    @OneToMany(mappedBy="serverNode", cascade = CascadeType.REMOVE)
+    public List<ServerNodeEvent> events = new LinkedList<ServerNodeEvent>();
 	
 	public static Finder<Long,ServerNode> find = new Finder<Long,ServerNode>(Long.class, ServerNode.class); 
 
@@ -281,6 +289,14 @@ extends Model
     {
         return widgetInstance;
     }
+    public ServerNodeEvent errorEvent(String message) {
+        logger.info("adding error event [{}]",message);
+        return new ServerNodeEvent()
+                .setServerNode(this)
+                .setMsg(message)
+                .setEventType(ServerNodeEvent.Type.ERROR);
+    }
+
 
     // guy - todo - formalize this for reuse.
     public static class QueryConf {

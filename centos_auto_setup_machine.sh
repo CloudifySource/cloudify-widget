@@ -47,6 +47,12 @@ else
     unzip $CLOUDIFY_FILE
 fi
 
+
+# assuming sysconfig_play exists on machine
+echo "copying sysconfig file"
+\cp -f ${SYSCONF_FILE} /etc/sysconfig/play
+. /etc/sysconfig/play
+
 echo "installing git"
 yum  -y install git
 cd play-2.0.4
@@ -77,11 +83,6 @@ yum install -y ruby ruby-devel rubygems gcc make libxml2 libxml2-devel libxslt l
 
 echo "installing sass"
 gem install sass
-
-# assuming sysconfig_play exists on machine
-echo "copying sysconfig file"
-\cp -f ${SYSCONF_FILE} /etc/sysconfig/play
-. /etc/sysconfig/play
 
 # assuming there is a prod.conf copied to here
 echo "copying configuration files"

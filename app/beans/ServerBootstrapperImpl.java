@@ -23,6 +23,7 @@ import com.google.common.net.HostAndPort;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import models.ServerNode;
+import models.ServerNodeEvent;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.io.FileUtils;
@@ -489,19 +490,22 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             serverNode.setPrivateKey( privateKey );
 
             serverNode.save();
-            logger.info( "server node updated and saved" );
-        } catch ( Exception e ) {
-            throw new RuntimeException( "Unable to bootstrap cloud", e );
-        } finally {
-            if ( cloudFolder != null ) {
-                FileUtils.deleteQuietly( cloudFolder );
-            }
-            if ( jCloudsContext != null ) {
-                jCloudsContext.close();
-            }
-            serverNode.setStopped( true );
-        }
-    }
+            logger.info("server node updated and saved");
+			return serverNode;
+		}catch(Exception e) {
+            serverNode.errorEvent("Invalid Credentials").save();
+			throw new RuntimeException("Unable to bootstrap cloud", e);
+		} finally {
+			if (cloudFolder != null) {
+				FileUtils.deleteQuietly(cloudFolder);
+			}
+			if (jCloudsContext != null) {
+				jCloudsContext.close();
+			}
+			serverNode.setStopped(true);
+			
+		}
+	}
 
 	private void deleteServer( String serverId )
 	{

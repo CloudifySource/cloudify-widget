@@ -72,7 +72,6 @@ WidgetApp.factory( 'myInterceptor', function ( $rootScope, $q, $window )
 WidgetApp.controller('WidgetController',
     function($scope, $location, $routeParams, $dialog, $rootScope,  WidgetModel ){
 
-        $rootScope.guy= "mograbi";
         $scope.authToken = $.cookie( "authToken" );
         WidgetModel.getWidgets( $scope.authToken ).then( function(data){ $scope.widgets = data; });
         $scope.admin = $.cookie("admin") == "true";

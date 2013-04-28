@@ -102,7 +102,7 @@ public class Widget
 
     @JsonIgnore
 	@OneToMany(cascade=CascadeType.ALL, mappedBy = "widget")
-	private List<WidgetInstance> instances;
+	private List<WidgetInstance> instances = new LinkedList<WidgetInstance>(  );
 
 	public static Finder<Long,Widget> find = new Finder<Long,Widget>(Long.class, Widget.class);
 

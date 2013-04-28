@@ -17,7 +17,7 @@ GET     /demos/:email                    controllers.DemosController.getDemoPage
 POST    /demos/verifyWidgetLogin         controllers.Demos.validateUserIdFromLogin(userId:String)
 
 # Widget
-POST     /widget/start		     	    controllers.Application.start( apiKey: String, hpcsKey:String ?= "", hpcsSecretKey:String ?= "", userId:String?="" )
+POST     /widget/start		     	    controllers.Application.start( apiKey: String, project:String ?="", key:String ?= "", secretKey:String ?= "", userId:String?="" )
 POST     /widget/:instanceId/stop	    controllers.Application.stop( apiKey: String, instanceId: String)
 GET      /widget/:instanceId/status     controllers.Application.getWidgetStatus( apiKey: String, instanceId: String )
 GET      /widget/:instanceId/pem        controllers.Application.downloadPemFile( instanceId:String )
