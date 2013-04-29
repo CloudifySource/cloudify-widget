@@ -321,7 +321,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     }
 
     public void init(){
-        novaContext = new NovaContext(conf.server.bootstrap.cloudProvider,conf.server.bootstrap.api.project, conf.server.bootstrap.api.key, conf.server.bootstrap.api.secretKey, conf.server.bootstrap.zoneName  );
+        novaContext = new NovaContext(conf.server.bootstrap.cloudProvider,conf.server.bootstrap.api.project, conf.server.bootstrap.api.key, conf.server.bootstrap.api.secretKey, conf.server.bootstrap.zoneName, false  );
     }
 
     public static class NovaContext{
@@ -332,11 +332,13 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         RestContext<NovaApi, NovaAsyncApi> nova = null;
         ComputeService computeService = null;
 
-        public NovaContext( String cloudProvider, String project, String key, String secretKey, String zone )
+        public NovaContext( String cloudProvider, String project, String key, String secretKey, String zone, boolean apiCredentials )
         {
             logger.info( "initializing bootstrapper with [cloudProvider, project, key, secretKey]=[{},{},{}]", new Object[]{cloudProvider, project, key, secretKey} );
             Properties overrides = new Properties();
-            overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
+            if ( apiCredentials ){
+                overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
+            }
             context = ContextBuilder.newBuilder( cloudProvider ).credentials( project+":"+key, secretKey ).overrides( overrides ).buildView( ComputeServiceContext.class );
             this.zone = zone;
         }
@@ -447,7 +449,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     {
         serverNode.setRemote( true );
         // get existing management machine
-        List<Server> existingManagementMachines = getAllMachinesWithPredicate( new ServerNamePrefixPredicate(), new NovaContext( conf.server.cloudBootstrap.cloudProvider,serverNode.getProject(), serverNode.getKey(), serverNode.getSecretKey(),conf.server.cloudBootstrap.zoneName ) );
+        List<Server> existingManagementMachines = getAllMachinesWithPredicate( new ServerNamePrefixPredicate(), new NovaContext( conf.server.cloudBootstrap.cloudProvider,serverNode.getProject(), serverNode.getKey(), serverNode.getSecretKey(),conf.server.cloudBootstrap.zoneName, true ) );
         logger.info( "found [{}] management machines", CollectionUtils.size( existingManagementMachines ) );
         if ( !CollectionUtils.isEmpty( existingManagementMachines ) ) {
 
