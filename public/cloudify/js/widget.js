@@ -10,7 +10,7 @@ $(function () {
             $project.val(project);
             $key.val(key);
         }else{
-            return { project : $project.val(), key : $key.val(), secretKey : $secretKey.val()}
+            return { project : $project.val(), key : $key.val(), secretKey : $secretKey.val() }
         }
     }
 
@@ -240,6 +240,10 @@ $(function () {
             widgetLog.appendOrOverride(data.status.output);
         }
 
+        if ( data.status.remote ){
+            $("#hp_console_link" ).show();
+        }
+
         if ( data.status.publicIp ) {
             widgetState.publicIp(data.status.publicIp);
         }
@@ -341,6 +345,8 @@ $(function () {
         widgetState.showStopButton();
         if ( !widgetState.isValid() ) {
             var advancedData = advanced();
+
+
 			var playData = { apiKey : params["apiKey"], "project" : advancedData.project, "key" : advancedData.key, "secretKey":advancedData.secretKey };
             $.ajax(
                 { type:"POST",
@@ -477,6 +483,13 @@ $(function () {
     window.open($(e.target).parents("a").attr("href"), '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600,left='+ leftvar +',top=' + topvar);
 
   });
+
+    $("form.advanced_form" ).submit(function(e){
+        e.stopPropagation();
+       console.log("submitting form");
+        widgetState.onPlay();
+        return false;
+    });
 
     // code for walkthrough on the widget end.
 //    var checkWTInterval = null;

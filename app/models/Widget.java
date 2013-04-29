@@ -99,6 +99,10 @@ public class Widget
     @Lob
     private String description;
 
+    // for remote bootstrap, use this service name to construct the console link.
+    //
+    private String consoleUrlService;
+
 
     @JsonIgnore
 	@OneToMany(cascade=CascadeType.ALL, mappedBy = "widget")
@@ -265,6 +269,7 @@ public class Widget
         WidgetInstance wInstance = new WidgetInstance();
         wInstance.setRecipeType( recipeType );
         wInstance.setServerNode( serverNode );
+        wInstance.setInstallName( toInstallName() );
 		if (instances == null){
 			instances = new ArrayList<WidgetInstance>();
         }
@@ -276,6 +281,10 @@ public class Widget
 
 		return wInstance;
 	}
+
+    public String toInstallName(){
+        return ("" + productName + productVersion).toLowerCase().replaceAll( "[^a-z0-9]", "_" );
+    }
 
     @Deprecated // todo : DO NOT USE THIS.. this is strictly for "WidgetServerImpl".
                //  todo : we should implement a different mechanism there, but for now there is no time.
@@ -632,4 +641,13 @@ public class Widget
         this.icon = icon;
     }
 
+    public String getConsoleUrlService()
+    {
+        return consoleUrlService;
+    }
+
+    public void setConsoleUrlService( String consoleUrlService )
+    {
+        this.consoleUrlService = consoleUrlService;
+    }
 }

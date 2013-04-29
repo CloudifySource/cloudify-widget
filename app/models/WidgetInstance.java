@@ -29,7 +29,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import controllers.Application;
 
 /**
- * This class represents a widget instance with a deployment metadata and instantiated on {@link Application#start(String, String, String)} }
+ * This class represents a widget instance with a deployment metadata and instantiated on {@link Application#start(String, String, String, String, String)}  }
  * The metadata contains on which server the widget instance has been deployed.
  * 
  * @author Igor Goldenberg
@@ -54,9 +54,15 @@ public class WidgetInstance
     @Enumerated(EnumType.STRING)
     private Recipe.Type recipeType;
 
+    private String servicePublicIp;
+
     @JsonIgnore
     @ManyToOne
     private Widget widget;
+
+
+    // the name we used when we installed this instance
+    private String installName;
 
 	
 	public static Finder<Long,WidgetInstance> find = new Finder<Long,WidgetInstance>(Long.class, WidgetInstance.class); 
@@ -94,11 +100,15 @@ public class WidgetInstance
         if ( serverNode != null && widget != null ){
             String consoleName = widget.getConsoleName();
             String consoleURL = widget.getConsoleURL();
-            String publicIP = serverNode.getPublicIP();
+            String publicIP = getActualServiceLink();
             // consoleURL might be null
             return new ConsoleLink( ).setTitle(consoleName).setUrl( StringUtils.isEmpty(consoleURL)  ? null : consoleURL.replace( HOST_TOKEN,publicIP == null ? "" : publicIP) ) ;
         }
         return null;
+    }
+
+    private String getActualServiceLink(){
+        return serverNode.isRemote() ? servicePublicIp : serverNode.getPublicIP();
     }
 
     public static WidgetInstance findByServerNode(ServerNode server) {
@@ -156,8 +166,30 @@ public class WidgetInstance
         return toString();
     }
 
+    public String getInstallName()
+    {
+        return installName;
+    }
+
+    public void setInstallName( String installName )
+    {
+        this.installName = installName;
+    }
+
     @Override
     public String toString() {
         return String.format("WidgetInstance{id=%d, serverNode=%s, widget=%s, recipeType=%s}", id, serverNode == null ? "N/A" : serverNode.getNodeId(), widget == null ? "N/A" : widget.getTitle() + ":" + widget.getId(), recipeType);
     }
+
+    public String getServicePublicIp()
+    {
+        return servicePublicIp;
+    }
+
+    public void setServicePublicIp( String servicePublicIp )
+    {
+        this.servicePublicIp = servicePublicIp;
+    }
+
+
 }

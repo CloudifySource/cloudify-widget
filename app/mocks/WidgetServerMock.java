@@ -36,7 +36,13 @@ public class WidgetServerMock implements WidgetServer {
         return null;
     }
 
-	@Override
+    @Override
+    public void uninstall( ServerNode server )
+    {
+        logger.info( "uninstalling [{}] on [{}]", server.getWidgetInstance(), server );
+    }
+
+    @Override
 	public WidgetInstance deploy(Widget widget, ServerNode server, String remoteAddress) {
 		logger.info("deploying : {}", server.getPublicIP());
 		return null;

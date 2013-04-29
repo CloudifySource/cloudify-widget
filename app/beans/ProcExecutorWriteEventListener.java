@@ -15,8 +15,13 @@
  *******************************************************************************/
 package beans;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.cache.Cache;
 import server.WriteEventListener;
+
+import java.util.concurrent.Callable;
+
 /**
  * 
  * A process executer output stream event listener.
@@ -28,6 +33,8 @@ import server.WriteEventListener;
 public class ProcExecutorWriteEventListener implements WriteEventListener {
 
 	private String serverNodeId;
+
+    private static Logger logger = LoggerFactory.getLogger( ProcExecutorWriteEventListener.class );
 	
 	private StringBuilder sb = null;
 	
@@ -46,12 +53,29 @@ public class ProcExecutorWriteEventListener implements WriteEventListener {
     }
 
     @Override
-    public void init(){
+    public void init()
+    {
         sb = new StringBuilder();
-        Cache.set( getKey(), sb );
+        logger.info( "initializing" );
+        try {
+            sb = Cache.getOrElse( getKey(), new Callable<StringBuilder>() {
+                @Override
+                public StringBuilder call() throws Exception
+                {
+                    StringBuilder sb = new StringBuilder();
+                    Cache.set( getKey(), sb );
+                    return sb;
+
+                }
+            }, 1 );
+        } catch ( Exception e ) {
+            logger.error( "unable to getOrElse string builder", e );
+            sb = new StringBuilder();
+            Cache.set( getKey(), sb );
+        }
     }
-	
-	@Override
+
+    @Override
 	public void writeEvent(int b) {
 		sb.append(Character.toChars(b));
 	}

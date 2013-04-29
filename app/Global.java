@@ -1,13 +1,10 @@
 import annotations.AnonymousUsers;
 import beans.config.Conf;
 import models.User;
-import models.Widget;
 import org.apache.commons.io.FileUtils;
-import org.codehaus.jackson.JsonNode;
 import org.slf4j.LoggerFactory;
 import play.Application;
 import play.GlobalSettings;
-import play.api.Play;
 import play.api.mvc.Results;
 import play.api.mvc.SimpleResult;
 import play.core.j.JavaResults;
@@ -23,7 +20,6 @@ import server.exceptions.ExceptionResponseDetails;
 import utils.Utils;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
