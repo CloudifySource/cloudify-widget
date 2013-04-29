@@ -224,6 +224,9 @@ $(function () {
         return $("<li></li>", {"id":"custom_link", "class":"mock"}).append($("<span></span>", {"text":link_info.title, "class":"mock_text"})).append($("<a></a>", {"href": link_info.url, "target": "_blank", "text": link_info.title}));
     }
 
+    var ellipsis = ".....";
+    var ellipsis_iteration = 0;
+
     function handleUpdateStatusSuccess( data )
     {
         $.postMessage( JSON.stringify({name:"widgetstatus", comment:"status_was_updated", status:data.status}), origin_page_url , parent );
@@ -233,6 +236,7 @@ $(function () {
         }
 
         if ( data.status.output ){
+            data.status.output.push(ellipsis.substring( 0, (ellipsis_iteration++ % 5) + 1) );
             widgetLog.appendOrOverride(data.status.output);
         }
 

@@ -137,7 +137,12 @@ public class Application extends Controller
                         public void run() {
                             if (finalServerNode.isRemote()) {
                                 logger.info("bootstrapping remote cloud");
-                                ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode);
+                                try{
+                                    ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode);
+                                }catch(Exception e){
+                                    logger.error("unable to bootstrap machine",e);
+                                    return;
+                                }
                             }
                             logger.info("installing widget on cloud");
                             ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress );
@@ -170,7 +175,7 @@ public class Application extends Controller
     private static Result statusToResult( Widget.Status status ){
         Map<String,Object> result = new HashMap<String, Object>();
         result.put("status", status );
-        logger.info("statusToResult > result: [{}]", result);
+        logger.debug("statusToResult > result: [{}]", result);
         return ok( Json.toJson( result ));
     }
 

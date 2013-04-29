@@ -141,6 +141,8 @@ public class Utils
 	/** Format string output by different patters */
 	public static List<String> formatOutput( String str, String substringPrefix , Collection<String> filterOutputLines, Collection<String> filterOutputStrings )
 	{
+        logger.debug(str);
+
 		List<String> list = split(str, "\n");
 		for( int i=0; i < list.size(); i++ )
 		{
@@ -169,7 +171,6 @@ public class Utils
 		}// for
 
         logger.debug("starting output format phase 2");
-		// trim empty lines or with a single dot
 		List<String> newList = new ArrayList<String>();
 		for( String s : list )
 		{
@@ -186,6 +187,7 @@ public class Utils
                     continue;
                 }
             }
+            // trim empty lines or with a single dot
 			if ( !s.equals("") && !s.equals(".") ){
 				newList.add( s );
             }
