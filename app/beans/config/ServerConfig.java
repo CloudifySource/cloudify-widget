@@ -80,7 +80,7 @@ public class ServerConfig {
         @Environment( key = "CLOUDIFY_HOME" )
         public String cloudifyHome = Utils.getFileByRelativePath("cloudify-folder").getAbsolutePath();
 
-        public boolean useSystemEnvAsDefault = true;
+        public boolean useSystemEnvAsDefault = false; // this will also pass JAVA_OPTS, be careful with this! for windows development mainly.
 
         private Map<String,String> environment = null ;
 
