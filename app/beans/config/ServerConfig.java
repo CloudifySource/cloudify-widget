@@ -130,7 +130,7 @@ public class ServerConfig {
         public String cloudProvider="hpcloud-compute";
         public File script;
         public String tags = null;
-        public ApiCredentials api;
+        public ApiCredentials api = new ApiCredentials();
     }
 
     public static class ApiCredentials{
