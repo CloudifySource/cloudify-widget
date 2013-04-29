@@ -311,7 +311,7 @@ extends Model
         return createEvent( message, ServerNodeEvent.Type.ERROR );
     }
 
-    private ServerNodeEvent createEvent( String message, ServerNodeEvent.Type type ){
+    public ServerNodeEvent createEvent( String message, ServerNodeEvent.Type type ){
         logger.info("adding [{}] event [{}]", type, message);
                 return new ServerNodeEvent()
                         .setServerNode( this )

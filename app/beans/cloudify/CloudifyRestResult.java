@@ -8,6 +8,9 @@
 
 package beans.cloudify;
 
+import org.codehaus.jackson.annotate.JsonProperty;
+
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +21,8 @@ import java.util.Map;
  */
 public class CloudifyRestResult {
     public Status status;
+    public List<String> errorArgs = new LinkedList<String>(  );
+    public String error;
 
     public static enum Status{
         success, error
@@ -33,6 +38,12 @@ public class CloudifyRestResult {
 
     public static class TestRest extends CloudifyRestResult{
         // nothing, empty body
+    }
+
+//    {"Cloud Public IP":"15.185.182.232"}
+    public static class GetPublicIpResult{
+        @JsonProperty(value = "Cloud Public IP")
+        public String cloudPublicIp;
     }
 
     public static class ListApplications extends CloudifyRestResult{

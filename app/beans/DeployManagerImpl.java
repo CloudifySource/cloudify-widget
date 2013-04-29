@@ -23,12 +23,14 @@ import javax.inject.Inject;
 import beans.cloudify.CloudifyRestClient;
 import models.ServerNode;
 
+import models.ServerNodeEvent;
 import models.Widget;
 import models.WidgetInstance;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +72,7 @@ public class DeployManagerImpl implements DeployManager
         CommandLine cmdLine = new CommandLine( script );
         cmdLine.addArgument( serverNode.getPublicIP() );
         cmdLine.addArgument( installName );
+        logger.info( "executing command [{}]", cmdLine );
         execute(  cmdLine, serverNode );
         return widgetInstance;
     }
@@ -96,6 +99,7 @@ public class DeployManagerImpl implements DeployManager
      */
     private boolean alreadyInstalled( ServerNode server, Widget widget, Recipe.Type recipeType ){
 
+        logger.info( "checking if [{}] named [{}] is installed on [{}]", new Object[]{recipeType, widget.toInstallName(), server.getPublicIP() });
         try{
         switch ( recipeType ) {
 
@@ -105,7 +109,13 @@ public class DeployManagerImpl implements DeployManager
             }
             case SERVICE:
             {
-                return cloudifyRestClient.listServices( server.getPublicIP(), "default" ).response.contains( widget.toInstallName() );
+                // check if application "default" is installed at all, and if so - check for services on it.
+                if ( cloudifyRestClient.listApplications( server.getPublicIP() ).response.containsKey( "default" )){
+                    return cloudifyRestClient.listServices( server.getPublicIP(), "default" ).response.contains( widget.toInstallName() );
+                }else{
+                    logger.info( "figured that application 'default' is not installed, and hence the service is not installed" );
+                    return false;
+                }
             }
         }
         }catch(Exception e){
@@ -130,17 +140,34 @@ public class DeployManagerImpl implements DeployManager
         Recipe.Type recipeType = new Recipe( recipeDir ).getRecipeType();
 
         if ( alreadyInstalled( server, widget, recipeType ) ){
-            // TODO : use new events mechanism to alert installation is DONE!
-            return widget.addWidgetInstance( server, recipeDir );
+            logger.info( "[{}] [{}] is already installed", recipeType, widget.toInstallName()  );
+            WidgetInstance widgetInstance = widget.addWidgetInstance( server, recipeDir );
+            try {
+                if ( recipeType == Recipe.Type.SERVICE ) {
+                    String serviceIp = cloudifyRestClient.getPublicIp( server.getPublicIP(), "default", widget.toInstallName() ).cloudPublicIp;
+                    logger.info("service IP is [{}]", serviceIp );
+                    widgetInstance.setServicePublicIp( serviceIp );
+                    widgetInstance.save(  );
+                } else if ( !StringUtils.isEmpty( widget.getConsoleUrlService() ) ) { // this is an application and we need to get ip for specific service
+                    String serviceIp = cloudifyRestClient.getPublicIp( server.getPublicIP(), widget.toInstallName(), widget.getConsoleUrlService() ).cloudPublicIp;
+                    widgetInstance.setServicePublicIp( serviceIp );
+                    widgetInstance.save(  );
+                }
+            } catch ( Exception e ) {
+                logger.error( "failed resolving public IP for service", e );
+            }
+            server.createEvent(null, ServerNodeEvent.Type.DONE ).save(  );
+
+            return widgetInstance;
         }else{
             logger.info( "Deploying: [ServerIP={}] [recipe={}] [type={}]", new Object[]{server.getPublicIP(), recipeDir, recipeType.name()} );
             String recipePath = FilenameUtils.separatorsToSystem( recipeDir.getPath() );
 
             CommandLine cmdLine = new CommandLine( conf.cloudify.deployScript );
             cmdLine.addArgument( server.getPublicIP() );
-            cmdLine.addArgument( recipePath );
-            cmdLine.addArgument( widget.toInstallName() );
+            cmdLine.addArgument( recipePath.replaceAll( "\\\\", "/" ) ); // support for windows.
             cmdLine.addArgument( recipeType.commandParam );
+            cmdLine.addArgument( widget.toInstallName() );
 
             execute( cmdLine, server );
             return widget.addWidgetInstance( server, recipeDir );
@@ -152,6 +179,7 @@ public class DeployManagerImpl implements DeployManager
         try {
             DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
             ProcExecutor executor = executorFactory.getDeployExecutor( server );
+            logger.info( "executing command [{}]", cmdLine );
             executor.execute( cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler );
             logger.info( "The process instanceId: {}", executor.getId() );
         } catch ( ExecuteException e ) {

@@ -131,11 +131,15 @@ public class WidgetServerImpl implements WidgetServer
 
         result.setRemote( server.isRemote() ).setHasPemFile( !StringUtils.isEmpty(server.getPrivateKey()) ); // let UI know this is a remote bootstrap.
 
+        boolean doneFromEvent = false;
+
         if ( !CollectionUtils.isEmpty(server.events) ){
             for (ServerNodeEvent event : server.events) {
                 switch ( event.getEventType() ) {
 
                     case DONE:
+                        logger.info( "detected that widget instance installation done by event" );
+                        doneFromEvent = true;
                         break;
                     case ERROR:
                     {
@@ -162,7 +166,7 @@ public class WidgetServerImpl implements WidgetServer
         WidgetInstance widgetInstance = WidgetInstance.findByServerNode(server);
         logger.debug("checking if installation finished for {} on the following output {}" , widgetInstance, output );
         if (widgetInstance != null ){
-            if (isFinished(widgetInstance.getRecipeType(), (String)CollectionUtils.last(output))){
+            if (doneFromEvent || isFinished(widgetInstance.getRecipeType(), (String)CollectionUtils.last(output))){
                 logger.debug("detected finished installation");
                 result.setInstanceIsAvailable(Boolean.TRUE);
                 result.setConsoleLink(widgetInstance.getLink());

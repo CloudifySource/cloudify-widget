@@ -99,6 +99,10 @@ public class Widget
     @Lob
     private String description;
 
+    // for remote bootstrap, use this service name to construct the console link.
+    //
+    private String consoleUrlService;
+
 
     @JsonIgnore
 	@OneToMany(cascade=CascadeType.ALL, mappedBy = "widget")
@@ -637,4 +641,13 @@ public class Widget
         this.icon = icon;
     }
 
+    public String getConsoleUrlService()
+    {
+        return consoleUrlService;
+    }
+
+    public void setConsoleUrlService( String consoleUrlService )
+    {
+        this.consoleUrlService = consoleUrlService;
+    }
 }

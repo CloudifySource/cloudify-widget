@@ -25,6 +25,8 @@ public class CloudifyRestClient {
     public String TEST_REST_FORMAT = "http://%s:8100/service/testrest";
     public String LIST_APPLICATIONS_FORMAT = "http://%s:8100/service/applications";
     public String LIST_SERVICES_FORMAT = "http://%s:8100/service/applications/%s/services";
+    public String DESCRIBE_SERVICES_FORMAT = "http://%s:8100/service/applications/%s/services/description";
+    public String GET_PUBLIC_IP_FORMAT= "http://%s:8100/admin/ProcessingUnits/Names/%s.%s/Instances/0/ServiceDetailsByServiceId/USM/Attributes/Cloud%%20Public%%20IP";
 
     private static Logger logger = LoggerFactory.getLogger( CloudifyRestClient.class );
 
@@ -41,6 +43,10 @@ public class CloudifyRestClient {
         return getResult( CloudifyRestResult.ListServices.class, LIST_SERVICES_FORMAT, ip, application );
     }
 
+    public CloudifyRestResult.GetPublicIpResult getPublicIp( String ip, String application, String service ){
+        return getResult( CloudifyRestResult.GetPublicIpResult.class, GET_PUBLIC_IP_FORMAT, ip, application, service );
+    }
+
     private <T> T getResult ( Class<T>  clzz, String format, String ... args ){
         return parse(clzz, getBody( format, args ));
     }
@@ -55,7 +61,6 @@ public class CloudifyRestClient {
             logger.info( "body is empty" );
             return null;
         } else {
-            logger.info( "body is not empty, testing if status successful" );
             ObjectMapper mapper = new ObjectMapper(  );
             return mapper.readValue( body, clzz );
         }

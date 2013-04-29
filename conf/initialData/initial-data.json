@@ -49,11 +49,6 @@
                 "image": {
                     "selected": "CouchbaseSelected.png"
                 },
-                "login": {
-                    "require": true,
-                    "url": "",
-                    "token": ""
-                },
                 "description" : "this is a description for couchbase player"
             },
 
