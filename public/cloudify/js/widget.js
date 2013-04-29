@@ -190,7 +190,11 @@ $(function () {
             var index = myLog.length;
             var logLength = aOutput.length;
 
-            console.log('IN > aOutput: ' + aOutput + ', myLog: ' + myLog);
+            console.log('IN');
+            console.log('\taOutput: ' + aOutput);
+            console.log('\tmyLog: ' + myLog);
+            console.log('\tindex: ' + index);
+            console.log('\tlogLength: ' + logLength);
 
             if (myLog.length!= aOutput.length || myLog[0] != aOutput[0]) { // print only the difference
 
