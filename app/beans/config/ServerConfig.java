@@ -130,6 +130,13 @@ public class ServerConfig {
         public String cloudProvider="hpcloud-compute";
         public File script;
         public String tags = null;
+        public ApiCredentials api;
+    }
+
+    public static class ApiCredentials{
+        public String project;
+        public String key;
+        public String secretKey;
     }
     
     // cloud bootstrap configuration.

@@ -321,7 +321,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     }
 
     public void init(){
-        novaContext = new NovaContext(conf.server.bootstrap.cloudProvider,conf.server.bootstrap.cloudProvider, conf.server.bootstrap.username, conf.server.bootstrap.apiKey, conf.server.bootstrap.zoneName  );
+        novaContext = new NovaContext(conf.server.bootstrap.cloudProvider,conf.server.bootstrap.api.project, conf.server.bootstrap.api.key, conf.server.bootstrap.api.secretKey, conf.server.bootstrap.zoneName  );
     }
 
     public static class NovaContext{
@@ -334,7 +334,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
         public NovaContext( String cloudProvider, String project, String key, String secretKey, String zone )
         {
-            logger.info( "initializing bootstrapper with [cloudProvider, username, apiKey]=[{},{},{}]", new Object[]{project, key, secretKey} );
+            logger.info( "initializing bootstrapper with [cloudProvider, project, key, secretKey]=[{},{},{}]", new Object[]{cloudProvider, project, key, secretKey} );
             Properties overrides = new Properties();
             overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
             context = ContextBuilder.newBuilder( cloudProvider ).credentials( project+":"+key, secretKey ).overrides( overrides ).buildView( ComputeServiceContext.class );
