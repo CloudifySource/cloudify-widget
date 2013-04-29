@@ -181,6 +181,8 @@ $(function () {
           $dom.scrollTop($dom[0].scrollHeight);
         }
 
+        var ellipsis = ".....";
+        var ellipsis_iteration = 0;
         // array of output strings.
         // this function will append new lines of log if new log is longer than current log.
         // otherwise it will clear the current log and rewrite it.
@@ -198,6 +200,7 @@ $(function () {
                 for (; index < logLength; index = index + 1) {
                     write_log(aOutput[index]);
                 }
+                write_log(ellipsis.substring( 0, (ellipsis_iteration++ % 5) + 1) );
                 myLog = aOutput;
             }
         };
@@ -224,8 +227,7 @@ $(function () {
         return $("<li></li>", {"id":"custom_link", "class":"mock"}).append($("<span></span>", {"text":link_info.title, "class":"mock_text"})).append($("<a></a>", {"href": link_info.url, "target": "_blank", "text": link_info.title}));
     }
 
-    var ellipsis = ".....";
-    var ellipsis_iteration = 0;
+
 
     function handleUpdateStatusSuccess( data )
     {
@@ -236,7 +238,6 @@ $(function () {
         }
 
         if ( data.status.output ){
-            data.status.output.push(ellipsis.substring( 0, (ellipsis_iteration++ % 5) + 1) );
             widgetLog.appendOrOverride(data.status.output);
         }
 
