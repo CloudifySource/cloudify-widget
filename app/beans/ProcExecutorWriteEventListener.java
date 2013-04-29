@@ -62,12 +62,10 @@ public class ProcExecutorWriteEventListener implements WriteEventListener {
                 @Override
                 public StringBuilder call() throws Exception
                 {
-                    StringBuilder sb = new StringBuilder();
-                    Cache.set( getKey(), sb );
-                    return sb;
-
+                    logger.info( "initializing a new string builder" );
+                    return new StringBuilder();
                 }
-            }, 1 );
+            }, 0 );
         } catch ( Exception e ) {
             logger.error( "unable to getOrElse string builder", e );
             sb = new StringBuilder();
