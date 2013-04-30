@@ -299,7 +299,14 @@ body {
   float:right;
   margin-right:5px;
   font-size:12px;
-  a { text-decoration: none; border-bottom:1px dashed; }
+  a {
+    color: #046c9f;
+    text-decoration: none;
+    border-bottom: 1px dashed;
+    &:hover {
+      border-bottom-style: solid;
+    }
+  }
 }
 
 .log-ellipsis{
