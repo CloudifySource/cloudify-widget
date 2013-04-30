@@ -301,3 +301,10 @@ body {
   font-size:12px;
   a { text-decoration: none; border-bottom:1px dashed; }
 }
+
+.log-ellipsis{
+  display:none;
+  &:last-child{
+    display:list-item;
+  }
+}

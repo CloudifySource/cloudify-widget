@@ -181,6 +181,9 @@ $(function () {
           $dom.scrollTop($dom[0].scrollHeight);
         }
 
+
+
+
         var ellipsis = ".....";
         var ellipsis_iteration = 0;
         // array of output strings.
@@ -200,7 +203,7 @@ $(function () {
                 for (; index < logLength; index = index + 1) {
                     write_log(aOutput[index]);
                 }
-                write_log(ellipsis.substring( 0, (ellipsis_iteration++ % 5) + 1) );
+                write_log(ellipsis.substring( 0, (ellipsis_iteration++ % 5) + 1),"log-ellipsis" );
                 myLog = aOutput;
             }
         };

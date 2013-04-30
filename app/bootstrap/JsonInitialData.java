@@ -109,6 +109,10 @@ public class JsonInitialData implements InitialData {
         }
 
         newWidget = new Widget( widgetName, widgetJson.version, widgetJson.title, widgetJson.youtube, widgetJson.provider, widgetJson.recipe, widgetJson.console.title, widgetJson.console.link, widgetJson.path );
+
+        newWidget.setConsoleUrlService( widgetJson.console.service );
+        newWidget.setRecipeName( widgetJson.name );
+
         newWidget.setDescription( widgetJson.description );
         // handle requires login
         if ( widgetJson.login != null ) {
@@ -189,6 +193,7 @@ public class JsonInitialData implements InitialData {
     public static class JsonConsole{
         public String title;
         public String link;
+        public String service;
     }
 
     public static class JsonImage{
@@ -206,6 +211,7 @@ public class JsonInitialData implements InitialData {
         public String title;
         public String youtube;
         public String description;
+        public String name;
         public String provider;
         public String recipe;
         public JsonConsole console = new JsonConsole();

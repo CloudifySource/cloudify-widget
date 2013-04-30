@@ -7,6 +7,7 @@
                 "youtube": "http://www.youtube.com/embed/w5qr4sx5Vt0",
                 "provider": "http://www.mongodb.org",
                 "recipe": "https://dl.dropbox.com/u/5682483/mongodb.zip",
+                "name":"mongod",
                 "console": {
                     "title": "Mongo Web Console",
                     "link": "http://$HOST:11001"
@@ -25,9 +26,11 @@
                 "youtube": "http://www.youtube.com/embed/anvYieQij94",
                 "provider": "http://www.cloudifysource.org/",
                 "recipe": "https://s3.amazonaws.com/widget_rep/petclinic-simple.zip",
+                "name":"petclinic",
                 "console": {
                     "title": "PetClinic",
-                    "link": "http://$HOST:8080/petclinic"
+                    "link": "http://$HOST:8080/petclinic",
+                    "service":"tomcat"
                 },
                 "path": "",
                 "image": {
@@ -39,6 +42,7 @@
                 "version": "2.0.0",
                 "title": "Launch Couchbase",
                 "youtube": "http://www.youtube.com/embed/VkQ3ppHeGX4",
+                "name":"couchbase",
                 "provider": "http://www.couchbase.com",
                 "recipe": "http://s3.amazonaws.com/cloudify-widget/couchbase-2.0.zip",
                 "console": {
@@ -56,6 +60,7 @@
                 "version": "5.*",
                 "title": "MySQL",
                 "youtube": "http://www.youtube.com/embed/6Li_lCZXaKY",
+                "name":"mysql",
                 "provider": "http://www.mysql.com/",
                 "recipe": "https://s3.amazonaws.com/cloudify-widget/mysql.zip",
                 "console": {
@@ -71,6 +76,7 @@
 
             "JBoss": {
                 "version": "7.1.0.Final",
+                "name":"jboss",
                 "title": "JBoss 7.1.0.Final",
                 "youtube": "",
                 "provider": "http://www.jboss.org",
@@ -89,6 +95,7 @@
             "Memcached": {
                 "version": "1.4.4-3.el6",
                 "title": "Memcached",
+                "name":"memcached",
                 "youtube": "",
                 "provider": "http://memcached.org",
                 "recipe": "https://s3.amazonaws.com/cloudify-widget/memcached.zip",
@@ -106,12 +113,14 @@
             "Play Framework": {
                 "version": "2.0.3",
                 "title": "Play Framework",
+                "name":"computers",
                 "youtube": "",
                 "provider": "http://www.playframework.com",
                 "recipe": "https://s3.amazonaws.com/cloudify-widget/computers.zip",
                 "console": {
                     "title": "Play Console",
-                    "link": "http://$HOST:8080"
+                    "link": "http://$HOST:8080",
+                    "service":"apacheLB"
                 },
                 "path": "apps/computers",
                 "image": {
@@ -123,6 +132,7 @@
             "Vertx": {
                 "version": "1.2.3",
                 "title": "Vertx",
+                "name":"vertx",
                 "youtube": "",
                 "provider": "http://vertx.io",
                 "recipe": "https://s3.amazonaws.com/cloudify-widget/vertx.zip",
@@ -140,12 +150,14 @@
             "Drupal": {
                 "version": "7.*",
                 "title": "Drupal",
+                "name":"babies",
                 "youtube": "",
                 "provider": "http://drupal.org",
                 "recipe": "https://s3.amazonaws.com/cloudify-widget/drupal.zip",
                 "console": {
                     "title": "Drupal site",
-                    "link": "http://$HOST:8080"
+                    "link": "http://$HOST:8080",
+                    "service":"drupal"
                 },
                 "path": "apps/drupal-babies",
                 "image": {
@@ -156,6 +168,7 @@
             "Cassandra": {
                 "version": "0.8.7",
                 "title": "Cassandra",
+                "name":"cassandra",
                 "youtube": "",
                 "provider": "http://cassandra.apache.org/",
                 "recipe": "https://s3.amazonaws.com/cloudify-widget/cassandra.zip",
