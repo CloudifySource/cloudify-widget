@@ -9,6 +9,7 @@
 
     <bean id="deployManager" class="beans.DeployManagerImpl"/>
     <bean id="executorFactory" class="beans.ExecutorFactoryImpl"/>
+    <bean id="cloudifyRestClient" class="beans.cloudify.CloudifyRestClient"/>
 
     <bean id="processStreamHandler" scope="prototype" class="beans.ProcessStreamHandlerImpl"/>
 	<bean id="executorWriteEventListener" scope="prototype" class="beans.ProcExecutorWriteEventListener"/>

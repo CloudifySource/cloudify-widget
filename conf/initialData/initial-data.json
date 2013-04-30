@@ -13,7 +13,7 @@
                 },
                 "path": "",
                 "image": {
-                    "selected": "MongoDB.png"
+                    "selected": "MongoDBSelected.png"
                 },
                 "description": "This is description for Mongo player"
             },
@@ -31,7 +31,7 @@
                 },
                 "path": "",
                 "image": {
-                    "selected": "Petclinic.png"
+                    "selected": "PetclinicSelected.png"
                 },
                 "description":"this is a description for petclinic player"
             },
@@ -47,16 +47,136 @@
                 },
                 "path": "",
                 "image": {
-                    "selected": "Couchbase.png"
-                },
-                "login": {
-                    "require": true,
-                    "url": "",
-                    "token": ""
+                    "selected": "CouchbaseSelected.png"
                 },
                 "description" : "this is a description for couchbase player"
+            },
+
+            "MySQL": {
+                "version": "5.*",
+                "title": "MySQL",
+                "youtube": "http://www.youtube.com/embed/6Li_lCZXaKY",
+                "provider": "http://www.mysql.com/",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/mysql.zip",
+                "console": {
+                    "title": "MySQL",
+                    "link": "http://$HOST:3306"
+                },
+                "path": "",
+                "image": {
+                    "selected": "MySQLSelected.png"
+                },
+                "description": "A recipe for MySQL which is the world's most popular open source database"
+            },
+
+            "JBoss": {
+                "version": "7.1.0.Final",
+                "title": "JBoss 7.1.0.Final",
+                "youtube": "",
+                "provider": "http://www.jboss.org",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/jboss.zip",
+                "console": {
+                    "title": "JBoss Console",
+                    "link": "http://$HOST:8080"
+                },
+                "path": "",
+                "image": {
+                    "selected": "jbossSelected.png"
+                },
+                "description": "A recipe for JBoss 7.1.0.Final"
+            },
+
+            "Memcached": {
+                "version": "1.4.4-3.el6",
+                "title": "Memcached",
+                "youtube": "",
+                "provider": "http://memcached.org",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/memcached.zip",
+                "console": {
+                    "title": "Memcached",
+                    "link": "http://$HOST:11211"
+                },
+                "path": "",
+                "image": {
+                    "selected": "MemcachedSelected.png"
+                },
+                "description": "A recipe for MemcacheD which is an open source, distributed memory object caching system. "
+            },
+
+            "Play Framework": {
+                "version": "2.0.3",
+                "title": "Play Framework",
+                "youtube": "",
+                "provider": "http://www.playframework.com",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/computers.zip",
+                "console": {
+                    "title": "Play Console",
+                    "link": "http://$HOST:8080"
+                },
+                "path": "apps/computers",
+                "image": {
+                    "selected": "PlayComputersSelected.png"
+                },
+                "description": "A recipe for the Play framework which is an open source web application framework."
+            },
+
+            "Vertx": {
+                "version": "1.2.3",
+                "title": "Vertx",
+                "youtube": "",
+                "provider": "http://vertx.io",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/vertx.zip",
+                "console": {
+                    "title": "Vertx Console",
+                    "link": "http://$HOST:8080/"
+                },
+                "path": "",
+                "image": {
+                    "selected": "vertxSelected.png"
+                },
+                "description": "A recipe for Vert.x which is an event driven application framework"
+            },
+
+            "Drupal": {
+                "version": "7.*",
+                "title": "Drupal",
+                "youtube": "",
+                "provider": "http://drupal.org",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/drupal.zip",
+                "console": {
+                    "title": "Drupal site",
+                    "link": "http://$HOST:8080"
+                },
+                "path": "apps/drupal-babies",
+                "image": {
+                    "selected": "DrupalSelected.png"
+                },
+                "description": "A recipe for Drupal which is an open source content management platform"
+            },
+            "Cassandra": {
+                "version": "0.8.7",
+                "title": "Cassandra",
+                "youtube": "",
+                "provider": "http://cassandra.apache.org/",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/cassandra.zip",
+                "console": {
+                    "title": "Cassandra",
+                    "link": "http://$HOST:9160"
+                },
+                "path": "",
+                "image": {
+                    "selected": "CassandraSelected.png"
+                },
+                "description": "A recipe for Cassandra which is a scalable and ha database."
             }
+
+
+
         }
+
+
+
+
     }
 }
 }

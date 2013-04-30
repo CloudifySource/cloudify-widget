@@ -143,6 +143,8 @@ $( function ()
 
     // edit it to edit the new widget form tips
     var field_tips = {
+        recipeName:"The name in the recipe for uninstall.",
+        consoleUrlService:"The name of the service replacing $HOST placeholder",
         productName: "The name of your product",
         productVersion: "The version of your product",
         title: "The widget title as it will appear when displaying the widget within a web page",
@@ -275,6 +277,7 @@ $( function ()
         }
 
         if ( !error ) {
+            debugger;
             $.post( "/widget/new?authToken=" + encodeURIComponent(authToken) + "&" + $( e.target ).serialize(), {}, function ( data )
             {
                 $( e.target ).reset();

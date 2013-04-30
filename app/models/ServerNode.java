@@ -20,13 +20,21 @@ import com.avaje.ebean.Junction;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.jclouds.openstack.nova.v2_0.domain.Address;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.db.ebean.Model;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Version;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -71,10 +79,14 @@ extends Model
 	private String privateKey;
 
 	@XStreamAsAttribute
-	private String userName;
+    @Column( name = "api_key") //  can't call a column "key" since it is a keyword
+	private String key;
+
+    private String project;
 
 	@XStreamAsAttribute
-	private String apiKey;
+    @Column( name="api_secret_key") // keep convention from key
+	private String secretKey;
 
 	@XStreamAsAttribute
 	private boolean stopped = false;
@@ -230,7 +242,7 @@ extends Model
                 ", privateIP='" + privateIP + '\'' +
                 ", busy=" + busy +
                 ", remote=" + remote +
-                ", userName='" + userName + '\'' +
+                ", project='" + project + '\'' +
                 '}';
     }
 
@@ -242,20 +254,32 @@ extends Model
 		this.privateKey = privateKey;
 	}
 
-	public String getApiKey() {
-		return apiKey;
+
+
+	public String getKey() {
+		return key;
 	}
 
-	public void setApiKey(final String apiKey) {
-		this.apiKey = apiKey;
+    public String getSecretKey()
+    {
+        return secretKey;
+    }
+
+    public void setSecretKey( String secretKey )
+    {
+        this.secretKey = secretKey;
+    }
+
+    public void setKey(final String key) {
+		this.key = key;
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getProject() {
+		return project;
 	}
 
-	public void setUserName(final String userName) {
-		this.userName = userName;
+	public void setProject(final String project) {
+		this.project = project;
 	}
 
 	public boolean isStopped() {
@@ -278,12 +302,25 @@ extends Model
         this.widgetInstance = widgetInstance;
     }
 
+    @JsonIgnore
+    public WidgetInstance getWidgetInstance()
+    {
+        return widgetInstance;
+    }
     public ServerNodeEvent errorEvent(String message) {
-        logger.info("adding error event [{}]",message);
-        return new ServerNodeEvent()
-                .setServerNode(this)
-                .setMsg(message)
-                .setEventType(ServerNodeEvent.Type.ERROR);
+        return createEvent( message, ServerNodeEvent.Type.ERROR );
+    }
+
+    public ServerNodeEvent createEvent( String message, ServerNodeEvent.Type type ){
+        logger.info("adding [{}] event [{}]", type, message);
+                return new ServerNodeEvent()
+                        .setServerNode( this )
+                        .setMsg( message )
+                        .setEventType( type );
+    }
+
+    public ServerNodeEvent infoEvent( String s ) {
+        return createEvent( s, ServerNodeEvent.Type.INFO );
     }
 
 

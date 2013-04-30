@@ -17,30 +17,28 @@
 package mocks;
 
 import models.ServerNode;
+import models.Widget;
+import models.WidgetInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import server.DeployManager;
-import server.ProcExecutor;
-
-import java.io.File;
 
 public class DeployManagerMock implements DeployManager 
 {
     private static Logger logger = LoggerFactory.getLogger(DeployManagerMock.class);
 
 
-    public ProcExecutor fork( ServerNode server, File recipe )
+    @Override
+    public WidgetInstance fork( ServerNode server, Widget widget )
     {
+        logger.info( "forking [{}] : [{}]" , server, widget );
         return null;
     }
 
-    public ProcExecutor getExecutor( String id )
+    @Override
+    public WidgetInstance uninstall( ServerNode server )
     {
+        logger.info( "uninstalling [{}]", server );
         return null;
     }
-
-    public void destroyExecutor(String id) {
-        logger.info("destroying executor : {}", id);
-    }
-
 }

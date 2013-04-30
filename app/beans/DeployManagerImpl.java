@@ -20,12 +20,17 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
+import beans.cloudify.CloudifyRestClient;
 import models.ServerNode;
 
+import models.ServerNodeEvent;
+import models.Widget;
+import models.WidgetInstance;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +40,7 @@ import server.ProcExecutor;
 import server.exceptions.ServerException;
 import beans.api.ExecutorFactory;
 import beans.config.Conf;
+import utils.Utils;
 
 /**
  * This class deploys a recipe file vi cloudify non-interactive CLI. 
@@ -53,44 +59,148 @@ public class DeployManagerImpl implements DeployManager
     @Inject 
     private ExecutorFactory executorFactory;
 
+    @Inject
+    private CloudifyRestClient cloudifyRestClient;
 
-	public ProcExecutor fork(ServerNode server, File recipe)
+
+    @Override
+    public WidgetInstance uninstall( ServerNode serverNode ){
+        WidgetInstance widgetInstance = serverNode.getWidgetInstance();
+        String installName = widgetInstance.getInstallName();
+        // TODO : maybe we should verify it is installed using the rest client?
+        File script = widgetInstance.getRecipeType() == Recipe.Type.APPLICATION ? conf.cloudify.uninstallApplicationScript : conf.cloudify.uninstallServiceScript;
+        CommandLine cmdLine = new CommandLine( script );
+        cmdLine.addArgument( serverNode.getPublicIP() );
+        cmdLine.addArgument( installName );
+        logger.info( "executing command [{}]", cmdLine );
+        execute(  cmdLine, serverNode );
+        return widgetInstance;
+    }
+
+
+    /**
+     *
+     *
+     * Decide if this is an application or a service
+     *
+     * if Application
+     *          Use a rest API call to list all the
+     *          http://IP:8100/service/applications
+     *
+     *if service
+     *          Use a rest API to list all services on default
+     *          http://IP:8100/service/applications/default/services
+     *
+     * view the results and decide if it is installed
+     *
+     * @param server
+     * @param widget
+     * @return
+     */
+    private boolean alreadyInstalled( ServerNode server, Widget widget, Recipe.Type recipeType ){
+
+        logger.info( "checking if [{}] named [{}] is installed on [{}]", new Object[]{recipeType, widget.toInstallName(), server.getPublicIP() });
+        try{
+        switch ( recipeType ) {
+
+            case APPLICATION:
+            {
+                return cloudifyRestClient.listApplications( server.getPublicIP() ).response.containsKey( widget.toInstallName() );
+            }
+            case SERVICE:
+            {
+                // check if application "default" is installed at all, and if so - check for services on it.
+                if ( cloudifyRestClient.listApplications( server.getPublicIP() ).response.containsKey( "default" )){
+                    return cloudifyRestClient.listServices( server.getPublicIP(), "default" ).response.contains( widget.toInstallName() );
+                }else{
+                    logger.info( "figured that application 'default' is not installed, and hence the service is not installed" );
+                    return false;
+                }
+            }
+        }
+        }catch(Exception e){
+            logger.error( "unable to decide if [{}] named [{}] is already installed on [{}]", new Object[]{recipeType, widget.toInstallName(), server} );
+        }
+
+        return false; // todo
+    }
+
+
+    // todo - replace widget with widgetInstance - since we have server 1to1 widgetInstance, we can simply transfer server here.
+    // todo - Widget should only be a template. We are installing a single instance.
+	public WidgetInstance fork(ServerNode server, Widget widget)
 	{
-		Recipe.Type recipeType = new Recipe( recipe ).getRecipeType();
-		logger.info( "Deploying: [ServerIP={}] [recipe={}] [type={}]", new Object[]{server.getPublicIP(), recipe, recipeType.name()} );
-		String recipePath = FilenameUtils.separatorsToSystem(recipe.getPath());
-		
-		CommandLine cmdLine = new CommandLine( conf.cloudify.deployScript );
-		cmdLine.addArgument(server.getPublicIP());
-		cmdLine.addArgument(recipePath);
-		cmdLine.addArgument(recipeType.commandParam );
-		
-		DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+        File unzippedDir = Utils.downloadAndUnzip( widget.getRecipeURL(), widget.getApiKey() );
+        File recipeDir = unzippedDir;
+        if ( widget.getRecipeRootPath() != null ) {
+            recipeDir = new File( unzippedDir, widget.getRecipeRootPath() );
+        }
+        logger.info( "Deploying an instance for recipe at : [{}] ", recipeDir );
 
-		ProcExecutor executor = executorFactory.getDeployExecutor( server );
+        Recipe.Type recipeType = new Recipe( recipeDir ).getRecipeType();
 
-		try
-		{
-			executor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler);
+        if ( alreadyInstalled( server, widget, recipeType ) ){
+            logger.info( "[{}] [{}] is already installed", recipeType, widget.toInstallName()  );
+            WidgetInstance widgetInstance = widget.addWidgetInstance( server, recipeDir );
+            try {
+                if ( recipeType == Recipe.Type.SERVICE ) {
+                    String serviceIp = cloudifyRestClient.getPublicIp( server.getPublicIP(), "default", widget.toInstallName() ).cloudPublicIp;
+                    logger.info("service IP is [{}]", serviceIp );
+                    widgetInstance.setServicePublicIp( serviceIp );
+                    widgetInstance.save(  );
+                } else if ( !StringUtils.isEmpty( widget.getConsoleUrlService() ) ) { // this is an application and we need to get ip for specific service
+                    String serviceIp = cloudifyRestClient.getPublicIp( server.getPublicIP(), widget.toInstallName(), widget.getConsoleUrlService() ).cloudPublicIp;
+                    widgetInstance.setServicePublicIp( serviceIp );
+                    widgetInstance.save(  );
+                }
+            } catch ( Exception e ) {
+                logger.error( "failed resolving public IP for service", e );
+            }
+            server.createEvent(null, ServerNodeEvent.Type.DONE ).save(  );
 
-			logger.info("The process instanceId: {}", executor.getId());
-			return executor;
-		} catch (ExecuteException e)
-		{
-			logger.error("Failed to execute process. Exit value: " + e.getExitValue(), e);
+            return widgetInstance;
+        }else{
+            logger.info( "Deploying: [ServerIP={}] [recipe={}] [type={}]", new Object[]{server.getPublicIP(), recipeDir, recipeType.name()} );
+            String recipePath = FilenameUtils.separatorsToSystem( recipeDir.getPath() );
 
-			throw new ServerException("Failed to execute process. Exit value: " + e.getExitValue(), e);
-		} catch (IOException e)
-		{
-			logger.error("Failed to execute process", e);
+            CommandLine cmdLine = new CommandLine( conf.cloudify.deployScript );
+            cmdLine.addArgument( server.getPublicIP() );
+            cmdLine.addArgument( recipePath.replaceAll( "\\\\", "/" ) ); // support for windows.
+            cmdLine.addArgument( recipeType.commandParam );
+            cmdLine.addArgument( widget.toInstallName() );
 
-			throw new ServerException("Failed to execute process.", e);
-		}
-	}
+            execute( cmdLine, server );
+            return widget.addWidgetInstance( server, recipeDir );
+        }
+    }
+
+    private void execute( CommandLine cmdLine, ServerNode server )
+    {
+        try {
+            DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+            ProcExecutor executor = executorFactory.getDeployExecutor( server );
+            logger.info( "executing command [{}]", cmdLine );
+            executor.execute( cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler );
+            logger.info( "The process instanceId: {}", executor.getId() );
+        } catch ( ExecuteException e ) {
+            logger.error( "Failed to execute process. Exit value: " + e.getExitValue(), e );
+
+            throw new ServerException( "Failed to execute process. Exit value: " + e.getExitValue(), e );
+        } catch ( IOException e ) {
+            logger.error( "Failed to execute process", e );
+
+            throw new ServerException( "Failed to execute process.", e );
+        }
+    }
 
 
     public void setConf( Conf conf )
     {
         this.conf = conf;
+    }
+
+    public void setCloudifyRestClient( CloudifyRestClient cloudifyRestClient )
+    {
+        this.cloudifyRestClient = cloudifyRestClient;
     }
 }

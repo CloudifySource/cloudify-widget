@@ -46,7 +46,7 @@ public class ServerBootstrapperMock implements ServerBootstrapper
     }
     @Override
     public ServerNode bootstrapCloud( ServerNode serverNode ){
-    	logger.info("bootstrapping cloud with [user,pass] = [{},{}]", serverNode.getUserName(), serverNode.getApiKey() );
+    	logger.info("bootstrapping cloud with [user,pass] = [{},{}]", serverNode.getProject(), serverNode.getKey() );
     	return null;
     	
     }

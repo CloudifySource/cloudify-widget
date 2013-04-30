@@ -56,13 +56,12 @@ public class CloudifyUtils {
 	 * Creates a cloud folder containing all necessary credentials 
 	 * for bootstrapping to the HP cloud.
 	 * 
-	 * @param cloudConf
-	 * 			The configuration used to start the cloud.
 	 * @return
 	 * 			A path to the newly created cloud folder.
 	 * @throws IOException
+     *
 	 */
-	public static File createCloudFolder(String userName, String apiKey, ComputeServiceContext context) throws IOException {
+	public static File createCloudFolder(String project, String key, String secretKey, ComputeServiceContext context) throws IOException {
 
 		CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
 		String cloudifyBuildFolder = ApplicationContext.get().conf().server.environment.cloudifyHome;
@@ -77,11 +76,10 @@ public class CloudifyUtils {
 		File newPemFile = createPemFile( context );
 		FileUtils.copyFile(newPemFile, new File(pemFolder, newPemFile.getName() +".pem"), true);
 
-		int colonIndex = userName.indexOf(":");
 		List<String> cloudProperties = new ArrayList<String>();
-		cloudProperties.add("tenant=" + '"' + userName.substring(0, colonIndex) + '"');
-		cloudProperties.add("user=" + '"' + userName.substring(colonIndex + 1, userName.length()) + '"');
-		cloudProperties.add("apiKey=" + '"' + apiKey + '"');
+		cloudProperties.add("tenant=" + '"' + project + '"');
+		cloudProperties.add("user=" + '"' + key  + '"');
+		cloudProperties.add("apiKey=" + '"' + secretKey + '"');
 		cloudProperties.add("keyFile=" + '"' + newPemFile.getName() +".pem" + '"');
 		cloudProperties.add("keyPair=" + '"' + newPemFile.getName() + '"');
 		cloudProperties.add("securityGroup=" + '"' + cloudConf.securityGroup + '"');
@@ -177,21 +175,22 @@ public class CloudifyUtils {
 	
 	/**
 	 * Create an HP cloud context.
-	 * @param userName HP cloud username.
-	 * @param apiKey HP cloud API key.
+	 * @param project HP cloud username.
+	 * @param key HP cloud API key.
 	 * @return the HP lClouds compute context.
+     *
+     * TODO : unify this with {@link beans.ServerBootstrapperImpl.NovaContext}
+     *
 	 */
-	public static ComputeServiceContext createJcloudsContext(String userName,
-			String apiKey) {
+	public static ComputeServiceContext createJcloudsContext(String project, String key, String secretKey ) {
 		CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
 		ComputeServiceContext context;
 		Properties overrides = new Properties();
 		overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
 		context = ContextBuilder.newBuilder( cloudConf.cloudProvider )
-				.credentials( userName, apiKey )
+				.credentials( project + ":" + key, secretKey )
 				.overrides(overrides)
 				.buildView(ComputeServiceContext.class);
-
 		return context;
 	}
 

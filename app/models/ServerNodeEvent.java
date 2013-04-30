@@ -16,7 +16,7 @@ public class ServerNodeEvent extends Model {
     private Long id;
 
     public static enum Type{
-        DONE, ERROR
+        DONE, ERROR, INFO
     }
 
     @Enumerated(EnumType.STRING)

@@ -367,7 +367,7 @@ public class WidgetAdmin extends Controller
 
 	public static Result createNewWidget( String widgetId, String authToken,  String productName, String productVersion,
 										  String title, String youtubeVideoUrl, String providerURL,
-										  String recipeURL, String consolename, String consoleurl, String rootpath )
+										  String recipeURL, String consolename, String consoleurl, String rootpath, String recipeName, String consoleUrlService )
 	{
         User user = User.validateAuthToken(authToken);
         Widget widget = null;
@@ -389,6 +389,8 @@ public class WidgetAdmin extends Controller
             widget.setConsoleName( consolename );
             widget.setConsoleURL( consoleurl );
             widget.setRecipeRootPath( rootpath );
+            widget.setRecipeName( recipeName );
+            widget.setConsoleUrlService( consoleUrlService );
             widget.save();
         }
 

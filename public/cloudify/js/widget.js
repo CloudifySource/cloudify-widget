@@ -10,7 +10,7 @@ $(function () {
             $project.val(project);
             $key.val(key);
         }else{
-            return { project : $project.val(), key : $key.val(), secretKey : $secretKey.val()}
+            return { project : $project.val(), key : $key.val(), secretKey : $secretKey.val() }
         }
     }
 
@@ -171,8 +171,6 @@ $(function () {
     var WidgetLog = function(){
         var myLog = [];
         var $dom = $("#log");
-        var ellipsis = ".....";
-        var ellipsis_iteration = 0;
 
         function clear(){
             $dom.empty();
@@ -183,41 +181,16 @@ $(function () {
           $dom.scrollTop($dom[0].scrollHeight);
         }
 
+        var ellipsis = ".....";
+        var ellipsis_iteration = 0;
         // array of output strings.
         // this function will append new lines of log if new log is longer than current log.
         // otherwise it will clear the current log and rewrite it.
         this.appendOrOverride = function (aOutput) {
-            var index = myLog.length;
-            var logLength = aOutput.length;
-
-            console.log('IN');
-            console.log('\taOutput: ' + aOutput);
-            console.log('\tmyLog: ' + myLog);
-            console.log('\tindex: ' + index);
-            console.log('\tlogLength: ' + logLength);
-
             if (myLog.length!= aOutput.length || myLog[0] != aOutput[0]) { // print only the difference
 
-                if (logLength <= index) {
-                    clear();
-                    index = 0;
-                }
-
-                for (; index < logLength; index = index + 1) {
-                    write_log(aOutput[index]);
-                }
-                myLog = aOutput;
-            }
-            // data.status.output.push(ellipsis.substring( 0, (ellipsis_iteration++ % 5) + 1));
-            // data.status.output.splice(data.status.output.length, +(data.status.output[data.status.output.length - 1].indexOf('.') == 0), ellipsis.substring( 0, (ellipsis_iteration++ % 5) + 1));
-            // log is not changed
-            else {
-                console.log('myLog and aOutput are identical');
-                if (aOutput[aOutput.length - 1].indexOf('.') == 0) {
-                    aOutput.splice(aOutput.length - 1, 1, ellipsis.substring( 0, (ellipsis_iteration++ % 5) + 1));
-                } else {
-                    aOutput.push(ellipsis.substring( 0, (ellipsis_iteration++ % 5) + 1));
-                }
+                var index = myLog.length;
+                var logLength = aOutput.length;
 
                 if (logLength <= index) {
                     clear();
@@ -227,10 +200,9 @@ $(function () {
                 for (; index < logLength; index = index + 1) {
                     write_log(aOutput[index]);
                 }
+                write_log(ellipsis.substring( 0, (ellipsis_iteration++ % 5) + 1) );
                 myLog = aOutput;
-
             }
-            console.log('OUT > aOutput: ' + aOutput + ', myLog: ' + myLog);
         };
 
         this.clear= function(){clear()};
@@ -255,6 +227,8 @@ $(function () {
         return $("<li></li>", {"id":"custom_link", "class":"mock"}).append($("<span></span>", {"text":link_info.title, "class":"mock_text"})).append($("<a></a>", {"href": link_info.url, "target": "_blank", "text": link_info.title}));
     }
 
+
+
     function handleUpdateStatusSuccess( data )
     {
         $.postMessage( JSON.stringify({name:"widgetstatus", comment:"status_was_updated", status:data.status}), origin_page_url , parent );
@@ -265,6 +239,10 @@ $(function () {
 
         if ( data.status.output ){
             widgetLog.appendOrOverride(data.status.output);
+        }
+
+        if ( data.status.remote ){
+            $("#hp_console_link" ).show();
         }
 
         if ( data.status.publicIp ) {
@@ -368,6 +346,8 @@ $(function () {
         widgetState.showStopButton();
         if ( !widgetState.isValid() ) {
             var advancedData = advanced();
+
+
 			var playData = { apiKey : params["apiKey"], "project" : advancedData.project, "key" : advancedData.key, "secretKey":advancedData.secretKey };
             $.ajax(
                 { type:"POST",
@@ -504,6 +484,13 @@ $(function () {
     window.open($(e.target).parents("a").attr("href"), '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600,left='+ leftvar +',top=' + topvar);
 
   });
+
+    $("form.advanced_form" ).submit(function(e){
+        e.stopPropagation();
+       console.log("submitting form");
+        widgetState.onPlay();
+        return false;
+    });
 
     // code for walkthrough on the widget end.
 //    var checkWTInterval = null;

@@ -80,6 +80,7 @@ public class ServerConfig {
         @Environment( key = "CLOUDIFY_HOME" )
         public String cloudifyHome = Utils.getFileByRelativePath("cloudify-folder").getAbsolutePath();
 
+        public boolean useSystemEnvAsDefault = false; // this will also pass JAVA_OPTS, be careful with this! for windows development mainly.
 
         private Map<String,String> environment = null ;
 
@@ -88,6 +89,11 @@ public class ServerConfig {
             try {
                 if (environment == null) {
                     environment = new HashMap<String, String>();
+
+                    if ( useSystemEnvAsDefault ){
+                        environment.putAll( System.getenv() );
+                    }
+
                     Set<Field> allFields = ReflectionUtils.getAllFields(this.getClass(), new Predicate<Field>() {
                         @Override
                         public boolean apply(Field field) {
@@ -124,6 +130,13 @@ public class ServerConfig {
         public String cloudProvider="hpcloud-compute";
         public File script;
         public String tags = null;
+        public ApiCredentials api = new ApiCredentials();
+    }
+
+    public static class ApiCredentials{
+        public String project;
+        public String key;
+        public String secretKey;
     }
     
     // cloud bootstrap configuration.
@@ -140,6 +153,7 @@ public class ServerConfig {
         public String securityGroup = "cloudifySecurityGroup";
         public String cloudProvider = "hpcloud-compute";
         public String cloudifyEscDirRelativePath = "tools/cli/plugins/esc/";
+        public String existingManagementMachinePrefix = "cloudify-manager";
     }
 
     public static class SshConfiguration{

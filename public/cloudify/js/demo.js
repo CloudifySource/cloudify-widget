@@ -15,6 +15,10 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
         $cookieStore.put("widgetId",widget.id);
     };
 
+    $scope.demoSort = function ( widget ){
+        return widget.productName == "Couchbase" ? 0 : 1;
+    };
+
 
     /////////////// Walkthrough!
     var walkthroughChecker = null;

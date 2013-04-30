@@ -15,9 +15,7 @@
  *******************************************************************************/
 package beans;
 
-import static server.Config.WIDGET_STOP_TIMEOUT;
 
-import java.io.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.cache.Cache;
 import play.i18n.Messages;
-import play.mvc.Controller;
 
 import models.ServerNode;
 import models.Widget;
@@ -89,20 +86,24 @@ public class WidgetServerImpl implements WidgetServer
         Utils.addAllTrimmed( filterOutputStrings,  StringUtils.split( conf.cloudify.removeOutputString, "|" ));
     }
 
-	
-	public WidgetInstance deploy( Widget widget, ServerNode server, String remoteAddress  )
+    @Override
+    public void uninstall( ServerNode server )
+    {
+        logger.info( "uninstalling [{}], [{}]", server, server.getWidgetInstance() );
+        if ( server.isRemote() ){
+            deployManager.uninstall( server );
+        }else{
+            undeploy( server.getNodeId() );
+        }
+
+    }
+
+    public WidgetInstance deploy( Widget widget, ServerNode server, String remoteAddress  )
 	{
         // keep the user for 30 seconds by IP, to avoid immediate widget start after stop
-        Cache.set( remoteAddress, new Long(System.currentTimeMillis() + WIDGET_STOP_TIMEOUT*1000), WIDGET_STOP_TIMEOUT );
-		File unzippedDir = Utils.downloadAndUnzip( widget.getRecipeURL(), widget.getApiKey() );
-        File recipeDir = unzippedDir;
-        if ( widget.getRecipeRootPath() != null  ){
-            recipeDir = new File( unzippedDir, widget.getRecipeRootPath() );
-        }
-        logger.info("Deploying an instance for recipe at : [{}] ", recipeDir );
+        Cache.set( remoteAddress, System.currentTimeMillis() + conf.settings.stopTimeout, ( int ) (conf.settings.stopTimeout / 1000) );
 		widget.countLaunch();
-		deployManager.fork(server, recipeDir);
-		return widget.addWidgetInstance( server, recipeDir );
+		return deployManager.fork( server, widget );
 	}
 	
 	public void undeploy( String instanceId )
@@ -130,12 +131,31 @@ public class WidgetServerImpl implements WidgetServer
 
         result.setRemote( server.isRemote() ).setHasPemFile( !StringUtils.isEmpty(server.getPrivateKey()) ); // let UI know this is a remote bootstrap.
 
+        boolean doneFromEvent = false;
+
         if ( !CollectionUtils.isEmpty(server.events) ){
             for (ServerNodeEvent event : server.events) {
-                if ( event.getEventType() == ServerNodeEvent.Type.ERROR){
-                    result.setState(Status.State.STOPPED);
-                    result.setMessage(event.getMsg());
-                    return result;
+                switch ( event.getEventType() ) {
+
+                    case DONE:
+                        logger.info( "detected that widget instance installation done by event" );
+                        doneFromEvent = true;
+                        break;
+                    case ERROR:
+                    {
+                        result.setState( Status.State.STOPPED );
+                        result.setMessage( event.getMsg() );
+                        return result;
+                    }
+                    case INFO:
+                    {
+                        output.add( event.getMsg() );
+                    }
+                    break;
+                    default:
+                    {
+                        logger.error( "unknown event type while formatting : [{}]", event.getEventType() );
+                    }
                 }
             }
         }
@@ -146,7 +166,7 @@ public class WidgetServerImpl implements WidgetServer
         WidgetInstance widgetInstance = WidgetInstance.findByServerNode(server);
         logger.debug("checking if installation finished for {} on the following output {}" , widgetInstance, output );
         if (widgetInstance != null ){
-            if (isFinished(widgetInstance.getRecipeType(), (String)CollectionUtils.last(output))){
+            if (doneFromEvent || isFinished(widgetInstance.getRecipeType(), (String)CollectionUtils.last(output))){
                 logger.debug("detected finished installation");
                 result.setInstanceIsAvailable(Boolean.TRUE);
                 result.setConsoleLink(widgetInstance.getLink());

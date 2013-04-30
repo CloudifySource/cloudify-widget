@@ -82,6 +82,7 @@ public class Application extends Controller
 	{
 		try
 		{
+
 			logger.info("starting widget with [apiKey, key, secretKey] = [{},{},{}]", new Object[]{apiKey, key, secretKey} );
  			Widget widget = Widget.getWidget( apiKey );
             ServerNode serverNode = null;
@@ -109,9 +110,11 @@ public class Application extends Controller
             // credentials validation is made when we attempt to create a PEM file. if credentials are wrong, it will fail.
             if ( !StringUtils.isEmpty( project ) && !StringUtils.isEmpty( key ) && !StringUtils.isEmpty( secretKey ) ){
                 serverNode = new ServerNode();
-                serverNode.setUserName( project + ":" +  key );
+
+                serverNode.setProject( project);
+                serverNode.setKey( key );
+                serverNode.setSecretKey( secretKey );
                 serverNode.setRemote(true);
-                serverNode.setApiKey( secretKey );
                 serverNode.save();
             }else{
                 serverNode = ApplicationContext.get().getServerPool().get(widget.getLifeExpectancy());
@@ -144,6 +147,7 @@ public class Application extends Controller
                                     return;
                                 }
                             }
+
                             logger.info("installing widget on cloud");
                             ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress );
                         }
@@ -180,28 +184,36 @@ public class Application extends Controller
     }
 
 
-	public static Result stop( String apiKey, String instanceId )
-	{
-		ServerNode serverNode = ServerNode.find.byId(Long.parseLong(instanceId));
-        if ( serverNode != null ){
-            Utils.deleteCachedOutput(serverNode);
-        }
-		if (serverNode.isRemote()) {
-			return ok(); // lets assume
-		}else {
-			Widget widget = Widget.getWidget( apiKey );
-			if ( widget != null ){
-				ApplicationContext.get().getEventMonitor().eventFired( new Events.StopWidget( request().remoteAddress(), widget ) );
-			}
-			if ( instanceId != null ){
-				ApplicationContext.get().getWidgetServer().undeploy(instanceId);
-			}
-
-			return ok(OK_STATUS).as("application/json");
-		}
-	}
+	
 
 
+    public static Result stop( final String apiKey, final String instanceId )
+    {
+        final String remoteAddress = request().remoteAddress();
+        Akka.system().scheduler().scheduleOnce( Duration.create( 0, TimeUnit.SECONDS ),
+                new Runnable() {
+                    @Override
+                    public void run()
+                    {
+                        logger.info( "uninstalling [{}], [{}]", apiKey, instanceId );
+
+                        Widget widget = Widget.getWidget( apiKey );
+
+                        if ( widget != null ) {
+                            ApplicationContext.get().getEventMonitor().eventFired( new Events.StopWidget( remoteAddress , widget ) );
+                        }
+
+                        if ( instanceId != null ) {
+                            ServerNode serverNode = ServerNode.find.byId( Long.parseLong( instanceId ) );
+                            ApplicationContext.get().getWidgetServer().uninstall( serverNode );
+                            Utils.deleteCachedOutput( serverNode );
+                        }
+                    }
+                } );
+        return ok( OK_STATUS ).as( "application/json" );
+    }
+
+	
 	public static Result getWidgetStatus( String apiKey, String instanceId )
 	{
 		try
