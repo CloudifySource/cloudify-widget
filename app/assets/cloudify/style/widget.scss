@@ -302,9 +302,9 @@ body {
   a {
     color: #0473a5;
     text-decoration: none;
-    border-bottom:1px dashed;
+    border-bottom: 1px dashed;
     &:hover {
-      border-style: solid;
+      border-bottom-style: solid;
     }
   }
 }
