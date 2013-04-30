@@ -149,7 +149,7 @@
                 },
                 "path": "apps/drupal-babies",
                 "image": {
-                    "selected": "drupalSelected.png"
+                    "selected": "DrupalSelected.png"
                 },
                 "description": "A recipe for Drupal which is an open source content management platform"
             },
