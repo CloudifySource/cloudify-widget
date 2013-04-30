@@ -23,7 +23,7 @@ import models.WidgetInstance;
 public interface WidgetServer 
 {
 
-    public void undeploy(String instanceId);
+    public void undeploy( ServerNode serverNode );
 
     public Widget.Status getWidgetStatus( ServerNode serverNode );
     

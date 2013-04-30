@@ -26,6 +26,7 @@ import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.db.ebean.Model;
+import utils.CollectionUtils;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -216,15 +217,7 @@ extends Model
 
 	static public ServerNode getServerNode( String serverId )
 	{
-		return ServerNode.find.where().eq("serverId", serverId).findUnique();
-	}
-
-	static public void deleteServer( String serverId )
-	{
-		ServerNode server = getServerNode( serverId );
-		if ( server != null ){
-			server.delete();
-        }
+		return CollectionUtils.first(ServerNode.find.where().eq("serverId", serverId).findList());
 	}
 
 	public String toDebugString() {

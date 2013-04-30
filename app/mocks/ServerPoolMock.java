@@ -44,8 +44,11 @@ public class ServerPoolMock implements ServerPool
         return null;
     }
 
-    public void destroy( String serverId )
+    @Override
+    public void destroy( ServerNode server )
     {
-        logger.info( "destroying : {} " , serverId );
+        logger.info( "destroying : {} " , server );
+
     }
+
 }

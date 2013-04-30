@@ -39,7 +39,7 @@ public interface ServerBootstrapper
 {
     public List<ServerNode> createServers(int numOfServers);
 
-    public void destroyServer(String serverId);
+    public void destroyServer(ServerNode serverNode);
 
     /**
      *

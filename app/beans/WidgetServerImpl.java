@@ -93,7 +93,7 @@ public class WidgetServerImpl implements WidgetServer
         if ( server.isRemote() ){
             deployManager.uninstall( server );
         }else{
-            undeploy( server.getNodeId() );
+            undeploy( server );
         }
 
     }
@@ -106,9 +106,9 @@ public class WidgetServerImpl implements WidgetServer
 		return deployManager.fork( server, widget );
 	}
 	
-	public void undeploy( String instanceId )
+	public void undeploy( ServerNode serverNode )
 	{
-		serverPool.destroy(instanceId);
+		serverPool.destroy( serverNode );
 	}
 
     private static boolean isFinished( Recipe.Type recipeType, String line ){
