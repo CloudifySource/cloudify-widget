@@ -187,6 +187,9 @@ public class Utils
                     continue;
                 }
             }
+            if (s.toLowerCase().startsWith("successfully created cloudify manager on provider")) {
+                s = "Cloudify initiated successfully.";
+            }
             // trim empty lines or with a single dot
 			if ( !s.equals("") && !s.equals(".") ){
 				newList.add( s );
