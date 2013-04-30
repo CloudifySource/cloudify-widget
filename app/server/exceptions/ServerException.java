@@ -43,4 +43,17 @@ public class ServerException extends RuntimeException implements ExceptionRespon
     {
         return response;
     }
+
+    public static class ManagementUnreachable extends ServerException{
+
+        public ManagementUnreachable( String msg, Throwable exception )
+        {
+            super( msg, exception );
+        }
+
+        public ManagementUnreachable( String msg )
+        {
+            super( msg );
+        }
+    }
 }

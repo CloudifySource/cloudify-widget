@@ -479,6 +479,11 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             }
 
 
+            if ( serverNodeIp  == null ){
+                serverNode.errorEvent( "Management machine exists but unreachable" );
+                logger.info( "unable to reach management machine. stopping progress." );
+                return null;
+            }
             logger.info( "using first machine  [{}] with ip [{}]", managementMachine, serverNodeIp );
             serverNode.infoEvent("Found management machine on :" + serverNodeIp ).save(  );
             serverNode.setPublicIP( serverNodeIp );

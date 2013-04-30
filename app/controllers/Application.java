@@ -141,7 +141,10 @@ public class Application extends Controller
                             if (finalServerNode.isRemote()) {
                                 logger.info("bootstrapping remote cloud");
                                 try{
-                                    ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode);
+                                    if ( ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode) == null ){
+                                        logger.info( "bootstrap cloud returned NULL. stopping progress." );
+                                        return;
+                                    };
                                 }catch(Exception e){
                                     logger.error("unable to bootstrap machine",e);
                                     return;
