@@ -63,6 +63,18 @@ body {
   a{ color:#F09927;}
 }
 
+/* selected text - must use separate rule for gecko as the whole rule will be dropped on non-supporting engines */
+#log li::-moz-selection,
+#log li a::-moz-selection {
+  background-color: #F09927;
+  color: #FFF;
+}
+#log li::selection,
+#log li a::selection {
+  background-color: #F09927;
+  color: #FFF;
+}
+
 #title {
   color: #F09927;
   font-size: 28px;
