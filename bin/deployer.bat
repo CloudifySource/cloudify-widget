@@ -6,4 +6,5 @@
  
 cd /d %CLOUDIFY_HOME%
 
-tools\cli\cloudify.bat "connect http://%SERVER_IP%:8100;%RECIPE_TYPE% -name %INSTALL_NAME%  %RECIPE_URL% "
+tools\cli\cloudify.bat "connect http://%SERVER_IP%:8100;%RECIPE_TYPE%  %RECIPE_URL% "
+rem tools\cli\cloudify.bat "connect http://%SERVER_IP%:8100;%RECIPE_TYPE% -name %INSTALL_NAME%  %RECIPE_URL% "

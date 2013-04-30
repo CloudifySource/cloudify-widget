@@ -1,0 +1,1 @@
+alter table widget add column recipe_name varchar(255);
