@@ -480,7 +480,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
 
             if ( serverNodeIp  == null ){
-                serverNode.errorEvent( "Management machine exists but unreachable" );
+                serverNode.errorEvent( "Management machine exists but unreachable" ).save(  );
                 logger.info( "unable to reach management machine. stopping progress." );
                 return null;
             }
