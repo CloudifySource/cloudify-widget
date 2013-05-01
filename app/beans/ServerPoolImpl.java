@@ -38,7 +38,7 @@ import javax.persistence.OptimisticLockException;
  * A server pool initialize with configured minimum/maximum number of servers. 
  * The get() method returns a bootstrap server instance.
  * On init() a server-pool deletes an expires or orphans servers. 
- * It also provides ability to startup with a cold init which deletes a running server. See {@link server.Config} class.
+ * It also provides ability to startup with a cold init which deletes a running server.
  * 
  * @author Igor Goldenberg
  * @see ServerBootstrapperImpl
@@ -102,7 +102,7 @@ public class ServerPoolImpl implements ServerPool
             if ( !bootstrapValidationResult.getResult() ){
                 if ( bootstrapValidationResult.testCompleted() ){
                     logger.info( "found a bad bootstrap on server [{}] I should destroy this server..", serverNode );
-                    destroy( serverNode.getNodeId() );
+                    destroy( serverNode );
                 }else{
                     logger.error("unable to complete bootstrap test on [{}], result is [{}], nothing to do",serverNode, bootstrapValidationResult );
                 }
@@ -159,7 +159,7 @@ public class ServerPoolImpl implements ServerPool
                     break;
                 }
                 i++;
-                destroy( server.getNodeId() );
+                destroy( server );
             }
         }
 
@@ -241,17 +241,17 @@ public class ServerPoolImpl implements ServerPool
         return false;
     }
 
-    public void destroy(String serverId)
+    public void destroy( ServerNode serverNode )
 	{
-        if ( serverId == null ){
+        if ( serverNode == null ){
             return; // nothing to do.
         }
-        logger.info("destroying server {}", serverId);
+        logger.info("destroying server {}", serverNode);
 
         // guy - removing "addNewServerToPool" - this is the destroy function, not create function.
         // guy - removing WidgetInstance.delete since we cascade removal
         // guy - removing ServerNode.delete, since we established it does not exist.
-        serverBootstrapper.destroyServer( serverId );
+        serverBootstrapper.destroyServer( serverNode );
 	}
 
     private void addNewServerToPool( int number ){

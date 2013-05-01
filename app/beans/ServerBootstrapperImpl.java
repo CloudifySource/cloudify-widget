@@ -152,7 +152,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             lastKnownException = e;
             // failed to boostrap machine, nothing to do - let destroy :(
             if ( srvNode != null ) {
-                destroyServer( srvNode.getNodeId() );
+                destroyServer( srvNode );
                 logger.error( "Failed to create machine.", e );
             }
 
@@ -207,11 +207,13 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
       }
 
 
-	public void destroyServer( String serverId )
+	public void destroyServer( ServerNode serverNode)
 	{
-       logger.info("destroying server {}", serverId );
-	   deleteServer( serverId );
-       ServerNode.deleteServer(serverId);
+       logger.info("destroying server {}", serverNode );
+        if ( !StringUtils.isEmpty( serverNode.getNodeId() ) ){
+            deleteServer( serverNode.getNodeId() );
+        }
+       serverNode.delete(  );
 	}
 
     /**
@@ -480,7 +482,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
 
             if ( serverNodeIp  == null ){
-                serverNode.errorEvent( "Management machine exists but unreachable" );
+                serverNode.errorEvent( "Management machine exists but unreachable" ).save(  );
                 logger.info( "unable to reach management machine. stopping progress." );
                 return null;
             }
@@ -637,7 +639,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		}catch(Exception ex)
 		{
             try{
-                destroyServer( server.getNodeId() );
+                destroyServer( server );
             }catch(Exception e){
                 logger.info("destroying server after failed bootstrap threw exception",e);
             }

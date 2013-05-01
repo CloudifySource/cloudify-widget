@@ -28,7 +28,7 @@ public interface ServerPool
 {
     public ServerNode get( long lifeExpectancy );
 
-    public void destroy( String serverId );
+    public void destroy( ServerNode server );
 
     public void init();
 
