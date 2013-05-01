@@ -320,14 +320,15 @@ body {
       &:after {
         content: 'If you\2019re an HP Cloud Services User, Use the Api Keys in the HP Cloud Console to get the cloud credentials. The screen shot below outlines the properties you need retrieve from the HPCS console:';
         position: absolute;
-        display: block;
-        background: #e6e6e6 url("/img/demo/hp-tooltip.jpg") 50% 100% no-repeat;
         bottom: 24px;
         right: 10px;
+        display: block;
         width: 350px;
         height: 300px;
         border: 1px solid #00B4DA;
         padding: 12px;
+        background: #e6e6e6 url("/img/demo/hp-tooltip.jpg") 50% 100% no-repeat;
+        color: #213540;
         box-shadow: 1px 1px 7px #777;
       }
     }
