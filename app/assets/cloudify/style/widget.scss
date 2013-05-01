@@ -12,11 +12,29 @@ body {
 }
 
 #start_btn {
-  background-image: url("/img/play_button.png");
+  background: url("/img/play_button_sprite.png") 0 -336px no-repeat;
+
+
+  &:hover{
+    background-position: 0 -448px;
+  }
+
+  &:active{
+      background-position: 0 0;
+    }
 }
 
 #stop_btn {
-  background-image: url("/img/pause_button.png");
+  background: url("/img/play_button_sprite.png") 0 -112px no-repeat;
+
+
+    &:hover{
+      background-position: 0 -560px;
+    }
+
+  &:active{
+        background-position: 0 -224px;
+      }
 }
 
 .beta-ribbon{
