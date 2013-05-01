@@ -317,6 +317,16 @@ body {
     border-bottom: 1px dashed;
     &:hover {
       border-bottom-style: solid;
+      &:after {
+        content: url('/img/demo/hp-tooltip.jpg');
+        display: block;
+        position: absolute;
+        bottom: 2em;
+        right: 0;
+        float: left;
+        border: 1px solid #00B4DA;
+        box-shadow: 2px 2px 5px #ccc;
+      }
     }
   }
 }
