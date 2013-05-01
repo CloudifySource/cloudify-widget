@@ -17,7 +17,6 @@ package controllers;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -428,7 +427,7 @@ public class WidgetAdmin extends Controller
 	public static Result shutdownInstance( String authToken, String instanceId )
 	{
 		User.validateAuthToken(authToken);
-		ApplicationContext.get().getWidgetServer().undeploy(instanceId); // todo : link to user somehow
+		ApplicationContext.get().getWidgetServer().undeploy( ServerNode.getServerNode( instanceId )); // todo : link to user somehow
 		return ok(OK_STATUS).as("application/json");
 	}
 

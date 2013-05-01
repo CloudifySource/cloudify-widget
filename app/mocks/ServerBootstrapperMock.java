@@ -31,10 +31,11 @@ public class ServerBootstrapperMock implements ServerBootstrapper
     private static Logger logger = LoggerFactory.getLogger(ServerBootstrapperMock.class);
 
     @Override
-    public void destroyServer(String serverId) {
-        logger.info("destroying server {}",serverId);
-
+    public void destroyServer( ServerNode serverNode )
+    {
+        logger.info( "destroying server [{}]", serverNode );
     }
+
     @Override
     public List<ServerNode> createServers(int numOfServers) {
         logger.info("creating servers {}", numOfServers);

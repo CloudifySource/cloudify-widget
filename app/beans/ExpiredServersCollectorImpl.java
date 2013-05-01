@@ -49,7 +49,7 @@ public class ExpiredServersCollectorImpl extends Timer implements ExpiredServers
             {
                 try {
                     logger.info("scheduled destruction activated for {}", server.getNodeId());
-                    serverPool.destroy( server.getNodeId() );
+                    serverPool.destroy( server );
                 } catch ( Exception e ) {
                     logger.error("destroying server threw exception", e);
                 }

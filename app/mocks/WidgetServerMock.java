@@ -26,8 +26,11 @@ import server.WidgetServer;
 public class WidgetServerMock implements WidgetServer {
     private static Logger logger = LoggerFactory.getLogger(WidgetServerMock.class);
 
-    public void undeploy(String instanceId) {
-        logger.info("undeploying : {}", instanceId);
+
+    @Override
+    public void undeploy( ServerNode serverNode )
+    {
+        logger.info("undeploying : {}", serverNode);
     }
 
     @Override
