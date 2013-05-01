@@ -188,7 +188,7 @@ public class Utils
                 }
             }
             if (s.toLowerCase().startsWith("successfully created cloudify manager on provider")) {
-                s = "Cloudify initiated successfully.";
+                s = "Cloudify manager created successfully.";
             }
             // trim empty lines or with a single dot
 			if ( !s.equals("") && !s.equals(".") ){
