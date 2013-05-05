@@ -24,9 +24,8 @@ object ApplicationBuild extends Build {
       "commons-lang" % "commons-lang" % "2.3",
       "com.typesafe" %% "play-plugins-mailer" % "2.0.4",
       "com.mixpanel" % "mixpanel-java" % "1.0.1",
-      "org.openid4java" % "openid4java" % "0.9.7"
-
-
+      "org.openid4java" % "openid4java" % "0.9.7",
+      "org.jasypt" % "jasypt" % "1.9.0"
 
     )
 
