@@ -5,6 +5,7 @@ $(function () {
     function advancedData( ){
 
         var cookieName = "ADVANCED_DATA";
+        var initialized = false;
 
         var data = {"project" : null, "key":null, "secretKey":null};
 
@@ -30,12 +31,24 @@ $(function () {
             return _isEmpty() ? null : JSON.stringify( data );
         }
 
+        function _save( data ){
+            var date = new Date();
+            date.setMonth( ( date.getMonth() + 1 ) % 12 );
+            $.cookie(cookieName, data, {"path" :"/", expires:date });
+        }
+
+        this.prolong = function(){
+            var rawVal = $.cookie(cookieName);
+            _save(rawVal);
+        }
+
         this.save = function(){
+
             $.ajax({
                 url: "/encrypt?data=" + encodeURIComponent(dataToSave()),
                 async: false,
                 success: function(result) {
-                    $.cookie(cookieName, result, {"path" :"/"});
+                    _save(result);
                 }
             });
         };
@@ -47,6 +60,7 @@ $(function () {
         };
 
         this.read = function(){
+            initialized = true;
             var v = $.cookie(cookieName);
             try{
                 if ( v != null && typeof(v) == "string" ){
@@ -71,9 +85,10 @@ $(function () {
             return _isEmpty();
         } ;
 
-
+        // either initialized already, and not empty
+        // or - lets initialize and check not empty
         this.exists = function(){
-            return !(this.read().isEmpty())
+            return ( initialized && this.isEmpty() ) || !(this.read().isEmpty())
         }
     }
 
@@ -95,11 +110,20 @@ $(function () {
         }
     }
 
-
-    if ( advancedCookie.exists()){
-        $("<datalist>", {"id":"advancedProject"} ).append($("<option/>", {"value":advancedCookie.project()})).appendTo("body");
-        $(".advanced_section [name=project_name]" ).attr("list","advancedProject");
+    function populateProjectNameDataList(){
+        // load into datalist
+        if ( advancedCookie.exists()){
+            var $datalist = $("datalist#advancedProject option");
+            if ( $datalist.length >  0){
+                $datalist.attr("value", advancedCookie.project());
+            }else{ // need to create the data list
+                $("<datalist>", {"id":"advancedProject"} ).append($("<option/>", {"value":advancedCookie.project()})).appendTo("body");
+                $(".advanced_section [name=project_name]" ).attr("list","advancedProject");
+            }
+        }
     }
+
+    populateProjectNameDataList(); // on page load
 
     $(".advanced_section [name=project_name]" ).change(function(){
         var v = $(this ).val();
@@ -334,6 +358,11 @@ $(function () {
             advancedCookie.key(ad.key);
             advancedCookie.secretKey(ad.secretKey);
             advancedCookie.save();
+
+
+            populateProjectNameDataList();
+
+
             $(this ).hide();
         },
         "no":function(){
@@ -478,7 +507,15 @@ $(function () {
                         }
 
                         if ( advancedData.project != null && advancedData.key != null && advancedData.secretKey != null ){
-                            $(".remember_creds" ).show();
+                            if (advancedData.project == advancedCookie.project() &&
+                                advancedData.key == advancedCookie.key() &&
+                                advancedData.secretKey == advancedCookie.secretKey()) {
+
+                                advancedCookie.prolong();
+
+                            } else {
+                                $(".remember_creds").show();
+                            }
                         }
 
                         setTimeoutForUpdateStatus(1);

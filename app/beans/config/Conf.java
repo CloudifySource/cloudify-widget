@@ -39,7 +39,7 @@ public class Conf {
     public String mixpanelApiKey = null;
 
     @Config(playKey = "application.secret")
-    public String applicationSecret = null;
+    public String applicationSecret;
 
 
     public static class SettingsConfig{
