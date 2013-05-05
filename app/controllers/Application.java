@@ -23,6 +23,7 @@ import models.ServerNode;
 import models.Widget;
 
 import org.apache.commons.lang.NumberUtils;
+import org.jasypt.util.text.BasicTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -259,13 +260,13 @@ public class Application extends Controller
     public static Result encrypt(String data) {
         BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
         textEncryptor.setPassword(conf.applicationSecret);
-        return textEncryptor.encrypt(data);
+        return ok(textEncryptor.encrypt(data));
     }
 
     public static Result decrypt(String data) {
         BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
         textEncryptor.setPassword(conf.applicationSecret);
-        return textEncryptor.decrypt(data);
+        return ok(textEncryptor.decrypt(data));
     }
 
     public static Result javascriptRoutes()
