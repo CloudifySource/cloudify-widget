@@ -581,7 +581,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	private void deleteServer( String serverId )
 	{
 		novaContext.getApi().delete( serverId );
-		logger.info("Server id: {} was deleted.", serverId);
+		logger.info("Server id: {} was terminated.", serverId);
 	}
 
 
@@ -626,14 +626,14 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	{
 		try
 		{
-			logger.info("Starting bootstrapping for server:{} " , server.getPublicIP() );
+			logger.info("Starting bootstrapping for server:{} " , server );
 
 			String script = FileUtils.readFileToString( conf.server.bootstrap.script );
 			ExecResponse response = runScriptOnNode( conf, server.getPublicIP(), script );
 
             logger.info("script finished");
 			logger.info("Bootstrap for server: {} finished successfully successfully. " +
-                    "ExitStatus: {} \nOutput:  {}", new Object[]{server.getPublicIP(),
+                    "ExitStatus: {} \nOutput:  {}", new Object[]{server,
                     response.getExitStatus(),
                     response.getOutput()} );
 		}catch(Exception ex)

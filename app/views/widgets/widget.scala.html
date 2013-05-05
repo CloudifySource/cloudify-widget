@@ -21,8 +21,9 @@
   <body @if(widget.isRequiresLogin()){data-requires-login="requires-login"} >
     <img src="/img/beta.png" class="beta-ribbon"/>
     <span id="title"></span>
-    <a herf="javascript:void(0)" id="start_btn" class="button"></a>
-    <a herf="javascript:void(0)" id="stop_btn" class="button" style="display:none;"></a>
+
+        <a herf="javascript:void(0)" id="start_btn" class="button" ></a>
+        <a herf="javascript:void(0)" id="stop_btn" class="button" style="display:none"></a>
     <ul id="log"></ul>
     <ul id="links">
       <li class="mock"><span class="mock_text">Manage Your App</span><a id="cloudify_dashboard_link" href="#" target="_blank">Manage Your App</a></li>
@@ -37,14 +38,19 @@
     </div>
 
 <div class="advanced_section">
+    <div class="remember_creds">
+        <div class="remember_me_title">Remember me?</div>
+        <div class="remember_option"><button class="yes" onclick="$(this).trigger('yes');">Yes</button></div>
+        <div class="remember_option"><button class="no" onclick="$(this).trigger('no');">No</button></div>
+    </div>
     <div class="advanced_header">
             <a href="javascript:void(0)" class="advanced_title" onclick="$(this).closest('.advanced_section').toggleClass('collapsed');">Advanced</a>
             <a id="pemFileLink" class="download-link download-pem-link" href="javascript:void(0)"> PEM </a>
     </div>
-    <form class="advanced_form">
+    <form class="advanced_form" autocomplete="on">
         <input name="project_name" autocomplete="on" placeholder="project"/>
         <input name="hpcs_key" autocomplete="on" placeholder="HPCS Key"/>
-        <input name="hpcs_secret_key" placeholder="HPCS Secret Key"/>
+        <input name="hpcs_secret_key" placeholder="HPCS Secret Key" type="password"/>
         <div class="form-footer-links">
             <a class="form-footer-links" href="http://youtu.be/lHtOBXpouyo" target="_blank">Help</a>
             <a style="display:none" id="hp_console_link" class="form-footer-links" href="http://console.hpcloud.com" target="_blank">HP Console</a>

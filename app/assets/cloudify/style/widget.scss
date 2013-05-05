@@ -205,6 +205,15 @@ body {
     }
 
   }
+
+  .remember_creds{
+    display:none;
+  }
+
+  &.should_remember .remember_creds{
+    display:block;
+  }
+
   .advanced_header{
 
     margin-left:5px;
@@ -335,7 +344,7 @@ body {
     border-bottom: 1px dashed;
     &:hover {
       border-bottom-style: solid;
-      &:after {
+      &:first-child:after {
         content: url('/img/demo/hp-tooltip.jpg');
         display: block;
         position: absolute;
@@ -353,5 +362,32 @@ body {
   display:none;
   &:last-child{
     display:list-item;
+  }
+}
+
+
+.remember_creds{
+  background: #ECECEC;
+  position: absolute;
+  height: 154px;
+  width: 280px;
+  margin-left: -12px;
+  margin-top: 2px;
+
+  .remember_me_title{
+    margin:auto;
+    border-bottom:1px solid;
+    width:160px;
+    padding-top:10px;
+    text-align: center;
+  }
+
+  .remember_option{
+     text-align: center;
+     button{
+       height:35px;
+       width:133px;
+     }
+    margin-top:10px;
   }
 }
