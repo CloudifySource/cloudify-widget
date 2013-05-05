@@ -1,6 +1,72 @@
 $(function () {
 
+
+
+    function advancedData( ){
+
+        var cookieName = "ADVANCED_DATA";
+
+        var data = {"project" : null, "key":null, "secretKey":null};
+
+        function getterSetter( key ){
+            return function(_value){
+                if ( typeof(_value)== "undefined"){
+                    return data[key];
+                }
+                data[key] = _value;
+            }
+        }
+
+        this.project = getterSetter("project");
+        this.key = getterSetter("key");
+        this.secretKey = getterSetter("secretKey");
+
+
+        function _isEmpty(){
+            for ( var v in data ){ if ( data[v] == null) return true;} return false;
+        }
+
+        function dataToSave(){
+            return _isEmpty() ? null : JSON.stringify( data );
+        }
+
+        this.save = function(){
+            $.cookie(cookieName, dataToSave(), {"path" :"/"});
+        };
+
+        this.clear = function(){
+            for ( var v in data ){
+                data[v] = null;
+            }
+        };
+
+        this.read = function(){
+            var v = $.cookie(cookieName);
+            try{
+                if ( v != null && typeof(v) == "string" ){
+                    data = JSON.parse(v);
+                }
+            }catch(e){
+                console.log(["unable to read advanced data",e])
+            };
+            return this;
+        };
+
+
+        this.isEmpty = function(){
+            return _isEmpty();
+        } ;
+
+
+        this.exists = function(){
+            return !(this.read().isEmpty())
+        }
+    }
+
+    var advancedCookie = new advancedData();
+
     function advanced( project, key, secretKey ){
+
         var $advanced = $(".advanced_section");
         var $project = $advanced.find("[name=project_name]");
         var $key = $advanced.find("[name=hpcs_key]");
@@ -9,10 +75,25 @@ $(function () {
         {
             $project.val(project);
             $key.val(key);
+            $secretKey.val(secretKey);
         }else{
             return { project : $project.val(), key : $key.val(), secretKey : $secretKey.val() }
         }
     }
+
+
+    if ( advancedCookie.exists()){
+        $("<datalist>", {"id":"advancedProject"} ).append($("<option/>", {"value":advancedCookie.project()})).appendTo("body");
+        $(".advanced_section [name=project_name]" ).attr("list","advancedProject");
+    }
+
+    $(".advanced_section [name=project_name]" ).change(function(){
+        var v = $(this ).val();
+
+        if ( advancedCookie.project() == v ){
+            advanced(v, advancedCookie.key(), advancedCookie.secretKey());
+        }
+    });
 
     function show_walkthrough(){
 
@@ -231,6 +312,22 @@ $(function () {
     }
 
 
+    $(".remember_creds" ).on( {
+        "yes":function(){
+            var ad = advanced();
+            console.log("saving advanced");
+            advancedCookie.project(ad.project);
+            advancedCookie.key(ad.key);
+            advancedCookie.secretKey(ad.secretKey);
+            advancedCookie.save();
+            $(this ).hide();
+        },
+        "no":function(){
+            console.log("not saving advanced");
+            $(this ).hide();
+        }
+    });
+
 
     function handleUpdateStatusSuccess( data )
     {
@@ -364,6 +461,10 @@ $(function () {
                         }
                         if (data.status.instanceId) {
                             widgetState.instanceId(data.status.instanceId);
+                        }
+
+                        if ( advancedData.project != null && advancedData.key != null && advancedData.secretKey != null ){
+                            $(".remember_creds" ).show();
                         }
 
                         setTimeoutForUpdateStatus(1);

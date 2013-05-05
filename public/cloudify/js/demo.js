@@ -6,8 +6,15 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
     $scope["widgets"] = $http.get(jsRoutes.controllers.DemosController.listWidgetForDemoUser( $scope["userId"] ).url ).then(function(data){
         var searchWidgetId = $cookieStore.get("widgetId");
         var cachedWidget = $( data.data ).filter(function(index,value){ return value.id == searchWidgetId })[0];
-        var selectedWidget = angular.isDefined(cachedWidget) ? cachedWidget : data.data[0];
-        $scope.menuClick(selectedWidget);
+
+        // return the cached widget or couchbase.
+        var selectedWidget = angular.isDefined(cachedWidget) ? cachedWidget : $.grep(data.data, function(item,index){ return item.productName == "Couchbase"});
+        selectedWidget =  selectedWidget.length > 0  ? selectedWidget[0] : null; // remove array from JQuery
+
+
+
+        // if no cached widget and no couchbase default to 0.
+        $scope.menuClick(selectedWidget == null ? data.data[0] : selectedWidget );
         return data.data;
     } );
     $scope.menuClick = function( widget ){
