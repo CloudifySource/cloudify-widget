@@ -55,7 +55,7 @@ $(function () {
                         url: "/decrypt?data=" + encodeURIComponent(v),
                         async: false,
                         success: function(result) {
-                            data = JSON.parse(v);
+                            data = JSON.parse(result);
                             return that;
                         }
                     });
