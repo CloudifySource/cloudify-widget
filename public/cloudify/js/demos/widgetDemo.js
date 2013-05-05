@@ -6,9 +6,9 @@ $(function () {
     callbacks["requirelogin"] = function (e) {
         $("body").trigger("requireLogin");
     };
-    callbacks["widgetstatus"] = function(e) {
-        console.log('-----' + e.data.status);
-    }
+    /*callbacks["widgetstatus"] = function(e) {
+        console.log('handling widgetstatus, status: ' + e.data.status);
+    }*/
     $.receiveMessage(function (e) {
             console.log(["parent got the message", e]);
             try {
