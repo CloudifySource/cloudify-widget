@@ -27,6 +27,7 @@ import org.jasypt.util.text.BasicTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.annotation.Value;
 import play.Play;
 import play.Routes;
 import play.cache.Cache;
@@ -51,6 +52,7 @@ import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import utils.StringUtils;
 import utils.Utils;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,9 +68,17 @@ public class Application extends Controller
 
     private static Logger logger = LoggerFactory.getLogger(Application.class);
 
-    @Inject
+    /*@Inject
     private static Conf conf;
 
+    @Value("${my.name}")
+    private Conf privateConf;
+
+    @PostConstruct
+    public void init(){
+        conf = privateConf;
+    }
+*/
 
     // guy - todo - apiKey should be an encoded string that contains the userId and widgetId.
     //              we should be able to decode it, verify user's ownership on the widget and go from there.
@@ -259,13 +269,13 @@ public class Application extends Controller
 
     public static Result encrypt(String data) {
         BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
-        textEncryptor.setPassword(conf.applicationSecret);
+        textEncryptor.setPassword(ApplicationContext.get().conf().applicationSecret);
         return ok(textEncryptor.encrypt(data));
     }
 
     public static Result decrypt(String data) {
         BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
-        textEncryptor.setPassword(conf.applicationSecret);
+        textEncryptor.setPassword(ApplicationContext.get().conf().applicationSecret);
         return ok(textEncryptor.decrypt(data));
     }
 
