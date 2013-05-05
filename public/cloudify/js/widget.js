@@ -31,7 +31,13 @@ $(function () {
         }
 
         this.save = function(){
-            $.cookie(cookieName, dataToSave(), {"path" :"/"});
+            $.ajax({
+                url: "/encrypt?data=" + encodeURIComponent(dataToSave()),
+                async: false,
+                success: function(result) {
+                    $.cookie(cookieName, result, {"path" :"/"});
+                }
+            });
         };
 
         this.clear = function(){
@@ -44,7 +50,15 @@ $(function () {
             var v = $.cookie(cookieName);
             try{
                 if ( v != null && typeof(v) == "string" ){
-                    data = JSON.parse(v);
+                    var that = this;
+                    $.ajax({
+                        url: "/decrypt?data=" + encodeURIComponent(v),
+                        async: false,
+                        success: function(result) {
+                            data = JSON.parse(v);
+                            return that;
+                        }
+                    });
                 }
             }catch(e){
                 console.log(["unable to read advanced data",e])
