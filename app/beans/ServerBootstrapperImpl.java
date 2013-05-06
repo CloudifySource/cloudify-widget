@@ -29,6 +29,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
@@ -44,6 +45,7 @@ import org.jclouds.openstack.nova.v2_0.domain.Server.Status;
 import org.jclouds.openstack.nova.v2_0.domain.ServerCreated;
 import org.jclouds.openstack.nova.v2_0.features.ServerApi;
 import org.jclouds.openstack.nova.v2_0.options.CreateServerOptions;
+import org.jclouds.rest.AuthorizationException;
 import org.jclouds.rest.RestContext;
 import org.jclouds.ssh.SshClient;
 import org.jclouds.sshj.config.SshjSshClientModule;
@@ -451,8 +453,20 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     {
         serverNode.setRemote( true );
         // get existing management machine
-        List<Server> existingManagementMachines = getAllMachinesWithPredicate( new ServerNamePrefixPredicate(), new NovaContext( conf.server.cloudBootstrap.cloudProvider,serverNode.getProject(), serverNode.getKey(), serverNode.getSecretKey(),conf.server.cloudBootstrap.zoneName, true ) );
+
+        List<Server> existingManagementMachines = null;
+        try{
+            existingManagementMachines = getAllMachinesWithPredicate( new ServerNamePrefixPredicate(), new NovaContext( conf.server.cloudBootstrap.cloudProvider,serverNode.getProject(), serverNode.getKey(), serverNode.getSecretKey(),conf.server.cloudBootstrap.zoneName, true ) );
+        }catch(Exception e){
+            if ( ExceptionUtils.indexOfThrowable( e, AuthorizationException.class ) > 0 ){
+                serverNode.errorEvent( "Invalid Credentials" ).save(  );
+                return null;
+            }
+            logger.error( "unrecognized exception, assuming only existing algorithm failed. ",e );
+        }
+
         logger.info( "found [{}] management machines", CollectionUtils.size( existingManagementMachines ) );
+
         if ( !CollectionUtils.isEmpty( existingManagementMachines ) ) {
 
             Server managementMachine = CollectionUtils.first( existingManagementMachines );
