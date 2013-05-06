@@ -11,7 +11,7 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
         var selectedWidget = angular.isDefined(cachedWidget) ? cachedWidget : $.grep(data.data, function(item,index){ return item.productName == "Couchbase"});
         selectedWidget =  selectedWidget.length > 0  ? selectedWidget[0] : null; // remove array from JQuery
 
-
+        // TODO receive message (jQuery) and handle walkthrough overlay
 
         // if no cached widget and no couchbase default to 0.
         $scope.menuClick(selectedWidget == null ? data.data[0] : selectedWidget );

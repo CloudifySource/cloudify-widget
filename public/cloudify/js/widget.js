@@ -374,7 +374,7 @@ $(function () {
 
     function handleUpdateStatusSuccess( data )
     {
-        $.postMessage( JSON.stringify({name:"widgetstatus", comment:"status_was_updated", status:data.status}), origin_page_url , parent );
+        $.postMessage( JSON.stringify({name:"widget_status", comment:"status_was_updated", status:data.status}), origin_page_url , parent );
         if ( data.status.timeleft ) {
             $("#time_left").show();
             $("#time_left_counter").text(data.status.timeleft + " minutes");
@@ -402,6 +402,7 @@ $(function () {
 
         if ( data.status.instanceIsAvailable ){
             console.log(["installation finished", data]);
+            $.postMessage( JSON.stringify({name:"instance_available"}), origin_page_url , parent );
         }
 
         if ( data.status.consoleLink ) {
@@ -409,6 +410,7 @@ $(function () {
             widgetState.customLink( link_info );
             show_custom_link( data.status.instanceIsAvailable );
 
+//            data.status.instanceIsAvailable && $.postMessage( JSON.stringify({name:"instance_available"}), origin_page_url , parent );
         }
 
 
@@ -454,9 +456,9 @@ $(function () {
     $.receiveMessage( function(e){
         console.log(["widget got a message",e]);
         var msg = JSON.parse(e.data);
-        if ( msg.name == "userlogin"){
+        if ( msg.name == "user_login"){
             params["userId"] = msg.userId;
-        } else if ( msg.name == "playwidget"){
+        } else if ( msg.name == "play_widget"){
             if ( widgetState.isPlaying() ){ // this is an echo.
                 return;
             }
@@ -466,7 +468,7 @@ $(function () {
                 advanced("","","");
             }
            widgetState.onPlay();
-        } else if ( msg.name == "stopwidget"){
+        } else if ( msg.name == "stop_widget"){
             if ( !widgetState.isPlaying() ){ // might be an echo.
                 return;
             }
@@ -485,10 +487,10 @@ $(function () {
         console.log(["sending message", myUrl, parent ] );
         console.log("after message");
         if ( is_requires_login() && !params["userId"] ){
-            $.postMessage( JSON.stringify({name:"requirelogin"}), myUrl , parent );
+            $.postMessage( JSON.stringify({name:"require_login"}), myUrl , parent );
             return;
         }else{
-            $.postMessage( JSON.stringify({name:"playwidget"}), myUrl , parent );
+            $.postMessage( JSON.stringify({name:"play_widget"}), myUrl , parent );
         }
         widgetState.isPlaying(true);
         widgetState.showStopButton();
@@ -542,7 +544,7 @@ $(function () {
     if (!confirm("Are you sure you want to stop the instance?")) {
       return;
     }
-        $.postMessage( JSON.stringify({name:"stopwidget"}), origin_page_url , parent );
+        $.postMessage( JSON.stringify({name:"stop_widget"}), origin_page_url , parent );
     widgetState.showPlayButton();
     if ( widgetState.instanceId()) {
       $.post("/widget/"+ widgetState.instanceId() + "/stop?apiKey=" + params["apiKey"], {}, function (data) {
