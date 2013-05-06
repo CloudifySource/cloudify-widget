@@ -20,14 +20,15 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
                 console.dir(data);
                 // installation finished
                 if (data.status.instanceIsAvailable) {
+                    $scope.$showWT(true);
                     // if not already shown, display customized overlay
-                    if (!$scope.completedWT) {
+                    /*if (!$scope.completedWT) {
                         $scope.completedWT = true;
                         $scope.$showWT();
-                    }
-                } else { // reset flag
+                    }*/
+                } /*else { // reset flag
                     $scope.completedWT = false;
-                }
+                }*/
             },
             function (origin) {
                 return true;
@@ -51,8 +52,9 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
     /////////////// Walkthrough!
     var walkthroughChecker = null;
     $scope.hideWT = true; // default
-    $scope.$showWT = function(){
+    $scope.$showWT = function(completed){
         $scope.hideWT = false;
+        !!completed && ($scope.completedWT = true);
         $(".walkthrough" ).fadeIn();
     };
 
