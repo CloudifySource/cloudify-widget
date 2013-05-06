@@ -19,8 +19,7 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
                 var data = JSON.parse(e.data);
                 console.dir(data);
                 // installation finished
-                if (data.status.cloudifyUiIsAvailable) { // temp
-//                if (status.instanceIsAvailable) {
+                if (status.instanceIsAvailable) {
                     // if not already shown, display customized overlay
                     if (!$scope.completedWT) {
                         $scope.completedWT = true;
