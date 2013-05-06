@@ -60,13 +60,14 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
 
     $scope.$hideWT = function(){
         $scope.hideWT = true;
-        $(".walkthrough" ).fadeOut();
+        $(".walkthrough" ).fadeOut(400, function() {
+            $scope.completedWT = false;
+        });
     };
 
     $scope.dismissWalkthrough = function () {
         $cookieStore.put("dismissWT", true);
         $scope.$hideWT();
-        $scope.completedWT = false;
     };
 
     $scope.shouldShowWalkthrough = function(){
