@@ -1,7 +1,28 @@
+
+/* helper classes */
+
+.hidden {
+  position: absolute !important;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 0 !important;
+  border: 0 !important;
+  height: 1px !important;
+  width: 1px !important;
+  overflow: hidden;
+}
+
+.put_left {
+  float: right;
+}
+
+/* baseline styles */
+
 body {
   background-image: url("/img/widget_background.png");
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
+
+/* components */
 
 .button {
   height: 112px;
@@ -14,27 +35,25 @@ body {
 #start_btn {
   background: url("/img/play_button_sprite.png") 0 -336px no-repeat;
 
-
-  &:hover{
+  &:hover {
     background-position: 0 -448px;
   }
 
-  &:active{
-      background-position: 0 0;
-    }
+  &:active {
+    background-position: 0 0;
+  }
 }
 
 #stop_btn {
   background: url("/img/play_button_sprite.png") 0 -112px no-repeat;
 
+  &:hover {
+    background-position: 0 -560px;
+  }
 
-    &:hover{
-      background-position: 0 -560px;
-    }
-
-  &:active{
-        background-position: 0 -224px;
-      }
+  &:active {
+    background-position: 0 -224px;
+  }
 }
 
 .beta-ribbon{
@@ -140,10 +159,6 @@ body {
   position: absolute;
   bottom: 8px;
   width: 580px;
-}
-
-.put_left {
-  float: right;
 }
 
 .brand_btns {
