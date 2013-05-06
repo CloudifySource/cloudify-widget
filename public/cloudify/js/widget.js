@@ -322,9 +322,9 @@ $(function () {
                 for (; index < logLength; index = index + 1) {
                     write_log(aOutput[index]);
                 }
-                write_log(ellipsis.substring( 0, (ellipsis_iteration++ % 5) + 1),"log-ellipsis" );
                 myLog = aOutput;
             }
+            write_log(ellipsis.substring( 0, (ellipsis_iteration++ % 5) + 1),"log-ellipsis" );
         };
 
         this.clear= function(){clear()};
