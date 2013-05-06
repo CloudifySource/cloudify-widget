@@ -21,6 +21,8 @@ POST     /widget/start		     	    controllers.Application.start( apiKey: String,
 POST     /widget/:instanceId/stop	    controllers.Application.stop( apiKey: String, instanceId: String)
 GET      /widget/:instanceId/status     controllers.Application.getWidgetStatus( apiKey: String, instanceId: String )
 GET      /widget/:instanceId/pem        controllers.Application.downloadPemFile( instanceId:String )
+GET     /encrypt                        controllers.Application.encrypt( data:String )
+GET     /decrypt                        controllers.Application.decrypt( data:String )
 
 
 
