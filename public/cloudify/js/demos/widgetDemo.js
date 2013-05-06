@@ -9,7 +9,7 @@ $(function () {
     };
     callbacks["widget_status"] = function(e) {
         // bubble up to demo page
-        $.postMessage( JSON.stringify({name:"cloudify_ui_available"}), document.location.origin , parent );
+        $.postMessage( e.data, document.location.origin , parent );
     };
     $.receiveMessage(function (e) {
             console.log(["parent got the message", e]);
