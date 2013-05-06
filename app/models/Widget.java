@@ -22,7 +22,6 @@ import javax.persistence.*;
 
 import beans.Recipe;
 import beans.config.ServerConfig;
-import com.avaje.ebean.Ebean;
 import org.apache.commons.collections.Predicate;
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -130,6 +129,7 @@ public class Widget
         private State state = State.RUNNING;
 
         private List<String> output;
+        private List<String> rawOutput; // for debug purposes
         private Integer timeleft; // minutes
         private String publicIp;
         private String instanceId;
@@ -214,6 +214,16 @@ public class Widget
 
         public void setOutput(List<String> output) {
             this.output = output;
+        }
+
+        public List<String> getRawOutput()
+        {
+            return rawOutput;
+        }
+
+        public void setRawOutput( List<String> rawOutput )
+        {
+            this.rawOutput = rawOutput;
         }
 
         public List<String> getOutput() {

@@ -129,6 +129,10 @@ public class WidgetServerImpl implements WidgetServer
             return result;
         }
 
+        String cachedOutput = Utils.getCachedOutput( server );// need to sort out the cache before we decide if the installation finished.
+
+        result.setRawOutput( Utils.split( cachedOutput, "\n" ) );
+
         result.setRemote( server.isRemote() ).setHasPemFile( !StringUtils.isEmpty(server.getPrivateKey()) ); // let UI know this is a remote bootstrap.
 
         boolean doneFromEvent = false;
@@ -160,13 +164,23 @@ public class WidgetServerImpl implements WidgetServer
             }
         }
 
-        String cachedOutput = Utils.getCachedOutput( server );// need to sort out the cache before we decide if the installation finished.
         output.addAll(Utils.formatOutput(cachedOutput, server.getPrivateIP() + "]", filterOutputLines, filterOutputStrings));
 
         WidgetInstance widgetInstance = WidgetInstance.findByServerNode(server);
         logger.debug("checking if installation finished for {} on the following output {}" , widgetInstance, output );
         if (widgetInstance != null ){
             if (doneFromEvent || isFinished(widgetInstance.getRecipeType(), (String)CollectionUtils.last(output))){
+
+                // need to figure out the remote service IP for the link
+                if ( server.isRemote() && StringUtils.isEmpty( widgetInstance.getServicePublicIp() ) && !StringUtils.isEmpty( widgetInstance.getWidget().getConsoleUrlService() )  ){
+                    // find out the service's public IP.
+                    String servicePublicIp = deployManager.getServicePublicIp( widgetInstance );
+                    if ( !StringUtils.isEmpty( servicePublicIp )){
+                        widgetInstance.setServicePublicIp( servicePublicIp );
+                        widgetInstance.save(  );
+                    }
+                }
+
                 logger.debug("detected finished installation");
                 result.setInstanceIsAvailable(Boolean.TRUE);
                 result.setConsoleLink(widgetInstance.getLink());

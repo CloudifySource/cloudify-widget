@@ -18,7 +18,6 @@ package controllers;
 import static utils.RestUtils.OK_STATUS;
 
 import akka.util.Duration;
-import beans.config.Conf;
 import models.ServerNode;
 import models.Widget;
 
@@ -27,7 +26,6 @@ import org.jasypt.util.text.BasicTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.beans.factory.annotation.Value;
 import play.Play;
 import play.Routes;
 import play.cache.Cache;
@@ -52,8 +50,6 @@ import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
 import utils.StringUtils;
 import utils.Utils;
 
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -161,7 +157,7 @@ public class Application extends Controller
                                     if ( ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode) == null ){
                                         logger.info( "bootstrap cloud returned NULL. stopping progress." );
                                         return;
-                                    };
+                                    }
                                 }catch(Exception e){
                                     logger.error("unable to bootstrap machine",e);
                                     return;
@@ -202,9 +198,6 @@ public class Application extends Controller
         logger.debug("statusToResult > result: [{}]", result);
         return ok( Json.toJson( result ));
     }
-
-
-	
 
 
     public static Result stop( final String apiKey, final String instanceId )

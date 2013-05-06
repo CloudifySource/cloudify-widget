@@ -114,8 +114,9 @@ public class Utils
 
 	public static List<String> split( String content, String regex )
 	{
-		if ( content == null )
+		if ( content == null ){
 			return new ArrayList<String>(0);
+        }
 
 		String[] splitStr = content.split( regex );
 		return Arrays.asList( splitStr );

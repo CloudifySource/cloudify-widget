@@ -40,4 +40,6 @@ public interface DeployManager
    public WidgetInstance fork( ServerNode server, Widget widget );
 
     public WidgetInstance uninstall( ServerNode server);
+
+    String getServicePublicIp( WidgetInstance widgetInstance );
 }

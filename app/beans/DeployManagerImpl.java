@@ -125,6 +125,25 @@ public class DeployManagerImpl implements DeployManager
         return false; // todo
     }
 
+    @Override
+    public String getServicePublicIp( WidgetInstance widgetInstance )
+    {
+        try {
+            ServerNode server = widgetInstance.getServerNode();
+            Widget widget = widgetInstance.getWidget();
+            Recipe.Type recipeType = widgetInstance.getRecipeType();
+            if ( recipeType == Recipe.Type.SERVICE ) {
+                String serviceIp = cloudifyRestClient.getPublicIp( server.getPublicIP(), "default", widget.toInstallName() ).cloudPublicIp;
+                logger.info( "service IP is [{}]", serviceIp );
+            } else if ( !StringUtils.isEmpty( widget.getConsoleUrlService() ) ) { // this is an application and we need to get ip for specific service
+                return cloudifyRestClient.getPublicIp( server.getPublicIP(), widget.toInstallName(), widget.getConsoleUrlService() ).cloudPublicIp;
+            }
+        } catch ( Exception e ) {
+            logger.error( "unable to resolve public ip for widget instance [{}]", widgetInstance, e );
+        }
+        return null;
+    }
+
 
     // todo - replace widget with widgetInstance - since we have server 1to1 widgetInstance, we can simply transfer server here.
     // todo - Widget should only be a template. We are installing a single instance.
@@ -142,19 +161,10 @@ public class DeployManagerImpl implements DeployManager
         if ( alreadyInstalled( server, widget, recipeType ) ){
             logger.info( "[{}] [{}] is already installed", recipeType, widget.toInstallName()  );
             WidgetInstance widgetInstance = widget.addWidgetInstance( server, recipeDir );
-            try {
-                if ( recipeType == Recipe.Type.SERVICE ) {
-                    String serviceIp = cloudifyRestClient.getPublicIp( server.getPublicIP(), "default", widget.toInstallName() ).cloudPublicIp;
-                    logger.info("service IP is [{}]", serviceIp );
-                    widgetInstance.setServicePublicIp( serviceIp );
-                    widgetInstance.save(  );
-                } else if ( !StringUtils.isEmpty( widget.getConsoleUrlService() ) ) { // this is an application and we need to get ip for specific service
-                    String serviceIp = cloudifyRestClient.getPublicIp( server.getPublicIP(), widget.toInstallName(), widget.getConsoleUrlService() ).cloudPublicIp;
-                    widgetInstance.setServicePublicIp( serviceIp );
-                    widgetInstance.save(  );
-                }
-            } catch ( Exception e ) {
-                logger.error( "failed resolving public IP for service", e );
+            String publicIp = getServicePublicIp( widgetInstance );
+            if ( !StringUtils.isEmpty( publicIp )){
+                widgetInstance.setServicePublicIp( publicIp );
+                widgetInstance.save(  );
             }
             server.createEvent(null, ServerNodeEvent.Type.DONE ).save(  );
 

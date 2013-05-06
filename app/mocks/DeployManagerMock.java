@@ -41,4 +41,11 @@ public class DeployManagerMock implements DeployManager
         logger.info( "uninstalling [{}]", server );
         return null;
     }
+
+    @Override
+    public String getServicePublicIp( WidgetInstance widgetInstance )
+    {
+        logger.info( "getting service public IP for [{}]", widgetInstance );
+        return null;
+    }
 }
