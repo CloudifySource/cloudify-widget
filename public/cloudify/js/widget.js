@@ -402,15 +402,12 @@ $(function () {
 
         if ( data.status.instanceIsAvailable ){
             console.log(["installation finished", data]);
-            $.postMessage( JSON.stringify({name:"instance_available"}), origin_page_url , parent );
         }
 
         if ( data.status.consoleLink ) {
             var link_info = data.status.consoleLink;
             widgetState.customLink( link_info );
             show_custom_link( data.status.instanceIsAvailable );
-
-//            data.status.instanceIsAvailable && $.postMessage( JSON.stringify({name:"instance_available"}), origin_page_url , parent );
         }
 
 
