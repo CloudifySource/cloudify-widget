@@ -182,6 +182,7 @@ public class WidgetServerImpl implements WidgetServer
                 }
 
                 logger.debug("detected finished installation");
+                output.add( "Installation completed successfully" );
                 result.setInstanceIsAvailable(Boolean.TRUE);
                 result.setConsoleLink(widgetInstance.getLink());
             }
