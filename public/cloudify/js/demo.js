@@ -22,7 +22,7 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
                 // installation finished
                 if (data.status.instanceIsAvailable) {
                     // if not already shown, display customized overlay
-                    if (!$scope.completedWT) {
+                    if (!completedOverlayShown) {
                         $scope.completedWT = true;
                         $scope.$showWT();
                         completedOverlayShown = true;
