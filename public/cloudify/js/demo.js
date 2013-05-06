@@ -19,7 +19,7 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
                 var status = JSON.parse(e.data).status;
                 console.dir(status);
 //                if (status.consoleLink && !completedOverlay) {
-                if (status.cloudifyUiIsAvailable && !completedOverlay) {
+                if (status.cloudifyUiIsAvailable && !$scope.completedWT) {
                     $scope.completedWT = true;
                     $scope.$showWT();
                 }
