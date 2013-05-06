@@ -12,15 +12,16 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
         var selectedWidget = angular.isDefined(cachedWidget) ? cachedWidget : $.grep(data.data, function(item,index){ return item.productName == "Couchbase"});
         selectedWidget =  selectedWidget.length > 0  ? selectedWidget[0] : null; // remove array from JQuery
 
-        var linkOverlay = false;
+        $scope.completedWT = false;
         $.receiveMessage(function (e) {
                 console.log(["demo got the message", e]);
                 // put an overlay to show link
                 var status = JSON.parse(e.data).status;
                 console.dir(status);
-                status && !!status.cloudifyUiIsAvailable && !linkOverlay && $scope.$showWT();
-//                status.instanceIsAvailable
-//                status.consoleLink
+                if (status.consoleLink && !completedOverlay) {
+                    $scope.completedWT = true;
+                    $scope.$showWT();
+                }
             },
             function (origin) {
                 return true;
@@ -53,7 +54,6 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
         $scope.hideWT = true;
         $(".walkthrough" ).fadeOut();
     };
-
 
     $scope.dismissWalkthrough = function(){
             $cookieStore.put("dismissWT",true);

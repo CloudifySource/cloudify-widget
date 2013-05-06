@@ -41,7 +41,8 @@
         </div>
     </div>
 
-    <div class="walkthrough" style="display:none" ng-click="dismissWalkthrough()">
+
+    <div class="walkthrough" style="display:none" ng-click="dismissWalkthrough()" ng-class="{'completed':completedWT}">
         <div class="wt-close" ng-click="$hideWT()"></div>
         <div class="wt-tooltip arrow1 manage"></div>
         <div class="wt-tooltip arrow2 view"></div>
