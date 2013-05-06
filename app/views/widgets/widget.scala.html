@@ -47,6 +47,7 @@
             <a href="javascript:void(0)" class="advanced_title" onclick="$(this).closest('.advanced_section').toggleClass('collapsed');">Advanced</a>
             <a id="pemFileLink" class="download-link download-pem-link" href="javascript:void(0)"> PEM </a>
     </div>
+    <!-- need to set autocomplete=off explicitly in order to turn off the browser's built-in autocomplete -->
     <form class="advanced_form" autocomplete="off">
         <input name="project_name" autocomplete="off" placeholder="project"/>
         <input name="hpcs_key" autocomplete="off" placeholder="HPCS Key"/>
