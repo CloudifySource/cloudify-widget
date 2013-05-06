@@ -15,13 +15,19 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
         $scope.completedWT = false;
         $.receiveMessage(function (e) {
                 console.log(["demo got the message", e]);
-                // put an overlay to show link
-                var status = JSON.parse(e.data).status;
-                console.dir(status);
-//                if (status.consoleLink && !completedOverlay) {
-                if (status.cloudifyUiIsAvailable && !$scope.completedWT) {
-                    $scope.completedWT = true;
-                    $scope.$showWT();
+
+                var data = JSON.parse(e.data);
+                console.dir(data);
+                // installation finished
+                if (data.status.cloudifyUiIsAvailable) { // temp
+//                if (status.instanceIsAvailable) {
+                    // if not already shown, display customized overlay
+                    if (!$scope.completedWT) {
+                        $scope.completedWT = true;
+                        $scope.$showWT();
+                    }
+                } else { // reset flag
+                    $scope.completedWT = false;
                 }
             },
             function (origin) {
