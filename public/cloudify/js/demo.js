@@ -13,6 +13,7 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
         selectedWidget =  selectedWidget.length > 0  ? selectedWidget[0] : null; // remove array from JQuery
 
         $scope.completedWT = false;
+        var completedOverlayShown = false;
         $.receiveMessage(function (e) {
                 console.log(["demo got the message", e]);
 
@@ -20,15 +21,15 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
                 console.dir(data);
                 // installation finished
                 if (data.status.instanceIsAvailable) {
-                    $scope.$showWT(true);
                     // if not already shown, display customized overlay
-                    /*if (!$scope.completedWT) {
+                    if (!$scope.completedWT) {
                         $scope.completedWT = true;
                         $scope.$showWT();
-                    }*/
-                } /*else { // reset flag
-                    $scope.completedWT = false;
-                }*/
+                        completedOverlayShown = true;
+                    }
+                } else { // reset flag
+                    completedOverlayShown = false;
+                }
             },
             function (origin) {
                 return true;
@@ -52,9 +53,8 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
     /////////////// Walkthrough!
     var walkthroughChecker = null;
     $scope.hideWT = true; // default
-    $scope.$showWT = function(completed){
+    $scope.$showWT = function(){
         $scope.hideWT = false;
-        !!completed && ($scope.completedWT = true);
         $(".walkthrough" ).fadeIn();
     };
 
