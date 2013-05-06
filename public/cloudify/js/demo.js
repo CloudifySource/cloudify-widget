@@ -18,7 +18,8 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
                 // put an overlay to show link
                 var status = JSON.parse(e.data).status;
                 console.dir(status);
-                if (status.consoleLink && !completedOverlay) {
+//                if (status.consoleLink && !completedOverlay) {
+                if (status.cloudifyUiIsAvailable && !completedOverlay) {
                     $scope.completedWT = true;
                     $scope.$showWT();
                 }
