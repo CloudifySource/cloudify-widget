@@ -339,7 +339,7 @@ $(function () {
 
     function setTimeoutForUpdateStatus( myTimeout )
     {
-        myTimeout = ( typeof(myTimeout) == "undefined" || myTimeout == null ) ? 10000 : myTimeout;
+        myTimeout = ( typeof(myTimeout) == "undefined" || myTimeout == null ) ? 3000 : myTimeout;
         setTimeout( update_status, myTimeout );
     }
 
@@ -474,6 +474,11 @@ $(function () {
         }
      }, origin_page_host ); // origin_page_host
 
+
+    function isEmpty( str ){
+        return str == null || $.trim(str ).length == 0;
+    }
+
     function start_instance_btn_handler()
     {
         var myUrl = origin_page_url;
@@ -506,7 +511,7 @@ $(function () {
                             widgetState.instanceId(data.status.instanceId);
                         }
 
-                        if ( advancedData.project != null && advancedData.key != null && advancedData.secretKey != null ){
+                        if ( !isEmpty(advancedData.project)  && !isEmpty(advancedData.key) && !isEmpty(advancedData.secretKey) ){
                             if (advancedData.project == advancedCookie.project() &&
                                 advancedData.key == advancedCookie.key() &&
                                 advancedData.secretKey == advancedCookie.secretKey()) {
