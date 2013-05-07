@@ -11,6 +11,7 @@
 <head>
     <title>Test Page For Cloudify Widget</title>
     <script src="/public/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/public/js/jquery.ba-postmessage.min.js"></script>
     <script src="/public/js/angularjs/angular.min.js"></script>
     <script src="/public/js/angularjs/angular-cookies.min.js"></script>
     <script type="text/javascript" src="/public/js/demo.js"></script>
@@ -40,7 +41,8 @@
         </div>
     </div>
 
-    <div class="walkthrough" style="display:none" ng-click="dismissWalkthrough()">
+
+    <div class="walkthrough" style="display:none" ng-click="dismissWalkthrough()" ng-class="{'completed':completedWT}">
         <div class="wt-close" ng-click="$hideWT()"></div>
         <div class="wt-tooltip arrow1 manage"></div>
         <div class="wt-tooltip arrow2 view"></div>
