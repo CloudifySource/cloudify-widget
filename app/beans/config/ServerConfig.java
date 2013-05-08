@@ -152,7 +152,7 @@ public class ServerConfig {
         public String linuxImageId = zoneName + "/221";
         public String securityGroup = "cloudifySecurityGroup";
         public String cloudProvider = "hpcloud-compute";
-        public String cloudifyEscDirRelativePath = "tools/cli/plugins/esc/";
+        public String cloudifyEscDirRelativePath = "clouds";
         public String existingManagementMachinePrefix = "cloudify-manager";
     }
 
