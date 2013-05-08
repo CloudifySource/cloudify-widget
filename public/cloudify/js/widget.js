@@ -125,6 +125,13 @@ $(function () {
 
     populateProjectNameDataList(); // on page load
 
+    // only load datalist polyfill scripts if datalist not supported by the browser
+    Modernizr.load({
+        test: Modernizr.datalistelem,
+        nope: ['/js/jquery.datalist.js', '/js/load.datalist.js']
+    });
+
+
     $(".advanced_section [name=project_name]" ).change(function(){
         var v = $(this ).val();
 

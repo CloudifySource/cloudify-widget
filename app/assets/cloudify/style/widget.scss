@@ -233,6 +233,7 @@ body {
 
     margin-left:5px;
     margin-top:10px;
+    margin-bottom: 7px;
     .advanced_title{
       font-size:17px;
       color:#00586B;
@@ -249,13 +250,19 @@ body {
   }
   .advanced_form{
     input{
-      margin-top:5px;
       width:250px;
-      padding-right:5px;
-      padding-left:5px;
-      padding-top:3px;
-      padding-bottom:3px;
+      height: 22px;
+      margin-bottom: 5px;
+      padding: 0 5px;
       border-radius: 5px;
+    }
+    /* jquery.datalist polyfill (for safari) */
+    ul.datalist{
+      margin: -2px 1px 0 !important;
+      padding: 0 5px !important;
+      font-size: 13px !important;
+      line-height: 1.6 !important;
+      border-color: #777 !important;
     }
   }
 
@@ -349,7 +356,6 @@ body {
 }
 
 .form-footer-links{
-  margin-top:2px;
   float:right;
   margin-right:5px;
   font-size:12px;
