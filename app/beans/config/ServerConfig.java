@@ -154,6 +154,8 @@ public class ServerConfig {
         public String cloudProvider = "hpcloud-compute";
         public String cloudifyEscDirRelativePath = "clouds";
         public String existingManagementMachinePrefix = "cloudify-manager";
+        @Config( ignoreNullValues =  true )
+        public boolean removeCloudFolder; // used in dev environment to see the configuration in case it got corrupted.
     }
 
     public static class SshConfiguration{
