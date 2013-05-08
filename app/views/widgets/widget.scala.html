@@ -1,5 +1,6 @@
 @(mixpanelKey:String, widget:Widget)
-<!DOCTYPE html>
+@import views.html.widgets.dashboard.embedCode
+    <!DOCTYPE html>
 <html>
   <head>
     <title>Widget</title>
@@ -78,12 +79,16 @@
       Powered by: <a href="http://hpcloud.com" target="_blank"><img class="brand_btns" src="/img/hp_cloud_icon.png"></a>
       <a href="http://cloudifysource.org" target="_blank"><img class="brand_btns" src="/img/cloudify_icon.png"></a>
       <a herf="javascript:void(0)" id="patent_pending">&nbsp;&nbsp;(Patent Pending)</a>
-      <div class="put_left">
-        <a class="share_link" id="facebook_share_link"  href="#"><img src="/img/share_facebook.png"></a>
-        <a class="share_link" id="google_plus_share_link" href="#"><img src="/img/share_google.png"></a>
-        <a class="share_link" id="twitter_share_link" href="#"><img src="/img/share_twitter.png"></a>
-      </div>
+          <div class="put_left">
+              <!-- TODO update image for embed button -->
+              <span id="embed_btn"><img src="/img/share_twitter.png"></span>
+              <a class="share_link" id="facebook_share_link" href="#"><img src="/img/share_facebook.png"></a>
+              <a class="share_link" id="google_plus_share_link" href="#"><img src="/img/share_google.png"></a>
+              <a class="share_link" id="twitter_share_link" href="#"><img src="/img/share_twitter.png"></a>
+          </div>
     </div>
+    <textarea id="embed-code-box" readonly="readonly">@embedCode.render( widget.getApiKey(), widget.getTitle(), widget.getYoutubeVideoUrl(), request.host()).body</textarea>
+
     @*<div id="walkthrough" style="display:none">&nbsp; <a href="javascript:void(0)">Click to close</a> </div>*@
   </body>
 </html>

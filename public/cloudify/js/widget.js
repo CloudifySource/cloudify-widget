@@ -591,14 +591,21 @@ $(function () {
 
     $("#title").text(decodeURIComponent(params["title"]));
 
-  var apiKey = params["apiKey"];
-  var shareUrl= encodeURI("http://launch.cloudifysource.org/admin/signin");
+    var apiKey = params["apiKey"];
+    var shareUrl= encodeURI("http://launch.cloudifysource.org/admin/signin");
 
-  var msg =  encodeURI("Launch on the cloud in a single click using the Cloudify widget");
+    var msg =  encodeURI("Launch on the cloud in a single click using the Cloudify widget");
     var twitterMsg = encodeURIComponent( $("#title" ).text() + " on any cloud with a single click with #cloudifysource");
-  $("#facebook_share_link").attr("href", "http://www.facebook.com/sharer/sharer.php?u=" + shareUrl);
-  $("#google_plus_share_link").attr("href", "https://plus.google.com/share?url=" + shareUrl);
-  $("#twitter_share_link").attr("href", "https://twitter.com/share?url=" + encodeURIComponent(origin_page_url) + "&text=" + twitterMsg);
+    var $embedCodeBox = $("#embed-code-box").hide();
+    // remove white spaces
+    $embedCodeBox.val($.trim($embedCodeBox.val()));
+    // tie box show/hide to button
+    $("#embed_btn").click(function() {
+        $embedCodeBox.toggle();
+    });
+    $("#facebook_share_link").attr("href", "http://www.facebook.com/sharer/sharer.php?u=" + shareUrl);
+    $("#google_plus_share_link").attr("href", "https://plus.google.com/share?url=" + shareUrl);
+    $("#twitter_share_link").attr("href", "https://twitter.com/share?url=" + encodeURIComponent(origin_page_url) + "&text=" + twitterMsg);
 
 
 

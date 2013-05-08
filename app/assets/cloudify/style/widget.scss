@@ -418,3 +418,20 @@ body {
     margin-top:10px;
   }
 }
+
+
+#embed_btn {
+  cursor: pointer;
+}
+#embed-code-box {
+  position: absolute;
+  bottom: 40px;
+  right: 104px;
+  width: 400px;
+  height: 120px;
+  padding: 5px 12px;
+  overflow: hidden;
+  background-color: #333;
+  color: #EEE;
+  box-shadow: 2px 1px 3px #999;
+}
