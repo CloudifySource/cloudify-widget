@@ -581,7 +581,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             serverNode.errorEvent("Invalid Credentials").save();
 			throw new RuntimeException("Unable to bootstrap cloud", e);
 		} finally {
-			if (cloudFolder != null) {
+			if (cloudFolder != null && conf.server.cloudBootstrap.removeCloudFolder ) {
 				FileUtils.deleteQuietly(cloudFolder);
 			}
 			if (jCloudsContext != null) {

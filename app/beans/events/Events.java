@@ -36,7 +36,7 @@ public class Events implements EventMonitor.Event {
 
             super( remoteIp + "_" + widget.getApiKey(), type );
             populateWidgetProperties( widget, this );
-            setProperty( "remoteIp" , remoteIp );
+            setProperty( "ip" , remoteIp );
         }
     }
 
