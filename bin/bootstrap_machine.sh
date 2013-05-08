@@ -14,8 +14,11 @@ echo "127.0.0.1 `hostname`" >> /etc/hosts
 echo Setting sudo privileged mode
 sudo sed -i 's/^Defaults.*requiretty/#&/g' /etc/sudoers
 
+CLOUDIFY_VERSION=2.5.1
+CLOUDIFY_BUILD=b4200
+CLOUDIFY_FOLDER=~/gigaspaces-cloudify-${CLOUDIFY_VERSION}-ga
 JAVA_64_URL="http://repository.cloudifysource.org/com/oracle/java/1.6.0_32/jdk-6u32-linux-x64.bin"
-CLOUDIFY_URL="http://repository.cloudifysource.org/org/cloudifysource/2.3.0-RELEASE/gigaspaces-cloudify-2.3.0-ga-b3510.zip"
+CLOUDIFY_URL="http://repository.cloudifysource.org/org/cloudifysource/${CLOUDIFY_VERSION}-RELEASE/gigaspaces-cloudify-${CLOUDIFY_VERSION}-ga-${CLOUDIFY_BUILD}.zip"
 
 echo Downloading JDK from $JAVA_64_URL
 wget -q -O ~/java.bin $JAVA_64_URL
@@ -37,12 +40,15 @@ source ~/.bashrc
 echo Downloading cloudify installation from $CLOUDIFY_URL
 wget -q $CLOUDIFY_URL -O ~/cloudify.zip || error_exit $? "Failed downloading cloudify installation"
 
+
 echo Unzip cloudify installation
 unzip ~/cloudify.zip > /dev/null
 rm -rf ~/cloudify.zip
 
+wget "https://raw.github.com/CloudifySource/cloudify-widget/master/conf/cloudify/webui-context.xml"   -O ${CLOUDIFY_FOLDER}/config/cloudify-webui-context-override.xml
 echo Starting Cloudify bootstrap-localcloud `hostname -I`
-nohup ~/gigaspaces-cloudify-2.3.0-ga/bin/cloudify.sh "bootstrap-localcloud -nic-address `hostname -I`"
+nohup ${CLOUDIFY_FOLDER}/bin/cloudify.sh "bootstrap-localcloud"
+ # -nic-address `hostname -I`"
 
 cat nohup.out
 exit 0

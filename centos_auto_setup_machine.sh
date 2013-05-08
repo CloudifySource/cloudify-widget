@@ -36,17 +36,6 @@ else
     unzip play-2.0.4.zip
 fi
 
-echo "downloading cloudify"
-CLOUDIFY_FOLDER=gigaspaces-cloudify-2.3.0-ga
-CLOUDIFY_ZIP_NAME=${CLOUDIFY_FOLDER}-b3510
-CLOUDIFY_FILE=${CLOUDIFY_ZIP_NAME}.zip
-if [ -f $CLOUDIFY_FILE ]; then
-    echo "cloudify already installed, nothing to go"
-else
-    wget "http://repository.cloudifysource.org/org/cloudifysource/2.3.0-RELEASE/${CLOUDIFY_FILE}"
-    unzip $CLOUDIFY_FILE
-fi
-
 
 # assuming sysconfig_play exists on machine
 echo "copying sysconfig file"
@@ -91,7 +80,7 @@ echo "copying configuration files"
 ln -fs ~/${CLOUDIFY_FOLDER} cloudify-widget/cloudify-folder # create a symbolic link to cloudify home.
 chmod 755 cloudify-widget/*.sh
 chmod 755 cloudify-widget/bin/*.sh
-ln -fs /root/${CLOUDIFY_FOLDER} cloudify-widget/cloudify-folder
+
 
 #install mysql
 echo "installing mysql"

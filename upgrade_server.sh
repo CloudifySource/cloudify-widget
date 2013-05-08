@@ -15,6 +15,30 @@ echo "changing mode for sh files"
 chmod 755 $WIDGET_HOME/*.sh
 chmod 755 $WIDGET_HOME/bin/*.sh
 
+
+
+CLOUDIFY_VERSION=2.5.1
+CLOUDIFY_BUILD=b4200
+echo "upgrading cloudify to version $CLOUDIFY_VERSION $CLOUDIFY_BUILD"
+CLOUDIFY_FOLDER=gigaspaces-cloudify-${CLOUDIFY_VERSION}-ga
+CLOUDIFY_ZIP_NAME=${CLOUDIFY_FOLDER}-${CLOUDIFY_BUILD}
+CLOUDIFY_FILE=${CLOUDIFY_ZIP_NAME}.zip
+if [ -f /root/$CLOUDIFY_FILE ]; then
+    echo "cloudify already installed, nothing to go"
+else
+    wget "http://repository.cloudifysource.org/org/cloudifysource/${CLOUDIFY_VERSION}-RELEASE/${CLOUDIFY_FILE}" -O /root/$CLOUDIFY_FILE
+    unzip /root/$CLOUDIFY_FILE -d /root/
+fi
+ln -Tfs /root/${CLOUDIFY_FOLDER} cloudify-folder
+
+echo "overriding webui-context.xml in cloudify installation"
+\cp -f conf/cloudify/webui-context.xml cloudify-folder/config/cloudify-webui-context-override.xml
+
+echo "injecting variables to cloudify.conf, and generating cloudify-prod.conf - extend this file in production instead of cloudify.conf"
+cat conf/cloudify.conf | sed 's,__CLOUDIFY_SECURITY_GROUP__,'"$CLOUDIFY_SECURITY_GROUP"','  > conf/cloudify-prod.conf
+
+
+
 TMP_SITE_CONF=conf/nginx/output.nginx
 SITE_CONF_TARGET=/etc/nginx/sites-available/$SITE_DOMAIN
 NGINX_CONF_SRC=conf/nginx/nginx.conf
@@ -56,11 +80,6 @@ echo "upgrading init.d script"
 \cp -f conf/initd/widget /etc/init.d/widget
 chmod 755 /etc/init.d/widget
 
-
-echo "overriding hp-cloud.groovy in cloudify home"
-cat conf/cloudify/hp-cloud.groovy | sed 's,__CLOUDIFY_SECURITY_GROUP__,'"$CLOUDIFY_SECURITY_GROUP"','  > cloudify-folder/tools/cli/plugins/esc/hp/hp-cloud.groovy
-echo "injecting variables to cloudify.conf, and generating cloudify-prod.conf - extend this file in production instead of cloudify.conf"
-cat conf/cloudify.conf | sed 's,__CLOUDIFY_SECURITY_GROUP__,'"$CLOUDIFY_SECURITY_GROUP"','  > conf/cloudify-prod.conf
 
 
 echo "upgrading monit configurations"
