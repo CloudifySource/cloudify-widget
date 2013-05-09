@@ -169,13 +169,19 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     {
         BootstrapValidationResult result = new BootstrapValidationResult();
         try{
-        result.machineReachable = isMachineReachable( serverNode );
+            result.machineReachable = isMachineReachable( serverNode );
         }catch(Exception e){
             result.machineReachableException = e;
         }
 
         if ( result.machineReachable == Boolean.TRUE ){
-            result.managementAvailable = isManagementAvailable( serverNode );
+            try{
+                result.managementVersion = cloudifyRestClient.getVersion( serverNode.getPublicIP() ).getVersion();
+                result.managementAvailable = true;
+            }catch( Exception e ){
+                logger.debug( "got exception while checking management version",e );
+                result.managementAvailable = false;
+            }
         }
         return result;
     }
@@ -191,22 +197,6 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 //        return reachable;
         return true; // guy - there's a problem pinging machines.
     }
-
-
-    private boolean isManagementAvailable( ServerNode serverNode )
-      {
-          logger.info( "testing if management is available at : {}", serverNode );
-          try{
-            return cloudifyRestClient.testRest( serverNode.getPrivateIP() ).isSuccess();
-          }catch(Exception e){
-
-              logger.error( "unable to decide if management is available or not [{}]", serverNode.getPublicIP(), e );
-
-          }
-          return false;
-
-
-      }
 
 
 	public void destroyServer( ServerNode serverNode)
@@ -422,7 +412,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		    try{
                 bootstrapMachine( serverNode );
                 BootstrapValidationResult bootstrapValidationResult = validateBootstrap( serverNode );
-                if ( bootstrapValidationResult.getResult() ) {
+                if ( bootstrapValidationResult.isValid() ) {
                     bootstrapSuccess = true;
                 }else{
                     logger.info( "machine [{}] did not bootstrap successfully [{}] retrying", serverNode, bootstrapValidationResult );

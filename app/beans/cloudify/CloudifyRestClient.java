@@ -11,7 +11,7 @@ package beans.cloudify;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import play.api.libs.ws.WS;
+import play.libs.WS;
 
 /**
  * User: guym
@@ -23,6 +23,7 @@ import play.api.libs.ws.WS;
 public class CloudifyRestClient {
 
     public String TEST_REST_FORMAT = "http://%s:8100/service/testrest";
+    public String GET_REST_VERSION_FORMAT = "http://%s:8100/service/testrest"; // we are using the test rest error message to parse the version
     public String LIST_APPLICATIONS_FORMAT = "http://%s:8100/service/applications";
     public String LIST_SERVICES_FORMAT = "http://%s:8100/service/applications/%s/services";
     public String DESCRIBE_SERVICES_FORMAT = "http://%s:8100/service/applications/%s/services/description";
@@ -33,6 +34,11 @@ public class CloudifyRestClient {
     public CloudifyRestResult.TestRest testRest( String ip )
     {
         return getResult( CloudifyRestResult.TestRest.class, TEST_REST_FORMAT, ip  );
+    }
+
+    public CloudifyRestResult.GetVersion getVersion( String ip )
+    {
+        return parse( CloudifyRestResult.GetVersion.class, getBody( WS.url( String.format( GET_REST_VERSION_FORMAT, ip ) ).setHeader( "cloudify-api-version", CloudifyRestResult.GetVersion.DUMMY_VERSION ) )  );
     }
 
     public CloudifyRestResult.ListApplications listApplications( String ip ){
@@ -50,9 +56,14 @@ public class CloudifyRestClient {
     private <T> T getResult ( Class<T>  clzz, String format, String ... args ){
         return parse(clzz, getBody( format, args ));
     }
+
     private String getBody( String format, String ... args ){
         String url = String.format( format, args );
-        return WS.url( url ).get().value().get().body();
+        return getBody( WS.url( url ) );
+    }
+
+    private String getBody(WS.WSRequestHolder requestHolder ){
+        return requestHolder.get().get().getBody();
     }
 
     private <T> T parse( Class<T> clzz, String body ){

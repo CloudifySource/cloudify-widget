@@ -99,9 +99,9 @@ public class ServerPoolImpl implements ServerPool
         List<ServerNode> cleanPool = new LinkedList<ServerNode>(  );
         for ( ServerNode serverNode : pool ) {
             BootstrapValidationResult bootstrapValidationResult = serverBootstrapper.validateBootstrap( serverNode );
-            if ( !bootstrapValidationResult.getResult() ){
+            if ( !bootstrapValidationResult.isValid( ) ){
                 if ( bootstrapValidationResult.testCompleted() ){
-                    logger.info( "found a bad bootstrap on server [{}] I should destroy this server..", serverNode );
+                    logger.info( "found a bad bootstrap on server [{}]. The test result showed the following [{}]. I should destroy this server..", serverNode, bootstrapValidationResult );
                     destroy( serverNode );
                 }else{
                     logger.error("unable to complete bootstrap test on [{}], result is [{}], nothing to do",serverNode, bootstrapValidationResult );
@@ -224,7 +224,7 @@ public class ServerPoolImpl implements ServerPool
     {
         try{
             BootstrapValidationResult result = serverBootstrapper.validateBootstrap( serverNode );
-            if ( result.getResult() ) {
+            if ( result.isValid() ) {
                 serverNode.setBusy( true );
                 serverNode.setExpirationTime( lifeExpectancy + System.currentTimeMillis() );
                 serverNode.save(); // optimistic locking
