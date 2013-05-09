@@ -205,6 +205,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         if ( !StringUtils.isEmpty( serverNode.getNodeId() ) ){
             deleteServer( serverNode.getNodeId() );
         }
+       serverNode.refresh();
        serverNode.delete(  );
 	}
 
