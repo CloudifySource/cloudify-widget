@@ -1,5 +1,7 @@
 package beans;
 
+import server.ApplicationContext;
+
 /**
  * User: guym
  * Date: 3/1/13
@@ -7,12 +9,31 @@ package beans;
  */
 public class BootstrapValidationResult {
     Boolean machineReachable = true;
+    String managementVersion = null;
     Boolean managementAvailable = null;
+    String lastComparedVersion = null;
     public Exception machineReachableException = null;
 
-    public boolean getResult()
+    private boolean getResult( String expectedVersion )
     {
-        return checkTrue( machineReachable, managementAvailable );
+        lastComparedVersion = expectedVersion;
+        return checkTrue( machineReachable, managementAvailable, expectedVersion == null || expectedVersion.equals( managementVersion ) );
+    }
+
+    private String getDefaultCompareVersion (){
+        return ApplicationContext.get().conf().cloudify.version;
+    }
+
+    public boolean isValidWithoutVersion(){
+        return getResult( null );
+    }
+
+    public boolean isValid(){
+        return getResult( getDefaultCompareVersion() );
+    }
+
+    public boolean isValid( String version ){
+        return getResult( version );
     }
 
     private boolean checkTrue( Boolean ... args ){
@@ -25,8 +46,8 @@ public class BootstrapValidationResult {
         return true;
     }
 
-    private boolean noNulls( Boolean ... args){
-        for ( Boolean arg: args ){
+    private boolean noNulls( Object ... args){
+        for ( Object arg: args ){
             if ( arg == null ){
                 return false;
             }
@@ -39,7 +60,7 @@ public class BootstrapValidationResult {
     }
 
     public boolean testCompleted(){
-        return noNulls( machineReachable, managementAvailable );
+        return noNulls( machineReachable, managementAvailable, managementVersion );
     }
 
     @Override
@@ -48,6 +69,9 @@ public class BootstrapValidationResult {
         return "BootstrapValidationResult{" +
                 "machineReachable=" + machineReachable +
                 ", managementAvailable=" + managementAvailable +
+                ", managementVersion=" + managementVersion +
+                ", conf version=" + getDefaultCompareVersion() +
+                ", last compared version = " + lastComparedVersion +
                 ", machineReachableException=" + excString( machineReachableException ) +
                 '}';
     }

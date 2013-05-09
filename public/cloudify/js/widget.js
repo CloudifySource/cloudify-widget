@@ -120,6 +120,7 @@ $(function () {
                 $("<datalist>", {"id":"advancedProject"} ).append($("<option/>", {"value":advancedCookie.project()})).appendTo("body");
                 $(".advanced_section [name=project_name]" ).attr("list","advancedProject");
             }
+            $("body" ).trigger("updateDataList");
         }
     }
 
@@ -128,11 +129,11 @@ $(function () {
     // only load datalist polyfill scripts if datalist not supported by the browser
     Modernizr.load({
         test: Modernizr.datalistelem,
-        nope: ['/js/jquery.datalist.js', '/js/load.datalist.js']
+        nope: ['/public/js/jquery.relevant-dropdown.js', '/public/js/load.datalist.js']
     });
 
 
-    $(".advanced_section [name=project_name]" ).change(function(){
+    $(".advanced_section [name=project_name]" ).bind('change blur',function(){
         var v = $(this ).val();
 
         if ( advancedCookie.project() == v ){

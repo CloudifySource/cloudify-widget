@@ -8,6 +8,7 @@
 
 package beans.cloudify;
 
+import org.apache.commons.exec.util.StringUtils;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.LinkedList;
@@ -21,6 +22,7 @@ import java.util.Map;
  */
 public class CloudifyRestResult {
     public Status status;
+    @JsonProperty( "error_args" )
     public List<String> errorArgs = new LinkedList<String>(  );
     public String error;
 
@@ -44,6 +46,20 @@ public class CloudifyRestResult {
     public static class GetPublicIpResult{
         @JsonProperty(value = "Cloud Public IP")
         public String cloudPublicIp;
+    }
+
+    public static class GetVersion extends CloudifyRestResult{
+
+        public static final String DUMMY_VERSION="XXX"; // we need to send some false version to cloudify.
+
+        public String getVersion(){
+            for ( String errorArg : errorArgs ) {
+                if ( !DUMMY_VERSION.equals( errorArg) ){
+                    return StringUtils.split(errorArg,"-")[0];
+                }
+            }
+            throw new RuntimeException( String.format("unable to decipher cloudify version from errorArgs [%s]", errorArgs) );
+        }
     }
 
     public static class ListApplications extends CloudifyRestResult{

@@ -1,0 +1,27 @@
+<!--
+  ~ Copyright (c) 2013 GigaSpaces Technologies Ltd. All rights reserved
+  ~ <p/>
+  ~ The software source code is proprietary and confidential information of GigaSpaces.
+  ~ You may use the software source code solely under the terms and limitations of
+  ~ the license agreement granted to you by GigaSpaces.
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+
+	<import resource="classpath:cloudify-webui-context.xml" />
+
+	<bean id="activeFeatures" class="com.gigaspaces.admin.webui.shared.beans.ActiveFeaturesImpl">
+        <property name="newLoginPage" value="true"/>
+		<property name="recipesRepository" value="true" />
+	</bean>
+<!-- 	 <bean id="cloudifyRestClient" class="com.gigaspaces.admin.webui.server.beans.CloudifyRestClientMock" /> -->
+    <bean id="repositoryDefinitionBean" class="org.cloudifysource.repository.definitions.GitRepositoryDefinition">
+        <property name="uri" value="https://github.com/CloudifySource/cloudify-recipes.git"/>
+        <property name="rootFolder" value="/tmp/cloudify_recipe_git_repository"/>
+        <property name="existingMethod" value="USE_IF_VALID"/>
+    </bean>
+</beans>
