@@ -492,6 +492,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                 return null;
             }
             logger.info( "using first machine  [{}] with ip [{}]", managementMachine, serverNodeIp );
+            serverNode.setServerId( managementMachine.getId() );
             serverNode.infoEvent("Found management machine on :" + serverNodeIp ).save(  );
             serverNode.setPublicIP( serverNodeIp );
             serverNode.save(  );

@@ -125,7 +125,12 @@ extends Model
 		return serverId;
 	}
 
-	public String getPrivateIP()
+    public void setServerId( String serverId )
+    {
+        this.serverId = serverId;
+    }
+
+    public String getPrivateIP()
 	{
 		return privateIP;
 	}
