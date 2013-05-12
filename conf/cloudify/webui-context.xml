@@ -20,7 +20,7 @@
 	</bean>
 <!-- 	 <bean id="cloudifyRestClient" class="com.gigaspaces.admin.webui.server.beans.CloudifyRestClientMock" /> -->
     <bean id="repositoryDefinitionBean" class="org.cloudifysource.repository.definitions.GitRepositoryDefinition">
-        <property name="uri" value="https://github.com/CloudifySource/cloudify-recipes.git"/>
+        <property name="uri" value="https://github.com/guy-mograbi-at-gigaspaces/cloudify-recipes.git"/>
         <property name="rootFolder" value="/tmp/cloudify_recipe_git_repository"/>
         <property name="existingMethod" value="USE_IF_VALID"/>
     </bean>
