@@ -129,12 +129,12 @@ public class DeployManagerImpl implements DeployManager
     public String getServicePublicIp( WidgetInstance widgetInstance )
     {
         try {
+            logger.info( "getting public IP for [{}]", widgetInstance );
             ServerNode server = widgetInstance.getServerNode();
             Widget widget = widgetInstance.getWidget();
             Recipe.Type recipeType = widgetInstance.getRecipeType();
             if ( recipeType == Recipe.Type.SERVICE ) {
-                String serviceIp = cloudifyRestClient.getPublicIp( server.getPublicIP(), "default", widget.toInstallName() ).cloudPublicIp;
-                logger.info( "service IP is [{}]", serviceIp );
+                return cloudifyRestClient.getPublicIp( server.getPublicIP(), "default", widget.toInstallName() ).cloudPublicIp;
             } else if ( !StringUtils.isEmpty( widget.getConsoleUrlService() ) ) { // this is an application and we need to get ip for specific service
                 return cloudifyRestClient.getPublicIp( server.getPublicIP(), widget.toInstallName(), widget.getConsoleUrlService() ).cloudPublicIp;
             }
@@ -163,6 +163,7 @@ public class DeployManagerImpl implements DeployManager
             WidgetInstance widgetInstance = widget.addWidgetInstance( server, recipeDir );
             String publicIp = getServicePublicIp( widgetInstance );
             if ( !StringUtils.isEmpty( publicIp )){
+                logger.info( "found service ip at [{}]", publicIp );
                 widgetInstance.setServicePublicIp( publicIp );
                 widgetInstance.save(  );
             }

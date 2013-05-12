@@ -36,9 +36,15 @@ public class CloudifyRestClient {
         return getResult( CloudifyRestResult.TestRest.class, TEST_REST_FORMAT, ip  );
     }
 
+    private String getUrl( String pattern, String ... args){
+        String f = String.format( pattern, args );
+        logger.info( "executing [{}]", f );
+        return f;
+    }
+
     public CloudifyRestResult.GetVersion getVersion( String ip )
     {
-        return parse( CloudifyRestResult.GetVersion.class, getBody( WS.url( String.format( GET_REST_VERSION_FORMAT, ip ) ).setHeader( "cloudify-api-version", CloudifyRestResult.GetVersion.DUMMY_VERSION ) )  );
+        return parse( CloudifyRestResult.GetVersion.class, getBody( WS.url( getUrl( GET_REST_VERSION_FORMAT, ip ) ).setHeader( "cloudify-api-version", CloudifyRestResult.GetVersion.DUMMY_VERSION ) )  );
     }
 
     public CloudifyRestResult.ListApplications listApplications( String ip ){
@@ -58,8 +64,7 @@ public class CloudifyRestClient {
     }
 
     private String getBody( String format, String ... args ){
-        String url = String.format( format, args );
-        return getBody( WS.url( url ) );
+        return getBody( WS.url( getUrl( format, args ) ) );
     }
 
     private String getBody(WS.WSRequestHolder requestHolder ){

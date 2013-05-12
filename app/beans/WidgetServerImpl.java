@@ -176,6 +176,7 @@ public class WidgetServerImpl implements WidgetServer
                     // find out the service's public IP.
                     String servicePublicIp = deployManager.getServicePublicIp( widgetInstance );
                     if ( !StringUtils.isEmpty( servicePublicIp )){
+                        logger.info( "found ip at : [{}]", servicePublicIp );
                         widgetInstance.setServicePublicIp( servicePublicIp );
                         widgetInstance.save(  );
                     }
