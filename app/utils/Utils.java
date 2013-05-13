@@ -190,6 +190,9 @@ public class Utils
             if (s.toLowerCase().startsWith("successfully created cloudify manager on provider")) {
                 s = "Cloudify manager created successfully.";
             }
+            if (s.toLowerCase().startsWith("->")) {
+                logger.info("LOG ->");
+            }
             // trim empty lines or with a single dot
 			if ( !s.equals("") && !s.equals(".") ){
 				newList.add( s );
