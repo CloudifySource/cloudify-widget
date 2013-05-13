@@ -16,8 +16,6 @@ package utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -32,6 +30,8 @@ import java.util.zip.ZipException;
 
 import models.ServerNode;
 import org.apache.commons.io.FileUtils;
+import org.jclouds.openstack.nova.v2_0.domain.Address;
+import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -330,5 +330,37 @@ public class Utils
     // return result if not null; otherwise return default
     public static <T> T getOrDefault(T result, T defaultResult) {
         return result == null ? defaultResult : result;
+    }
+
+    public static ServerIp getServerIp( Server server )
+    {
+        ServerIp res = new ServerIp();
+        try {
+            Collection<Address> aPrivate = server.getAddresses().get( "private" );
+            Address[] addresses = aPrivate.toArray( new Address[ aPrivate.size() ] );
+
+
+            res.publicIp = addresses[ 1 ].getAddr();
+            res.privateIp = addresses[ 0 ].getAddr();
+
+        } catch ( Exception e ) {
+            logger.error( "unable to get ips", e );
+        }
+
+        return res;
+    }
+
+    public static class ServerIp{
+        public String publicIp = null;
+        public String privateIp = null;
+
+        @Override
+        public String toString()
+        {
+            return "ServerIp{" +
+                    "publicIp='" + publicIp + '\'' +
+                    ", privateIp='" + privateIp + '\'' +
+                    '}';
+        }
     }
 }

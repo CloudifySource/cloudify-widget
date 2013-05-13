@@ -20,12 +20,12 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import org.codehaus.jackson.annotate.JsonIgnore;
-import org.jclouds.openstack.nova.v2_0.domain.Address;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.db.ebean.Model;
 import utils.CollectionUtils;
+import utils.Utils;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -35,7 +35,6 @@ import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Version;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -112,11 +111,10 @@ extends Model
 	public ServerNode( Server srv )
 	{
 		this.serverId  = srv.getId();
-        Collection<Address> aPrivate = srv.getAddresses().get("private");
-        Address[] addresses = aPrivate.toArray(new Address[aPrivate.size()]);
-        this.privateIP = addresses[0].getAddr();
-		this.publicIP  = addresses[1].getAddr();
-		this.expirationTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis( 30 ); // default unless configured otherwise
+        Utils.ServerIp serverIp = Utils.getServerIp( srv );
+        publicIP = serverIp.publicIp;
+        privateIP = serverIp.privateIp;
+        this.expirationTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis( 30 ); // default unless configured otherwise
 	}
 
 	public String getNodeId() // guy - it is dangerous to call this getId as it looks like the getter of "long id"
