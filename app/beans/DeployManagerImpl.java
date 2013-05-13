@@ -1,18 +1,17 @@
-/*******************************************************************************
- * Copyright (c) 2011 GigaSpaces Technologies Ltd. All rights reserved
+/*
+ * Copyright (c) 2013 GigaSpaces Technologies Ltd. All rights reserved
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *******************************************************************************/
+ */
 package beans;
 
 import java.io.File;
@@ -129,12 +128,12 @@ public class DeployManagerImpl implements DeployManager
     public String getServicePublicIp( WidgetInstance widgetInstance )
     {
         try {
+            logger.info( "getting public IP for [{}]", widgetInstance );
             ServerNode server = widgetInstance.getServerNode();
             Widget widget = widgetInstance.getWidget();
             Recipe.Type recipeType = widgetInstance.getRecipeType();
             if ( recipeType == Recipe.Type.SERVICE ) {
-                String serviceIp = cloudifyRestClient.getPublicIp( server.getPublicIP(), "default", widget.toInstallName() ).cloudPublicIp;
-                logger.info( "service IP is [{}]", serviceIp );
+                return cloudifyRestClient.getPublicIp( server.getPublicIP(), "default", widget.toInstallName() ).cloudPublicIp;
             } else if ( !StringUtils.isEmpty( widget.getConsoleUrlService() ) ) { // this is an application and we need to get ip for specific service
                 return cloudifyRestClient.getPublicIp( server.getPublicIP(), widget.toInstallName(), widget.getConsoleUrlService() ).cloudPublicIp;
             }
@@ -163,6 +162,7 @@ public class DeployManagerImpl implements DeployManager
             WidgetInstance widgetInstance = widget.addWidgetInstance( server, recipeDir );
             String publicIp = getServicePublicIp( widgetInstance );
             if ( !StringUtils.isEmpty( publicIp )){
+                logger.info( "found service ip at [{}]", publicIp );
                 widgetInstance.setServicePublicIp( publicIp );
                 widgetInstance.save(  );
             }

@@ -1,9 +1,16 @@
 /*
  * Copyright (c) 2013 GigaSpaces Technologies Ltd. All rights reserved
- * <p/>
- * The software source code is proprietary and confidential information of GigaSpaces.
- * You may use the software source code solely under the terms and limitations of
- * the license agreement granted to you by GigaSpaces.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package beans.cloudify;
@@ -36,9 +43,15 @@ public class CloudifyRestClient {
         return getResult( CloudifyRestResult.TestRest.class, TEST_REST_FORMAT, ip  );
     }
 
+    private String getUrl( String pattern, String ... args){
+        String f = String.format( pattern, args );
+        logger.info( "executing [{}]", f );
+        return f;
+    }
+
     public CloudifyRestResult.GetVersion getVersion( String ip )
     {
-        return parse( CloudifyRestResult.GetVersion.class, getBody( WS.url( String.format( GET_REST_VERSION_FORMAT, ip ) ).setHeader( "cloudify-api-version", CloudifyRestResult.GetVersion.DUMMY_VERSION ) )  );
+        return parse( CloudifyRestResult.GetVersion.class, getBody( WS.url( getUrl( GET_REST_VERSION_FORMAT, ip ) ).setHeader( "cloudify-api-version", CloudifyRestResult.GetVersion.DUMMY_VERSION ) )  );
     }
 
     public CloudifyRestResult.ListApplications listApplications( String ip ){
@@ -50,7 +63,12 @@ public class CloudifyRestClient {
     }
 
     public CloudifyRestResult.GetPublicIpResult getPublicIp( String ip, String application, String service ){
-        return getResult( CloudifyRestResult.GetPublicIpResult.class, GET_PUBLIC_IP_FORMAT, ip, application, service );
+        try{
+            return getResult( CloudifyRestResult.GetPublicIpResult.class, GET_PUBLIC_IP_FORMAT, ip, application, service );
+        }catch(Exception e){
+            logger.error("could not get public IP. please make sure the application.service combination is correct [{}.{}]", application, service );
+        }
+        return new CloudifyRestResult.GetPublicIpResult();
     }
 
     private <T> T getResult ( Class<T>  clzz, String format, String ... args ){
@@ -58,8 +76,7 @@ public class CloudifyRestClient {
     }
 
     private String getBody( String format, String ... args ){
-        String url = String.format( format, args );
-        return getBody( WS.url( url ) );
+        return getBody( WS.url( getUrl( format, args ) ) );
     }
 
     private String getBody(WS.WSRequestHolder requestHolder ){
