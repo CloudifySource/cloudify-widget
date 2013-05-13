@@ -82,8 +82,8 @@ public class CloudifyUtils {
 		cloudProperties.add("keyFile=" + '"' + newPemFile.getName() +".pem" + '"');
 		cloudProperties.add("keyPair=" + '"' + newPemFile.getName() + '"');
 		cloudProperties.add("securityGroup=" + '"' + cloudConf.securityGroup + '"');
-		cloudProperties.add("hardwareId=" + '"' + cloudConf.hardwareId + '"');
-		cloudProperties.add("linuxImageId=" + '"' + cloudConf.linuxImageId + '"');
+		cloudProperties.add("hardwareId=" + '"' + cloudConf.hardwareId() + '"');
+		cloudProperties.add("linuxImageId=" + '"' + cloudConf.linuxImageId() + '"');
         cloudProperties.add( "persistencePath=null" );
 
 		//create new props file and init with custom credentials. 
