@@ -418,12 +418,31 @@ body {
 #embed-code-box {
   position: absolute;
   bottom: 40px;
-  right: 105px;
+  right: 107px;
   width: 440px;
-  height: 102px;
-  padding: 5px 12px;
+  height: 180px;
+  padding: 8px 12px 12px;
   overflow: hidden;
-  background-color: #333;
-  color: #eee;
-  box-shadow: 2px 1px 3px #999;
+  font-size: .9em;
+  border: 1px solid #777;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+  box-shadow: 2px 1px 10px #555;
+  h3, p {
+    margin: 0;
+    padding: 3px 0;
+    text-align: center;
+    line-height: 1.2;
+  }
+  p {
+    padding-bottom: 8px;
+  }
+  textarea {
+    width: 416px;
+    height: 118px;
+    padding: 5px 12px;
+    background-color: #333;
+    color: #eee;
+  }
 }
