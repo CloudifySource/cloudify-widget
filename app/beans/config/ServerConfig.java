@@ -148,14 +148,22 @@ public class ServerConfig {
         public String cloudifyHpUploadDirName = "upload";
         public String cloudPropertiesFileName = "hp-cloud.properties";
         public String zoneName = "az-2.region-a.geo-1";
-        public String hardwareId = zoneName + "/102";
-        public String linuxImageId = zoneName + "/221";
+        public String hardwareId = "102";
+        public String linuxImageId = "221";
         public String securityGroup = "cloudifySecurityGroup";
         public String cloudProvider = "hpcloud-compute";
         public String cloudifyEscDirRelativePath = "clouds";
         public String existingManagementMachinePrefix = "cloudify-manager";
         @Config( ignoreNullValues =  true )
         public boolean removeCloudFolder; // used in dev environment to see the configuration in case it got corrupted.
+
+        public String hardwareId(){
+            return zoneName + "/" + hardwareId;
+        }
+
+        public String linuxImageId() {
+            return zoneName + "/" + linuxImageId;
+        }
     }
 
     public static class SshConfiguration{
