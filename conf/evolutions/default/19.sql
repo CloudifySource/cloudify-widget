@@ -1,0 +1,1 @@
+alter table server_node drop column api_secret_key;

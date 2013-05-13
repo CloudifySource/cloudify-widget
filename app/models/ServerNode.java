@@ -23,6 +23,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.cache.Cache;
 import play.db.ebean.Model;
 import utils.CollectionUtils;
 import utils.Utils;
@@ -82,10 +83,6 @@ extends Model
 	private String key;
 
     private String project;
-
-	@XStreamAsAttribute
-    @Column( name="api_secret_key") // keep convention from key
-	private String secretKey;
 
 	@XStreamAsAttribute
 	private boolean stopped = false;
@@ -255,14 +252,18 @@ extends Model
 		return key;
 	}
 
+    private String secretKeyToken(){
+        return project + "___" + key;
+    }
+
     public String getSecretKey()
     {
-        return secretKey;
+        return (String) Cache.get( secretKeyToken() );
     }
 
     public void setSecretKey( String secretKey )
     {
-        this.secretKey = secretKey;
+        Cache.set( secretKeyToken() , secretKey );
     }
 
     public void setKey(final String key) {
