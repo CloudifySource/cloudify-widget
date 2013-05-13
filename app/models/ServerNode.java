@@ -93,7 +93,7 @@ extends Model
 	@XStreamAsAttribute
 	private boolean remote = false;
 
-    @OneToOne( cascade = CascadeType.REMOVE )
+    @OneToOne( cascade = CascadeType.REMOVE, mappedBy="serverNode" )
     WidgetInstance widgetInstance = null;
 
     @Version

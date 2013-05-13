@@ -46,7 +46,7 @@ public class WidgetInstance
 	private Long id;
 
     @JsonIgnore
-    @OneToOne( mappedBy = "widgetInstance" )
+    @OneToOne( )
     private ServerNode serverNode;
 
 
