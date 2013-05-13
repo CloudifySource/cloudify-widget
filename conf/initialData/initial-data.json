@@ -120,7 +120,7 @@
                 "console": {
                     "title": "Play Console",
                     "link": "http://$HOST:8080",
-                    "service":"apacheLB"
+                    "service":"play"
                 },
                 "path": "apps/computers",
                 "image": {
