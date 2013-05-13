@@ -63,7 +63,12 @@ public class CloudifyRestClient {
     }
 
     public CloudifyRestResult.GetPublicIpResult getPublicIp( String ip, String application, String service ){
-        return getResult( CloudifyRestResult.GetPublicIpResult.class, GET_PUBLIC_IP_FORMAT, ip, application, service );
+        try{
+            return getResult( CloudifyRestResult.GetPublicIpResult.class, GET_PUBLIC_IP_FORMAT, ip, application, service );
+        }catch(Exception e){
+            logger.error("could not get public IP. please make sure the application.service combination is correct [{}.{}]", application, service );
+        }
+        return new CloudifyRestResult.GetPublicIpResult();
     }
 
     private <T> T getResult ( Class<T>  clzz, String format, String ... args ){

@@ -50,9 +50,9 @@ public class CloudifyRestResult {
     }
 
 //    {"Cloud Public IP":"15.185.182.232"}
-    public static class GetPublicIpResult{
+    public static class GetPublicIpResult extends CloudifyRestResult{
         @JsonProperty(value = "Cloud Public IP")
-        public String cloudPublicIp;
+        public String cloudPublicIp = null;
     }
 
     public static class GetVersion extends CloudifyRestResult{
