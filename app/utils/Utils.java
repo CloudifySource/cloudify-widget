@@ -190,11 +190,8 @@ public class Utils
             if (s.toLowerCase().startsWith("successfully created cloudify manager on provider")) {
                 s = "Cloudify manager created successfully.";
             }
-            if (s.toLowerCase().startsWith("->")) {
-                logger.info("LOG ->");
-            }
-            // trim empty lines or with a single dot
-			if ( !s.equals("") && !s.equals(".") ){
+            // trim empty lines, or with a single dot, or lines starting with "->" / "- >" / "-    >"
+            if ( !s.equals("") && !s.equals(".") && !s.matches("^\\-\\s*>") ){
 				newList.add( s );
             }
 		}
