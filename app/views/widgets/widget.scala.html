@@ -89,9 +89,10 @@
           </div>
     </div>
     <div id="embed-code-box">
+        <i class="close"></i>
         <h3>Embed Code</h3>
         <p>Copy the code below to embed the widget on your website.</p>
-        <textarea readonly="readonly">@embedCode.render( widget.getApiKey(), widget.getTitle(), widget.getYoutubeVideoUrl(), request.host()).body</textarea>
+        <textarea class="autoselect" readonly="readonly">@embedCode.render( widget.getApiKey(), widget.getTitle(), widget.getYoutubeVideoUrl(), request.host()).body</textarea>
     </div>
 
     @*<div id="walkthrough" style="display:none">&nbsp; <a href="javascript:void(0)">Click to close</a> </div>*@

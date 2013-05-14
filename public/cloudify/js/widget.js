@@ -597,17 +597,39 @@ $(function () {
 
     var msg =  encodeURI("Launch on the cloud in a single click using the Cloudify widget");
     var twitterMsg = encodeURIComponent( $("#title" ).text() + " on any cloud with a single click with #cloudifysource");
+
     var $embedCodeBox = $("#embed-code-box").hide();
     // remove white spaces
     $embedCodeBox.val($.trim($embedCodeBox.val()));
-    // tie box show/hide to button
+    // tie show/hide handlers
     $("#embed_btn").click(function() {
         $embedCodeBox.toggle();
     });
+    $("#embed-code-box .close").click(function() {
+        $embedCodeBox.hide();
+    });
+
     $("#facebook_share_link").attr("href", "http://www.facebook.com/sharer/sharer.php?u=" + shareUrl);
     $("#google_plus_share_link").attr("href", "https://plus.google.com/share?url=" + shareUrl);
     $("#twitter_share_link").attr("href", "https://twitter.com/share?url=" + encodeURIComponent(origin_page_url) + "&text=" + twitterMsg);
 
+    // select all on focus/click for autoselect textareas
+    $("textarea.autoselect").focus(function() {
+        var $this = $(this);
+
+        $this.select();
+
+        window.setTimeout(function() {
+            $this.select();
+        }, 1);
+
+        // Work around WebKit's little problem
+        $this.mouseup(function() {
+            // Prevent further mouseup intervention
+            $this.unbind("mouseup");
+            return false;
+        });
+    });
 
 
     // moved to template instead.
