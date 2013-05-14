@@ -191,7 +191,7 @@ public class Utils
                 s = "Cloudify manager created successfully.";
             }
             // trim empty lines, or with a single dot, or lines starting with "->" / "- >" / "-    >"
-            if ( !s.equals("") && !s.equals(".") && !s.matches("^\\-\\s*>") ){
+            if ( !s.equals("") && !s.equals(".") && !s.matches("^\\-\\s*>.*") ){
 				newList.add( s );
             }
 		}
