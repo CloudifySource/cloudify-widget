@@ -58,11 +58,15 @@ public class Widget
 	private Long id;
 
     @Constraints.Required
-	private String productName;
-	private String providerURL;
-	private String productVersion;
-	private String title;
+    private String productName;
+    @Constraints.Required
+    private String providerURL;
+    @Constraints.Required
+    private String productVersion;
+    @Constraints.Required
+    private String title;
 	private String youtubeVideoUrl;
+    @Constraints.Required
 	private String recipeURL;
 	private Boolean allowAnonymous;
 	private String apiKey;
