@@ -155,6 +155,24 @@ WidgetApp.controller('WidgetController',
             backdropFade: true,
             dialogFade:true
           };
+
+        // alerts struct: {[type: 'type',] msg: 'message'}
+        // alert types may be 'error', 'success', or no type.
+        $scope.alerts = [
+            {
+                msg: 'Welcome to the new dashboard! # to return to the old one.',
+                link: {text: 'Click here', href: '/admin/widgets'}
+            }
+        ];
+
+        $scope.addAlert = function(alert) {
+            $scope.alerts.push(alert);
+        };
+
+        $scope.closeAlert = function(index) {
+            $scope.alerts.splice(index, 1);
+        };
+
     }
 );
 

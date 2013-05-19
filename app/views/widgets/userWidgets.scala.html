@@ -9,6 +9,14 @@
 }
 
 <div id="main" class="widgets-dashboard" ui-if="!actions">
+
+    @* TODO use the i18n filter *@
+    <div style="text-align: center;">
+        <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">
+            {{ alert.msg.substring(0, alert.msg.indexOf('#')) }} <a href="{{ alert.link.href }}">{{ alert.link.text }}</a> {{ alert.msg.substring(alert.msg.indexOf('#') + 1) }}
+        </alert>
+    </div>
+
     <div class="hero-unit" id="welcome_window" ui-if="!widgets.length && angular.isDefined(widgets)">
         <h1>Welcome to the Cloudify Widget Dashboard!</h1>
         <p>We are thrilled to have you on board. This dashboard helps you to create a new Widget, embed the widget into your website and then monitor and administrate the running widget instances.</p>
