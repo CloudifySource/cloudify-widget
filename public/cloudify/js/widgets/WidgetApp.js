@@ -80,15 +80,17 @@ WidgetApp.controller('WidgetController',
 
         // edit it to edit the new widget form tips
         $scope.infoTooltips = {
-                productName: "The name of your product",
-                productVersion: "The version of your product",
-                title: "The widget title as it will appear when displaying the widget within a web page",
-                youtubeVideoUrl: "URL of a YouTube video you want to display within the widget (Optional)",
-                providerURL: "The URL of the product owner, e.g. http://www.mongodb.org",
-                recipeURL: "A URL (http/https)to the recipe zip file",
-                consolename: "The title of the link to the product dashboard / UI in the widget console",
-                consoleurl: "The URL to the product dashboard / UI. Use $HOST as the hostname placeholder, e.g.: http://$HOST:8080/tomcat/index.html"
-            };
+            recipeName: "The name in the recipe for uninstall.",
+            consoleUrlService:"The name of the service replacing $HOST placeholder",
+            productName: "The name of your product",
+            productVersion: "The version of your product",
+            title: "The widget title as it will appear when displaying the widget within a web page",
+            youtubeVideoUrl: "URL of a YouTube video you want to display within the widget (Optional)",
+            providerURL: "The URL of the product owner, e.g. http://www.mongodb.org",
+            recipeURL: "A URL (http/https)to the recipe zip file",
+            consolename: "The title of the link to the product dashboard / UI in the widget console",
+            consoleurl: "The URL to the product dashboard / UI. Use $HOST as the hostname placeholder, e.g.: http://$HOST:8080/tomcat/index.html"
+        };
 
         $scope.newWidget = function(){ $scope.actions = { "editWidget" : {} } };
         $scope.goBack = function(){  $scope.showEmbedCode = false; $scope.actions = null; };
@@ -155,6 +157,24 @@ WidgetApp.controller('WidgetController',
             backdropFade: true,
             dialogFade:true
           };
+
+        // alerts struct: {[type: 'type',] msg: 'message'}
+        // alert types may be 'error', 'success', or no type.
+        $scope.alerts = [
+            {
+                msg: 'Welcome to the new dashboard! # to return to the old one.',
+                link: {text: 'Click here', href: '/admin/widgets'}
+            }
+        ];
+
+        $scope.addAlert = function(alert) {
+            $scope.alerts.push(alert);
+        };
+
+        $scope.closeAlert = function(index) {
+            $scope.alerts.splice(index, 1);
+        };
+
     }
 );
 

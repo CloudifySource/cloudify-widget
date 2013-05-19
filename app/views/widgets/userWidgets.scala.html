@@ -9,6 +9,14 @@
 }
 
 <div id="main" class="widgets-dashboard" ui-if="!actions">
+
+    @* TODO use the i18n filter *@
+    <div style="text-align: center;">
+        <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">
+            {{ alert.msg.substring(0, alert.msg.indexOf('#')) }} <a href="{{ alert.link.href }}">{{ alert.link.text }}</a> {{ alert.msg.substring(alert.msg.indexOf('#') + 1) }}
+        </alert>
+    </div>
+
     <div class="hero-unit" id="welcome_window" ui-if="!widgets.length && angular.isDefined(widgets)">
         <h1>Welcome to the Cloudify Widget Dashboard!</h1>
         <p>We are thrilled to have you on board. This dashboard helps you to create a new Widget, embed the widget into your website and then monitor and administrate the running widget instances.</p>
@@ -161,8 +169,9 @@
                             @field("productName", "Product Name", required = true, value = "actions.editWidget.productName")
                             @field("productVersion", "Product Version", required = true, value = "actions.editWidget.productVersion")
                             @field("title", "Title", required = true, value = "actions.editWidget.title")
-                            @field("providerURL", "Provider URL", required = true, value = "actions.editWidget.providerURL")
+                            @field("recipeName", "Recipe Name", required = true, value = "actions.editWidget.recipeName")
                             @field("recipeURL", "Recipe URL", required = true, value = "actions.editWidget.recipeURL")
+                            @field("providerURL", "Provider URL", required = true, value = "actions.editWidget.providerURL")
                         </div>
                         <div style="border-bottom:1px solid #EEE; height:0">&nbsp;</div>
                         <div>
@@ -176,6 +185,7 @@
                         @field("youtubeVideoUrl", "Youtube Video URL", required = false, value = "actions.editWidget.youtubeVideoUrl")
                         @field("consolename", "Console Link Title", required = false, value = "actions.editWidget.consolename")
                         @field("consoleurl", "Console Link URL", required = false, value = "actions.editWidget.consoleurl")
+                        @field("consoleUrlService", "Console URL Service", required = false, value = "actions.editWidget.consoleUrlService")
                         @field("rootpath", "Recipe Root Path", required = false, value = "actions.editWidget.rootpath")
                         <div class="control-group">
                             <label class="control-label" for="apiKey">API Key</label>
