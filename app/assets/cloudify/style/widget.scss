@@ -420,7 +420,7 @@ body {
   bottom: 40px;
   right: 107px;
   width: 440px;
-  height: 180px;
+  height: 190px;
   padding: 8px 12px 12px;
   overflow: hidden;
   font-size: .9em;
@@ -428,7 +428,7 @@ body {
   border-radius: 4px;
   background-color: #fff;
   color: #333;
-  box-shadow: 2px 1px 10px #555;
+  box-shadow: 2px 1px 12px #555;
   h3, p {
     margin: 0;
     padding: 3px 0;
@@ -440,9 +440,19 @@ body {
   }
   textarea {
     width: 416px;
-    height: 118px;
+    height: 128px;
     padding: 5px 12px;
     background-color: #333;
     color: #eee;
+  }
+  // TODO abstract away for reuse
+  .close {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 29px;
+    height: 29px;
+    background: url("/img/icons/close-button.png") 50% 50% no-repeat;
+    cursor: pointer;
   }
 }
