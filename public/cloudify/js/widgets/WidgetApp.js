@@ -141,7 +141,6 @@ WidgetApp.controller('WidgetController',
             var widgetFormConstruct = this.widgetForm;
             console.log(["saving widget", widget ]);
             WidgetModel.saveWidget( $scope.authToken, widget ).then( function( savedWidget ){
-                widgetFormConstruct.$dirty = false; // ugly fix until angularjs patch this .
                 if ( !angular.isDefined(widget.id)){
                     widget.id = savedWidget.id;
                 }
