@@ -14,25 +14,10 @@
  */
 package controllers;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
-
 import beans.ServerNodesPoolStats;
 import com.avaje.ebean.Ebean;
 import data.validation.GsConstraints;
-import models.ServerNode;
-import models.Summary;
-import models.User;
-import models.Widget;
-import models.WidgetIcon;
-import models.WidgetInstance;
+import models.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,9 +36,6 @@ import server.HeaderMessage;
 import server.exceptions.ServerException;
 import utils.CollectionUtils;
 import utils.RestUtils;
-
-import static utils.RestUtils.*;
-
 import views.html.common.linkExpired;
 import views.html.widgets.admin.newPassword;
 import views.html.widgets.admin.resetPassword;
@@ -61,9 +43,19 @@ import views.html.widgets.admin.signin;
 import views.html.widgets.admin.signup;
 import views.html.widgets.dashboard.account;
 import views.html.widgets.dashboard.angularjs_widget;
+import views.html.widgets.dashboard.serverNodePool;
+import views.html.widgets.dashboard.serverNodePoolTemplate;
 import views.html.widgets.dashboard.previewWidget;
 import views.html.widgets.dashboard.widgets;
 import views.html.widgets.widget;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.*;
+import java.util.regex.Pattern;
+
+import static utils.RestUtils.*;
 
 
 /**
@@ -415,11 +407,19 @@ public class WidgetAdmin extends Controller
 	}
 	
 	
-	public static Result getAllServers()
+	public static Result getAllServers( String authToken )
 	{
-		List<ServerNode> list = ServerNode.find.all();
+        logger.info("got a request to list all server nodes");
 
-		return resultAsJson(list);
+        User user = User.validateAuthToken(authToken);
+        if ( !user.isAdmin() )   {
+            logger.info("user [{}] is not an admin, denying request to show list of server nodes", user.getFullName());
+            return badRequest();
+        }
+
+        List<ServerNode> list = ServerNode.find.all();
+        logger.debug("list of server nodes:\n{}", list);
+        return ok( Json.toJson( list ) );
 	}
 
 	
@@ -462,14 +462,31 @@ public class WidgetAdmin extends Controller
 
         User user = User.validateAuthToken(authToken);
         if ( user.isAdmin() ){
-             return Widget.getWidget( apiKey );
+             return Widget.getWidget(apiKey);
         }else{
-            return Widget.getWidgetByApiKey( user, apiKey );
+            return Widget.getWidgetByApiKey(user, apiKey);
         }
     }
 
     public static Result getUserWidgetTemplate(){
         return ok( views.html.widgets.userWidgets.render() ); // we do this so we can get the embed code.. we cannot use angularJS as we might want to email it too..
+    }
+
+    public static Result getServerNodePoolTemplate(){
+        logger.info("got a request to show server node pool page");
+        Http.Cookie authToken = request().cookies().get("authToken");
+        User user;
+        if (authToken != null &&
+                (user = User.validateAuthToken(authToken.value())) != null) {
+            if (!user.isAdmin()) {
+                logger.info("user [{}] is not an admin, denying request to show server node pool page", user.getFullName());
+                new HeaderMessage().setError( "User is not allowed to view this page" ).apply( response().getHeaders() );
+                return badRequest();
+            }
+        } else {
+            return redirect(routes.WidgetAdmin.getSigninPage(null));
+        }
+        return ok(serverNodePoolTemplate.render());
     }
 
     public static Result summary( String authToken )
@@ -510,7 +527,7 @@ public class WidgetAdmin extends Controller
     public static Result previewWidget( String apiKey ){
         String authToken = request().cookies().get("authToken").value();
         Widget widget = getWidgetSafely( authToken, apiKey );
-        return ok( previewWidget.render( widget, request().host() ));
+        return ok( previewWidget.render(widget, request().host()));
     }
 	
 	public static Result regenerateWidgetApiKey( String authToken, String apiKey )
@@ -575,6 +592,10 @@ public class WidgetAdmin extends Controller
 
     public static Result newWidgetsPage(){
         return ok( angularjs_widget.render() );
+    }
+
+    public static Result getServerNodePoolPage(){
+        return ok( serverNodePool.render() );
     }
 
     public static Result addIcon()
