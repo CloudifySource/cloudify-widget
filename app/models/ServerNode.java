@@ -90,12 +90,14 @@ extends Model
 	@XStreamAsAttribute
 	private boolean remote = false;
 
+
     @OneToOne( cascade = CascadeType.REMOVE, mappedBy="serverNode" )
     WidgetInstance widgetInstance = null;
 
     @Version
     private long version = 0;
 
+    @JsonIgnore
     @OneToMany(mappedBy="serverNode", cascade = CascadeType.REMOVE)
     public List<ServerNodeEvent> events = new LinkedList<ServerNodeEvent>();
 	

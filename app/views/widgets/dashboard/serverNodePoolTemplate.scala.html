@@ -1,0 +1,65 @@
+<div id="main" class="widgets-dashboard">
+
+<div ui-if="serverNodes.length">
+    <div class="row" id="search_panel">
+        <div class="span1">
+            <form class="form-search">
+                <input id="search" type="text" placeholder="Filter server nodes" class="input-medium search-query">
+            </form>
+        </div>
+    </div>
+
+    <div id="summary" class="well summary" ui-if="admin">
+        <ul>
+            <li ng-repeat="attr in summary.attributes"><span class='count'> {{attr.value}} </span> {{attr.name}}</li>
+        </ul>
+    </div>
+
+    <div id="widgets_panel">
+        <table class="table table-bordered table-striped">
+            <thead class="list_head">
+                <tr>
+                    <th>Server ID</th>
+                    <th>Expiration Time</th>
+                    <th>Public IP</th>
+                    <th>Private IP</th>
+                    <th>Busy</th>
+                    <th>Private Key</th>
+                    <th>Project</th>
+                    <th>API Key</th>
+                    <th>Stopped</th>
+                    <th>Remote</th>
+                    <th>Version</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Use this to use enable/disable options in CSS {{widget.enabled && 'enabled-widget' || 'disabled-widget'}}-->
+                <tr ng-repeat="node in serverNodes" class="widget" id="server_{{node.server_id}}">
+                    <td>{{ node.server_id }}</td>
+                    <td>{{ node.expiration_time }}</td>
+                    <td>{{ node.public_ip }}</td>
+                    <td>{{ node.private_ip }}</td>
+                    <td>{{ node.busy }}</td>
+                    <td>{{ node.private_key }}</td>
+                    <td>{{ node.project }}</td>
+                    <td>{{ node.api_key }}</td>
+                    <td>{{ node.stopped }}</td>
+                    <td>{{ node.remote }}</td>
+                    <td>{{ node.version }}</td>
+@*
+                    <td class="action_col">
+                        <a href="/widget/previewWidget?apiKey={{widget.apiKey}}" style="text-decoration: none; color:black;"><i title="preview" class="icon-eye-open"></i></a>
+                        <i title="edit" class="icon-edit" ng-click="editWidget(widget)"></i>
+                        <i title="get embed code" class="icon-share " ng-click="getEmbed(widget)"></i>
+                        <i title="delete" class="icon-trash " ng-click="delete(widget)"></i>
+                        <i title="disabled - click to enable" class="icon-globe" style="color:red" ui-if="!widget.enabled" ng-click="enable(widget)"></i>
+                        <i title="enabled - click to disable" class="icon-globe" style="color:green" ui-if="widget.enabled" ng-click="disable(widget)"></i>
+                    </td>
+*@
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+    <!-- main -->
+</div>

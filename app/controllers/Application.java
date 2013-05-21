@@ -279,6 +279,7 @@ public class Application extends Controller
 
                         // Routes for Projects
                         routes.javascript.WidgetAdmin.getAllWidgets(),
+                        routes.javascript.WidgetAdmin.getAllServers(),
                         routes.javascript.WidgetAdmin.summary(),
                         routes.javascript.WidgetAdmin.postWidget(),
                         routes.javascript.WidgetAdmin.checkPasswordStrength(),
