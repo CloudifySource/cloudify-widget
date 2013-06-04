@@ -16,10 +16,8 @@ package beans;
 
 import beans.api.ExecutorFactory;
 import beans.cloudify.CloudifyRestClient;
-import beans.cloudify.CloudifyRestResult;
 import beans.config.Conf;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Multimap;
 import com.google.common.net.HostAndPort;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -38,7 +36,6 @@ import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.config.NullLoggingModule;
 import org.jclouds.openstack.nova.v2_0.NovaApi;
 import org.jclouds.openstack.nova.v2_0.NovaAsyncApi;
-import org.jclouds.openstack.nova.v2_0.domain.Address;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.jclouds.openstack.nova.v2_0.domain.Server.Status;
 import org.jclouds.openstack.nova.v2_0.domain.ServerCreated;
@@ -68,7 +65,6 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,6 +80,8 @@ import java.util.concurrent.atomic.AtomicLong;
  * On each new server runs a bootstrap script that prepare machine for a server-pool,
  * it includes a setup of firewall, JDK, cloudify installation and etc...
  * The bootstrap script can be found under ssh/bootstrap_machine.sh
+ *
+ * TODO : Nova is "compute" for openstack. For abstraction purposes we should rename "nove" to "compute" because we are not bound to "openstack".
  *
  * @author Igor Goldenberg
  */
@@ -332,7 +330,17 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             if ( apiCredentials ){
                 overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
             }
-            context = ContextBuilder.newBuilder( cloudProvider ).credentials( project+":"+key, secretKey ).overrides( overrides ).buildView( ComputeServiceContext.class );
+
+
+            String identity = key;
+            String credential = secretKey;
+
+            if ( "hp-cloud".equalsIgnoreCase(cloudProvider ) ){
+                identity = project + ":" + key;
+            }
+
+
+            context = ContextBuilder.newBuilder( cloudProvider ).credentials( identity, credential ).overrides( overrides ).buildView( ComputeServiceContext.class );
             this.zone = zone;
         }
 
