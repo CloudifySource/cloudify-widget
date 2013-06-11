@@ -1,0 +1,13 @@
+WIDGET_HOME=/my/user/home/play-2.0.4/cloudify-widget
+DB_USER=<my db user>
+DB_PASSWORD=<my db password>
+DB_ADMIN=<my db admin username>
+DB_ADMIN_PASSWORD=<my db admin password>
+DB=<my db name>
+COMPANY_DOMAIN=mydomain.com
+SITE_DOMAIN=mysubdomain.$COMPANY_DOMAIN
+SITE_STAGING_DOMAIN=mystagingdomain$SITE_DOMAIN
+MONIT_FROM=noreply@$COMPANY_DOMAIN
+MONIT_SET_ALERT=widget@$COMPANY_DOMAIN
+CLOUDIFY_SECURITY_GROUP=widgetSecurityGroup
+TAKIPI_KEY=<Only if I have one, otherwise provided>

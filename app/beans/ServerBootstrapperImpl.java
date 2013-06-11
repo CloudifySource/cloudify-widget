@@ -16,6 +16,7 @@ package beans;
 
 import beans.api.ExecutorFactory;
 import beans.cloudify.CloudifyRestClient;
+import beans.config.CloudProvider;
 import beans.config.Conf;
 import com.google.common.base.Predicate;
 import com.google.common.net.HostAndPort;
@@ -335,7 +336,8 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             String identity = key;
             String credential = secretKey;
 
-            if ( "hp-cloud".equalsIgnoreCase(cloudProvider ) ){
+            // todo : translate configuration to enum, and work with enum - or implement beans.
+            if ( CloudProvider.HP.label.equalsIgnoreCase(cloudProvider) ){
                 identity = project + ":" + key;
             }
 

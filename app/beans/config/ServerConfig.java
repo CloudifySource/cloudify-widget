@@ -142,7 +142,7 @@ public class ServerConfig {
         public SshConfiguration ssh = new SshConfiguration();
         public String apiKey="<HP cloud Password>";
         public String username="<tenant>:<user>";
-        public String cloudProvider="hpcloud-compute";
+        public String cloudProvider=CloudProvider.HP.label;
         public File script;
         public String tags = null;
         public ApiCredentials api = new ApiCredentials();
