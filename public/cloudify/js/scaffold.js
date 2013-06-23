@@ -8,9 +8,6 @@
 
 $( function ()
 {
-
-
-
     $( document ).ajaxError(function ( event, jqXHR, ajaxSettings, thrownError )
     {
         console.log( ["handling error", jqXHR.getAllResponseHeaders(), jqXHR.getResponseHeader( "session-expired" )] );
@@ -58,4 +55,11 @@ $( function ()
 
     // auto-render elements on page
     $(".info-icon" ).tooltip();
+
+    window.username = $.cookie( "username" );
+    $("#username").text(username);
+
+    if ($.cookie("admin") != "true"){
+        $(".adminOnly").remove();
+    }
 } );

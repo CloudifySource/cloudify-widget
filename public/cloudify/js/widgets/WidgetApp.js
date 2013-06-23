@@ -26,57 +26,22 @@ var widgetConfig = function($routeProvider, $locationProvider, $httpProvider){
             templateUrl: '/user/widgetsTemplate'
 //            templateUrl: '/public/templates/widgets.html'
         });
-
-
-        $httpProvider.responseInterceptors.push('myInterceptor');
+        $httpProvider.responseInterceptors.push('WidgetAjaxInterceptor');
 };
 
 
 
-var WidgetApp = angular.module( 'WidgetApp', ["ui.bootstrap","ui", "gs.modules"] ).config( widgetConfig );
+console.log("loading WidgetApp");
+var WidgetApp = angular.module( 'WidgetApp', ["ui.bootstrap","ui",   "WidgetModules"] ).config( widgetConfig );
 
-WidgetApp.factory( 'myInterceptor', function ( $rootScope, $q, $window )
-{
-    function success( response )
-    {
-        $rootScope.formErrors = {};
-        return response;
-    }
-
-    function error( response )
-    {
-        var status = response.status;
-        if ( status == 401 ) {
-            window.location = "/";
-            return;
-        }
-
-        var hdrs = response.headers();
-        if ( hdrs["display-message"]){
-            var displayMessages = JSON.parse(hdrs["display-message"]);
-            if ( displayMessages["formErrors"]){
-                $rootScope.formErrors = displayMessages["formErrors"];
-            }
-        }
-        console.log(["hdrs",hdrs]);
-        // otherwise
-        return $q.reject( response );
-    }
-
-    return function ( promise )
-    {
-        return promise.then( success, error );
-    };
-} );
 
 WidgetApp.controller('WidgetController',
-    function($scope, $location, $routeParams, $dialog, $rootScope,  WidgetModel ){
+    function($scope, $location, $routeParams, $dialog, $rootScope,  WidgetModel, SessionService ){
+        SessionService.applySession( $scope ); // apply session onto scope.
 
-        $scope.authToken = $.cookie( "authToken" );
-        WidgetModel.getWidgets( $scope.authToken ).then( function(data){ $scope.widgets = data; });
-        $scope.admin = $.cookie("admin") == "true";
-        $scope.summary = WidgetModel.getSummary( $scope.authToken );
         $scope.host = window.location.host;
+
+        WidgetModel.getWidgets( $scope.authToken ).then( function(data){ $scope.widgets = data; });
 
         // edit it to edit the new widget form tips
         $scope.infoTooltips = {
@@ -157,101 +122,5 @@ WidgetApp.controller('WidgetController',
             dialogFade:true
           };
 
-        // alerts struct: {[type: 'type',] msg: 'message'}
-        // alert types may be 'error', 'success', or no type.
-        $scope.alerts = [
-            {
-                msg: 'Welcome to the new dashboard! # to return to the old one.',
-                link: {text: 'Click here', href: '/admin/widgets'}
-            }
-        ];
-
-        $scope.addAlert = function(alert) {
-            $scope.alerts.push(alert);
-        };
-
-        $scope.closeAlert = function(index) {
-            $scope.alerts.splice(index, 1);
-        };
-
     }
 );
-
-
-angular.module("gs.modules", ["gs.modules.i18n"]);
-angular.module('gs.modules.i18n',[] ).filter( 'i18n', function( i18n ){
-    return function(key){ return i18n.translate(key); }
-} ).service('i18n', function( $http, $rootScope ){
-        var option = { lng:'dev', resGetPath: '/public/js/i18next/dicts/__ns__-__lng__.json' };
-        i18n.init(option, function(){ $rootScope.$digest(); console.log("after i18n loading")});
-        this.translate = function(key){ return window.i18n.t(key) };
-    } );
-
-/**
- *
- * Guy - we are currently using promises here. We could take another approach - create an array and keep the reference
- * and then update the array - while keeping the same reference.
- *
- * something like
- *
- *           function( authToken, $scope ){
- *              $http().success(function(data){ $scope["widgets"] = data } )
- *          }
- *
- *
- * or
- *
- *         function (authToken){
- *              var result = {}
- *              $http().success(function(data){ result["widgets"] = data } }
- *              return result;
- *         }
- *
- *
- * The "result" here behaves like a scope that we can modify
- * This approach (updating references) might expose a nicer API.. at the meantime I am going with the flow and I use promises.
- *
- */
-
-WidgetApp.service('WidgetModel', function( $http ){
-    this.getWidgets = function( authToken ){
-        console.log(["getting all widgets", authToken]);
-//        return $http.get(jsRoutes.controllers.WidgetAdmin.getAllWidgets( "gergerge" ).url )
-//            .success(function(a,b,c,d){ debugger; return "guy"})
-//            .error(function(a,b,c,d){  debugger;});
-        return $http.get(jsRoutes.controllers.WidgetAdmin.getAllWidgets( authToken ).url ).then(function( data ){ return data.data; }); //, function(a,b,c,d){  console.log("got an error"); });
-    };
-
-    this.saveWidget = function( authToken, widget ){
-        return $http.post(jsRoutes.controllers.WidgetAdmin.postWidget( authToken ).url, widget ).then( function( data ){ return data.data });
-    };
-
-    this.getSummary = function (authToken ){
-        console.log(["getting summary", authToken]);
-        return $http.get(jsRoutes.controllers.WidgetAdmin.summary( authToken ).url ).then(function(data){ console.log(["I have a summary", data]); return data.data.summary}, function(){ console.log("returning summary null" ); return null; }); // on error return null;
-    };
-
-    this.deleteWidget = function ( authToken , widget ){
-        console.log(["deleting widget", authToken, widget]);
-        return $http.post( jsRoutes.controllers.WidgetAdmin.deleteWidget( authToken, widget.apiKey ).url );
-    };
-
-    this.regenerateKey = function( authToken, widget ){
-        return $http.post( jsRoutes.controllers.WidgetAdmin.regenerateWidgetApiKey(authToken, widget.apiKey ).url ).then( function(result){ return result.data.widget.apiKey; } );
-    };
-
-    this.enableWidget = function( authToken, widget ){
-        return $http.post( jsRoutes.controllers.WidgetAdmin.enableWidget( authToken, widget.apiKey ).url );
-    };
-
-    this.disableWidget = function( authToken, widget ){
-        return $http.post( jsRoutes.controllers.WidgetAdmin.disableWidget( authToken, widget.apiKey ).url );
-    }
-
-});
-
-WidgetApp.service( 'WidgetInstanceModel', function($http){
-    this.shutdown = function(){
-
-    }
-});

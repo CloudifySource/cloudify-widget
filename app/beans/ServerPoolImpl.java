@@ -20,9 +20,11 @@ import java.util.List;
 
 import beans.config.Conf;
 
+import beans.pool.PoolEvent;
 import com.avaje.ebean.Ebean;
 import models.ServerNode;
 import org.apache.commons.collections.Predicate;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import server.*;
@@ -170,6 +172,11 @@ public class ServerPoolImpl implements ServerPool
         }
     }
 
+    @Override
+    public Collection<ServerNode> getPool() {
+        return ServerNode.findByCriteria(new ServerNode.QueryConf().setMaxRows(-1).criteria().setBusy(null).setRemote(false).done());
+    }
+
     public ServerNodesPoolStats getStats(){
         ServerNodesPoolStats stats = new ServerNodesPoolStats();
 
@@ -190,7 +197,7 @@ public class ServerPoolImpl implements ServerPool
         logger.info( "getting a server node with lifeExpectancy [{}]", lifeExpectancy );
 
         List<ServerNode> freeServers = null;
-        freeServers = ServerNode.findByCriteria( new ServerNode.QueryConf().setMaxRows( 10 ).criteria().setBusy( false ).setRemote( false ).done() );
+        freeServers = ServerNode.findByCriteria(new ServerNode.QueryConf().setMaxRows(10).criteria().setBusy(false).setRemote(false).done());
         ServerNode selectedServer = null;
         if ( !CollectionUtils.isEmpty( freeServers )){
             for ( ServerNode freeServer : freeServers ) {
@@ -228,16 +235,36 @@ public class ServerPoolImpl implements ServerPool
                 serverNode.setExpirationTime( lifeExpectancy + System.currentTimeMillis() );
                 serverNode.save(); // optimistic locking
                 // schedule to destroy after time expiration
-                // TODO when unlimited server will support uncomment this line if ( serverNode.isTimeLimited() )
                 expiredServerCollector.scheduleToDestroy( serverNode );
                 return true;
             } else {
-                logger.info( "serverNode[{}] has an invalid bootstrap", result );
+                logger.info( "serverNode[{}] has an invalid bootstrap. I will rebuild it.", result );
+                rebuild( serverNode );
             }
         }catch(OptimisticLockException e){
             logger.info( "server [{}] already caught by another thread, could not get it", serverNode );
         }
         return false;
+    }
+
+    // this will destroy one machine and create another.
+    public void rebuild( final ServerNode serverNode ){
+        logger.info("rebuilding machine [{}]", serverNode);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if ( !serverBootstrapper.reboot(serverNode) ){
+                    logger.info("could not rebuild machine [{}]. I will destroy it and create another one", serverNode );
+                    destroy(serverNode);
+                }else{
+                    logger.info("machine [{}] rebuilt successfully", serverNode );
+                    destroy(serverNode);
+                    serverBootstrapper.createServers( 1 );
+                }
+
+            }
+        }).start();
+
     }
 
     public void destroy( ServerNode serverNode )
@@ -263,7 +290,8 @@ public class ServerPoolImpl implements ServerPool
         return ServerNode.count() >= conf.server.pool.maxNodes;
     }
 	
-	void addNewServerToPool()
+	@Override
+    public void addNewServerToPool()
 	{
         logger.info( "adding new server to the pool" );
 		new Thread(new Runnable()
@@ -279,7 +307,12 @@ public class ServerPoolImpl implements ServerPool
 				} catch (Exception e)
 				{
 					logger.error("ServerPool failed to create a new server node", e);
-				}
+                    String stackTrace = ExceptionUtils.getFullStackTrace(e);
+                    ApplicationContext.get().getPoolEventManager().handleEvent(new PoolEvent.MachineStateEvent()
+                            .setType(PoolEvent.Type.ERROR)
+                            .setErrorMessage(e.getMessage())
+                            .setErrorStackTrace(stackTrace));
+                }
 			}
 		}).start();
 	}

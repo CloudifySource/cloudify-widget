@@ -14,4 +14,13 @@ public enum CloudProvider {
     private CloudProvider( String label ) {
         this.label = label;
     }
+
+    public static CloudProvider findByLabel(String cloudProvider) {
+        for (CloudProvider provider : values()) {
+            if ( provider.label.equals(cloudProvider)){
+                return provider;
+            }
+        }
+        throw new IllegalArgumentException(String.format("cannot find cloudProvider with label [%s]", cloudProvider));
+    }
 }

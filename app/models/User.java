@@ -286,6 +286,10 @@ public class User
     // so we can simply invoke methods. However, the "session" should be handled by the GUI controller and not Javascript.
     static public User validateAuthToken( String authToken, boolean silent )
     {
+       return validateAuthToken(authToken, silent, Http.Context.current());
+    }
+
+    static public User validateAuthToken( String authToken, boolean silent, Http.Context context ){
         Long userId = null;
         if ( ApplicationContext.get().conf().settings.expireSession ) {
             userId = ( Long ) Cache.get( authToken ); // for now, lets use the cache as session. we should implement an encrypted cookie.
@@ -298,8 +302,9 @@ public class User
 
         User user = null;
         if ( userId == null ) {
-            if ( !silent ) {
-                Http.Context.current().response().setHeader( "session-expired", "session-expired" );
+            if ( !silent && context != null) {
+
+               context.response().setHeader( "session-expired", "session-expired" );
                 throw new ServerException( Messages.get( "session.expired" ) ).getResponseDetails().setHeaderKey( "session-expired" ).setError( "Session Expired" ).done();
             }
         } else {
@@ -307,8 +312,10 @@ public class User
             if ( user == null && !silent ) {
                 throw new ServerException( Messages.get( "auth.token.not.valid", authToken ) );
             }
-            Http.Context.current().session().put( "authToken", authToken );
-            prolongSession( authToken, user.id );
+            if ( context != null ){
+                context.session().put( "authToken", authToken );
+                prolongSession( authToken, user.id );
+            }
         }
 
         return user;

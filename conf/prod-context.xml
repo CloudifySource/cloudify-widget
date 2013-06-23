@@ -6,6 +6,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
+    <bean id="poolEventManager" class="beans.pool.PoolEventManager"/>
 
     <bean id="deployManager" class="beans.DeployManagerImpl"/>
     <bean id="executorFactory" class="beans.ExecutorFactoryImpl"/>
@@ -36,9 +37,10 @@
     <bean id="conf" factory-method="getConfiguration" factory-bean="confBean"/>
 
     <bean id="applicationContext" class="server.ApplicationContext"/>
+    <bean id="novaCloudCredentials" class="beans.NovaCloudCredentials" scope="prototype" init-method="init"/>
 
 
     <context:annotation-config />
-    <context:component-scan base-package="beans" />
+    <context:component-scan base-package="beans" />	
 
 </beans>

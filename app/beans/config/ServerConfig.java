@@ -152,6 +152,8 @@ public class ServerConfig {
         public String project;
         public String key;
         public String secretKey;
+        @Config(ignoreNullValues = true)
+        public boolean apiAccessKeyCredentials = false; // are this the tenant's details, or the user details? HP makes a difference.
     }
     
     // cloud bootstrap configuration.

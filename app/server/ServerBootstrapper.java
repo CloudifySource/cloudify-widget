@@ -18,7 +18,9 @@ package server;
 import java.util.List;
 
 import beans.BootstrapValidationResult;
+import beans.NovaCloudCredentials;
 import models.ServerNode;
+import org.jclouds.openstack.nova.v2_0.domain.Server;
 import server.exceptions.BootstrapException;
 
 /**
@@ -40,6 +42,9 @@ public interface ServerBootstrapper
 
     public void destroyServer(ServerNode serverNode);
 
+    // used when we don't have a ServerNode in the DB
+    public void deleteServer( String nodeId );
+
     /**
      *
      *
@@ -53,4 +58,14 @@ public interface ServerBootstrapper
     public ServerNode bootstrapCloud( ServerNode serverNode ) throws BootstrapException;
 
     public List<ServerNode> recoverUnmonitoredMachines();
+
+    List<Server> getAllMachines(NovaCloudCredentials cloudCredentials);
+
+    /**
+     *   Take this machine and make it work.
+     *   @return true iff you succeed.
+     **/
+    boolean reboot(ServerNode serverNode);
+
+
 }

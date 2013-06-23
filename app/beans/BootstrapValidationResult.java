@@ -23,10 +23,10 @@ import server.ApplicationContext;
  * Time: 3:59 AM
  */
 public class BootstrapValidationResult {
-    Boolean machineReachable = true;
-    String managementVersion = null;
-    Boolean managementAvailable = null;
-    String lastComparedVersion = null;
+    public Boolean machineReachable = true;
+    public String managementVersion = null;
+    public Boolean managementAvailable = null;
+    public String lastComparedVersion = null;
     public Exception machineReachableException = null;
 
     private boolean getResult( String expectedVersion )

@@ -27,7 +27,6 @@ GET     /decrypt                        controllers.Application.decrypt( data:St
 
 
 # Admin API
-GET     /admin/serverNodePoolTemplate   controllers.WidgetAdmin.getServerNodePoolTemplate
 GET     /user/widgetsTemplate           controllers.WidgetAdmin.getUserWidgetTemplate
 GET     /admin/checkPasswordStrength    controllers.WidgetAdmin.checkPasswordStrength( password:String,  email:String )
 GET     /admin/passwordStrength         controllers.WidgetAdmin.getPasswordMatch( authToken:String, password:String)
@@ -40,7 +39,6 @@ GET      /admin/resetPassword           controllers.WidgetAdmin.getResetPassword
 GET      /admin/signin                  controllers.WidgetAdmin.getSigninPage( message:String ?= null )
 GET      /admin/widgets                 controllers.WidgetAdmin.getWidgetsPage
 GET      /user/widgets                  controllers.WidgetAdmin.newWidgetsPage
-GET      /admin/serverNodePool          controllers.WidgetAdmin.getServerNodePoolPage
 GET      /admin/logout                  controllers.WidgetAdmin.logout
 POST     /signin	     		     	controllers.WidgetAdmin.signIn( email: String, password: String )
 POST     /signup      		     		controllers.WidgetAdmin.signUp( email: String, passwordConfirmation: String, password: String, firstname: String, lastname: String  )
@@ -57,10 +55,25 @@ GET     /widget/previewWidget           controllers.WidgetAdmin.previewWidget( a
 GET     /widget/icon                    controllers.WidgetAdmin.icon( apiKey: String)
 POST    /widget/icon                    controllers.WidgetAdmin.addIcon
 POST    /widget/removeIcon              controllers.WidgetAdmin.removeIcon( authToken: String, widgetId:Long )
-GET      /widget/summary 				controllers.WidgetAdmin.summary( authToken: String )
-GET      /server/list 					controllers.WidgetAdmin.getAllServers( authToken: String )
 GET      /server/headers            	controllers.WidgetAdmin.headers
 GET     /widget/widget                  controllers.WidgetAdmin.getWidget( apiKey:String )
+
+
+POST     /admin/pool/manage/add                          controllers.AdminPoolController.addNode( authToken:String )
+POST     /admin/pool/manage/:nodeId/remove               controllers.AdminPoolController.removeNode( authToken:String, nodeId:String )
+GET     /admin/pool/manage/:nodeId/check                controllers.AdminPoolController.checkAvailability( authToken:String, nodeId:String )
+GET     /admin/pool/manage                              controllers.AdminPoolController.index
+GET     /admin/pool/manage/nodes                        controllers.AdminPoolController.getServerNodes( authToken :String)
+GET     /admin/pool/manage/instance                     controllers.AdminPoolController.getWidgetInstances( authToken :String)
+GET     /admin/pool/manage/machines                     controllers.AdminPoolController.getCloudServers( authToken :String)
+GET     /admin/pool/manage/statuses                     controllers.AdminPoolController.getStatuses( authToken :String)
+GET     /admin/pool/manage/events                       controllers.AdminPoolController.poolEvents( authToken: String )
+
+GET     /admin/pool/summary             controllers.AdminPoolController.summary( authToken :String)
+
+#GET     /user/pool/manage              controllers.UserPoolController.getServerNodePoolPage( authToken:String, project:String, key:String, secretKey:String)
+#GET     /user/pool/manage/list         controllers.UserPoolController.getAllServers
+#GET     /user/pool/summary             controllers.UserPoolController.summary
 
 
 

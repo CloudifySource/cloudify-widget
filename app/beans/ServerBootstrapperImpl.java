@@ -18,6 +18,9 @@ import beans.api.ExecutorFactory;
 import beans.cloudify.CloudifyRestClient;
 import beans.config.CloudProvider;
 import beans.config.Conf;
+import beans.pool.PoolEvent;
+import beans.pool.PoolEventListener;
+import beans.pool.PoolEventManager;
 import com.google.common.base.Predicate;
 import com.google.common.net.HostAndPort;
 import com.google.inject.Guice;
@@ -50,6 +53,7 @@ import org.jclouds.util.Strings2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.i18n.Messages;
+import play.modules.spring.Spring;
 import server.ApplicationContext;
 import server.DeployManager;
 import server.ProcExecutor;
@@ -63,7 +67,6 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -71,7 +74,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 
@@ -102,6 +105,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     @Inject
     private ExecutorFactory executorFactory;
 
+    @Inject
+    private PoolEventManager poolEventManager;
+
     // this is an incrementing ID starting from currentMilliTime..
     // resolves issue where we got "Server by this name already exists"
     private AtomicLong incNodeId = new AtomicLong(  System.currentTimeMillis() );
@@ -112,8 +118,6 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     @Inject
     private CloudifyRestClient cloudifyRestClient;
 
-    private Exception lastKnownException = null;
-
     public List<ServerNode> createServers( int numOfServers )
 	{
 		List<ServerNode> servers = new ArrayList<ServerNode>();
@@ -121,11 +125,25 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		for( int i=0; i< numOfServers; i++ )
 		{
             ServerNode server = createServer();
-            servers.add( server );
+            if ( server != null ){
+                servers.add( server );
+            }
         }
 		return servers;
 	}
 
+
+    /**
+     * This method will try to create a server.
+     * Creating a server includes 2 steps :
+     * 1. Getting a machine up and running
+     * 2. Installing Cloudify on the machine.
+     *
+     * If any of the above fails, it is the "createServer" responsibility to clean the workspace.
+     * In this case - the method will return NULL.
+     *
+     * @return ServerNode if creation was successful.
+     */
     public ServerNode createServer()
     {
 
@@ -133,32 +151,22 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         int i =0;
         for ( ; i < retries && serverNode == null ; i++){
             logger.info( "creating new server node, try #[{}]",i );
-            serverNode = tryCreateServer();
-        }
+            ServerNode tmpNode = createMachine();
+            if ( tmpNode != null && bootstrap(tmpNode)){
+                serverNode = tmpNode;
+                logger.info("successful bootstrap on [{}]", serverNode);
+            }else if ( tmpNode != null ) {
+                logger.info("bootstrap failed, deleting server");
+                deleteServer( tmpNode.getNodeId() ); // deleting the machine from HP.
+            }else{
+                logger.info("unable to create machine. try [{}/{}]", i+1, retries);
+            }
 
-        if ( serverNode == null ){
-            throw new RuntimeException( "unable to create new nodes!! printed last known exception here", lastKnownException );
         }
         return serverNode;
 
     }
 
-    public ServerNode tryCreateServer(){
-        ServerNode srvNode = null;
-        try {
-            srvNode = createServerNode();
-            return srvNode;
-        } catch ( Exception e ) {
-            lastKnownException = e;
-            // failed to boostrap machine, nothing to do - let destroy :(
-            if ( srvNode != null ) {
-                destroyServer( srvNode );
-                logger.error( "Failed to create machine.", e );
-            }
-
-        }
-        return null;
-    }
 
     // guy - todo - need to ping machine first. If machine is down, we cannot validate - throw exception.
     // guy - todo - if machine is up we do the same thing we do today.
@@ -203,8 +211,19 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         if ( !StringUtils.isEmpty( serverNode.getNodeId() ) ){
             deleteServer( serverNode.getNodeId() );
         }
-       serverNode.delete(  );
+        if ( serverNode.getId() != null ){
+            logger.info("deleting from DB");
+            serverNode.refresh();
+            serverNode.delete(  );
+        }else{
+            logger.info("server node saved in database, nothing to delete");
+        }
 	}
+
+    @Override
+    public List<Server> getAllMachines(NovaCloudCredentials cloudCredentials){
+        return getAllMachinesWithTag(new NovaContext(cloudCredentials));
+    }
 
     /**
      * We encourage using conf.server.bootstrap.tags
@@ -237,6 +256,16 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                             .toImmutableList();
     }
 
+    class TruePredicate implements Predicate<Server>{
+        @Override
+        public boolean apply(Server server) {
+            return server != null;
+        }
+
+        public String toString(){
+            return "always true predicate";
+        }
+    }
 
     class ServerNamePrefixPredicate implements Predicate<Server>{
         String prefix = conf.server.cloudBootstrap.existingManagementMachinePrefix;
@@ -324,26 +353,32 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         RestContext<NovaApi, NovaAsyncApi> nova = null;
         ComputeService computeService = null;
 
-        public NovaContext( String cloudProvider, String project, String key, String secretKey, String zone, boolean apiCredentials )
-        {
-            logger.info( "initializing bootstrapper with [cloudProvider, project, key, secretKey]=[{},{},{}]", new Object[]{cloudProvider, project, key, secretKey} );
+        public NovaContext(NovaCloudCredentials cloudCredentials) {
+            logger.info("initializing bootstrapper with cloudCredentials [%s]", cloudCredentials.toString());
             Properties overrides = new Properties();
-            if ( apiCredentials ){
+            if (cloudCredentials.apiCredentials) {
                 overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
             }
 
 
-            String identity = key;
-            String credential = secretKey;
 
-            // todo : translate configuration to enum, and work with enum - or implement beans.
-            if ( CloudProvider.HP.label.equalsIgnoreCase(cloudProvider) ){
-                identity = project + ":" + key;
-            }
+            context = ContextBuilder.newBuilder( cloudCredentials.cloudProvider.label )
+                    .credentials(cloudCredentials.getIdentity(), cloudCredentials.getCredential())
+                    .overrides(overrides)
+                    .buildView(ComputeServiceContext.class);
+            this.zone = cloudCredentials.zone;
+        }
 
-
-            context = ContextBuilder.newBuilder( cloudProvider ).credentials( identity, credential ).overrides( overrides ).buildView( ComputeServiceContext.class );
-            this.zone = zone;
+        public NovaContext( String cloudProvider, String project, String key, String secretKey, String zone, boolean apiCredentials )
+        {
+            // todo : ugly - we should resort to "credentials factory" - will be required once we support other platforms other than Nova.
+             this( ApplicationContext.getNovaCloudCredentials()
+                     .setCloudProvider(CloudProvider.findByLabel(cloudProvider))
+                     .setProject(project)
+                     .setKey(key)
+                     .setApiCredentials(apiCredentials)
+                     .setZone(zone)
+                     .setSecretKey(secretKey));
         }
 
         private RestContext<NovaApi, NovaAsyncApi> getNova(){
@@ -373,79 +408,100 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         }
     }
 
+    private ServerNode createMachine(){
+        logger.info( "Starting to create new Server [imageId={}, flavorId={}]", conf.server.bootstrap.imageId, conf.server.bootstrap.flavorId );
 
-	private ServerNode createServerNode() throws RunNodesException, TimeoutException
-	{
-		logger.info( "Starting to create new Server [imageId={}, flavorId={}]", conf.server.bootstrap.imageId, conf.server.bootstrap.flavorId );
-
-		ServerApi serverApi = novaContext.getApi();
-		CreateServerOptions serverOpts = new CreateServerOptions();
+        final ServerApi serverApi = novaContext.getApi();
+        CreateServerOptions serverOpts = new CreateServerOptions();
 
         Map<String,String> metadata = new HashMap<String, String>();
 
         List<String> tags = new LinkedList<String>();
-        String hostname = null;
-        try {
-            java.net.InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            logger.debug("unable to get hostname",e);
-        }
-
-        if ( hostname != null ){
-            tags.add( hostname );
-        }
 
         if ( !StringUtils.isEmpty(conf.server.bootstrap.tags) ){
             tags.add( conf.server.bootstrap.tags );
         }
+
         metadata.put("tags", StringUtils.join(tags, ","));
         serverOpts.metadata(metadata);
-		serverOpts.keyPairName( conf.server.bootstrap.keyPair );
-		serverOpts.securityGroupNames(conf.server.bootstrap.securityGroup);
+        serverOpts.keyPairName( conf.server.bootstrap.keyPair );
+        serverOpts.securityGroupNames(conf.server.bootstrap.securityGroup);
 
-		ServerCreated serverCreated = serverApi.create( conf.server.bootstrap.serverNamePrefix + incNodeId.incrementAndGet(), conf.server.bootstrap.imageId , conf.server.bootstrap.flavorId, serverOpts);
-		blockUntilServerInState(serverCreated.getId(), Server.Status.ACTIVE, 1000, 5, serverApi);
-		Server server = serverApi.get(serverCreated.getId());
+        final ServerCreated serverCreated = serverApi.create( conf.server.bootstrap.serverNamePrefix + incNodeId.incrementAndGet(), conf.server.bootstrap.imageId , conf.server.bootstrap.flavorId, serverOpts);
 
-		ServerNode serverNode = new ServerNode( server );
+        logger.info("waiting for serverId activation [{}]", serverCreated.getId());
+        // start the event
+        PoolEvent.MachineStateEvent poolEvent = new PoolEvent.MachineStateEvent().setType(PoolEvent.Type.CREATE).setResource(serverCreated);
+        poolEventManager.handleEvent(poolEvent);
+        final ActiveWait wait = new ActiveWait();
+        if ( wait
+                .setIntervalMillis(TimeUnit.SECONDS.toMillis(5))
+                .setTimeoutMillis(TimeUnit.SECONDS.toMillis(120))
+                .waitUntil(new Wait.Test() {
+                    @Override
+                    public boolean resolved() {
+                        logger.info("Waiting for a server activation... Left timeout: {} sec", wait.getTimeLeftMillis() / 1000);
+                        return serverApi.get(serverCreated.getId()).getStatus().equals(Status.ACTIVE);
+                    }
+                }))
+        {
+            Server server = serverApi.get( serverCreated.getId());
+            poolEventManager.handleEvent(poolEvent.setResource(server));
+            logger.info("Server created.{} ", server.getAddresses());
+            return new ServerNode( server );
+        }
 
-		logger.info("Server created, wait 10 seconds before starting to bootstrap machine: {}" ,  serverNode.getPublicIP() );
-		Utils.threadSleep(10000); // need for a network interfaces initialization
+        logger.info("server did not become active.");
+        return null;
+
+    }
+
+    @Override
+    public boolean reboot(ServerNode serverNode){
+        rebuild( serverNode);
+        return bootstrap( serverNode );
+    }
+
+    private void rebuild( ServerNode serverNode ){
+        logger.info("rebuilding machine");
+        ServerApi serverApi = novaContext.getApi();
+        try {
+            serverApi.rebuild(serverNode.getNodeId());
+        } catch (RuntimeException e) {
+            logger.error("error while rebuilding machine [{}]", serverNode, e);
+        }
+    }
+
+    private boolean bootstrap( ServerNode serverNode ){
+        logger.info("Server created, wait 10 seconds before starting to bootstrap machine: {}", serverNode.getPublicIP());
+        Utils.threadSleep(10000); // need for a network interfaces initialization
 
 
         boolean bootstrapSuccess = false;
         Exception lastBootstrapException = null;
-        for ( int i = 0; i < bootstrapRetries && !bootstrapSuccess ; i ++ ){
-		    // bootstrap machine: firewall, jvm, start cloudify
-            logger.info( "bootstrapping machine try #[{}]", i );
-		    try{
-                bootstrapMachine( serverNode );
-                BootstrapValidationResult bootstrapValidationResult = validateBootstrap( serverNode );
-                if ( bootstrapValidationResult.isValid() ) {
+        for (int i = 0; i < bootstrapRetries && !bootstrapSuccess; i++) {
+            // bootstrap machine: firewall, jvm, start cloudify
+            logger.info("bootstrapping machine try #[{}]", i);
+            try {
+                bootstrapMachine(serverNode);
+                BootstrapValidationResult bootstrapValidationResult = validateBootstrap(serverNode);
+                if (bootstrapValidationResult.isValid()) {
                     bootstrapSuccess = true;
-                }else{
-                    logger.info( "machine [{}] did not bootstrap successfully [{}] retrying", serverNode, bootstrapValidationResult );
-                    logger.info( "rebuilding machine" );
-                    try{
-                        serverApi.rebuild( serverNode.getNodeId() );
-                    }catch(RuntimeException e){
-                        logger.error( "error while rebuilding machine [{}]", serverNode ,e );
-                    }
+                } else {
+                    logger.info("machine [{}] did not bootstrap successfully [{}] retrying", serverNode, bootstrapValidationResult);
+                    rebuild( serverNode );
                 }
-            }catch(RuntimeException e){
-                 lastBootstrapException = e;
+            } catch (RuntimeException e) {
+                lastBootstrapException = e;
             }
         }
 
-        if ( !bootstrapSuccess ){
-            logger.error( "unable to bootstrap machine", lastBootstrapException );
+        if (!bootstrapSuccess) {
+            logger.error("unable to bootstrap machine", lastBootstrapException);
         }
+        return bootstrapSuccess;
 
-		logger.info("Server created.{} " , server.getAddresses() );
-
-		return serverNode;
-	}
-
+    }
 
     @Override
     public ServerNode bootstrapCloud( ServerNode serverNode )
@@ -574,49 +630,25 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		}
 	}
 
-	private void deleteServer( String serverId )
+	public void deleteServer( String serverId )
 	{
-		novaContext.getApi().delete( serverId );
-		logger.info("Server id: {} was terminated.", serverId);
+        try{
+            ServerApi api = novaContext.getApi();
+            Server server = api.get( serverId );
+            if ( server != null ){
+                api.delete(serverId);
+                server = api.get( serverId );
+		        logger.info("Server id: {} was terminated.", serverId);
+            }
+            poolEventManager.handleEvent(new PoolEvent.MachineStateEvent().setType(PoolEvent.Type.DELETE).setResource(server));
+        }catch(Exception e){
+            logger.error("unable to delete server [{}]", serverId);
+        }
+
 	}
 
 
-	/**
-	 * Will block until the server is in the correct state.
-	 *
-	 * @param serverId The id of the server to block on
-	 * @param status The status the server needs to reach before the method stops blocking
-	 * @param timeoutSeconds The maximum amount of time to block before throwing a TimeoutException
-	 * @param delaySeconds The amount of time between server status checks
-	 * @param serverApi The ServerApi used to do the checking
-	 *
-	 * @throws TimeoutException If the server does not reach the status by timeoutSeconds
-	 */
-	private void blockUntilServerInState(String serverId, Status status,
-			int timeoutSeconds, int delaySeconds, ServerApi serverApi)
-			throws TimeoutException
-	{
-		int totalSeconds = 0;
 
-		while (totalSeconds < timeoutSeconds)
-		{
-			logger.info("Waiting for a server activation... Left timeout: {} sec", timeoutSeconds - totalSeconds);
-
-			Server server = serverApi.get(serverId);
-
-			if (server.getStatus().equals(status))
-				return;
-
-			Utils.threadSleep(delaySeconds * 1000);
-
-			totalSeconds += delaySeconds;
-		}
-
-		String message = String.format("Timed out at %d seconds waiting for server %s to reach status %s.",
-						timeoutSeconds, serverId, status);
-
-		throw new TimeoutException(message);
-	}
 
 	private void bootstrapMachine( ServerNode server )
 	{
@@ -702,4 +734,6 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     {
         this.cloudifyRestClient = cloudifyRestClient;
     }
+
+
 }

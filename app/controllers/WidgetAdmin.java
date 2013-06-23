@@ -43,8 +43,6 @@ import views.html.widgets.admin.signin;
 import views.html.widgets.admin.signup;
 import views.html.widgets.dashboard.account;
 import views.html.widgets.dashboard.angularjs_widget;
-import views.html.widgets.dashboard.serverNodePool;
-import views.html.widgets.dashboard.serverNodePoolTemplate;
 import views.html.widgets.dashboard.previewWidget;
 import views.html.widgets.dashboard.widgets;
 import views.html.widgets.widget;
@@ -118,7 +116,7 @@ public class WidgetAdmin extends Controller
         // and we can redirect to widgets.html
         Http.Cookie authToken = request().cookies().get( "authToken" );
         if ( authToken != null && User.validateAuthToken( authToken.value(), true ) != null ) {
-            return redirect( routes.WidgetAdmin.getWidgetsPage() );
+            return redirect( routes.WidgetAdmin.newWidgetsPage() );
         }
         else{
             return redirect( routes.WidgetAdmin.getSigninPage( null ) );
@@ -405,24 +403,9 @@ public class WidgetAdmin extends Controller
 
         return ok( Json.toJson(list) );
 	}
-	
-	
-	public static Result getAllServers( String authToken )
-	{
-        logger.info("got a request to list all server nodes");
 
-        User user = User.validateAuthToken(authToken);
-        if ( !user.isAdmin() )   {
-            logger.info("user [{}] is not an admin, denying request to show list of server nodes", user.getFullName());
-            return badRequest();
-        }
 
-        List<ServerNode> list = ServerNode.find.all();
-        logger.debug("list of server nodes:\n{}", list);
-        return ok( Json.toJson( list ) );
-	}
 
-	
 	public static Result shutdownInstance( String authToken, String instanceId )
 	{
 		User.validateAuthToken(authToken);
@@ -471,51 +454,6 @@ public class WidgetAdmin extends Controller
     public static Result getUserWidgetTemplate(){
         return ok( views.html.widgets.userWidgets.render() ); // we do this so we can get the embed code.. we cannot use angularJS as we might want to email it too..
     }
-
-    public static Result getServerNodePoolTemplate(){
-        logger.info("got a request to show server node pool page");
-        Http.Cookie authToken = request().cookies().get("authToken");
-        User user;
-        if (authToken != null &&
-                (user = User.validateAuthToken(authToken.value())) != null) {
-            if (!user.isAdmin()) {
-                logger.info("user [{}] is not an admin, denying request to show server node pool page", user.getFullName());
-                new HeaderMessage().setError( "User is not allowed to view this page" ).apply( response().getHeaders() );
-                return badRequest();
-            }
-        } else {
-            return redirect(routes.WidgetAdmin.getSigninPage(null));
-        }
-        return ok(serverNodePoolTemplate.render());
-    }
-
-    public static Result summary( String authToken )
-	{
-		User user = User.validateAuthToken(authToken);
-
-		Summary summary = new Summary();
-
-		// only for admin users, we return summary information
-		if ( user.isAdmin() )
-		{		
-			int totalUsers = User.find.findRowCount();
-			int totalWidgets = Widget.find.findRowCount();
-
-            // find only widget instances deployed on my cloud.
-            int localInstances = WidgetInstance.find.where().eq( "serverNode.remote", false ).findRowCount();
-
-            summary.addAttribute( "Users", String.valueOf( totalUsers ) );
-			summary.addAttribute("Widgets", String.valueOf( totalWidgets ));
-			summary.addAttribute("Instances", String.valueOf( localInstances ));
-
-            ServerNodesPoolStats stats = ApplicationContext.get().getServerPool().getStats();
-            summary.addAttribute("Idle Servers", String.valueOf( stats.nonBusyServers ));
-			summary.addAttribute("Busy Servers", String.valueOf( stats.busyServers ));
-		}
-
-
-		return resultAsJson(summary);
-	}
 
     public static Result deleteWidget( String authToken, String apiKey ){
         logger.info( "got a request to delete widget [{}]", apiKey );
@@ -594,9 +532,6 @@ public class WidgetAdmin extends Controller
         return ok( angularjs_widget.render() );
     }
 
-    public static Result getServerNodePoolPage(){
-        return ok( serverNodePool.render() );
-    }
 
     public static Result addIcon()
     {

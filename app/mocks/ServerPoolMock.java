@@ -21,6 +21,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import server.ServerPool;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class ServerPoolMock implements ServerPool 
 {
     private static Logger logger = LoggerFactory.getLogger( ServerPoolMock.class );
@@ -29,6 +32,12 @@ public class ServerPoolMock implements ServerPool
     public void init()
     {
 
+    }
+
+    @Override
+    public Collection<ServerNode> getPool() {
+        logger.info("getting pool");
+        return Collections.emptyList();
     }
 
     @Override
@@ -50,4 +59,9 @@ public class ServerPoolMock implements ServerPool
 
     }
 
+    @Override
+    public void addNewServerToPool() {
+        logger.info("adding new server to pool");
+
+    }
 }

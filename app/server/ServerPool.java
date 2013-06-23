@@ -18,6 +18,8 @@ package server;
 import beans.ServerNodesPoolStats;
 import models.ServerNode;
 
+import java.util.Collection;
+
 /**
  * This interface provides an abstraction of server pool.
  * 
@@ -32,4 +34,8 @@ public interface ServerPool
     public void init();
 
     public ServerNodesPoolStats getStats();
+
+    public Collection<ServerNode> getPool();
+
+    void addNewServerToPool();
 }

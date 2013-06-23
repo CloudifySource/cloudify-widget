@@ -1,0 +1,87 @@
+<div id="main" class="widgets-dashboard widgets-pool">
+    <div>
+        {{AjaxCallInProcess}}
+        <div class="row" id="search_panel">
+            <div class="span1">
+                <form class="form-search">
+                    <input ng-model="searchText" type="text" placeholder="Filter server nodes" class="input-medium search-query"/>
+                </form>
+            </div>
+        </div>
+        <div ng-include="'/public/pages/poolSummary.html'"></div>
+
+        <div class="thinking" ng-guy-show="AjaxCallInProcess" style="
+                position: fixed;
+                left: 0;
+                right: 0;
+                background-color: rgba(125,125,125,0.8);
+                text-align: center;
+                padding: 21px;
+                font-size: 35px;
+                text-shadow: 0 7px 33px white;
+                -webkit-text-stroke: 2px white;
+                top: 0; ">Saving... | Got Event ... </div>
+
+        <div class="buttons_panel" style="padding:10px;">
+            <button class="btn" ng-click="addNode()">Add machine to pool</button>
+        </div>
+        <div id="widgets_panel" class="span9">
+            <table class="table table-bordered table-striped">
+                <thead class="list_head">
+                <tr>
+                    <th>Server ID</th>
+                    <th>In Cloud</th>
+                    <th>Expiration Time</th>
+                    <th>Public IP</th>
+                    <th>Status</th>
+                    <!--<th>Private IP</th>-->
+                    <th>Busy</th>
+                    <th>Stopped</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="node in data | filter:searchText" class="widget">
+                    <td>{{node.server.nodeId}}</td>
+                    <td>{{!!node.machine}}</td>
+                    <td>{{node.server.expirationTime | prettyDate }}</td>
+                    <td ng-class="{'error':node.check.valid==false,'valid':node.check.valid == true}" title="{{node.check}}">{{node.server.publicIP}} - <a ng-href="http://{{node.server.publicIP}}:8100">REST</a>&nbsp;<a ng-href="http://{{node.server.publicIP}}:8099">UI</a> </td>
+                    <td>{{node.machine.status}}</td>
+                    <!--<td>{{node.server.privateIP}}</td>-->
+                    <td>{{node.server.busy}}</td>
+                    <td>{{node.server.stopped}}</td>
+                    <td><!-- Actions -->
+                        <button ng-click="removeNode(node)">remove</button>
+                        <button ng-click="checkAvailability(node)">Check</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="events span6">
+
+        <alert type="event.type == 'ERROR' && 'error' || 'info'" ng-repeat="event in events | orderBy:timestamp" close="events.splice($index,1)">
+            <span ng-switch on="event.type">
+            <span ng-switch-when="ERROR" >
+                <div style="overflow:hidden; text-overflow: ellipsis; white-space:nowrap; display:inline-block;height:20px; width:300px;">{{event.errorMessage}}</div>
+                <button ng-click="more = true" ng-show="!more">More</button>
+                <button ng-click="more = false" ng-show="!!more">Less</button>
+                <span ng-show="!!more">
+                    <pre>{{event}}</pre>
+                </span>
+            </span>
+            <span ng-switch-default>
+                <div>{{event.category}} - {{event.type}}</div>
+                <button ng-click="more = true" ng-show="!more">More</button>
+                <button ng-click="more = false" ng-show="!!more">Less</button>
+                <span ng-show="!!more">
+                    <pre>{{event}}</pre>
+                </span>
+            </span>
+                </span>
+        </alert>
+        </div>
+    </div>
+    <!-- main -->
+</div>

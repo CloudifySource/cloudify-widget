@@ -276,11 +276,8 @@ public class Application extends Controller
         response().setContentType( "text/javascript" );
         return ok(
                 Routes.javascriptRouter( "jsRoutes",
-
                         // Routes for Projects
                         routes.javascript.WidgetAdmin.getAllWidgets(),
-                        routes.javascript.WidgetAdmin.getAllServers(),
-                        routes.javascript.WidgetAdmin.summary(),
                         routes.javascript.WidgetAdmin.postWidget(),
                         routes.javascript.WidgetAdmin.checkPasswordStrength(),
                         routes.javascript.WidgetAdmin.postChangePassword(),
@@ -288,10 +285,25 @@ public class Application extends Controller
                         routes.javascript.WidgetAdmin.postWidgetDescription(),
                         routes.javascript.WidgetAdmin.deleteWidget(),
                         routes.javascript.WidgetAdmin.postRequireLogin(),
-                        routes.javascript.Application.downloadPemFile(),
                         routes.javascript.WidgetAdmin.regenerateWidgetApiKey(),
                         routes.javascript.WidgetAdmin.enableWidget(),
                         routes.javascript.WidgetAdmin.disableWidget(),
+
+                        routes.javascript.Application.downloadPemFile(),
+                        routes.javascript.Application.encrypt(),
+                        routes.javascript.Application.decrypt(),
+
+                        routes.javascript.AdminPoolController.addNode(),
+                        routes.javascript.AdminPoolController.poolEvents(),
+                        routes.javascript.AdminPoolController.removeNode(),
+                        routes.javascript.AdminPoolController.checkAvailability(),
+                        routes.javascript.AdminPoolController.summary(),
+                        routes.javascript.AdminPoolController.getCloudServers(),
+                        routes.javascript.AdminPoolController.getServerNodes(),
+                        routes.javascript.AdminPoolController.getWidgetInstances(),
+                        routes.javascript.AdminPoolController.getStatuses(),
+
+
                         routes.javascript.DemosController.listWidgetForDemoUser()
 
                 )

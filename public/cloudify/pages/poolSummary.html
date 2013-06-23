@@ -1,0 +1,5 @@
+<div id="summary" class="well summary adminOnly" ui-if="admin" ng-controller="PoolSummaryController">
+    <ul>
+        <li ng-repeat="attr in summary.attributes"><span class='count'> {{attr.value}} </span> {{attr.name}}</li>
+    </ul>
+</div>

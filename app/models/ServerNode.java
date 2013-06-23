@@ -190,9 +190,11 @@ extends Model
 
         for (Criteria criteria : conf.criterias) {
             ExpressionList<ServerNode> conjuction = disjunction.conjunction();
+            conjuction.eq("1","1"); // solves issues where criteria is actually empty.
             if (criteria.busy != null) {
                 conjuction.eq("busy", criteria.busy);
             }
+
             if (criteria.remote != null) {
                 conjuction.eq("remote", criteria.remote);
             }
@@ -206,6 +208,14 @@ extends Model
                 }else{
                     conjuction.isNotNull("serverId");
                 }
+            }
+
+            if( criteria.nodeId != null ){
+                conjuction.eq("serverId", criteria.nodeId );
+            }
+
+            if ( criteria.user != null && !criteria.user.isAdmin()){
+                conjuction.eq("user", criteria.user);
             }
         }
 
@@ -346,6 +356,7 @@ extends Model
         public String nodeId = null;
         private QueryConf conf;
         private Boolean serverIdIsNull;
+        private User user;
 
         public Criteria(QueryConf conf) {
             this.conf = conf;
@@ -378,6 +389,11 @@ extends Model
 
         public Criteria setServerIdIsNull(boolean serverIdIsNull) {
             this.serverIdIsNull = serverIdIsNull;
+            return this;
+        }
+
+        public Criteria setUser(User user) {
+            this.user = user;
             return this;
         }
     }

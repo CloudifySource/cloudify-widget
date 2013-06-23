@@ -8,6 +8,9 @@ jQuery.fn.reset = function ()
 
 $( function ()
 {
+    if ($.cookie('newDashboard') != null ){
+        document.location = "/user/widgets";
+    }
 
     function WidgetModel(){
         var data = [];
@@ -39,7 +42,7 @@ $( function ()
     function render_summary()
     {
         $( "#summary ul" ).empty();
-        $.get( "/widget/summary?authToken=" + authToken, {}, function ( data )
+        $.get( "/admin/pool/summary?authToken=" + authToken, {}, function ( data )
         {
             if ( data.status == "session-expired" ) {
                 remove_session();

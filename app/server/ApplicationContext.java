@@ -17,6 +17,8 @@ package server;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import beans.NovaCloudCredentials;
+import beans.pool.PoolEventManager;
 import bootstrap.InitialData;
 import mocks.EventMonitorMock;
 import org.slf4j.Logger;
@@ -54,6 +56,7 @@ public class ApplicationContext
     @Inject private EventMonitor eventMonitor;
     @Inject private Conf conf;
     @Inject private InitialData initialData;
+    @Inject private PoolEventManager poolEventManager;
 
     private static ApplicationContext instance;
 
@@ -89,7 +92,7 @@ public class ApplicationContext
         return conf();
     }
 
-    private  <T> T getBean( String bean ){
+    private  static <T> T getBean( String bean ){
         return (T) Spring.getBean( bean );
     }
 
@@ -176,8 +179,21 @@ public class ApplicationContext
         return initialData;
     }
 
+
     public void setInitialData( InitialData initialData )
     {
         this.initialData = initialData;
+    }
+
+    public static NovaCloudCredentials getNovaCloudCredentials(){
+        return getBean("novaCloudCredentials");  // prototype, we cannot inject it.
+    }
+
+    public void setPoolEventManager(PoolEventManager poolEventManager) {
+        this.poolEventManager = poolEventManager;
+    }
+
+    public PoolEventManager getPoolEventManager() {
+        return poolEventManager;
     }
 }

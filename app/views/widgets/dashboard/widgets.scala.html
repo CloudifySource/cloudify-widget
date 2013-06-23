@@ -9,11 +9,16 @@
 </div>
 }
 
+@context.set("head"){
+    <link href="/public/style/widgets.css" rel="stylesheet">
+    <script src="/public/js/widgets.js"></script>
+}
+
 @context.set("body"){
     <div id="main" class="widgets-dashboard">
 
         <div class="alert" style="text-align: center;">
-            The new dashboard is available! <a href="/user/widgets">Click here</a> to check it out.
+            The new dashboard is available! <a href="javascript:$.cookie('newDashboard','true', {'path':'/'}); document.location='/user/widgets';" >Click here</a> to check it out.
             <button type="button" class="close" data-dismiss="alert">&times;</button>
         </div>
 

@@ -12,9 +12,11 @@
 
     @* TODO use the i18n filter *@
     <div style="text-align: center;">
-        <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">
-            {{ alert.msg.substring(0, alert.msg.indexOf('#')) }} <a href="{{ alert.link.href }}">{{ alert.link.text }}</a> {{ alert.msg.substring(alert.msg.indexOf('#') + 1) }}
-        </alert>
+        <div class="alert">
+            Welcome to the new dashboard! <a href="javascript:$.cookie('newDashboard',null,{'path':'/'}); document.location='/admin/widgets'">Click here</a> to return to the old one. @* use i18n for this somehow.. need to figure out how to embed link *@
+        </div>
+
+
     </div>
 
     <div class="hero-unit" id="welcome_window" ui-if="!widgets.length && angular.isDefined(widgets)">
@@ -41,11 +43,7 @@
             </div>
         </div>
 
-        <div id="summary" class="well summary" ui-if="admin">
-            <ul>
-                <li ng-repeat="attr in summary.attributes"><span class='count'> {{attr.value}} </span> {{attr.name}}</li>
-            </ul>
-        </div>
+        <div ng-include="'/public/pages/poolSummary.html'"></div>
 
         <div id="widgets_panel">
             <table class="table table-bordered table-striped">

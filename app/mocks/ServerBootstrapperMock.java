@@ -15,11 +15,14 @@
 
 package mocks;
 
+import java.util.Collections;
 import java.util.List;
 
 import beans.BootstrapValidationResult;
+import beans.NovaCloudCredentials;
 import models.ServerNode;
 
+import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +36,11 @@ public class ServerBootstrapperMock implements ServerBootstrapper
     public void destroyServer( ServerNode serverNode )
     {
         logger.info( "destroying server [{}]", serverNode );
+    }
+
+    @Override
+    public void deleteServer(String nodeId) {
+        logger.info("destroying nodeId [{}]", nodeId );
     }
 
     @Override
@@ -61,6 +69,19 @@ public class ServerBootstrapperMock implements ServerBootstrapper
     @Override
     public BootstrapValidationResult validateBootstrap( ServerNode serverNode )
     {
+        logger.info("validating bootstrap");
         return new BootstrapValidationResult();
+    }
+
+    @Override
+    public List<Server> getAllMachines(NovaCloudCredentials cloudCredentials) {
+        logger.info("getting all machines");
+        return Collections.emptyList();
+    }
+
+    @Override
+    public boolean reboot(ServerNode serverNode) {
+        logger.info("rebooting serverNode [{}]", serverNode );
+        return true;
     }
 }
