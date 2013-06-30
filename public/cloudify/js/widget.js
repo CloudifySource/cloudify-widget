@@ -486,6 +486,10 @@ $(function () {
         return str == null || $.trim(str ).length == 0;
     }
 
+    function advancedDataAvailable( advancedData ){
+        return   !isEmpty(advancedData.project)  && !isEmpty(advancedData.key) && !isEmpty(advancedData.secretKey)
+    }
+
     function start_instance_btn_handler()
     {
         var myUrl = origin_page_url;
@@ -498,8 +502,12 @@ $(function () {
             $.postMessage( JSON.stringify({name:"play_widget"}), myUrl , parent );
         }
         widgetState.isPlaying(true);
+
+
+
         try{
-            mixpanel.track("Play Widget",{'page name' : $("#title" ).text(), 'url' : origin_page_url});
+
+            mixpanel.track("Play Widget",{'page name' : $("#title" ).text(), 'url' : origin_page_url, "anonymous" : !advancedDataAvailable( advanced() ) });
         }catch(e){}
         widgetState.showStopButton();
         if ( !widgetState.isValid() ) {
@@ -520,7 +528,7 @@ $(function () {
                             widgetState.instanceId(data.status.instanceId);
                         }
 
-                        if ( !isEmpty(advancedData.project)  && !isEmpty(advancedData.key) && !isEmpty(advancedData.secretKey) ){
+                        if ( advancedDataAvailable( advancedData ) ){
                             if (advancedData.project == advancedCookie.project() &&
                                 advancedData.key == advancedCookie.key() &&
                                 advancedData.secretKey == advancedCookie.secretKey()) {
