@@ -498,12 +498,14 @@ $(function () {
             $.postMessage( JSON.stringify({name:"play_widget"}), myUrl , parent );
         }
         widgetState.isPlaying(true);
+        try{
+            mixpanel.track("Play Widget",{'page name' : $("#title" ).text(), 'url' : origin_page_url});
+        }catch(e){}
         widgetState.showStopButton();
         if ( !widgetState.isValid() ) {
             var advancedData = advanced();
-
-
 			var playData = { apiKey : params["apiKey"], "project" : advancedData.project, "key" : advancedData.key, "secretKey":advancedData.secretKey };
+            widgetLog.appendOrOverride(["Acquiring machine..."]);
             $.ajax(
                 { type:"POST",
                   url : "/widget/start?" + $.param(playData),
