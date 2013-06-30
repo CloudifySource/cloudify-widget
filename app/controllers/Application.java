@@ -117,7 +117,7 @@ public class Application extends Controller
             }
 
 
-             ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ) );
+//             ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ) );
 
             // credentials validation is made when we attempt to create a PEM file. if credentials are wrong, it will fail.
             if ( !StringUtils.isEmpty( project ) && !StringUtils.isEmpty( key ) && !StringUtils.isEmpty( secretKey ) ){
@@ -211,9 +211,9 @@ public class Application extends Controller
 
                         Widget widget = Widget.getWidget( apiKey );
 
-                        if ( widget != null ) {
-                            ApplicationContext.get().getEventMonitor().eventFired( new Events.StopWidget( remoteAddress , widget ) );
-                        }
+//                        if ( widget != null ) {
+//                            ApplicationContext.get().getEventMonitor().eventFired( new Events.StopWidget( remoteAddress , widget ) );
+//                        }
 
                         if ( instanceId != null ) {
                             ServerNode serverNode = ServerNode.find.byId( Long.parseLong( instanceId ) );
