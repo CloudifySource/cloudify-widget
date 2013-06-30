@@ -1,6 +1,5 @@
 <div id="main" class="widgets-dashboard widgets-pool">
     <div>
-        {{AjaxCallInProcess}}
         <div class="row" id="search_panel">
             <div class="span1">
                 <form class="form-search">
@@ -10,7 +9,7 @@
         </div>
         <div ng-include="'/public/pages/poolSummary.html'"></div>
 
-        <div class="thinking" ng-guy-show="AjaxCallInProcess" style="
+        <div class="thinking" ng-show="AjaxCallInProcess" style="
                 position: fixed;
                 left: 0;
                 right: 0;
@@ -30,7 +29,7 @@
                 <thead class="list_head">
                 <tr>
                     <th>Server ID</th>
-                    <th>In Cloud</th>
+                    <th>Has Machine</th>
                     <th>Expiration Time</th>
                     <th>Public IP</th>
                     <th>Status</th>
@@ -42,7 +41,7 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="node in data | filter:searchText" class="widget">
-                    <td>{{node.server.nodeId}}</td>
+                    <td>{{nodeId(node)}}</td>
                     <td>{{!!node.machine}}</td>
                     <td>{{node.server.expirationTime | prettyDate }}</td>
                     <td ng-class="{'error':node.check.valid==false,'valid':node.check.valid == true}" title="{{node.check}}">{{node.server.publicIP}} - <a ng-href="http://{{node.server.publicIP}}:8100">REST</a>&nbsp;<a ng-href="http://{{node.server.publicIP}}:8099">UI</a> </td>
@@ -51,8 +50,8 @@
                     <td>{{node.server.busy}}</td>
                     <td>{{node.server.stopped}}</td>
                     <td><!-- Actions -->
-                        <button ng-click="removeNode(node)">remove</button>
-                        <button ng-click="checkAvailability(node)">Check</button>
+                        <button ng-click="removeNode(node)" ng-show="!!node.server.nodeId">remove</button>
+                        <button ng-click="checkAvailability(node)" ng-show="!!node.server.nodeId">Check</button>
                     </td>
                 </tr>
                 </tbody>

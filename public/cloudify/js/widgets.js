@@ -280,7 +280,7 @@ $( function ()
         }
 
         if ( !error ) {
-            debugger;
+//            debugger;
             $.post( "/widget/new?authToken=" + encodeURIComponent(authToken) + "&" + $( e.target ).serialize(), {}, function ( data )
             {
                 $( e.target ).reset();

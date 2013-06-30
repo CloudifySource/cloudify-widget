@@ -46,6 +46,7 @@ public class WebSocketEventListener implements PoolEventListener{
             public void invoke() throws Throwable {
                 logger.info("not listening - connection closed");
                 poolEventManager.removeListener(self);
+                out.close();
             }
         });
         out.write("started listening");
@@ -74,7 +75,19 @@ public class WebSocketEventListener implements PoolEventListener{
     public void handleEvent(PoolEvent poolEvent){
         logger.info("handling pool event [{}]", poolEvent);
         if ( canSee( poolEvent )){
+            logger.info("writing to out");
             out.write( Json.stringify(Json.toJson(poolEvent)) );
+            logger.info("finished writing to out");
+        }
+    }
+
+    public static class WriteOut implements Runnable{
+        public WebSocket.Out<String> out;
+
+        public String msg;
+        @Override
+        public void run() {
+            out.write( msg );
         }
     }
 }

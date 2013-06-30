@@ -126,6 +126,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		{
             ServerNode server = createServer();
             if ( server != null ){
+                poolEventManager.handleEvent(new PoolEvent.ServerNodeEvent().setServerNode(server).setType(PoolEvent.Type.CREATE));
                 servers.add( server );
             }
         }
@@ -152,14 +153,18 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         for ( ; i < retries && serverNode == null ; i++){
             logger.info( "creating new server node, try #[{}]",i );
             ServerNode tmpNode = createMachine();
-            if ( tmpNode != null && bootstrap(tmpNode)){
-                serverNode = tmpNode;
-                logger.info("successful bootstrap on [{}]", serverNode);
-            }else if ( tmpNode != null ) {
-                logger.info("bootstrap failed, deleting server");
-                deleteServer( tmpNode.getNodeId() ); // deleting the machine from HP.
-            }else{
-                logger.info("unable to create machine. try [{}/{}]", i+1, retries);
+            PoolEvent.ServerNodeEvent newServerNodeEvent = new PoolEvent.ServerNodeEvent().setType(PoolEvent.Type.CREATE).setServerNode(tmpNode);
+            if (tmpNode != null) {
+                if (bootstrap(tmpNode)) { // bootstrap success
+                    poolEventManager.handleEvent(newServerNodeEvent);
+                    serverNode = tmpNode;
+                    logger.info("successful bootstrap on [{}]", serverNode);
+                } else { // bootstrap failed
+                    logger.info("bootstrap failed, deleting server");
+                    deleteServer(tmpNode.getNodeId()); // deleting the machine from HP.                }
+                }
+            } else { // create server failed
+                logger.info("unable to create machine. try [{}/{}]", i + 1, retries);
             }
 
         }
@@ -446,7 +451,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                 }))
         {
             Server server = serverApi.get( serverCreated.getId());
-            poolEventManager.handleEvent(poolEvent.setResource(server));
+            poolEventManager.handleEvent(poolEvent.setResource(server).setType(PoolEvent.Type.UPDATE));
             logger.info("Server created.{} ", server.getAddresses());
             return new ServerNode( server );
         }
@@ -497,6 +502,11 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         }
 
         if (!bootstrapSuccess) {
+            poolEventManager.handleEvent(new PoolEvent.ServerNodeEvent()
+                    .setType(PoolEvent.Type.UPDATE)
+                    .setServerNode(serverNode)
+                    .setErrorMessage(lastBootstrapException.getMessage())
+                    .setErrorStackTrace(ExceptionUtils.getFullStackTrace(lastBootstrapException)));
             logger.error("unable to bootstrap machine", lastBootstrapException);
         }
         return bootstrapSuccess;

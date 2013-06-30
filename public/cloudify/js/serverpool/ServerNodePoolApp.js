@@ -27,37 +27,48 @@ ServerNodePoolApp.controller('ServerNodePoolController',
         $scope.data = [];
         $scope.database = {};
 
-        try{
-        function safelyGetDataNodeId ( nodeId ){
-            if ( !$scope.database.hasOwnProperty("node_" + nodeId)){
-                $scope.database["node_" + nodeId] = {};
-                $scope.data.push($scope.database["node_" + nodeId]);
+        try {
+            function safelyGetDataNodeId(nodeId) {
+                if (!$scope.database.hasOwnProperty("node_" + nodeId)) {
+                    $scope.database["node_" + nodeId] = {};
+                    $scope.data.push($scope.database["node_" + nodeId]);
+                }
+                return $scope.database["node_" + nodeId];
             }
-            return $scope.database["node_" + nodeId];
-        }
 
-            function deleteNodeId( nodeId ){
-                if ( $scope.database.hasOwnProperty("node_" + nodeId) ){
+            function deleteNodeId(nodeId) {
+
+                if ($scope.database.hasOwnProperty("node_" + nodeId)) {
                     var nodeToDelete = $scope.database["node_" + nodeId];
-                    $scope.data.splice($scope.data.indexOf(nodeToDelete),1);
+                    $scope.data.splice($scope.data.indexOf(nodeToDelete), 1);
                     delete $scope.database["node_" + nodeId];
                 }
             }
 
-        ServerNodePoolModel.getServerNodes($scope.authToken).then( function( data ){
-            $.each(data, function(index,item){ safelyGetDataNodeId(item.nodeId)["server"] = item});
-        });
-        ServerNodePoolModel.getCloudServers( $scope.authToken).then(function(data){
-            $.each(data, function(index,item){ safelyGetDataNodeId(item.id)["machine"] = item});
-        });
-        ServerNodePoolModel.getWidgetInstances( $scope.authToken).then(function(data){
-            $.each( data, function(index,item){ safelyGetDataNodeId( item.instanceId)["instance"] = item });
-        });
-        ServerNodePoolModel.getStatuses( $scope.authToken).then(function(data){
-            $.each(data, function(index,item){ if ( item.instanceId != null ){safelyGetDataNodeId( item)["status"] = item;}});
-        });
-        }catch(e){
-           console.log(["error",e]);
+            ServerNodePoolModel.getServerNodes($scope.authToken).then(function (data) {
+                $.each(data, function (index, item) {
+                    safelyGetDataNodeId(item.nodeId)["server"] = item
+                });
+            });
+            ServerNodePoolModel.getCloudServers($scope.authToken).then(function (data) {
+                $.each(data, function (index, item) {
+                    safelyGetDataNodeId(item.id)["machine"] = item
+                });
+            });
+            ServerNodePoolModel.getWidgetInstances($scope.authToken).then(function (data) {
+                $.each(data, function (index, item) {
+                    safelyGetDataNodeId(item.instanceId)["instance"] = item
+                });
+            });
+            ServerNodePoolModel.getStatuses($scope.authToken).then(function (data) {
+                $.each(data, function (index, item) {
+                    if (item.instanceId != null) {
+                        safelyGetDataNodeId(item)["status"] = item;
+                    }
+                });
+            });
+        } catch (e) {
+            console.log(["error", e]);
         }
 
         $scope.checkAvailability = function( node ){
@@ -71,6 +82,10 @@ ServerNodePoolApp.controller('ServerNodePoolController',
             }else{
                 console.log("not removing node");
             }
+        };
+
+        $scope.nodeId = function( node ){
+            return ServerNodePoolModel.getNodeId( node );
         };
 
         $scope.addNode = function(){
@@ -88,8 +103,19 @@ ServerNodePoolApp.controller('ServerNodePoolController',
                       },
                       DELETE:function( msgObj ){
                           console.log(["machine was deleted", msgObj, msgObj.resource.id ]);
-                          deleteNodeId(msgobj.resource.id);
-                      }
+                          deleteNodeId(msgObj.resource.id);
+                      },
+                    UPDATE: function(msgObj){
+                        console.log(["received update msg", msgObj]);
+                        var machine = msgObj.resource;
+                        safelyGetDataNodeId( machine.id )["machine"] = machine;
+                    },
+                    CREATE: function( msgObj ){
+                        console.log(["received create msg", msgObj]);
+                        var machine = msgObj.resource;
+                        safelyGetDataNodeId( machine.id )["machine"] = machine;
+
+                    }
             } } ;
 
 
@@ -98,7 +124,7 @@ ServerNodePoolApp.controller('ServerNodePoolController',
             this.onclose = function(){ console.log("closing"); };
             this.onmessage = function( event ){
                 try{
-                    debugger;
+//                    debugger;
                     console.log("got message");
 
                     var messageObj = JSON.parse( event[0].data );
@@ -171,6 +197,11 @@ ServerNodePoolApp.service('WebSocketService', function ( $rootScope ){
 });
 
 ServerNodePoolApp.service('ServerNodePoolModel', function( $http, WebSocketService ){
+
+    this.getNodeId = function( node ){
+
+        return !!node.machine ? node.machine.id : node.server.nodeId ;
+    };
 
     this.getServerNodes = function( authToken ){
         console.log(['getting all server nodes', authToken]);

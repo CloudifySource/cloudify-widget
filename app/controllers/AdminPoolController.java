@@ -163,15 +163,12 @@ public class AdminPoolController extends UserPoolController {
             // Called when the Websocket Handshake is done.
             public void onReady(WebSocket.In<String> in, WebSocket.Out<String> out) {
                 try{
-                out.write("I will try to listen");
                 try{Thread.sleep(2000);}catch(Exception e){}
-                out.write("I promise I will try");
                new WebSocketEventListener()
                        .setUser(User.validateAuthToken(authToken, true, null ))
                        .setIn(in)
                        .setManager( ApplicationContext.get().getPoolEventManager() )
                        .setOut(out).listen();
-                out.write("still trying");
                 }catch(Exception e){
                     logger.error("unable to listen",e);
                 }

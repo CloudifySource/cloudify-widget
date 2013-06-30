@@ -8,11 +8,9 @@ import play.libs.Akka;
 import play.libs.Json;
 
 import javax.inject.Inject;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,10 +31,12 @@ public class PoolEventManager implements PoolEventListener{
 
     public void removeListener( PoolEventListener listener ){
         listeners.remove(listener);
+        logger.info("removing listener. I now have {} listeners", listeners.size());
     }
 
     public void addListener( PoolEventListener listener ){
         listeners.add( listener );
+        logger.info("adding listener. I now have {} listeners", listeners.size() );
     }
 
     @Override
