@@ -559,6 +559,7 @@ $(function () {
     if (!confirm("Are you sure you want to stop the instance?")) {
       return;
     }
+        mixpanel.track("Stop Widget",{'page name' : $("#title" ).text(), 'url' : origin_page_url });
         $.postMessage( JSON.stringify({name:"stop_widget"}), origin_page_url , parent );
     widgetState.showPlayButton();
     if ( widgetState.instanceId()) {
