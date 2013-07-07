@@ -12,6 +12,7 @@ object ApplicationBuild extends Build {
       "commons-io" % "commons-io" % "2.4"  ,
       "commons-collections" % "commons-collections" % "3.0"   ,
       "org.apache.commons" % "commons-exec" % "1.1"  ,
+    "commons-configuration" % "commons-configuration" % "1.9",
       "org.jclouds" % "jclouds-allcompute" % "1.5.1"  ,
       "org.jclouds.driver" % "jclouds-sshj" % "1.5.0"  ,
       "com.thoughtworks.xstream" % "xstream" % "1.4.3"  ,

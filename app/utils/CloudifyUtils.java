@@ -17,11 +17,9 @@ package utils;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.exec.DefaultExecuteResultHandler;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeServiceContext;
@@ -38,7 +36,6 @@ import org.jclouds.rest.RestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import server.ApplicationContext;
-import server.exceptions.ServerException;
 import beans.config.ServerConfig.CloudBootstrapConfiguration;
 
 import com.google.common.collect.FluentIterable;
@@ -67,42 +64,31 @@ public class CloudifyUtils {
 		File cloudifyEscFolder = new File(cloudifyBuildFolder, cloudConf.cloudifyEscDirRelativePath);
 
 		//copy the content of hp configuration files to a new folder
+        File origCloudFolder = new File( cloudifyEscFolder, cloudConf.cloudName );
 		File destFolder = new File(cloudifyEscFolder, cloudConf.cloudName + getTempSuffix()); 
-		FileUtils.copyDirectory(new File(cloudifyEscFolder, cloudConf.cloudName), destFolder); 
+		FileUtils.copyDirectory(origCloudFolder, destFolder);
 
 		// create new pem file using new credentials.
 		File pemFolder = new File(destFolder, cloudConf.cloudifyHpUploadDirName);
 		File newPemFile = createPemFile( context );
 		FileUtils.copyFile(newPemFile, new File(pemFolder, newPemFile.getName() +".pem"), true);
 
-		List<String> cloudProperties = new ArrayList<String>();
-		cloudProperties.add("tenant=" + '"' + project + '"');
-		cloudProperties.add("user=" + '"' + key  + '"');
-		cloudProperties.add("apiKey=" + '"' + secretKey + '"');
-		cloudProperties.add("keyFile=" + '"' + newPemFile.getName() +".pem" + '"');
-		cloudProperties.add("keyPair=" + '"' + newPemFile.getName() + '"');
-		cloudProperties.add("securityGroup=" + '"' + cloudConf.securityGroup + '"');
-		cloudProperties.add("hardwareId=" + '"' + cloudConf.hardwareId() + '"');
-		cloudProperties.add("linuxImageId=" + '"' + cloudConf.linuxImageId() + '"');
-        cloudProperties.add( "persistencePath=null" );
+        try {
+            File propertiesFile = new File(destFolder, cloudConf.cloudPropertiesFileName);
+            PropertiesConfiguration cloudProperties = new PropertiesConfiguration(propertiesFile);
 
-		//create new props file and init with custom credentials. 
-		File newPropertiesFile = new File(destFolder, cloudConf.cloudPropertiesFileName + ".new" );
-		newPropertiesFile.createNewFile();
-		FileUtils.writeLines(newPropertiesFile, cloudProperties);
+            cloudProperties.addProperty("tenant", project);
+            cloudProperties.addProperty("user", key);
+            cloudProperties.addProperty("apiKey", secretKey);
+            cloudProperties.addProperty("keyFile", newPemFile.getName() + ".pem");
+            cloudProperties.addProperty("keyPair", newPemFile.getName());
+            cloudProperties.addProperty("securityGroup", cloudConf.securityGroup);
+            cloudProperties.save( );
 
-		//delete old props file
-		File propertiesFile = new File(destFolder, cloudConf.cloudPropertiesFileName );
-		if (propertiesFile.exists()) {
-			propertiesFile.delete();
-		}
-
-		//rename new props file.
-		if (!newPropertiesFile.renameTo(propertiesFile)){
-			throw new ServerException("Failed creating custom cloud folder." +
-					" Failed renaming custom cloud properties file.");
-		}
-		return destFolder;
+            return destFolder;
+        } catch (Exception e) {
+            throw new RuntimeException( String.format("error while writing cloud properties"), e );
+        }
 	}
 	
 	/**
@@ -110,8 +96,6 @@ public class CloudifyUtils {
 	 * 
 	 * @param cloudFolder 
 	 * 			The folder used to bootstrap to the cloud.
-	 * @param cloudBootstrapConfig
-	 * 			The cloud configuration used to bootstrap to the cloud.
 	 * @return
 	 * 			The private key used for starting the remote machines
 	 * @throws IOException
