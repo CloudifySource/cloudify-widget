@@ -77,12 +77,12 @@ public class CloudifyUtils {
             File propertiesFile = new File(destFolder, cloudConf.cloudPropertiesFileName);
             PropertiesConfiguration cloudProperties = new PropertiesConfiguration(propertiesFile);
 
-            cloudProperties.addProperty("tenant", project);
-            cloudProperties.addProperty("user", key);
-            cloudProperties.addProperty("apiKey", secretKey);
-            cloudProperties.addProperty("keyFile", newPemFile.getName() + ".pem");
-            cloudProperties.addProperty("keyPair", newPemFile.getName());
-            cloudProperties.addProperty("securityGroup", cloudConf.securityGroup);
+            cloudProperties.addProperty("tenant", StringUtils.wrapWithQuotes(project));
+            cloudProperties.addProperty("user", StringUtils.wrapWithQuotes(key));
+            cloudProperties.addProperty("apiKey", StringUtils.wrapWithQuotes(secretKey));
+            cloudProperties.addProperty("keyFile", StringUtils.wrapWithQuotes(newPemFile.getName() + ".pem"));
+            cloudProperties.addProperty("keyPair", StringUtils.wrapWithQuotes(newPemFile.getName()));
+            cloudProperties.addProperty("securityGroup", StringUtils.wrapWithQuotes(cloudConf.securityGroup));
             cloudProperties.save( );
 
             return destFolder;

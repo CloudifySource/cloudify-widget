@@ -30,4 +30,8 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return replace( str, "\r\n", "\n");
     }
 
+    public static String wrapWithQuotes( String s ){
+        return "\"" + s + "\"";
+    }
+
 }
