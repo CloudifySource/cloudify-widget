@@ -17,9 +17,10 @@ package utils;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Properties;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeServiceContext;
@@ -75,15 +76,17 @@ public class CloudifyUtils {
 
         try {
             File propertiesFile = new File(destFolder, cloudConf.cloudPropertiesFileName);
-            PropertiesConfiguration cloudProperties = new PropertiesConfiguration(propertiesFile);
 
-            cloudProperties.addProperty("tenant", StringUtils.wrapWithQuotes(project));
-            cloudProperties.addProperty("user", StringUtils.wrapWithQuotes(key));
-            cloudProperties.addProperty("apiKey", StringUtils.wrapWithQuotes(secretKey));
-            cloudProperties.addProperty("keyFile", StringUtils.wrapWithQuotes(newPemFile.getName() + ".pem"));
-            cloudProperties.addProperty("keyPair", StringUtils.wrapWithQuotes(newPemFile.getName()));
-            cloudProperties.addProperty("securityGroup", StringUtils.wrapWithQuotes(cloudConf.securityGroup));
-            cloudProperties.save( );
+            // GUY - Important - Note - Even though this is the "properties" files, it is not used for "properties" per say
+            // we are actually writing a groovy file that defines variables.
+            Collection<String> newLines = new LinkedList<String>();
+            newLines.add("tenant="+ StringUtils.wrapWithQuotes(project));
+            newLines.add("user="+ StringUtils.wrapWithQuotes(key));
+            newLines.add("apiKey="+ StringUtils.wrapWithQuotes(secretKey));
+            newLines.add("keyFile="+ StringUtils.wrapWithQuotes(newPemFile.getName() + ".pem"));
+            newLines.add("keyPair="+ StringUtils.wrapWithQuotes(newPemFile.getName()));
+            newLines.add("securityGroup="+ StringUtils.wrapWithQuotes(cloudConf.securityGroup));
+            FileUtils.writeLines( propertiesFile, newLines, true );
 
             return destFolder;
         } catch (Exception e) {
