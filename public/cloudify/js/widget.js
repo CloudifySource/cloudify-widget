@@ -34,7 +34,7 @@ $(function () {
         function _save( data ){
             var date = new Date();
             date.setMonth( ( date.getMonth() + 1 ) % 12 );
-            $.cookie(cookieName, data, {"path" :"/", expires:date });
+            $.cookie(cookieName, data, {"path" :"/", expires:10000 });
         }
 
         this.prolong = function(){
