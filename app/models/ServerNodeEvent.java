@@ -24,6 +24,7 @@ import javax.persistence.*;
  * Date: 4/23/13
  * Time: 7:22 PM
  */
+@SuppressWarnings("serial")
 @Entity
 public class ServerNodeEvent extends Model {
 
