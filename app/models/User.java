@@ -21,7 +21,6 @@ import controllers.WidgetAdmin;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonManagedReference;
 import play.cache.Cache;
 import play.data.validation.Constraints.Required;
 import play.db.ebean.Model;

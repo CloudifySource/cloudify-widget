@@ -14,7 +14,6 @@
  */
 package controllers;
 
-import beans.ServerNodesPoolStats;
 import com.avaje.ebean.Ebean;
 import data.validation.GsConstraints;
 import models.*;

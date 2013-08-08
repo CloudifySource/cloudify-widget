@@ -1,19 +1,22 @@
 package controllers;
 
-import beans.BootstrapValidationResult;
-import beans.NovaCloudCredentials;
-import beans.ServerNodesPoolStats;
-import beans.config.Conf;
-import beans.config.ServerConfig;
-import beans.pool.WebSocketEventListener;
-import controllers.compositions.AdminUserCheck;
-import controllers.compositions.UserCheck;
-import models.*;
+import static utils.RestUtils.resultAsJson;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import models.ServerNode;
+import models.Summary;
+import models.User;
+import models.Widget;
+import models.WidgetInstance;
+
 import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import play.libs.Akka;
-import play.libs.F;
 import play.libs.Json;
 import play.mvc.Result;
 import play.mvc.WebSocket;
@@ -23,14 +26,12 @@ import server.ServerBootstrapper;
 import server.ServerPool;
 import server.WidgetServer;
 import utils.CollectionUtils;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-
-import static utils.RestUtils.resultAsJson;
+import beans.BootstrapValidationResult;
+import beans.ServerNodesPoolStats;
+import beans.config.Conf;
+import beans.config.ServerConfig;
+import beans.pool.WebSocketEventListener;
+import controllers.compositions.AdminUserCheck;
 
 /**
  * Created with IntelliJ IDEA.
@@ -106,7 +107,7 @@ public class AdminPoolController extends UserPoolController {
                 Conf conf = ApplicationContext.get().conf();
                 ServerConfig.ApiCredentials apiCredentials = conf.server.bootstrap.api;
                 // get all machines with our tag.
-                List<Server> servers = serverBootstrapper.getAllMachines(ApplicationContext.get().getNovaCloudCredentials()
+                List<Server> servers = serverBootstrapper.getAllMachines(ApplicationContext.getNovaCloudCredentials()
                         .setProject(apiCredentials.project)
                         .setKey(apiCredentials.key)
                         .setApiCredentials(false)
