@@ -22,3 +22,5 @@ logFile.log
 /.idea_modules
 /conf/bin
 nohup.out
+.ssh/
+cloudify-folder
