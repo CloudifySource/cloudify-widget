@@ -18,7 +18,7 @@
 /* baseline styles */
 
 body {
-  background-image: url("/img/widget_background.png");
+  background: url("/img/widget_background.png") no-repeat;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
@@ -32,6 +32,12 @@ body {
   right: 17px;
 }
 
+#stop_btn, #start_btn {
+  position: absolute;
+  left: 467px;
+  top: 139px;
+}
+
 #start_btn {
   background: url("/img/play_button_sprite.png") 0 -336px no-repeat;
 
@@ -41,7 +47,7 @@ body {
 
   &:active {
     background-position: 0 0;
-  }
+  }  
 }
 
 #stop_btn {
@@ -57,9 +63,11 @@ body {
 }
 
 .beta-ribbon{
-  float: right;
   margin-top: -6px;
   margin-right: -6px;
+  left: 536px;
+  top: 8px;
+  position: absolute;
 }
 
 .button:hover {
@@ -157,7 +165,7 @@ body {
 #footer {
   font-size: 12px;
   position: absolute;
-  bottom: 8px;
+  top: 425px;
   width: 580px;
 }
 
@@ -189,7 +197,7 @@ body {
   object{
     position: absolute;
     left: 20px;
-    bottom: 65px;
+    top: 252px;
   }
   object,embed{
     height:160px;
@@ -200,11 +208,11 @@ body {
 
 .advanced_section{
   width: 272px;
-   height: 158px;
-   position: absolute;
-   bottom: 65px;
-   right: 20px;
-   padding-left:14px;
+  height: 158px;
+  position: absolute;
+  top: 252px;
+  left: 300px;
+  padding-left:14px;
   border-radius: 5px;
   background-color:#EFEFEF;
   border:1px solid #00B4DA;
