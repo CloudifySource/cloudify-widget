@@ -17,6 +17,7 @@ package controllers;
 import static utils.RestUtils.OK_STATUS;
 
 import akka.util.Duration;
+import beans.config.Conf;
 import models.ServerNode;
 import models.Widget;
 
@@ -132,7 +133,8 @@ public class Application extends Controller
                 serverNode = ApplicationContext.get().getServerPool().get(widget.getLifeExpectancy());
                 if (serverNode == null) {
                     // if the user clicked another play in the last 30 seconds, we allow ourselves to tell them to wait..
-                    Long timeLeft = (Long) Cache.get(Controller.request().remoteAddress());
+                    Long timeLeft = getPlayTimeout();
+
                     if (timeLeft != null) {
                         throw new ServerException(Messages.get("please.wait.x.sec", (timeLeft - System.currentTimeMillis()) / 1000));
                     }
@@ -164,6 +166,7 @@ public class Application extends Controller
                             }
 
                             logger.info("installing widget on cloud");
+                            setPlayTimeout();
                             ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress );
                         }
                     });
@@ -174,6 +177,28 @@ public class Application extends Controller
             return exceptionToStatus( ex );
 		}
 	}
+
+    private static Long getPlayTimeout(){
+        Long timeLeft = (Long) Cache.get(Controller.request().remoteAddress());
+
+        Conf conf = ApplicationContext.get().conf();
+        if ( timeLeft != null ){
+            Long delta =  timeLeft - System.currentTimeMillis();
+            if ( delta < 0 || delta > conf.settings.stopTimeout ){
+                logger.info("got a weird delta [{}], returning NULL", delta );
+            }
+            return null;
+        }
+
+        return timeLeft;
+    }
+
+    private static void setPlayTimeout(){
+        Conf conf = ApplicationContext.get().conf();
+        logger.info("counting the user [{}] millis before another deploy" , ApplicationContext.get().conf().settings.stopTimeout );
+        // keep the user for 30 seconds by IP, to avoid immediate widget start after stop
+        Cache.set( Controller.request().remoteAddress(), System.currentTimeMillis() + conf.settings.stopTimeout, ( int ) (conf.settings.stopTimeout / 1000) );
+    }
 
     private static Result exceptionToStatus( Exception e ){
            Widget.Status status = new Widget.Status();

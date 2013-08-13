@@ -99,8 +99,6 @@ public class WidgetServerImpl implements WidgetServer
 
     public WidgetInstance deploy( Widget widget, ServerNode server, String remoteAddress  )
 	{
-        // keep the user for 30 seconds by IP, to avoid immediate widget start after stop
-        Cache.set( remoteAddress, System.currentTimeMillis() + conf.settings.stopTimeout, ( int ) (conf.settings.stopTimeout / 1000) );
 		widget.countLaunch();
 		return deployManager.fork( server, widget );
 	}
