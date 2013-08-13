@@ -25,16 +25,22 @@ CLOUDIFY_MILESTONE=${CLOUDIFY_VERSION}-${MILESTONE}
 CLOUDIFY_BUILD=${CLOUDIFY_VERSION}-${BUILD_NUMBER}
 echo "upgrading cloudify to version $CLOUDIFY_VERSION $CLOUDIFY_BUILD"
 CLOUDIFY_FOLDER=gigaspaces-cloudify-${CLOUDIFY_BUILD}
-CLOUDIFY_ZIP_NAME=${CLOUDIFY_FOLDER}-${CLOUDIFY_BUILD}
+CLOUDIFY_ZIP_NAME=${CLOUDIFY_FOLDER}
 CLOUDIFY_FILE=${CLOUDIFY_ZIP_NAME}.zip
 echo searching if file [${CLOUDIFY_FILE}] already exists
 if [ -f /root/$CLOUDIFY_FILE ]; then
     echo "cloudify already installed, nothing to go"
 else
     wget "http://repository.cloudifysource.org/org/cloudifysource/${CLOUDIFY_MILESTONE}/${CLOUDIFY_FILE}" -O /root/$CLOUDIFY_FILE
-    unzip /root/$CLOUDIFY_FILE -d /root/
+    if [ $? -ne 0 ]; then
+        echo "wget failed. deleting the file"
+        rm -f  /root/$CLOUDIFY_FILE
+    else
+        unzip /root/$CLOUDIFY_FILE -d /root/
+        ln -Tfs /root/${CLOUDIFY_FOLDER} cloudify-folder
+    fi
 fi
-ln -Tfs /root/${CLOUDIFY_FOLDER} cloudify-folder
+
 
 echo "overriding webui-context.xml in cloudify installation"
 \cp -f conf/cloudify/webui-context.xml cloudify-folder/config/cloudify-webui-context-override.xml
