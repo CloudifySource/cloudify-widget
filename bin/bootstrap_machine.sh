@@ -43,7 +43,7 @@ source ~/.bashrc
 echo Downloading cloudify installation from $CLOUDIFY_URL
 
 wget -q $CLOUDIFY_URL -O ~/cloudify.zip
-if [ $? -ne 0 ]
+if [ $? -ne 0 ]; then
     echo "Failed downloading cloudify installation"
     exit 1
 fi
