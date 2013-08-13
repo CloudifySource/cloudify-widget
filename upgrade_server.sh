@@ -21,6 +21,9 @@ chmod 755 $WIDGET_HOME/bin/*.sh
 CLOUDIFY_VERSION=2.7.0
 BUILD_NUMBER=b5982-4
 MILESTONE=m1
+BUILD_TYPE=SNAPSHOT
+
+BUILD_VERSION=${CLOUDIFY_VERSION}-${BUILD_TYPE}
 CLOUDIFY_MILESTONE=${CLOUDIFY_VERSION}-${MILESTONE}
 CLOUDIFY_BUILD=${CLOUDIFY_VERSION}-${BUILD_NUMBER}
 echo "upgrading cloudify to version $CLOUDIFY_VERSION $CLOUDIFY_BUILD"
@@ -31,8 +34,8 @@ echo searching if file [${CLOUDIFY_FILE}] already exists
 if [ -f /root/$CLOUDIFY_FILE ]; then
     echo "cloudify already installed, nothing to go"
 else
-    echo "executing wget on [http://repository.cloudifysource.org/org/cloudifysource/${CLOUDIFY_MILESTONE}/${CLOUDIFY_FILE}]"
-    wget "http://repository.cloudifysource.org/org/cloudifysource/${CLOUDIFY_MILESTONE}/${CLOUDIFY_FILE}" -O /root/$CLOUDIFY_FILE
+    echo "executing wget on [http://repository.cloudifysource.org/org/cloudifysource/${BUILD_VERSION}/${CLOUDIFY_FILE}]"
+    wget "http://repository.cloudifysource.org/org/cloudifysource/${BUILD_VERSION}/${CLOUDIFY_FILE}" -O /root/$CLOUDIFY_FILE
     if [ $? -ne 0 ]; then
         echo "wget failed. deleting the file"
         rm -f  /root/$CLOUDIFY_FILE
