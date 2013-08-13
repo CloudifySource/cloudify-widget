@@ -502,12 +502,12 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         }
 
         if (!bootstrapSuccess) {
-            poolEventManager.handleEvent(new PoolEvent.ServerNodeEvent()
-                    .setType(PoolEvent.Type.UPDATE)
-                    .setServerNode(serverNode)
-                    .setErrorMessage(lastBootstrapException.getMessage())
-                    .setErrorStackTrace(ExceptionUtils.getFullStackTrace(lastBootstrapException)));
-            logger.error("unable to bootstrap machine", lastBootstrapException);
+//            poolEventManager.handleEvent(new PoolEvent.ServerNodeEvent()
+//                    .setType(PoolEvent.Type.UPDATE)
+//                    .setServerNode(serverNode)
+//                    .setErrorMessage(lastBootstrapException.getMessage())
+//                    .setErrorStackTrace(ExceptionUtils.getFullStackTrace(lastBootstrapException)));
+//            logger.error("unable to bootstrap machine", lastBootstrapException);
         }
         return bootstrapSuccess;
 
