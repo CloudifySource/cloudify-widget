@@ -14,11 +14,14 @@ echo "127.0.0.1 `hostname`" >> /etc/hosts
 echo Setting sudo privileged mode
 sudo sed -i 's/^Defaults.*requiretty/#&/g' /etc/sudoers
 
-CLOUDIFY_VERSION=2.5.1
-CLOUDIFY_BUILD=b4200
-CLOUDIFY_FOLDER=~/gigaspaces-cloudify-${CLOUDIFY_VERSION}-ga
+
+CLOUDIFY_VERSION=2.7.0
+BUILD_NUMBER=b5982-4
+MILESTONE=m1
+BUILD_TYPE=SNAPSHOT
+CLOUDIFY_FOLDER=~/gigaspaces-cloudify-${CLOUDIFY_VERSION}-${MILESTONE}
 JAVA_64_URL="http://repository.cloudifysource.org/com/oracle/java/1.6.0_32/jdk-6u32-linux-x64.bin"
-CLOUDIFY_URL="http://repository.cloudifysource.org/org/cloudifysource/${CLOUDIFY_VERSION}-RELEASE/gigaspaces-cloudify-${CLOUDIFY_VERSION}-ga-${CLOUDIFY_BUILD}.zip"
+CLOUDIFY_URL="http://repository.cloudifysource.org/org/cloudifysource/${CLOUDIFY_VERSION}-${BUILD_TYPE}/gigaspaces-cloudify-${CLOUDIFY_VERSION}-${MILESTONE}-${CLOUDIFY_BUILD}.zip"
 
 echo Downloading JDK from $JAVA_64_URL
 wget -q -O ~/java.bin $JAVA_64_URL
