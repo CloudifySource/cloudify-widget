@@ -359,7 +359,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         ComputeService computeService = null;
 
         public NovaContext(NovaCloudCredentials cloudCredentials) {
-            logger.info("initializing bootstrapper with cloudCredentials [%s]", cloudCredentials.toString());
+            logger.info("initializing bootstrapper with cloudCredentials [{}]", cloudCredentials.toString());
             Properties overrides = new Properties();
             if (cloudCredentials.apiCredentials) {
                 overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
