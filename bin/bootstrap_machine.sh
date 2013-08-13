@@ -21,7 +21,7 @@ MILESTONE=m1
 BUILD_TYPE=SNAPSHOT
 CLOUDIFY_FOLDER=~/gigaspaces-cloudify-${CLOUDIFY_VERSION}-${MILESTONE}
 JAVA_64_URL="http://repository.cloudifysource.org/com/oracle/java/1.6.0_32/jdk-6u32-linux-x64.bin"
-CLOUDIFY_URL="http://repository.cloudifysource.org/org/cloudifysource/${CLOUDIFY_VERSION}-${BUILD_TYPE}/gigaspaces-cloudify-${CLOUDIFY_VERSION}-${MILESTONE}-${CLOUDIFY_BUILD}.zip"
+CLOUDIFY_URL="http://repository.cloudifysource.org/org/cloudifysource/${CLOUDIFY_VERSION}-${BUILD_TYPE}/gigaspaces-cloudify-${CLOUDIFY_VERSION}-${MILESTONE}-${BUILD_NUMBER}.zip"
 
 echo Downloading JDK from $JAVA_64_URL
 wget -q -O ~/java.bin $JAVA_64_URL
@@ -41,7 +41,12 @@ echo 'export PATH=$PATH:$JAVA_HOME/bin' >> ~/.bashrc
 source ~/.bashrc
 
 echo Downloading cloudify installation from $CLOUDIFY_URL
-wget -q $CLOUDIFY_URL -O ~/cloudify.zip || error_exit $? "Failed downloading cloudify installation"
+
+wget -q $CLOUDIFY_URL -O ~/cloudify.zip
+if [ $? -ne 0 ]
+    echo "Failed downloading cloudify installation"
+    exit 1
+fi
 
 
 echo Unzip cloudify installation
