@@ -6,7 +6,7 @@
                 "title": "Launch MongoDB",
                 "youtube": "http://www.youtube.com/embed/w5qr4sx5Vt0",
                 "provider": "http://www.mongodb.org",
-                "recipe": "https://dl.dropbox.com/u/5682483/mongodb.zip",
+                "recipe": "http://s3.amazonaws.com/cloudify-widget/2.7/mongodb.zip",
                 "name":"mongod",
                 "console": {
                     "title": "Mongo Web Console",
@@ -25,7 +25,7 @@
                 "title": "Petclinic simple application example",
                 "youtube": "http://www.youtube.com/embed/anvYieQij94",
                 "provider": "http://www.cloudifysource.org/",
-                "recipe": "https://s3.amazonaws.com/widget_rep/petclinic-simple.zip",
+                "recipe": "http://s3.amazonaws.com/cloudify-widget/2.7/petclinic-simple.zip",
                 "name":"petclinic",
                 "console": {
                     "title": "PetClinic",
@@ -44,7 +44,7 @@
                 "youtube": "http://www.youtube.com/embed/VkQ3ppHeGX4",
                 "name":"couchbase",
                 "provider": "http://www.couchbase.com",
-                "recipe": "http://s3.amazonaws.com/cloudify-widget/couchbase-2.0.zip",
+                "recipe": "http://s3.amazonaws.com/cloudify-widget/2.7/couchbase-2.0.zip",
                 "console": {
                     "title": "Couchbase Console",
                     "link": "http://$HOST:8091"
@@ -62,7 +62,7 @@
                 "youtube": "http://www.youtube.com/embed/6Li_lCZXaKY",
                 "name":"mysql",
                 "provider": "http://www.mysql.com/",
-                "recipe": "https://s3.amazonaws.com/cloudify-widget/mysql.zip",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/2.7/mysql.zip",
                 "console": {
                     "title": "MySQL",
                     "link": "http://$HOST:3306"
@@ -80,7 +80,7 @@
                 "title": "JBoss 7.1.0.Final",
                 "youtube": "",
                 "provider": "http://www.jboss.org",
-                "recipe": "https://s3.amazonaws.com/cloudify-widget/jboss.zip",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/2.7/jboss.zip",
                 "console": {
                     "title": "JBoss Console",
                     "link": "http://$HOST:8080"
@@ -98,7 +98,7 @@
                 "name":"memcached",
                 "youtube": "",
                 "provider": "http://memcached.org",
-                "recipe": "https://s3.amazonaws.com/cloudify-widget/memcached.zip",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/2.7/memcached.zip",
                 "console": {
                     "title": "Memcached",
                     "link": "http://$HOST:11211"
@@ -116,7 +116,7 @@
                 "name":"computers",
                 "youtube": "",
                 "provider": "http://www.playframework.com",
-                "recipe": "https://s3.amazonaws.com/cloudify-widget/computers.zip",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/2.7/computers.zip",
                 "console": {
                     "title": "Play Console",
                     "link": "http://$HOST:8080",
@@ -135,7 +135,7 @@
                 "name":"vertx",
                 "youtube": "",
                 "provider": "http://vertx.io",
-                "recipe": "https://s3.amazonaws.com/cloudify-widget/vertx.zip",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/2.7/vertx.zip",
                 "console": {
                     "title": "Vertx Console",
                     "link": "http://$HOST:8080/"
@@ -153,7 +153,7 @@
                 "name":"babies",
                 "youtube": "",
                 "provider": "http://drupal.org",
-                "recipe": "https://s3.amazonaws.com/cloudify-widget/drupal.zip",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/2.7/drupal.zip",
                 "console": {
                     "title": "Drupal site",
                     "link": "http://$HOST:8080",
@@ -171,7 +171,7 @@
                 "name":"cassandra",
                 "youtube": "",
                 "provider": "http://cassandra.apache.org/",
-                "recipe": "https://s3.amazonaws.com/cloudify-widget/cassandra.zip",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/2.7/cassandra.zip",
                 "console": {
                     "title": "Cassandra",
                     "link": "http://$HOST:9160"
