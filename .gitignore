@@ -21,3 +21,4 @@ logFile.log
 /.sass-cache
 /.idea_modules
 /conf/bin
+cloudify-folder
