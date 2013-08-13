@@ -27,6 +27,7 @@ echo "upgrading cloudify to version $CLOUDIFY_VERSION $CLOUDIFY_BUILD"
 CLOUDIFY_FOLDER=gigaspaces-cloudify-${CLOUDIFY_BUILD}
 CLOUDIFY_ZIP_NAME=${CLOUDIFY_FOLDER}-${CLOUDIFY_BUILD}
 CLOUDIFY_FILE=${CLOUDIFY_ZIP_NAME}.zip
+echo searching if file [${CLOUDIFY_FILE}] already exists
 if [ -f /root/$CLOUDIFY_FILE ]; then
     echo "cloudify already installed, nothing to go"
 else
