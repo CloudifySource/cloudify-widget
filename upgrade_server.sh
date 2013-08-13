@@ -16,17 +16,21 @@ chmod 755 $WIDGET_HOME/*.sh
 chmod 755 $WIDGET_HOME/bin/*.sh
 
 
+# 2.7.0-SNAPSHOT/gigaspaces-cloudify-2.7.0-m1-b5982-4.zip
 
-CLOUDIFY_VERSION=2.5.1
-CLOUDIFY_BUILD=b4200
+CLOUDIFY_VERSION=2.7.0
+BUILD_NUMBER=b5982-4
+MILESTONE=m1
+CLOUDIFY_MILESTONE=${CLOUDIFY_VERSION}-${MILESTONE}
+CLOUDIFY_BUILD=${CLOUDIFY_VERSION}-${BUILD_NUMBER}
 echo "upgrading cloudify to version $CLOUDIFY_VERSION $CLOUDIFY_BUILD"
-CLOUDIFY_FOLDER=gigaspaces-cloudify-${CLOUDIFY_VERSION}-ga
+CLOUDIFY_FOLDER=gigaspaces-cloudify-${CLOUDIFY_BUILD}
 CLOUDIFY_ZIP_NAME=${CLOUDIFY_FOLDER}-${CLOUDIFY_BUILD}
 CLOUDIFY_FILE=${CLOUDIFY_ZIP_NAME}.zip
 if [ -f /root/$CLOUDIFY_FILE ]; then
     echo "cloudify already installed, nothing to go"
 else
-    wget "http://repository.cloudifysource.org/org/cloudifysource/${CLOUDIFY_VERSION}-RELEASE/${CLOUDIFY_FILE}" -O /root/$CLOUDIFY_FILE
+    wget "http://repository.cloudifysource.org/org/cloudifysource/${CLOUDIFY_MILESTONE}/${CLOUDIFY_FILE}" -O /root/$CLOUDIFY_FILE
     unzip /root/$CLOUDIFY_FILE -d /root/
 fi
 ln -Tfs /root/${CLOUDIFY_FOLDER} cloudify-folder
