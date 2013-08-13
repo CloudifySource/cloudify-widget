@@ -676,6 +676,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                     response.getOutput()} );
 		}catch(Exception ex)
 		{
+            logger.error("unable to bootstrap machine [{}]", server, ex);
             try{
                 destroyServer( server );
             }catch(Exception e){
