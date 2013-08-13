@@ -106,7 +106,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     private ExecutorFactory executorFactory;
 
     @Inject
-    private PoolEventManager poolEventManager;
+    private PoolEventListener poolEventManager;
 
     // this is an incrementing ID starting from currentMilliTime..
     // resolves issue where we got "Server by this name already exists"

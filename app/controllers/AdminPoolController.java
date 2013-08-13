@@ -158,24 +158,25 @@ public class AdminPoolController extends UserPoolController {
 
 
     public static WebSocket<String> poolEvents( final String authToken ) {
-        return new WebSocket<String>() {
-
-            // Called when the Websocket Handshake is done.
-            public void onReady(WebSocket.In<String> in, WebSocket.Out<String> out) {
-                try{
-                try{Thread.sleep(2000);}catch(Exception e){}
-               new WebSocketEventListener()
-                       .setUser(User.validateAuthToken(authToken, true, null ))
-                       .setIn(in)
-                       .setManager( ApplicationContext.get().getPoolEventManager() )
-                       .setOut(out).listen();
-                }catch(Exception e){
-                    logger.error("unable to listen",e);
-                }
-
-            }
-
-        };
+//        return new WebSocket<String>() {
+//
+//            // Called when the Websocket Handshake is done.
+//            public void onReady(WebSocket.In<String> in, WebSocket.Out<String> out) {
+//                try{
+//                try{Thread.sleep(2000);}catch(Exception e){}
+//               new WebSocketEventListener()
+//                       .setUser(User.validateAuthToken(authToken, true, null ))
+//                       .setIn(in)
+//                       .setManager( ApplicationContext.get().getPoolEventManager() )
+//                       .setOut(out).listen();
+//                }catch(Exception e){
+//                    logger.error("unable to listen",e);
+//                }
+//
+//            }
+//
+//        };
+        return null; //todo implement better.
     }
 
 }

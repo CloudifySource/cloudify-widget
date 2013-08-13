@@ -18,6 +18,7 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import beans.NovaCloudCredentials;
+import beans.pool.PoolEventListener;
 import beans.pool.PoolEventManager;
 import bootstrap.InitialData;
 import mocks.EventMonitorMock;
@@ -56,7 +57,7 @@ public class ApplicationContext
     @Inject private EventMonitor eventMonitor;
     @Inject private Conf conf;
     @Inject private InitialData initialData;
-    @Inject private PoolEventManager poolEventManager;
+    @Inject private PoolEventListener poolEventManager;
 
     private static ApplicationContext instance;
 
@@ -193,7 +194,7 @@ public class ApplicationContext
         this.poolEventManager = poolEventManager;
     }
 
-    public PoolEventManager getPoolEventManager() {
+    public PoolEventListener getPoolEventManager() {
         return poolEventManager;
     }
 }
