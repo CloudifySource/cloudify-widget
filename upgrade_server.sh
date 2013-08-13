@@ -31,6 +31,7 @@ echo searching if file [${CLOUDIFY_FILE}] already exists
 if [ -f /root/$CLOUDIFY_FILE ]; then
     echo "cloudify already installed, nothing to go"
 else
+    echo "executing wget on [http://repository.cloudifysource.org/org/cloudifysource/${CLOUDIFY_MILESTONE}/${CLOUDIFY_FILE}]"
     wget "http://repository.cloudifysource.org/org/cloudifysource/${CLOUDIFY_MILESTONE}/${CLOUDIFY_FILE}" -O /root/$CLOUDIFY_FILE
     if [ $? -ne 0 ]; then
         echo "wget failed. deleting the file"
