@@ -120,7 +120,9 @@ public class Global extends GlobalSettings
                     list.add(ac);
                     scala.collection.immutable.List<Tuple2<String, String>> headers =
                       JavaConversions.asScalaBuffer( list ).toList();
-
+//
+//
+//            guy -- important.. even though Intellij marks this as error, it is not an error.. ignore it.
             status.header().headers().$plus(  ac );
            result = status.withHeaders( headers );
 //            return result;

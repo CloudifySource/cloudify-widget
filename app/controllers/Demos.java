@@ -23,7 +23,6 @@ import org.openid4java.message.ax.FetchRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.DynamicForm;
-import play.libs.Json;
 import play.libs.OpenID;
 import play.mvc.Controller;
 import play.mvc.Result;

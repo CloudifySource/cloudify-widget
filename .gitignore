@@ -21,4 +21,6 @@ logFile.log
 /.sass-cache
 /.idea_modules
 /conf/bin
+nohup.out
+.ssh/
 cloudify-folder
