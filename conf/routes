@@ -56,11 +56,9 @@ GET     /widget/previewWidget           controllers.WidgetAdmin.previewWidget( a
 GET     /widget/icon                    controllers.WidgetAdmin.icon( apiKey: String)
 POST    /widget/icon                    controllers.WidgetAdmin.addIcon
 POST    /widget/removeIcon              controllers.WidgetAdmin.removeIcon( authToken: String, widgetId:Long )
-GET      /server/headers            	controllers.WidgetAdmin.headers
+GET     /server/headers               	controllers.WidgetAdmin.headers
 GET     /widget/widget                  controllers.WidgetAdmin.getWidget( apiKey:String )
-
-GET     /widget/:apiKey                 controllers.WidgetAdmin.getWidgetInfo( apiKey: String )
-
+GET     /widget/single/:apiKey          controllers.WidgetAdmin.getWidgetSinglePage( apiKey:String )
 
 POST     /admin/pool/manage/add                          controllers.AdminPoolController.addNode( authToken:String )
 POST     /admin/pool/manage/:nodeId/remove               controllers.AdminPoolController.removeNode( authToken:String, nodeId:String )
@@ -77,8 +75,6 @@ GET     /admin/pool/summary             controllers.AdminPoolController.summary(
 #GET     /user/pool/manage              controllers.UserPoolController.getServerNodePoolPage( authToken:String, project:String, key:String, secretKey:String)
 #GET     /user/pool/manage/list         controllers.UserPoolController.getAllServers
 #GET     /user/pool/summary             controllers.UserPoolController.summary
-
-
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /recipes/*file      	   		controllers.Assets.at(path="/public/recipes", file)

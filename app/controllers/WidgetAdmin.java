@@ -45,6 +45,7 @@ import views.html.widgets.dashboard.angularjs_widget;
 import views.html.widgets.dashboard.previewWidget;
 import views.html.widgets.dashboard.widgets;
 import views.html.widgets.widget;
+import views.html.widgets.widgetSinglePage;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -72,27 +73,15 @@ public class WidgetAdmin extends Controller
         }
         return ok(widget.render(ApplicationContext.get().conf().mixpanelApiKey, widgetItem));
     }
-
-
-    public static Result getWidgetInfo( String apiKey ){
-        Widget widgetItem = Widget.getWidget( apiKey );
-
-
-
+    
+    public static Result getWidgetSinglePage( String apiKey ){
+        Widget widgetItem = Widget.getWidget(apiKey);
         if ( widgetItem == null ){
             return notFound("widget does not exist");
         }else if( !widgetItem.isEnabled() ){
             return badRequest( "widget disabled");
-        }else{
-
-            Map<String, Object> fields = new HashMap<String, Object>();
-
-            fields.put("apiKey", widgetItem.getApiKey());
-            fields.put("title", widgetItem.getTitle());
-            fields.put("videoUrl", widgetItem.getYoutubeVideoUrl());
-
-            return ok(Json.toJson(fields));
         }
+        return ok(widgetSinglePage.render(widgetItem, request().host()));
     }
 
     public static Result icon( String apiKey ){
