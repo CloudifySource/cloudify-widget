@@ -51,12 +51,15 @@ POST     /widget/new              	    controllers.WidgetAdmin.createNewWidget( 
 POST     /widget/edit                   controllers.WidgetAdmin.postWidget( authToken:String )
 GET      /widget/list 					controllers.WidgetAdmin.getAllWidgets( authToken: String )
 POST    /widget/delete                  controllers.WidgetAdmin.deleteWidget( authToken:String, apiKey:String )
+
 GET     /widget/previewWidget           controllers.WidgetAdmin.previewWidget( apiKey:String )
 GET     /widget/icon                    controllers.WidgetAdmin.icon( apiKey: String)
 POST    /widget/icon                    controllers.WidgetAdmin.addIcon
 POST    /widget/removeIcon              controllers.WidgetAdmin.removeIcon( authToken: String, widgetId:Long )
 GET      /server/headers            	controllers.WidgetAdmin.headers
 GET     /widget/widget                  controllers.WidgetAdmin.getWidget( apiKey:String )
+
+GET     /widget/:apiKey                 controllers.WidgetAdmin.getWidgetInfo( apiKey: String )
 
 
 POST     /admin/pool/manage/add                          controllers.AdminPoolController.addNode( authToken:String )

@@ -73,6 +73,28 @@ public class WidgetAdmin extends Controller
         return ok(widget.render(ApplicationContext.get().conf().mixpanelApiKey, widgetItem));
     }
 
+
+    public static Result getWidgetInfo( String apiKey ){
+        Widget widgetItem = Widget.getWidget( apiKey );
+
+
+
+        if ( widgetItem == null ){
+            return notFound("widget does not exist");
+        }else if( !widgetItem.isEnabled() ){
+            return badRequest( "widget disabled");
+        }else{
+
+            Map<String, Object> fields = new HashMap<String, Object>();
+
+            fields.put("apiKey", widgetItem.getApiKey());
+            fields.put("title", widgetItem.getTitle());
+            fields.put("videoUrl", widgetItem.getYoutubeVideoUrl());
+
+            return ok(Json.toJson(fields));
+        }
+    }
+
     public static Result icon( String apiKey ){
         WidgetIcon widgetItem = WidgetIcon.findByWidgetApiKey( apiKey );
         if ( widgetItem == null ){
@@ -80,6 +102,8 @@ public class WidgetAdmin extends Controller
         }
         return ok( widgetItem.getData() ).as( widgetItem.getContentType() );
     }
+
+
 
 	/*
 	 * Creates new account.
