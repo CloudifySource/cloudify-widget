@@ -76,6 +76,8 @@ GET     /admin/pool/summary             controllers.AdminPoolController.summary(
 #GET     /user/pool/manage/list         controllers.UserPoolController.getAllServers
 #GET     /user/pool/summary             controllers.UserPoolController.summary
 
+GET     /embed/img/:apiKey              controllers.WidgetAdmin.embedImage( apiKey: String)                  
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /recipes/*file      	   		controllers.Assets.at(path="/public/recipes", file)
 GET     /public/*file  		     	    controllers.Assets.at(path="/public/cloudify", file)

@@ -92,7 +92,18 @@ public class WidgetAdmin extends Controller
         return ok( widgetItem.getData() ).as( widgetItem.getContentType() );
     }
 
+    public static Result embedImage( String apiKey ){
+        Widget widgetItem = Widget.getWidget(apiKey);
+        if ( widgetItem == null ){
+            return notFound("widget does not exist");
+        }else if( !widgetItem.isEnabled() ){
+            return badRequest( "widget disabled");
+        }
+    	//TODO(ran): This will be project specific logo, with number of users etc, something engaging...
+    	return redirect("/img/cloudify-logo-embed.png");
+    }
 
+    
 
 	/*
 	 * Creates new account.
