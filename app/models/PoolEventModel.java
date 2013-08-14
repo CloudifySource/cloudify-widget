@@ -17,6 +17,7 @@ import java.util.List;
  * Date: 6/20/13
  * Time: 12:14 AM
  */
+@SuppressWarnings("serial")
 @Entity
 public class PoolEventModel extends Model {
 

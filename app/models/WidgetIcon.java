@@ -27,6 +27,7 @@ import javax.persistence.OneToOne;
  * Date: 3/29/13
  * Time: 10:00 PM
  */
+@SuppressWarnings("serial")
 @Entity
 public class WidgetIcon extends Model {
 

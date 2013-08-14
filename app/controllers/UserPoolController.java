@@ -1,7 +1,6 @@
 package controllers;
 
 import beans.NovaCloudCredentials;
-import beans.ServerBootstrapperImpl;
 import beans.ServerNodesPoolStats;
 import controllers.compositions.AdminUserCheck;
 import controllers.compositions.UserCheck;
