@@ -104,7 +104,7 @@ public class Global extends GlobalSettings
     public Result onError( Http.RequestHeader requestHeader, Throwable throwable )
     {
 
-        logger.error( String.format( "experienced error {}", Utils.requestToString( requestHeader ) ), throwable );
+        logger.error(  "experienced error [{}]", Utils.requestToString( requestHeader ), throwable );
 
         // todo : maybe this should be a method implemented in the exception.
         // I assume there is an easier way to do this, but this is what I have so far.
@@ -119,10 +119,8 @@ public class Global extends GlobalSettings
                     ArrayList<Tuple2<String, String>> list = new ArrayList<Tuple2<String, String>>();
                     list.add(ac);
                     scala.collection.immutable.List<Tuple2<String, String>> headers =
-                      JavaConversions.asBuffer( list ).toList();
-//
-//
-//            guy -- important.. even though Intellij marks this as error, it is not an error.. ignore it.
+                      JavaConversions.asScalaBuffer( list ).toList();
+
             status.header().headers().$plus(  ac );
            result = status.withHeaders( headers );
 //            return result;
