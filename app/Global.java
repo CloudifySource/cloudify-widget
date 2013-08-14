@@ -119,7 +119,7 @@ public class Global extends GlobalSettings
                     ArrayList<Tuple2<String, String>> list = new ArrayList<Tuple2<String, String>>();
                     list.add(ac);
                     scala.collection.immutable.List<Tuple2<String, String>> headers =
-                      JavaConversions.asBuffer( list ).toList();
+                      JavaConversions.asScalaBuffer( list ).toList();
 //
 //
 //            guy -- important.. even though Intellij marks this as error, it is not an error.. ignore it.
