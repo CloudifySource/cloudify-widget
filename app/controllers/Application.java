@@ -166,7 +166,7 @@ public class Application extends Controller
                             }
 
                             logger.info("installing widget on cloud");
-                            setPlayTimeout();
+                            setPlayTimeout( remoteAddress );
                             ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress );
                         }
                     });
@@ -193,11 +193,15 @@ public class Application extends Controller
         return timeLeft;
     }
 
-    private static void setPlayTimeout(){
+    private static void setPlayTimeout( String remoteAddress ){
+        try{
         Conf conf = ApplicationContext.get().conf();
         logger.info("counting the user [{}] millis before another deploy" , ApplicationContext.get().conf().settings.stopTimeout );
         // keep the user for 30 seconds by IP, to avoid immediate widget start after stop
         Cache.set( Controller.request().remoteAddress(), System.currentTimeMillis() + conf.settings.stopTimeout, ( int ) (conf.settings.stopTimeout / 1000) );
+        }catch(Exception e){
+            logger.error("unable to set timeout for remoteAddress",e);
+        }
     }
 
     private static Result exceptionToStatus( Exception e ){
