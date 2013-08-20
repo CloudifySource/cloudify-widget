@@ -15,6 +15,7 @@ GET     /demos/:userId/list              controllers.DemosController.listWidgetF
 GET     /demos/:userId/:apiKey           controllers.DemosController.getDemoPageForWidget( userId:Long, apiKey:String )
 GET     /demos/:email                    controllers.DemosController.getDemoPageForUser( email:String )
 POST    /demos/verifyWidgetLogin         controllers.Demos.validateUserIdFromLogin(userId:String)
+GET     /api/demo/widget/list           controllers.DemosController.listWidgetForDemoUserByEmail( email: String )
 
 # Widget
 POST     /widget/start		     	    controllers.Application.start( apiKey: String, project:String ?="", key:String ?= "", secretKey:String ?= "", userId:String?="" )

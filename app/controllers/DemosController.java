@@ -58,4 +58,14 @@ public class DemosController extends Controller {
         }
         return ok(views.html.widgets.demos.widgetDemo.render(widget, request().host()));
     }
+
+    public static Result listWidgetForDemoUserByEmail( String email ){
+        if ( email.endsWith( ApplicationContext.get().conf().demoUserEmailSuffix )){
+            User user = User.find.where().eq( "email" , email ).findUnique() ;
+            if ( user != null ){
+                return listWidgetForDemoUser( user.getId() );
+            }
+        }
+        return badRequest("can only query for demo users");
+    }
 }
