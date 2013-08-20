@@ -9,6 +9,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.With;
 import tyrex.services.UUID;
+import utils.CollectionUtils;
 
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class LeadsController extends Controller {
     @With( UserCheck.class )
     public static Result getLead(  String userId, String authToken, String email  ){
         User user =  (User) ctx().args.get("user");
-        Lead lead = Lead.find.where().eq("email", email).eq("owner", user).findUnique();
+        Lead lead = CollectionUtils.first(Lead.find.where().eq("email", email).eq("owner", user).findList());
         return ok( Json.toJson(lead));
     }
 
