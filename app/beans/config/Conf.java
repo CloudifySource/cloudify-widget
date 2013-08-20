@@ -68,7 +68,17 @@ public class Conf {
 
         public Boolean globalSecurityCheck = false; // todo : switch this on once feature is completed.
 
+        public TimeoutValues timeoutValues = new TimeoutValues();
 
+    }
+
+    // conversion widget extensions for registered users.
+    public static class TimeoutValues{
+        @Config(ignoreNullValues = true)
+        public long registered = Utils.parseTimeToMillis("7d");
+
+        @Config(ignoreNullValues = true)
+        public long verified = Utils.parseTimeToMillis("30d");
     }
 
     public static class InitialData{
