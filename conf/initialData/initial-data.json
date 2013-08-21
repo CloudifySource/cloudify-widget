@@ -181,15 +181,26 @@
                     "selected": "CassandraSelected.png"
                 },
                 "description": "A recipe for Cassandra which is a scalable and ha database."
+            },
+
+            "ElasticSearch": {
+                "version": "0.20.1",
+                "title": "ElasticSearch",
+                "name":"elasticsearch",
+                "youtube": "http://www.youtube.com/embed/K_d8St6NFs0",
+                "provider": "http://www.elasticsearch.org/",
+                "recipe": "https://s3.amazonaws.com/cloudify-widget/elasticsearch.zip",
+                "console": {
+                    "title": "ElasticSearch",
+                    "link": "http://$HOST:9200/_plugin/head/"
+                },
+                "path": "",
+                "image": {
+                    "selected": "ElasticSearch.jpeg"
+                },
+                "description": "A recipe for ElasticSEarch, a flexible and powerful open source, distributed real-time search and analytics engine for the cloud"
             }
-
-
-
         }
-
-
-
-
     }
 }
 }
