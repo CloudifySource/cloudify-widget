@@ -37,6 +37,13 @@ import com.google.common.base.Predicate;
 public class ServerConfig {
 
 
+    public static enum DestroyMethod{
+        SCHEDULE, INTERVAL
+    }
+
+    public DestroyMethod destroyMethod = DestroyMethod.SCHEDULE;
+
+    public long destroyServerIntervalMillis = Utils.parseTimeToMillis("1mn");
 
     public PoolConfiguration pool = new PoolConfiguration();
 
@@ -145,6 +152,8 @@ public class ServerConfig {
         public String cloudProvider=CloudProvider.HP.label;
         public File script;
         public String tags = null;
+        @Config(ignoreNullValues = true)
+        public long sleepBeforeBootstrapMillis = Utils.parseTimeToMillis("20s");
         public ApiCredentials api = new ApiCredentials();
     }
 

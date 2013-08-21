@@ -478,8 +478,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     }
 
     private boolean bootstrap( ServerNode serverNode ){
-        logger.info("Server created, wait 10 seconds before starting to bootstrap machine: {}", serverNode.getPublicIP());
-        Utils.threadSleep(10000); // need for a network interfaces initialization
+        long timeout = conf.server.bootstrap.sleepBeforeBootstrapMillis;
+        logger.info("Server created, wait {} seconds before starting to bootstrap machine: {}", timeout, serverNode.getPublicIP());
+        Utils.threadSleep(timeout); // need for a network interfaces initialization
 
 
         boolean bootstrapSuccess = false;

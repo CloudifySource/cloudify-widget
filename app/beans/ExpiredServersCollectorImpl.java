@@ -16,8 +16,10 @@ package beans;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import beans.config.Conf;
+import beans.config.ServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,26 +46,56 @@ public class ExpiredServersCollectorImpl extends Timer implements ExpiredServers
 
     private static Logger logger = LoggerFactory.getLogger( ExpiredServersCollectorImpl.class );
 
-	public void scheduleToDestroy(final ServerNode server)
-	{
-        if ( server.getNodeId() == null ){ // possible if remote bootstrap that failed for some reason.
-            server.delete();
+
+    /** a repeating time task in interval of @{link conf#destroyTickInterval}
+     *
+     ***/
+    public void scheduleToDestroyTicker(){
+         if ( conf.server.destroyMethod == ServerConfig.DestroyMethod.INTERVAL ){
+            schedule( new DestroyServersTask(), 0, TimeUnit.MILLISECONDS.convert( 1 , TimeUnit.MINUTES ) );
+         }
+    }
+
+    public static class DestroyServersTask extends TimerTask{
+        @Override
+        public void run() {
+            logger.info("looking for servers to stop");
+
         }
-		
-		logger.info( "This server {} was scheduled for destroy after: {} ms", server, server.getElapsedTime() );
-		schedule( new TimerTask() {
-            public void run()
-            {
-                try {
-                    logger.info("scheduled destruction activated for {}", server.getNodeId());
-                    serverPool.destroy( server );
-                } catch ( Exception e ) {
-                    logger.error("destroying server threw exception", e);
-                }
+    }
+
+    public static class DestroyServerTask extends TimerTask{
+        ServerNode server;
+        final ServerPool serverPool;
+
+        public DestroyServerTask(ServerNode server, ServerPool serverPool ) {
+            this.server = server;
+            this.serverPool = serverPool;
+        }
+
+        @Override
+        public void run() {
+            if (server.getNodeId() == null) { // possible if remote bootstrap that failed for some reason.
+                server.delete();
             }
 
-        }, server.getElapsedTime() );
-	}
+            logger.info("This server {} was scheduled for destroy after: {} ms", server, server.getElapsedTime());
+            try {
+                logger.info("scheduled destruction activated for {}", server.getNodeId());
+                serverPool.destroy(server);
+            } catch (Exception e) {
+                logger.error("destroying server threw exception", e);
+            }
+        }
+    }
+
+
+
+    public void scheduleToDestroy(final ServerNode server) {
+        if (conf.server.destroyMethod == ServerConfig.DestroyMethod.SCHEDULE) {
+            schedule(new DestroyServerTask( server, serverPool ), server.getElapsedTime());
+        }
+    }
 
     @Override
     public void cancel() {

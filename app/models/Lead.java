@@ -9,10 +9,7 @@ import server.ApplicationContext;
 import tyrex.services.UUID;
 import utils.StringUtils;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,16 +18,22 @@ import javax.persistence.ManyToOne;
  * Time: 12:18 PM
  */
 @Entity
+@Table(uniqueConstraints =
+@UniqueConstraint(name="unique_email", columnNames =  {"owner_id","email"}))
 public class Lead extends Model {
 
     @Id
     public Long id;
+
 
     public String email;
 
     @JsonIgnore
     @Lob
     public String extra;
+
+    @JsonIgnore
+    public String confirmationCode;
 
     public String uuid;
 

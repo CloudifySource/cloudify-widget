@@ -32,11 +32,26 @@ public class LeadsController extends Controller {
         lead.email = email;
         lead.owner = user;
         lead.uuid = UUID.create();
+        lead.confirmationCode = UUID.create();
         lead.validated = false;
         lead.extra = postLeadBody.toString();
         lead.save();
 
          return ok(Json.toJson(lead));
+    }
+
+    @With( UserCheck.class )
+    public static Result confirmEmail( String userId, String authToken, String email, String confirmationCode ){
+        User user = (User) ctx().args.get("user");
+        Lead lead = CollectionUtils.first(Lead.find.where().eq("email",email).eq("owner", user).eq("confirmationCode", confirmationCode).findList());
+
+        if ( lead == null ){
+            return notFound("no such lead");
+        }else{
+            lead.validated = true;
+            lead.save();
+            return ok();
+        }
     }
 
 
