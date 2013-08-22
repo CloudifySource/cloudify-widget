@@ -28,7 +28,7 @@ public class DestroyServersTaskImpl implements DestroyServersTask {
         logger.debug("running DestroyServersTaskImpl");
         List<ServerNode> all = ServerNode.all();
         for (ServerNode serverNode : all) {
-            if (serverNode.getExpirationTime() > System.currentTimeMillis()) {
+            if ( serverNode.getExpirationTime() < System.currentTimeMillis() ) {
                 DestroySingleServerTask task = new DestroySingleServerTask().setServerNode(serverNode).setServerPool(serverPool);
                 Akka.system().scheduler().scheduleOnce(Duration.create(0, TimeUnit.MILLISECONDS), task);
             }
