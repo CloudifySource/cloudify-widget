@@ -170,8 +170,8 @@ public class ConfigBean {
 
             if ( handlers.containsKey( field.getType() ) ) {
                 try {
-                    Object value = handlers.get( field.getType() ).getValue( conf, configKey );
-                    if ( value != null || !isIgnoreNullValue( configAnn ) ){
+                    if ( conf.getString( configKey ) != null || !isIgnoreNullValue( configAnn ) ){
+                        Object value = handlers.get( field.getType() ).getValue( conf, configKey );
                         field.set( obj, value );
                     }
                 } catch ( Exception e ) {
