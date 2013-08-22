@@ -67,6 +67,9 @@ public class WidgetAdmin extends Controller
     private static Logger logger = LoggerFactory.getLogger( WidgetAdmin.class );
 
     public static Result getWidget( String apiKey ){
+        if ( StringUtils.isEmpty(apiKey)){
+            return badRequest("apiKey required");
+        }
         Widget widgetItem = Widget.getWidget(apiKey);
         if ( widgetItem == null || !widgetItem.isEnabled()){
             return ok();
