@@ -51,8 +51,6 @@ public class ServerPoolImpl implements ServerPool
     @Inject
     private ServerBootstrapper serverBootstrapper;
 
-    @Inject
-    private ExpiredServersCollector expiredServerCollector;
 
     @Inject
     private Conf conf;
@@ -134,11 +132,7 @@ public class ServerPoolImpl implements ServerPool
 
         Collection<ServerNode> busyServer = CollectionUtils.select( servers, busyServerPredicate );
         logger.info("I found {} busy servers", CollectionUtils.size(busyServer));
-        if ( !CollectionUtils.isEmpty( busyServer )){
-            for (ServerNode server : busyServer) {
-				     expiredServerCollector.scheduleToDestroy(server);
-			}
-		}// for
+
 
         Collection<ServerNode> availableServer = CollectionUtils.select( servers, nonBusyServerPredicate );
         availableServer = cleanPool( availableServer );
@@ -234,8 +228,6 @@ public class ServerPoolImpl implements ServerPool
                 serverNode.setBusy( true );
                 serverNode.setExpirationTime( lifeExpectancy + System.currentTimeMillis() );
                 serverNode.save(); // optimistic locking
-                // schedule to destroy after time expiration
-                expiredServerCollector.scheduleToDestroy( serverNode );
                 return true;
             } else {
                 logger.info( "serverNode[{}] has an invalid bootstrap. I will rebuild it.", result );
@@ -319,10 +311,6 @@ public class ServerPoolImpl implements ServerPool
 
     public void setServerBootstrapper(server.ServerBootstrapper serverBootstrapper) {
         this.serverBootstrapper = serverBootstrapper;
-    }
-
-    public void setExpiredServerCollector(ExpiredServersCollector expiredServerCollector) {
-        this.expiredServerCollector = expiredServerCollector;
     }
 
     public void setConf( Conf conf )

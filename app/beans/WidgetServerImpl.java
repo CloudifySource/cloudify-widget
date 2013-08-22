@@ -196,6 +196,8 @@ public class WidgetServerImpl implements WidgetServer
         if (!server.isRemote() && server.getExpirationTime() != null) {
             long elapsedTime = server.getExpirationTime() - System.currentTimeMillis();
             result.setTimeleft((int) TimeUnit.MILLISECONDS.toMinutes(elapsedTime));
+            result.setTimeleftMillis( elapsedTime );
+
         }
         return result;
     }

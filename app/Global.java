@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import akka.util.Duration;
 import annotations.AnonymousUsers;
 import beans.config.Conf;
 import models.User;
@@ -23,6 +24,7 @@ import play.GlobalSettings;
 import play.api.mvc.Results;
 import play.api.mvc.SimpleResult;
 import play.core.j.JavaResults;
+import play.libs.Akka;
 import play.libs.Json;
 import play.mvc.Action;
 import play.mvc.Http;
@@ -37,6 +39,7 @@ import utils.Utils;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -81,6 +84,13 @@ public class Global extends GlobalSettings
         }
 
         uploadInitialData( app );
+
+        logger.info("starting destroy server job");
+        Akka.system().scheduler().schedule(
+                Duration.Zero(),
+                Duration.create(1, TimeUnit.MINUTES),
+                ApplicationContext.get().getDestroyServersTask()
+        );
 	}
 
     private void uploadInitialData( Application app )

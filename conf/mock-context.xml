@@ -7,7 +7,8 @@
     <import resource="classpath:prod-context.xml"/>
 
     <bean id="deployManager" class="mocks.DeployManagerMock" />
-    <bean id="expiredServerCollector" class="mocks.ExpireServersCollectorMock"/>
+    <bean id="destroyServersTask" class="beans.tasks.DestroyServersTaskMock"/>
+
     <bean id="serverBootstrapper" class="mocks.ServerBootstrapperMock"/>
     <bean id="serverPool" class="mocks.ServerPoolMock"/>
     <bean id="widgetServer" class="mocks.WidgetServerMock"/>

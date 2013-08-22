@@ -134,6 +134,7 @@ public class Widget
         private List<String> output;
         private List<String> rawOutput; // for debug purposes
         private Integer timeleft; // minutes
+        private Long timeleftMillis; // millis
         private String publicIp;
         private String instanceId;
         private Boolean remote;
@@ -174,6 +175,14 @@ public class Widget
 
         public void setState(State state) {
             this.state = state;
+        }
+
+        public Long getTimeleftMillis() {
+            return timeleftMillis;
+        }
+
+        public void setTimeleftMillis(Long timeleftMillis) {
+            this.timeleftMillis = timeleftMillis;
         }
 
         public void setTimeleft(Integer timeleft) {
