@@ -6,10 +6,10 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import play.db.ebean.Model;
 import play.libs.Json;
 import server.ApplicationContext;
-import tyrex.services.UUID;
 import utils.StringUtils;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -73,6 +73,26 @@ public class Lead extends Model {
         }else{
             return Json.parse(extra);
         }
+    }
+
+    public static Lead findByOwnerIdAndConfirmationCode( User owner, Long id, String confirmationCode ){
+        return Lead.find.where().eq("owner", owner).eq("id",id).eq("confirmationCode", confirmationCode).findUnique();
+    }
+
+    public static Lead findByOwnerAndEmail( User owner, String email ){
+        return Lead.find.where().eq( "owner", owner).eq( "email" , email ).findUnique();
+    }
+
+    public static List<Lead> findAllByOwner( User owner ){
+        return Lead.find.where().eq("owner", owner).findList();
+    }
+
+    public static Lead findByOwnerAndId(User owner, Long id) {
+        return Lead.find.where().eq("owner", owner).eq("id", id).findUnique();
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String toDebugString(){

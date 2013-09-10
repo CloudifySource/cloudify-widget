@@ -204,7 +204,7 @@ public class Utils
 	}
 
 	public static long parseTimeToMillis( String timeExpression ){
-		return Time.parseDuration( timeExpression ) * 1000 ;
+		return ((long)Time.parseDuration( timeExpression )) * 1000L ;
 	}
 
 	//http://stackoverflow.com/questions/10381354/how-to-manipulate-session-request-and-response-for-test-in-play2-0

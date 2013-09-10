@@ -136,7 +136,7 @@ public class Widget
         private Integer timeleft; // minutes
         private Long timeleftMillis; // millis
         private String publicIp;
-        private String instanceId;
+        private String instanceId;  // server node instance id - NOT widget instance id.
         private Boolean remote;
         private Boolean hasPemFile;
         private WidgetInstance.ConsoleLink consoleLink;

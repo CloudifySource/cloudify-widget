@@ -49,9 +49,6 @@ public class WidgetInstance
     @OneToOne( )
     private ServerNode serverNode;
 
-    @ManyToOne
-    private Lead lead;
-
 
     @Enumerated(EnumType.STRING)
     private Recipe.Type recipeType;
@@ -117,6 +114,10 @@ public class WidgetInstance
         return find.where().eq("serverNode", server).findUnique();
     }
 
+    public static WidgetInstance findByInstanceIdAndApiKey( String instanceId, String apiKey ){
+        return find.where().eq("instanceId", instanceId).eq("widget.apiKey", apiKey ).findUnique();
+    }
+
     public static WidgetInstance findByInstanceId(String instanceId) {
         return find.where().eq("instanceId", instanceId).findUnique();
     }
@@ -178,13 +179,7 @@ public class WidgetInstance
         this.installName = installName;
     }
 
-    public Lead getLead() {
-        return lead;
-    }
 
-    public void setLead(Lead lead) {
-        this.lead = lead;
-    }
 
     @Override
     public String toString() {

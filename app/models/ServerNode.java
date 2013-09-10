@@ -28,14 +28,7 @@ import play.db.ebean.Model;
 import utils.CollectionUtils;
 import utils.Utils;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -63,6 +56,9 @@ extends Model
 	@XStreamAsAttribute
 	private String serverId;
 
+
+    @ManyToOne
+    private Lead lead;
 
 
     private Long creationTime;
@@ -148,8 +144,8 @@ extends Model
 
     public Long getTimeLeft() {
         if (widgetInstance != null) {
-            if (widgetInstance.getLead() != null) {
-                return creationTime + widgetInstance.getLead().getLeadExtraTimeout() - System.currentTimeMillis();
+            if ( lead != null) {
+                return creationTime + lead.getLeadExtraTimeout() - System.currentTimeMillis();
             } else {
                 return Math.max(EXPIRED_TIME, creationTime + widgetInstance.getWidget().getLifeExpectancy() - System.currentTimeMillis());
             }
@@ -345,6 +341,13 @@ extends Model
         return createEvent(s, ServerNodeEvent.Type.INFO);
     }
 
+    public Lead getLead() {
+        return lead;
+    }
+
+    public void setLead(Lead lead) {
+        this.lead = lead;
+    }
 
     // guy - todo - formalize this for reuse.
     public static class QueryConf {

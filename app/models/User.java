@@ -29,11 +29,7 @@ import play.mvc.Http;
 import server.ApplicationContext;
 import server.exceptions.ServerException;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -96,6 +92,9 @@ public class User
 	@Id
 	@XStreamOmitField
 	private Long id;
+
+    @ManyToOne( cascade = CascadeType.REMOVE, fetch = FetchType.EAGER )
+    private UserPermissions permissions;
 	
 	@XStreamOmitField
 	private String firstName;
@@ -413,6 +412,14 @@ public class User
     public String toDebugString()
     {
         return email + " (" + id + ")";
+    }
+
+    public UserPermissions getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(UserPermissions permissions) {
+        this.permissions = permissions;
     }
 
     @Override

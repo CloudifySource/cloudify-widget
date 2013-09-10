@@ -3,6 +3,7 @@ package controllers;
 import controllers.compositions.AdminUserCheck;
 import controllers.compositions.UserCheck;
 import models.Lead;
+import models.ServerNode;
 import models.User;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -15,7 +16,6 @@ import play.mvc.Result;
 import play.mvc.With;
 import server.ApplicationContext;
 import tyrex.services.UUID;
-import utils.CollectionUtils;
 
 import java.util.List;
 
@@ -36,15 +36,19 @@ public class LeadsController extends Controller {
         logger.info("postLeadBody = " + postLeadBody );
         String email = (String) postLeadBody.get("email").asText();
 
-
-        Lead lead = new Lead();
-        lead.email = email;
-        lead.owner = user;
-        lead.uuid = UUID.create();
-        lead.confirmationCode = UUID.create();
-        lead.validated = false;
-        lead.extra = postLeadBody.toString();
-        lead.save();
+        Lead lead = Lead.findByOwnerAndEmail( user, email );
+        if ( lead == null ){
+            lead = new Lead();
+            lead.email = email;
+            lead.owner = user;
+            lead.uuid = UUID.create();
+            lead.confirmationCode = UUID.create();
+            lead.validated = false;
+            lead.extra = postLeadBody.toString();
+            lead.save();
+        }else{
+            logger.info("lead [{}] already exists for user [{}], sending email again", email, user.toDebugString() );
+        }
 
         logger.info("sending registration mail to [{}]", lead.toDebugString() );
         ApplicationContext.get().getMailSender().sendRegistrationMail( lead );
@@ -52,10 +56,69 @@ public class LeadsController extends Controller {
          return ok(Json.toJson(lead));
     }
 
+    /**
+     *
+     *
+     * This is a REST API call used by users to extend leads' widget timeout.
+     *
+     * Leads provide their email and get more trial time in return.
+     *
+     * Currently, we allow user A to extend time on widgets defined by user B.
+     * We also allow to assign a single hacker to multiple widgets.
+     * This is a potential security threat as a hacker can "snatch" widgets and keep assigning a dummy lead
+     * to each widget, thus denying it from other leads.
+     *
+     * Currently we will do with a permissions definition for users that can assign leads to widgets.
+     * This reduces the problems to users with this permission.
+     * A wider resolution is required.
+     *
+     *
+     * @param userId - the user's primary key
+     * @param authToken - the user's authentication token
+     * @param leadId - the lead's primary key
+     * @param instanceId = the server node primary key
+     * @return - success or error
+     */
     @With( UserCheck.class )
-    public static Result confirmEmail( String userId, String authToken, String email, String confirmationCode ){
+    public static Result assignLeadToWidgetInstance( String userId, String authToken, Long leadId, Long instanceId ){
+         User user = (User) ctx().args.get("user");
+
+        logger.info(user.getPermissions().toString());
+        if ( !user.getPermissions().isCanAssignLeads() ){
+           return forbidden("You need permission to assign leads");
+        }
+        ServerNode serverNode = ServerNode.find.byId( instanceId );
+
+        Lead lead = Lead.find.byId( leadId );
+
+        if ( lead == null || !lead.owner.getId().equals( user.getId() )){
+            return notFound("no lead with id " + leadId );
+        }
+
+        // lets verify serverNode exists and is not assigned to another lead already.
+        // if it is assigned to another lead, we want to give the same message as if the server node
+        // does not exist.
+        if ( serverNode == null || ( serverNode.getLead() != null && !serverNode.getLead().getId().equals(lead.getId()))){
+             return notFound("instanceId " + instanceId + " does not exist");
+        }
+        else if ( serverNode.getLead() == null){
+
+            serverNode.setLead( lead );
+            serverNode.save();
+
+            return ok();
+        }else if ( serverNode.getLead().getId().equals( lead.getId() )){
+            return ok();
+        }
+
+        return ok();
+
+    }
+
+    @With( UserCheck.class )
+    public static Result confirmEmail( String userId, String authToken, Long leadId, String confirmationCode ){
         User user = (User) ctx().args.get("user");
-        Lead lead = CollectionUtils.first(Lead.find.where().eq("email",email).eq("owner", user).eq("confirmationCode", confirmationCode).findList());
+        Lead lead = Lead.findByOwnerIdAndConfirmationCode( user, leadId, confirmationCode);
 
         if ( lead == null ){
             return notFound("no such lead");
@@ -70,7 +133,7 @@ public class LeadsController extends Controller {
     @With( UserCheck.class )
     public static Result getLead(  String userId, String authToken, String email  ){
         User user =  (User) ctx().args.get("user");
-        Lead lead = CollectionUtils.first(Lead.find.where().eq("email", email).eq("owner", user).findList());
+        Lead lead = Lead.findByOwnerAndEmail( user, email );
         return ok( Json.toJson(lead));
     }
 
@@ -90,7 +153,7 @@ public class LeadsController extends Controller {
     @With( UserCheck.class )
     public static Result getLeads( String userId, String authToken ){
         User user = ( User ) ctx().args.get("user");
-        List<Lead> leads = Lead.find.where().eq("owner", user).findList();
+        List<Lead> leads = Lead.findAllByOwner( user );
         return ok( Json.toJson( leads ) );
     }
 }

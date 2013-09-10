@@ -28,11 +28,12 @@ GET     /decrypt                        controllers.Application.decrypt( data:St
 
 
 # User API
-POST   /api/user/:userId/lead           controllers.LeadsController.postLead( userId:String, authToken:String )
-GET    /api/user/:userId/lead/list      controllers.LeadsController.getLeads( userId:String, authToken:String )
-GET    /api/user/:userId/lead/:email    controllers.LeadsController.getLead( userId:String, authToken:String, email:String )
-POST    /api/user/:userId/lead/:email/validate  controllers.LeadsController.confirmEmail( userId:String, authToken:String, email:String, confirmationCode:String )
-GET     /api/admin/:userId/lead/list    controllers.LeadsController.getAdminLeads( userId:String, authToken:String )
+POST   /api/user/:userId/lead                                       controllers.LeadsController.postLead( userId:String, authToken:String )
+GET    /api/user/:userId/lead/list                                  controllers.LeadsController.getLeads( userId:String, authToken:String )
+GET    /api/user/:userId/lead/:email                                controllers.LeadsController.getLead( userId:String, authToken:String, email:String )
+POST    /api/user/:userId/lead/:leadId/validate                      controllers.LeadsController.confirmEmail( userId:String, authToken:String, leadId:Long, confirmationCode:String )
+GET     /api/admin/:userId/lead/list                                controllers.LeadsController.getAdminLeads( userId:String, authToken:String )
+POST    /api/user/:userId/lead/:leadId/prolong/:instanceId          controllers.LeadsController.assignLeadToWidgetInstance( userId:String , authToken:String , leadId:Long , instanceId:Long )
 
 
 # Admin API
