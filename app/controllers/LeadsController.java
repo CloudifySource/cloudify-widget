@@ -1,15 +1,19 @@
 package controllers;
 
+import controllers.compositions.AdminUserCheck;
 import controllers.compositions.UserCheck;
 import models.Lead;
 import models.User;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.With;
+import server.ApplicationContext;
 import tyrex.services.UUID;
 import utils.CollectionUtils;
 
@@ -42,6 +46,9 @@ public class LeadsController extends Controller {
         lead.extra = postLeadBody.toString();
         lead.save();
 
+        logger.info("sending registration mail to [{}]", lead.toDebugString() );
+        ApplicationContext.get().getMailSender().sendRegistrationMail( lead );
+
          return ok(Json.toJson(lead));
     }
 
@@ -67,6 +74,19 @@ public class LeadsController extends Controller {
         return ok( Json.toJson(lead));
     }
 
+    @With( AdminUserCheck.class )
+    public static Result getAdminLeads( String userId, String authToken ){
+        List<Lead> leads = Lead.find.all();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.getSerializationConfig().addMixInAnnotations( Lead.class , LeadUserMixin.class );
+        return ok( mapper.valueToTree( leads ) );
+    }
+
+
+    public static class LeadUserMixin{
+        @JsonProperty
+        public User owner;
+    }
     @With( UserCheck.class )
     public static Result getLeads( String userId, String authToken ){
         User user = ( User ) ctx().args.get("user");

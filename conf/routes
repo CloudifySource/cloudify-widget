@@ -32,6 +32,7 @@ POST   /api/user/:userId/lead           controllers.LeadsController.postLead( us
 GET    /api/user/:userId/lead/list      controllers.LeadsController.getLeads( userId:String, authToken:String )
 GET    /api/user/:userId/lead/:email    controllers.LeadsController.getLead( userId:String, authToken:String, email:String )
 POST    /api/user/:userId/lead/:email/validate  controllers.LeadsController.confirmEmail( userId:String, authToken:String, email:String, confirmationCode:String )
+GET     /api/admin/:userId/lead/list    controllers.LeadsController.getAdminLeads( userId:String, authToken:String )
 
 
 # Admin API

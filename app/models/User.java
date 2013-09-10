@@ -109,9 +109,11 @@ public class User
 	private String email;
 	
 	@Required
+    @JsonIgnore
 	@XStreamOmitField
 	private String password;
-	
+
+    @JsonIgnore
 	private String authToken; 
 	
 	private String expires;
@@ -120,6 +122,7 @@ public class User
 	@XStreamOmitField
 	private Boolean admin;
 
+    @JsonIgnore
 //    @JsonManagedReference
 	@OneToMany(cascade= CascadeType.ALL, mappedBy = "user")
 	private List<Widget> widgets;
