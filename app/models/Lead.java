@@ -49,10 +49,21 @@ public class Lead extends Model {
 
     public static Finder<Long, Lead> find = new Finder<Long, Lead>(Long.class, Lead.class);
 
-    // calculate when should we kill the widget
-//    public Long getTimeoutTimestamp( ){
-//        ApplicationContext.get().conf().settings.
-//    }
+//    calculate when should we kill the widget
+    public Long getLeadExtraTimeout(){
+        long deltaTime = 0;
+        if ( trialTimeoutTimestamp != null ){
+            deltaTime = trialTimeoutTimestamp;
+        }else{
+            if ( validated ){
+                deltaTime = ApplicationContext.get().conf().settings.timeoutValues.verified;
+            }else{
+                deltaTime = ApplicationContext.get().conf().settings.timeoutValues.registered;
+            }
+        }
+        deltaTime = deltaTime -  ( System.currentTimeMillis() - createdTimestamp ) ; // remove the amount of time since creation.
+        return Math.max( 0 , deltaTime );
+    }
 
 
     @JsonProperty
@@ -62,6 +73,19 @@ public class Lead extends Model {
         }else{
             return Json.parse(extra);
         }
+    }
+
+    public String toDebugString(){
+        return "Lead{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", extra='" + extra + '\'' +
+                ", confirmationCode='" + confirmationCode + '\'' +
+                ", uuid='" + uuid + '\'' +
+                ", validated=" + validated +
+                ", createdTimestamp=" + createdTimestamp +
+                ", trialTimeoutTimestamp=" + trialTimeoutTimestamp +
+                '}';
     }
 
 

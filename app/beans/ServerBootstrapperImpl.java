@@ -45,6 +45,7 @@ import org.jclouds.openstack.nova.v2_0.domain.Server.Status;
 import org.jclouds.openstack.nova.v2_0.domain.ServerCreated;
 import org.jclouds.openstack.nova.v2_0.features.ServerApi;
 import org.jclouds.openstack.nova.v2_0.options.CreateServerOptions;
+import org.jclouds.openstack.nova.v2_0.options.RebuildServerOptions;
 import org.jclouds.rest.AuthorizationException;
 import org.jclouds.rest.RestContext;
 import org.jclouds.ssh.SshClient;
@@ -53,7 +54,6 @@ import org.jclouds.util.Strings2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.i18n.Messages;
-import play.modules.spring.Spring;
 import server.ApplicationContext;
 import server.DeployManager;
 import server.ProcExecutor;
@@ -471,7 +471,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         logger.info("rebuilding machine");
         ServerApi serverApi = novaContext.getApi();
         try {
-            serverApi.rebuild(serverNode.getNodeId());
+
+            RebuildServerOptions rebuildServerOptions = RebuildServerOptions.Builder.withImage(ApplicationContext.get().conf().server.bootstrap.imageId);
+            serverApi.rebuild(serverNode.getNodeId(), rebuildServerOptions );
         } catch (RuntimeException e) {
             logger.error("error while rebuilding machine [{}]", serverNode, e);
         }

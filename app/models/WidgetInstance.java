@@ -49,6 +49,9 @@ public class WidgetInstance
     @OneToOne( )
     private ServerNode serverNode;
 
+    @ManyToOne
+    private Lead lead;
+
 
     @Enumerated(EnumType.STRING)
     private Recipe.Type recipeType;
@@ -173,6 +176,14 @@ public class WidgetInstance
     public void setInstallName( String installName )
     {
         this.installName = installName;
+    }
+
+    public Lead getLead() {
+        return lead;
+    }
+
+    public void setLead(Lead lead) {
+        this.lead = lead;
     }
 
     @Override

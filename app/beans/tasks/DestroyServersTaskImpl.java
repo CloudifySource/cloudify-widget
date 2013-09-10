@@ -28,15 +28,38 @@ public class DestroyServersTaskImpl implements DestroyServersTask {
         logger.debug("running DestroyServersTaskImpl");
         List<ServerNode> all = ServerNode.all();
         for (ServerNode serverNode : all) {
-            if ( serverNode.getExpirationTime() < System.currentTimeMillis() ) {
+            logger.debug("checking to see if server [{}] expired", serverNode.toDebugString() );
+            if ( serverNode.isExpired() ) {
                 DestroySingleServerTask task = new DestroySingleServerTask().setServerNode(serverNode).setServerPool(serverPool);
                 Akka.system().scheduler().scheduleOnce(Duration.create(0, TimeUnit.MILLISECONDS), task);
+                serverPool.addNewServerToPool( new CheckPoolStatusCallback( serverPool )  );
+            }else{
+                logger.debug("not expired, timeleft is : " + serverNode.getTimeLeft() );
             }
         }
     }
 
     public void setServerPool(ServerPool serverPool) {
         this.serverPool = serverPool;
+    }
+
+
+    public static class CheckPoolStatusCallback implements Runnable{
+        private ServerPool serverPool;
+
+        public CheckPoolStatusCallback(ServerPool serverPool) {
+            this.serverPool = serverPool;
+        }
+
+        @Override
+        public void run() {
+            if ( serverPool.getStats().isBelowLimit() ){
+                logger.info("after destroying a server node, I told the pool to add another. " +
+                        "When it finished, it called me. " +
+                        "I checked and the pool is below limit. " +
+                        "I am reinitializing it");
+            }
+        }
     }
 
     public static class DestroySingleServerTask implements Runnable{

@@ -8,4 +8,5 @@ package beans.tasks;
  */
 public interface DestroyServersTask extends Runnable {
 
+
 }

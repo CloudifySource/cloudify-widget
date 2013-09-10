@@ -186,7 +186,7 @@ public class Widget
         }
 
         public void setTimeleft(Integer timeleft) {
-            this.timeleft = timeleft <= 0 ? 1 : timeleft;
+            this.timeleft = timeleft == null ? 0 : timeleft;
         }
 
         public Status setHasPemFile(Boolean hasPemFile) {

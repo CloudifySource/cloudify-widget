@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import akka.util.Duration;
 import beans.config.Conf;
 
 import beans.pool.PoolEvent;
@@ -27,6 +28,7 @@ import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.libs.Akka;
 import server.*;
 import utils.CollectionUtils;
 
@@ -205,7 +207,12 @@ public class ServerPoolImpl implements ServerPool
             logger.info( "freeServers is empty, adding a new server. pool status is [{}]", getStats() );
         }
 
-		addNewServerToPool();
+		addNewServerToPool( NoOpCallback.instance );
+
+        if ( selectedServer != null ){
+            selectedServer.setCreationTime( System.currentTimeMillis() );
+            selectedServer.save();
+        }
 
 		return selectedServer;
 	}
@@ -226,7 +233,6 @@ public class ServerPoolImpl implements ServerPool
             BootstrapValidationResult result = serverBootstrapper.validateBootstrap( serverNode );
             if ( result.isValid() ) {
                 serverNode.setBusy( true );
-                serverNode.setExpirationTime( lifeExpectancy + System.currentTimeMillis() );
                 serverNode.save(); // optimistic locking
                 return true;
             } else {
@@ -274,40 +280,38 @@ public class ServerPoolImpl implements ServerPool
 
     private void addNewServerToPool( int number ){
         for (int i = 0; i < number; i++) {
-            addNewServerToPool();
+            addNewServerToPool( NoOpCallback.instance );
         }
     }
 
     private boolean isPoolSaturated(){
         return ServerNode.count() >= conf.server.pool.maxNodes;
     }
-	
-	@Override
-    public void addNewServerToPool()
-	{
-        logger.info( "adding new server to the pool" );
-		new Thread(new Runnable()
-		{
-			public void run()
-			{
-				try
-				{
-					List<ServerNode> servers = serverBootstrapper.createServers( 1 );
-					for( ServerNode srv :  servers ){
-						srv.save();
+
+    @Override
+    public void addNewServerToPool( final Runnable callback ) {
+        logger.info("adding new server to the pool");
+        Akka.system().scheduler().scheduleOnce(Duration.Zero(),
+                new Runnable() {
+                    public void run() {
+                        try {
+                            List<ServerNode> servers = serverBootstrapper.createServers(1);
+                            for (ServerNode srv : servers) {
+                                srv.save();
+                            }
+                        } catch (Exception e) {
+                            logger.error("ServerPool failed to create a new server node", e);
+                            String stackTrace = ExceptionUtils.getFullStackTrace(e);
+                            ApplicationContext.get().getPoolEventManager().handleEvent(new PoolEvent.MachineStateEvent()
+                                    .setType(PoolEvent.Type.ERROR)
+                                    .setErrorMessage(e.getMessage())
+                                    .setErrorStackTrace(stackTrace));
+                        }
+                        Akka.system().scheduler().scheduleOnce( Duration.Zero() , callback );
                     }
-				} catch (Exception e)
-				{
-					logger.error("ServerPool failed to create a new server node", e);
-                    String stackTrace = ExceptionUtils.getFullStackTrace(e);
-                    ApplicationContext.get().getPoolEventManager().handleEvent(new PoolEvent.MachineStateEvent()
-                            .setType(PoolEvent.Type.ERROR)
-                            .setErrorMessage(e.getMessage())
-                            .setErrorStackTrace(stackTrace));
                 }
-			}
-		}).start();
-	}
+        );
+    }
 
     public void setServerBootstrapper(server.ServerBootstrapper serverBootstrapper) {
         this.serverBootstrapper = serverBootstrapper;

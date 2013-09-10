@@ -60,8 +60,9 @@ public class ServerPoolMock implements ServerPool
     }
 
     @Override
-    public void addNewServerToPool() {
+    public void addNewServerToPool( Runnable callback ) {
         logger.info("adding new server to pool");
+        callback.run();
 
     }
 }

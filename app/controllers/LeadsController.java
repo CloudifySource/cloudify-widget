@@ -4,6 +4,8 @@ import controllers.compositions.UserCheck;
 import models.Lead;
 import models.User;
 import org.codehaus.jackson.JsonNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -21,10 +23,13 @@ import java.util.List;
  */
 public class LeadsController extends Controller {
 
+    private static Logger logger = LoggerFactory.getLogger(LeadsController.class);
+
     @With( UserCheck.class )
     public static Result postLead( String userId , String authToken ){
         User user = ( User) ctx().args.get("user");
         JsonNode postLeadBody = request().body().asJson();
+        logger.info("postLeadBody = " + postLeadBody );
         String email = (String) postLeadBody.get("email").asText();
 
 

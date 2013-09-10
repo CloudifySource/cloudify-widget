@@ -17,6 +17,7 @@ package beans;
 
 import beans.config.Conf;
 import controllers.routes;
+import models.Lead;
 import models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +62,22 @@ public class MailSenderImpl implements MailSender {
         }catch(RuntimeException e){
             logger.error( "error sending pool is empty email",e );
         }
+    }
+
+    @Override
+    public void sendRegistrationMail(Lead lead) {
+        logger.info( "sending registration email to lead [{}]", lead.toDebugString() );
+
+        String mailContent = views.html.mail.registration.render(lead).body();
+        GsMailConfiguration mConf = new GsMailConfiguration();
+        mConf.addRecipient( GsMailer.RecipientType.TO,  lead.email, null)
+                .setBodyHtml( mailContent )
+                .setBodyText( mailContent )
+                .setFrom( conf.smtp.user, conf.mailer.name )
+                .setReplyTo( conf.mailer )
+                .setSubject( "Cloud Activation" );
+
+        ApplicationContext.get().getMailer().send(mConf);
     }
 
     @Override

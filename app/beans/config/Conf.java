@@ -115,7 +115,7 @@ public class Conf {
 
     public static class CloudifyConfiguration{
 
-        public String version = "2.7.0";
+        public String version = "2.7.0-Cloudify-m1";
 
         public long deployWatchDogProcessTimeoutMillis = Utils.parseTimeToMillis( "2mn" );
         

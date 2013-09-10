@@ -1,7 +1,6 @@
 $(function () {
 
 
-
     function advancedData( ){
 
         var cookieName = "ADVANCED_DATA";
@@ -385,7 +384,7 @@ $(function () {
         $.postMessage( JSON.stringify({name:"widget_status", comment:"status_was_updated", status:data.status}), origin_page_url , parent );
         if ( data.status.timeleft ) {
             $("#time_left").show();
-            $("#time_left_counter").text(data.status.timeleft + " minutes");
+            $("#time_left_counter").text( (parseInt(data.status.timeleft) + 1) + " minutes");
         }
 
         if ( data.status.output ){

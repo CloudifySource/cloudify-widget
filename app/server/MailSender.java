@@ -15,6 +15,7 @@
 
 package server;
 
+import models.Lead;
 import models.User;
 
 /**
@@ -26,4 +27,6 @@ public interface MailSender {
     public void resetPasswordMail( User user );
 
     public void sendPoolIsEmptyMail( String stats );
+
+    public void sendRegistrationMail( Lead lead  );
 }

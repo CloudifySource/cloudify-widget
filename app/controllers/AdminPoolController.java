@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import beans.NoOpCallback;
 import models.ServerNode;
 import models.Summary;
 import models.User;
@@ -153,7 +154,7 @@ public class AdminPoolController extends UserPoolController {
     }
 
     public static Result addNode( String authToken ){
-        ApplicationContext.get().getServerPool().addNewServerToPool();
+        ApplicationContext.get().getServerPool().addNewServerToPool(NoOpCallback.instance);
         return ok();
     }
 

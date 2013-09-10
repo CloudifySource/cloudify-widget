@@ -62,7 +62,7 @@ public class CloudifyRestResult {
         public String getVersion(){
             for ( String errorArg : errorArgs ) {
                 if ( !DUMMY_VERSION.equals( errorArg) ){
-                    return StringUtils.split(errorArg,"-")[0];
+                    return errorArg;
                 }
             }
             throw new RuntimeException( String.format("unable to decipher cloudify version from errorArgs [%s]", errorArgs) );

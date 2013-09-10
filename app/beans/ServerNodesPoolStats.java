@@ -28,6 +28,11 @@ public class ServerNodesPoolStats {
     public int minLimit = -1;
     public int maxLimit = -1;
 
+
+    public boolean isBelowLimit(){
+        return nonBusyServers < minLimit;
+    }
+
     @Override
     public String toString()
     {
