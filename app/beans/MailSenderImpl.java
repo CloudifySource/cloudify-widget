@@ -54,7 +54,7 @@ public class MailSenderImpl implements MailSender {
             ApplicationContext.get().getMailer().send( new GsMailConfiguration()
                     .setSubject( "Important : pool is empty" )
                     .setBodyText( "pool is empty  " + stats )
-                    .addRecipient( GsMailer.RecipientType.TO, "widget@cloudifysource.org", "Cloudify Widget Team")
+                    .addRecipient( GsMailer.RecipientType.TO, conf.mails.poolEmpty.email , conf.mails.poolEmpty.name )
                     .setFrom( conf.smtp.user, conf.mailer.name )
                     .setReplyTo( conf.mailer )
 

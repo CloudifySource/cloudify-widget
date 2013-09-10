@@ -31,6 +31,9 @@ public class Conf {
 
     public SmtpConf smtp = new SmtpConf();
 
+    public Mails mails = new Mails();
+
+
     // who is sending the mail?
     public GsMailer.Mailer mailer = new GsMailer.Mailer();
 
@@ -133,6 +136,10 @@ public class Conf {
 
         @Config(ignoreNullValues = true)
         public long verifyLoginUserIdTimeout = Utils.parseTimeToMillis("20s");
+    }
+
+    public static class Mails{
+        public GsMailer.Mailer poolEmpty = new GsMailer.Mailer().setEmail("widget@cloudifysource.org").setName("Cloudify Widget Team");
     }
 
 
