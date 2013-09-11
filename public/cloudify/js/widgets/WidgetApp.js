@@ -110,6 +110,7 @@ WidgetApp.controller('WidgetController',
             WidgetModel.saveWidget( $scope.authToken, widget ).then( function( savedWidget ){
                 if ( !angular.isDefined(widget.id)){
                     widget.id = savedWidget.id;
+                    $scope.widgets.push( savedWidget );
                 }
                 if ( isDone ){
                     $scope.goBack();

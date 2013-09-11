@@ -69,6 +69,7 @@ public class Widget
     @Constraints.Required
 	private String recipeURL;
 	private Boolean allowAnonymous;
+    @Constraints.Required
 	private String apiKey;
 
     @JsonIgnore
@@ -284,11 +285,15 @@ public class Widget
 		this.recipeURL  = recipeURL;
 		this.consoleName = consoleName;
 		this.consoleURL = consoleURL;
-		this.enabled = true;
-		this.launches = 0;
-		this.apiKey = UUID.randomUUID().toString();
         this.recipeRootPath = recipeRootPath;
+        init();
 	}
+
+    public void init(){
+        this.enabled = true;
+        this.launches = 0;
+        this.apiKey = UUID.randomUUID().toString();
+    }
 	
 	public WidgetInstance addWidgetInstance( ServerNode serverNode, File recipeDir )
 	{
