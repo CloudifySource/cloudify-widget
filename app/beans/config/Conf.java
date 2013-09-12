@@ -140,6 +140,7 @@ public class Conf {
 
     public static class Mails{
         public GsMailer.Mailer poolEmpty = new GsMailer.Mailer().setEmail("widget@cloudifysource.org").setName("Cloudify Widget Team");
+        public GsMailer.Mailer registrationCc = new GsMailer.Mailer();
     }
 
 
