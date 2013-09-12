@@ -143,6 +143,9 @@ extends Model
 	}
 
     public Long getTimeLeft() {
+        if ( remote ){
+            return Long.MAX_VALUE; // leave forever;
+        }
         if (widgetInstance != null) {
             if ( lead != null) {
                 return creationTime + lead.getLeadExtraTimeout() - System.currentTimeMillis();
