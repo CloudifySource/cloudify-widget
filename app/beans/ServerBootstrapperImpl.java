@@ -670,6 +670,8 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			logger.info("Starting bootstrapping for server:{} " , server );
 
 			String script = FileUtils.readFileToString( conf.server.bootstrap.script );
+            script = script.replace("##publicip##", server.getPublicIP()).replace("##privateip##", server.getPrivateIP());
+
 			ExecResponse response = runScriptOnNode( conf, server.getPublicIP(), script );
 
             logger.info("script finished");
