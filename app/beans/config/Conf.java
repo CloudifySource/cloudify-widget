@@ -118,11 +118,11 @@ public class Conf {
 
     public static class CloudifyConfiguration{
 
-        public String version = "2.7.0-Cloudify-m1";
+        public String version = "2.7.0-Cloudify-m3";
 
-        public long deployWatchDogProcessTimeoutMillis = Utils.parseTimeToMillis( "2mn" );
+        public long deployWatchDogProcessTimeoutMillis = Utils.parseTimeToMillis( "10mn" );
         
-        public long bootstrapCloudWatchDogProcessTimeoutMillis = Utils.parseTimeToMillis( "2mn" );
+        public long bootstrapCloudWatchDogProcessTimeoutMillis = Utils.parseTimeToMillis( "10mn" );
 
         public File deployScript=Utils.getFileByRelativePath( "/bin/deployer.sh" );
 
