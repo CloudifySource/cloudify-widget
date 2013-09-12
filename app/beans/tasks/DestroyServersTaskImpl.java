@@ -26,7 +26,7 @@ public class DestroyServersTaskImpl implements DestroyServersTask {
     @Override
     public void run() {
         logger.debug("running DestroyServersTaskImpl");
-        List<ServerNode> all = ServerNode.all();
+        List<ServerNode> all = ServerNode.findByCriteria( new ServerNode.QueryConf().criteria().setRemote(false).done() );
         for (ServerNode serverNode : all) {
             logger.debug("checking to see if server [{}] expired", serverNode.toDebugString() );
             if ( serverNode.isExpired() ) {
