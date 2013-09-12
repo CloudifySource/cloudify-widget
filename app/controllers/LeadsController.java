@@ -42,7 +42,7 @@ public class LeadsController extends Controller {
             lead.email = email;
             lead.owner = user;
             lead.uuid = UUID.create();
-            lead.confirmationCode = UUID.create();
+            lead.confirmationCode = UUID.create().replaceAll("-", "");
             lead.validated = false;
             lead.extra = postLeadBody.toString();
             lead.save();
