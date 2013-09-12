@@ -240,8 +240,8 @@ public class GsMailer implements Plugin {
 
     }
     public static class Mailer{
-        public String email;
-        public String name;
+        public String email = null;
+        public String name = null;
 
         public Mailer setEmail( String email )
         {
@@ -253,6 +253,10 @@ public class GsMailer implements Plugin {
         {
             this.name = name;
             return this;
+        }
+
+        public boolean isValid(){
+            return StringUtils.isNotBlank( email ) && StringUtils.isNotBlank( name );
         }
 
         @Override
