@@ -17,6 +17,7 @@ package beans;
 
 import beans.config.Conf;
 import controllers.routes;
+import models.Lead;
 import models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,7 @@ public class MailSenderImpl implements MailSender {
             ApplicationContext.get().getMailer().send( new GsMailConfiguration()
                     .setSubject( "Important : pool is empty" )
                     .setBodyText( "pool is empty  " + stats )
-                    .addRecipient( GsMailer.RecipientType.TO, "widget@cloudifysource.org", "Cloudify Widget Team")
+                    .addRecipient( GsMailer.RecipientType.TO, conf.mails.poolEmpty.email , conf.mails.poolEmpty.name )
                     .setFrom( conf.smtp.user, conf.mailer.name )
                     .setReplyTo( conf.mailer )
 
@@ -61,6 +62,26 @@ public class MailSenderImpl implements MailSender {
         }catch(RuntimeException e){
             logger.error( "error sending pool is empty email",e );
         }
+    }
+
+    @Override
+    public void sendRegistrationMail(Lead lead) {
+        logger.info( "sending registration email to lead [{}]", lead.toDebugString() );
+
+        String mailContent = views.html.mail.registration.render(lead).body();
+        GsMailConfiguration mConf = new GsMailConfiguration();
+        mConf.addRecipient( GsMailer.RecipientType.TO,  lead.email, null)
+                .setBodyHtml( mailContent )
+                .setBodyText( mailContent )
+                .setFrom( conf.smtp.user, conf.mailer.name )
+                .setReplyTo( conf.mailer )
+                .setSubject( "Cloud Activation" );
+
+        if ( conf.mails.registrationCc.isValid() ){
+            mConf.addRecipient( GsMailer.RecipientType.BCC, conf.mails.registrationCc.email, conf.mails.registrationCc.name );
+        }
+
+        ApplicationContext.get().getMailer().send(mConf);
     }
 
     @Override

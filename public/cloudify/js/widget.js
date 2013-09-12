@@ -1,7 +1,6 @@
 $(function () {
 
 
-
     function advancedData( ){
 
         var cookieName = "ADVANCED_DATA";
@@ -304,6 +303,8 @@ $(function () {
         }
 
         function write_log(message, class_name) {
+
+            $.postMessage( JSON.stringify({name:"widget_log", comment:"writing_to_log", message: message, type:class_name }), origin_page_url , parent );
           $dom.append($("<li/>", {html: message}).addClass(class_name));
           $dom.scrollTop($dom[0].scrollHeight);
         }
@@ -385,7 +386,7 @@ $(function () {
         $.postMessage( JSON.stringify({name:"widget_status", comment:"status_was_updated", status:data.status}), origin_page_url , parent );
         if ( data.status.timeleft ) {
             $("#time_left").show();
-            $("#time_left_counter").text(data.status.timeleft + " minutes");
+            $("#time_left_counter").text( (parseInt(data.status.timeleft) + 1) + " minutes");
         }
 
         if ( data.status.output ){

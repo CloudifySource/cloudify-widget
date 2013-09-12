@@ -114,6 +114,10 @@ public class WidgetInstance
         return find.where().eq("serverNode", server).findUnique();
     }
 
+    public static WidgetInstance findByInstanceIdAndApiKey( String instanceId, String apiKey ){
+        return find.where().eq("instanceId", instanceId).eq("widget.apiKey", apiKey ).findUnique();
+    }
+
     public static WidgetInstance findByInstanceId(String instanceId) {
         return find.where().eq("instanceId", instanceId).findUnique();
     }
@@ -174,6 +178,8 @@ public class WidgetInstance
     {
         this.installName = installName;
     }
+
+
 
     @Override
     public String toString() {

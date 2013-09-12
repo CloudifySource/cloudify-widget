@@ -69,6 +69,7 @@ public class Widget
     @Constraints.Required
 	private String recipeURL;
 	private Boolean allowAnonymous;
+    @Constraints.Required
 	private String apiKey;
 
     @JsonIgnore
@@ -134,8 +135,9 @@ public class Widget
         private List<String> output;
         private List<String> rawOutput; // for debug purposes
         private Integer timeleft; // minutes
+        private Long timeleftMillis; // millis
         private String publicIp;
-        private String instanceId;
+        private String instanceId;  // server node instance id - NOT widget instance id.
         private Boolean remote;
         private Boolean hasPemFile;
         private WidgetInstance.ConsoleLink consoleLink;
@@ -176,8 +178,16 @@ public class Widget
             this.state = state;
         }
 
+        public Long getTimeleftMillis() {
+            return timeleftMillis;
+        }
+
+        public void setTimeleftMillis(Long timeleftMillis) {
+            this.timeleftMillis = timeleftMillis;
+        }
+
         public void setTimeleft(Integer timeleft) {
-            this.timeleft = timeleft <= 0 ? 1 : timeleft;
+            this.timeleft = timeleft == null ? 0 : timeleft;
         }
 
         public Status setHasPemFile(Boolean hasPemFile) {
@@ -275,11 +285,15 @@ public class Widget
 		this.recipeURL  = recipeURL;
 		this.consoleName = consoleName;
 		this.consoleURL = consoleURL;
-		this.enabled = true;
-		this.launches = 0;
-		this.apiKey = UUID.randomUUID().toString();
         this.recipeRootPath = recipeRootPath;
+        init();
 	}
+
+    public void init(){
+        this.enabled = true;
+        this.launches = 0;
+        this.apiKey = UUID.randomUUID().toString();
+    }
 	
 	public WidgetInstance addWidgetInstance( ServerNode serverNode, File recipeDir )
 	{

@@ -37,5 +37,5 @@ public interface ServerPool
 
     public Collection<ServerNode> getPool();
 
-    void addNewServerToPool();
+    void addNewServerToPool( Runnable callback );
 }

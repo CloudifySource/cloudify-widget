@@ -15,6 +15,8 @@ GET     /demos/:userId/list              controllers.DemosController.listWidgetF
 GET     /demos/:userId/:apiKey           controllers.DemosController.getDemoPageForWidget( userId:Long, apiKey:String )
 GET     /demos/:email                    controllers.DemosController.getDemoPageForUser( email:String )
 POST    /demos/verifyWidgetLogin         controllers.Demos.validateUserIdFromLogin(userId:String)
+GET     /api/demo/widget/list           controllers.DemosController.listWidgetForDemoUserByEmail( email: String )
+
 
 # Widget
 POST     /widget/start		     	    controllers.Application.start( apiKey: String, project:String ?="", key:String ?= "", secretKey:String ?= "", userId:String?="" )
@@ -24,6 +26,14 @@ GET      /widget/:instanceId/pem        controllers.Application.downloadPemFile(
 GET     /encrypt                        controllers.Application.encrypt( data:String )
 GET     /decrypt                        controllers.Application.decrypt( data:String )
 
+
+# User API
+POST   /api/user/:userId/lead                                       controllers.LeadsController.postLead( userId:String, authToken:String )
+GET    /api/user/:userId/lead/list                                  controllers.LeadsController.getLeads( userId:String, authToken:String )
+GET    /api/user/:userId/lead/:email                                controllers.LeadsController.getLead( userId:String, authToken:String, email:String )
+POST    /api/user/:userId/lead/:leadId/validate                      controllers.LeadsController.confirmEmail( userId:String, authToken:String, leadId:Long, confirmationCode:String )
+GET     /api/admin/:userId/lead/list                                controllers.LeadsController.getAdminLeads( userId:String, authToken:String )
+POST    /api/user/:userId/lead/:leadId/prolong/:instanceId          controllers.LeadsController.assignLeadToWidgetInstance( userId:String , authToken:String , leadId:Long , instanceId:Long )
 
 
 # Admin API
@@ -84,6 +94,8 @@ GET     /public/*file  		     	    controllers.Assets.at(path="/public/cloudify"
 GET     /assets/*file             	    controllers.Assets.at(path="/public", file)
 GET     /d                              controllers.DemosController.getDemoPageForUser(email="default_demo@gigaspaces.com")
 GET     /*file        		     	    controllers.Assets.at(path="/public/cloudify", file)
+
+
 
 
 

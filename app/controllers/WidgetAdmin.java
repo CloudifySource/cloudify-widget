@@ -67,6 +67,9 @@ public class WidgetAdmin extends Controller
     private static Logger logger = LoggerFactory.getLogger( WidgetAdmin.class );
 
     public static Result getWidget( String apiKey ){
+        if ( StringUtils.isEmpty(apiKey)){
+            return badRequest("apiKey required");
+        }
         Widget widgetItem = Widget.getWidget(apiKey);
         if ( widgetItem == null || !widgetItem.isEnabled()){
             return ok();
@@ -343,14 +346,21 @@ public class WidgetAdmin extends Controller
         String bodyRequest = jsonNode.toString();
 
         Form<Widget> validator = form( Widget.class ).bind( jsonNode );
+
+        // ignore apiKey errors
+        validator.errors().remove("apiKey");
+
         if ( validator.hasErrors() ){
             new HeaderMessage().populateFormErrors( validator ).apply( response().getHeaders() );
+            logger.error("trying to save an invalid widget " + validator.toString());
             return badRequest( );
         }
 
         try {
             if ( w == null ){
+                // creating a new widget.
                 w = mapper.treeToValue( jsonNode, Widget.class );
+                w.init();
             }else{
                 mapper.readerForUpdating( w ).treeToValue( jsonNode, Widget.class );
             }
@@ -485,8 +495,16 @@ public class WidgetAdmin extends Controller
         return ok( );
     }
 
+
+
     public static Result previewWidget( String apiKey ){
-        String authToken = request().cookies().get("authToken").value();
+        Http.Cookie authTokenCookie = request().cookies().get("authToken");
+
+        if ( authTokenCookie == null ){
+             redirect("/");
+        }
+
+        String authToken = authTokenCookie.value();
         Widget widget = getWidgetSafely( authToken, apiKey );
         return ok( previewWidget.render(widget, request().host()));
     }

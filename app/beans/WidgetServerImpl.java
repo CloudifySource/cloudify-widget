@@ -117,6 +117,9 @@ public class WidgetServerImpl implements WidgetServer
     @Override
     public Status getWidgetStatus(ServerNode server) {
         Status result = new Status();
+
+
+
         List<String> output = new LinkedList<String>();
         result.setOutput(output);
 
@@ -124,6 +127,8 @@ public class WidgetServerImpl implements WidgetServer
             result.setState(Status.State.STOPPED);
             output.add(Messages.get("test.drive.successfully.complete"));
             return result;
+        }else{
+            result.setInstanceId( Long.toString(server.getId()) ); // will need this to register users on specific nodes.
         }
 
         String cachedOutput = Utils.getCachedOutput( server );// need to sort out the cache before we decide if the installation finished.
@@ -193,9 +198,11 @@ public class WidgetServerImpl implements WidgetServer
         }
 
         // server is remote we don't count time
-        if (!server.isRemote() && server.getExpirationTime() != null) {
-            long elapsedTime = server.getExpirationTime() - System.currentTimeMillis();
-            result.setTimeleft((int) TimeUnit.MILLISECONDS.toMinutes(elapsedTime));
+        Long timeLeft = server.getTimeLeft();
+        if (!server.isRemote() && timeLeft != null) {
+            result.setTimeleft((int) TimeUnit.MILLISECONDS.toMinutes(timeLeft));
+            result.setTimeleftMillis(timeLeft);
+
         }
         return result;
     }

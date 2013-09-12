@@ -23,6 +23,10 @@
         </encoder>
     </appender>
 
+    <logger name="beans.tasks.DestroyServersTaskImpl" level="debug" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
 
     <logger name="application" level="info" additivity="false">
         <appender-ref ref="STDOUT"/>

@@ -20,10 +20,12 @@ import javax.inject.Inject;
 import beans.NovaCloudCredentials;
 import beans.pool.PoolEventListener;
 import beans.pool.PoolEventManager;
+import beans.tasks.DestroyServersTask;
 import bootstrap.InitialData;
 import mocks.EventMonitorMock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.Play;
 import play.modules.spring.Spring;
 import beans.GsMailer;
 import beans.HmacImpl;
@@ -51,13 +53,13 @@ public class ApplicationContext
     @Inject private WidgetServer widgetServer;
     @Inject private ServerPool serverPool;
     @Inject private ServerBootstrapper serverBootstrapper;
-    @Inject private ExpiredServersCollector expiredServersCollector;
     @Inject private MailSender mailSender;
     @Inject private HmacImpl hmac;
     @Inject private EventMonitor eventMonitor;
     @Inject private Conf conf;
     @Inject private InitialData initialData;
     @Inject private PoolEventListener poolEventManager;
+    @Inject private DestroyServersTask destroyServersTask;
 
     private static ApplicationContext instance;
 
@@ -98,7 +100,14 @@ public class ApplicationContext
     }
 
     public  GsMailer.IMailer getMailer(){
-        return play.Play.application().plugin( GsMailer.class ).email();
+        GsMailer plugin = Play.application().plugin(GsMailer.class);
+        return plugin == null ? new GsMailer.IMailer() {
+            @Override
+            public void send(GsMailer.GsMailConfiguration mailDetails) {
+                logger.info("sending");
+
+            }
+        } : plugin.email();
     }
 
     public  DeployManager getDeployManager() {
@@ -115,10 +124,6 @@ public class ApplicationContext
 
     public  ServerBootstrapper getServerBootstrapper() {
         return serverBootstrapper;
-    }
-
-    public  ExpiredServersCollector getExpiredServersCollector() {
-        return expiredServersCollector;
     }
 
     public void setDeployManager( DeployManager deployManager )
@@ -139,11 +144,6 @@ public class ApplicationContext
     public void setServerBootstrapper( ServerBootstrapper serverBootstrapper )
     {
         this.serverBootstrapper = serverBootstrapper;
-    }
-
-    public void setExpiredServersCollector( ExpiredServersCollector expiredServersCollector )
-    {
-        this.expiredServersCollector = expiredServersCollector;
     }
 
     public void setMailSender( MailSender mailSender )
@@ -197,4 +197,14 @@ public class ApplicationContext
     public PoolEventListener getPoolEventManager() {
         return poolEventManager;
     }
+
+    public DestroyServersTask getDestroyServersTask() {
+        return destroyServersTask;
+    }
+
+    public void setDestroyServersTask(DestroyServersTask destroyServersTask) {
+        this.destroyServersTask = destroyServersTask;
+    }
 }
+
+

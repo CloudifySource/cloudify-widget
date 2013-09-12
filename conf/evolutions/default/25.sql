@@ -1,0 +1,1 @@
+ALTER TABLE widget CHANGE api_key api_key VARCHAR(255) NOT NULL;

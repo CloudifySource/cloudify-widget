@@ -28,14 +28,7 @@ import play.db.ebean.Model;
 import utils.CollectionUtils;
 import utils.Utils;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -53,6 +46,7 @@ public class ServerNode
 extends Model
 {
 
+    public static final long EXPIRED_TIME = 0L;
     private static Logger logger = LoggerFactory.getLogger(ServerNode.class);
 
 	@Id
@@ -62,8 +56,12 @@ extends Model
 	@XStreamAsAttribute
 	private String serverId;
 
-	@XStreamAsAttribute
-	private Long expirationTime;
+
+    @ManyToOne
+    private Lead lead;
+
+
+    private Long creationTime;
 
 	@XStreamAsAttribute
 	private String publicIP;  // todo : change case to Ip
@@ -113,7 +111,7 @@ extends Model
         Utils.ServerIp serverIp = Utils.getServerIp( srv );
         publicIP = serverIp.publicIp;
         privateIP = serverIp.privateIp;
-        this.expirationTime = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis( 30 ); // default unless configured otherwise
+
 	}
 
 	public String getNodeId() // guy - it is dangerous to call this getId as it looks like the getter of "long id"
@@ -144,24 +142,36 @@ extends Model
 		this.publicIP = publicIP;
 	}
 
-	public Long getExpirationTime()
-	{
-		return expirationTime;
-	}
+    public Long getTimeLeft() {
+        if (widgetInstance != null) {
+            if ( lead != null) {
+                return creationTime + lead.getLeadExtraTimeout() - System.currentTimeMillis();
+            } else {
+                return Math.max(EXPIRED_TIME, creationTime + widgetInstance.getWidget().getLifeExpectancy() - System.currentTimeMillis());
+            }
+        }else{
+            if ( isBusy() ){
+                logger.error("unstable status - widget instance is null, but server node is marked busy. expiring the server node [id,serverId, publicIp, privateIp] =  [{} , {}, {}, {}]", new Object[]{this.id, this.serverId, this.publicIP, this.privateIP} );
+                return EXPIRED_TIME;
+            }else{
+                return null;
+            }
+        }
 
-	public void setExpirationTime(Long expirationTime)
-	{
-		this.expirationTime = expirationTime;
-	}
+    }
 
-	public long getElapsedTime()
-	{
-        return Math.max(  expirationTime - System.currentTimeMillis(), 0 );
-	}
+    public Long getCreationTime() {
+        return creationTime;
+    }
 
-	public boolean isExpired()
+    public void setCreationTime(Long creationTime) {
+        this.creationTime = creationTime;
+    }
+
+    public boolean isExpired()
 	{
-		return getElapsedTime() < 0;
+        Long timeLeft = getTimeLeft();
+        return timeLeft != null && timeLeft <= 0;
 	}
 
 	public boolean isBusy()
@@ -232,7 +242,7 @@ extends Model
 	}
 
 	public String toDebugString() {
-		return String.format("ServerNode{id='%s', serverId='%s', expirationTime=%d, publicIP='%s', privateIP='%s', busy=%s}", id, serverId, expirationTime, publicIP, privateIP, busy);
+		return String.format("ServerNode{id='%s', serverId='%s', expirationTime=%d, publicIP='%s', privateIP='%s', busy=%s}", id, serverId, getTimeLeft(), publicIP, privateIP, busy);
 	}
 
     @Override
@@ -241,7 +251,7 @@ extends Model
         return "ServerNode{" +
                 "id=" + id +
                 ", serverId='" + serverId + '\'' +
-                ", expirationTime=" + expirationTime +
+                ", expirationTime=" + getTimeLeft() +
                 ", publicIP='" + publicIP + '\'' +
                 ", privateIP='" + privateIP + '\'' +
                 ", busy=" + busy +
@@ -324,13 +334,20 @@ extends Model
                 return new ServerNodeEvent()
                         .setServerNode( this )
                         .setMsg( message )
-                        .setEventType( type );
+                        .setEventType(type);
     }
 
     public ServerNodeEvent infoEvent( String s ) {
-        return createEvent( s, ServerNodeEvent.Type.INFO );
+        return createEvent(s, ServerNodeEvent.Type.INFO);
     }
 
+    public Lead getLead() {
+        return lead;
+    }
+
+    public void setLead(Lead lead) {
+        this.lead = lead;
+    }
 
     // guy - todo - formalize this for reuse.
     public static class QueryConf {
