@@ -19,8 +19,8 @@ chmod 755 $WIDGET_HOME/bin/*.sh
 # http://repository.cloudifysource.org/org/cloudifysource/2.7.0-5985-M3/gigaspaces-cloudify-2.7.0-M3-b5985.zip
 
 CLOUDIFY_VERSION=2.7.0
-BUILD_NUMBER=5982-4
-MILESTONE=m1
+BUILD_NUMBER=5985
+MILESTONE=m3
 BUILD_TYPE=SNAPSHOT
 
 MILESTONE_UPPERCASE=`echo $MILESTONE | tr '[:lower:]' '[:upper:]'`
