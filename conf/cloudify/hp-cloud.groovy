@@ -109,7 +109,7 @@ cloud {
                     imageId smallLinuxImageId
 
                     // file transfer protocol
-                    fileTransfer org.cloudifysource.dsl.cloud.FileTransferModes.SFTP
+                    fileTransfer org.cloudifysource.domain.cloud.FileTransferModes.SFTP
 
                     // Mandatory. Files from the local directory will be copied to this directory on the remote machine.
                     remoteDirectory "/home/root/gs-files"
@@ -153,7 +153,7 @@ cloud {
                     //"az-2.region-a.geo-1/67074"
 
                     // file transfer protocol
-                    fileTransfer org.cloudifysource.dsl.cloud.FileTransferModes.SFTP
+                    fileTransfer org.cloudifysource.domain.cloud.FileTransferModes.SFTP
 
                     // Mandatory. Files from the local directory will be copied to this directory on the remote machine.
                     remoteDirectory "/home/root/gs-files"
