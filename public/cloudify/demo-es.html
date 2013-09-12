@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <title>ElasticSearch | Cloudify</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://ricostacruz.com/nprogress/nprogress.css">
+    <style type="text/css">
+      body {
+        background: #74b73f;
+        background-image: url(/img/demo-es-bg.jpg);
+      }
+      .header h3 {
+        color: #fff;
+      }
+      .panel-heading a {
+        padding-left: 10px;
+      }
+      #launch {
+        width: 153px;
+        text-align: left;
+      }
+
+      #nprogress .bar {
+        background: #ddd;
+      }
+      #nprogress .peg {
+        box-shadow: 0 0 10px #fff, 0 0 5px #fff;
+      }
+      #nprogress .spinner-icon {
+        border-top-color:  #ddd;
+        border-left-color: #ddd;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+
+    <div class="row">
+      <div class="col-md-offset-3 col-sm-offset-3 col-xs-offset-4 col-xs-8 col-sm-6 col-md-6">
+        <div class="header">
+          <h3>ElasticSeach</h3>
+        </div>
+        <div class="jumbotron">
+          <h2>Launch ElasticSearch using Cloudify</h2>
+          <p class="lead">ElasticSearch is a flexible and powerful open source, distributed real-time
+  search and analytics engine for the cloud</p>
+          <p>
+            <a class="btn btn-lg btn-success" id='launch' href="javascript:void(0)" data-launched="false">
+              <span class="glyphicon glyphicon-play"></span>
+              Launch Now
+            </a>
+          </p>
+        </div>
+        <div class="panel panel-default" style="display:none">
+          <div class="panel-heading">
+            <h3 class="panel-title">Runtime Log </h3>
+            <a href="#">&raquo; Manage your app</a>
+            <a href="#">&raquo; Use ElasticSearch</a>
+          </div>
+          <div class="panel-body">
+            <pre>
+              blah blah blah...
+            </pre>
+          </div>
+          <div class="panel-footer">Powered by: HP Cloud, Cloudify (Patent Pending)</div>
+        </div>
+
+      </div>
+    </div>
+
+    </div> <!-- /container -->
+
+
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="http://ricostacruz.com/nprogress/nprogress.js"></script>
+    <script type="text/javascript">
+      $(function() {
+        $('#launch').click(function() {
+          if ($('#launch').data('launched')) {
+            NProgress.done();
+            $('#launch').data('launched', false).
+              html("<span class='glyphicon glyphicon-play'></span> Launch Now");
+          } else {
+            NProgress.start();
+            $('#launch').data('launched', true).
+              html("<span class='glyphicon glyphicon-stop'></span> Stop");
+            $('.panel').show(200);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
