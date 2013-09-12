@@ -77,6 +77,10 @@ public class MailSenderImpl implements MailSender {
                 .setReplyTo( conf.mailer )
                 .setSubject( "Cloud Activation" );
 
+        if ( conf.mails.registrationCc.isValid() ){
+            mConf.addRecipient( GsMailer.RecipientType.BCC, conf.mails.registrationCc.email, conf.mails.registrationCc.name );
+        }
+
         ApplicationContext.get().getMailer().send(mConf);
     }
 
