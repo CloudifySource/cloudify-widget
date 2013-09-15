@@ -1,5 +1,9 @@
 #! /bin/bash
 
+
+CLOUDIFY_AGENT_ENV_PUBLIC_IP=##publicip##
+CLOUDIFY_AGENT_ENV_PRIVATE_IP=##privateip##
+
 echo Open firewall ports
 iptables -A INPUT -i eth0 -p tcp -m multiport --dports 22,80,443,8080,9000,8100,8099 -m state --state NEW,ESTABLISHED -j ACCEPT
 
