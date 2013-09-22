@@ -73,6 +73,8 @@ public class Conf {
 
         public TimeoutValues timeoutValues = new TimeoutValues();
 
+        public String applicationName = "Cloudify-Widget";
+
     }
 
     // conversion widget extensions for registered users.
@@ -141,6 +143,7 @@ public class Conf {
     public static class Mails{
         public GsMailer.Mailer poolEmpty = new GsMailer.Mailer().setEmail("widget@cloudifysource.org").setName("Cloudify Widget Team");
         public GsMailer.Mailer registrationCc = new GsMailer.Mailer();
+        public GsMailer.Mailer logErrors = new GsMailer.Mailer();
     }
 
 
