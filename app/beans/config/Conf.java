@@ -73,6 +73,8 @@ public class Conf {
 
         public TimeoutValues timeoutValues = new TimeoutValues();
 
+        public String applicationName = "Cloudify-Widget";
+
     }
 
     // conversion widget extensions for registered users.

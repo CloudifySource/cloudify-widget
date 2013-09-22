@@ -22,4 +22,5 @@ package beans.config;
  */
 public class ApplicationConfiguration {
     public String secret;
+    public String name;
 }

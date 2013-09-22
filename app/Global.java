@@ -117,6 +117,9 @@ public class Global extends GlobalSettings
                         smtpAppender.setSMTPHost( conf.smtp.host );
                         smtpAppender.setSMTPPort( conf.smtp.port );
 
+                        String subject = smtpAppender.getSubject();
+                        smtpAppender.setSubject( conf.application.name + " " + subject );
+
                         smtpAppender.addTo( conf.mails.logErrors.email );
 
                     }else{

@@ -24,7 +24,7 @@
     </appender>
 
     <appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
-        <subject>Launcher: %logger{20} - %m</subject>
+        <subject>ERROR : %logger{20} - %m</subject>
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>%d{HH:mm:ss.SSS}  %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
         </layout>
