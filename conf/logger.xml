@@ -23,22 +23,33 @@
         </encoder>
     </appender>
 
-    <logger name="beans.tasks.DestroyServersTaskImpl" level="debug" additivity="false">
-        <appender-ref ref="STDOUT"/>
-    </logger>
+    <appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
+        <subject>Launcher: %logger{20} - %m</subject>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{HH:mm:ss.SSS}  %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </layout>
+    </appender>
+
+
+    <!--<logger name="beans.tasks.DestroyServersTaskImpl" level="debug" additivity="false">-->
+        <!--<appender-ref ref="STDOUT"/>-->
+    <!--</logger>-->
 
 
     <logger name="application" level="info" additivity="false">
+        <appender-ref ref="EMAIL"/>
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </logger>
 
     <logger name="play" level="INFO" additivity="false">
+        <appender-ref ref="EMAIL"/>
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </logger>
 
     <root level="info" additivity="false">
+        <appender-ref ref="EMAIL"/>
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE"/>
     </root>

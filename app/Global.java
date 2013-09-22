@@ -16,6 +16,9 @@
 import akka.util.Duration;
 import annotations.AnonymousUsers;
 import beans.config.Conf;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.net.SMTPAppender;
 import models.User;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.LoggerFactory;
@@ -91,6 +94,39 @@ public class Global extends GlobalSettings
                 Duration.create(1, TimeUnit.MINUTES),
                 ApplicationContext.get().getDestroyServersTask()
         );
+
+
+        try{
+            if (!conf.mails.logErrors.isValid() || !conf.smtp.enabled ) {
+                logger.info("disabling log errors SMTP appender as smtp configuration or emails configuration is unsatisfactory");
+                LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+                for (Logger _logger : loggerContext.getLoggerList()) {
+                    _logger.detachAppender("EMAIL");
+                }
+            }else{
+                LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+                for (Logger _logger : loggerContext.getLoggerList()) {
+
+                    SMTPAppender smtpAppender = ( SMTPAppender )_logger.getAppender("EMAIL");
+                    if ( smtpAppender != null ){
+
+                        smtpAppender.setPassword( conf.smtp.password );
+                        smtpAppender.setSTARTTLS( conf.smtp.tls );
+                        smtpAppender.setUsername( conf.smtp.user );
+                        smtpAppender.setSMTPHost( conf.smtp.host );
+                        smtpAppender.setSMTPPort( conf.smtp.port );
+
+                        smtpAppender.addTo( conf.mails.logErrors.email );
+
+                    }else{
+                        logger.info("logger [" + _logger.getName() + "] does not have emails appender");
+                    }
+                }
+            }
+        }catch(Exception e){
+            logger.error("unable to reconfigure logback");
+        }
 	}
 
     private void uploadInitialData( Application app )
