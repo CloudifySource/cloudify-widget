@@ -65,5 +65,9 @@ echo Starting Cloudify bootstrap-localcloud `hostname -I`
 nohup ${CLOUDIFY_FOLDER}/bin/cloudify.sh "bootstrap-localcloud"
  # -nic-address `hostname -I`"
 
+
+echo "installing node"
+yum -y install npm
+
 cat nohup.out
 exit 0
