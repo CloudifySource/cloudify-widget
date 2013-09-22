@@ -110,10 +110,10 @@ public class Global extends GlobalSettings
 
                     SMTPAppender smtpAppender = ( SMTPAppender )_logger.getAppender("EMAIL");
                     if ( smtpAppender != null ){
-
                         smtpAppender.setPassword( conf.smtp.password );
                         smtpAppender.setSTARTTLS( conf.smtp.tls );
                         smtpAppender.setUsername( conf.smtp.user );
+                        smtpAppender.setFrom( conf.smtp.user );
                         smtpAppender.setSMTPHost( conf.smtp.host );
                         smtpAppender.setSMTPPort( conf.smtp.port );
 
@@ -121,10 +121,13 @@ public class Global extends GlobalSettings
                         smtpAppender.setSubject( conf.application.name + " " + subject );
 
                         smtpAppender.addTo( conf.mails.logErrors.email );
-
-                    }else{
-                        logger.info("logger [" + _logger.getName() + "] does not have emails appender");
+                        smtpAppender.start();
+                        logger.info(_logger.getName() + " has appender " + smtpAppender.getName() + " fully configured");
+                        break;
                     }
+//                    }else{
+//                        logger.info("logger [" + _logger.getName() + "] does not have emails appender");
+//                    }
                 }
             }
         }catch(Exception e){
