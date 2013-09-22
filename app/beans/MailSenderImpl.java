@@ -52,8 +52,8 @@ public class MailSenderImpl implements MailSender {
         try{
             logger.info( "sending email for empty pool" );
             ApplicationContext.get().getMailer().send( new GsMailConfiguration()
-                    .setSubject( "Important : pool is empty" )
-                    .setBodyText( "pool is empty  " + stats )
+                    .setSubject( conf.application.name + " - Important : pool is empty" )
+                    .setBodyText( "pool is empty  at " + conf.application.name + ". Pool status is " + stats )
                     .addRecipient( GsMailer.RecipientType.TO, conf.mails.poolEmpty.email , conf.mails.poolEmpty.name )
                     .setFrom( conf.smtp.user, conf.mailer.name )
                     .setReplyTo( conf.mailer )
