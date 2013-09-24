@@ -130,7 +130,7 @@ public class Application extends Controller
                 serverNode.setRemote(true);
                 serverNode.save();
             }else{
-                serverNode = ApplicationContext.get().getServerPool().get(widget.getLifeExpectancy());
+                serverNode = ApplicationContext.get().getServerPool().get();
                 if (serverNode == null) {
                     // if the user clicked another play in the last 30 seconds, we allow ourselves to tell them to wait..
                     Long timeLeft = getPlayTimeout();
@@ -317,6 +317,7 @@ public class Application extends Controller
                         routes.javascript.WidgetAdmin.regenerateWidgetApiKey(),
                         routes.javascript.WidgetAdmin.enableWidget(),
                         routes.javascript.WidgetAdmin.disableWidget(),
+//                        routes.javascript.WidgetAdmin.addIcon(),
 
                         routes.javascript.Application.downloadPemFile(),
                         routes.javascript.Application.encrypt(),
