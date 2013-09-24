@@ -152,7 +152,10 @@ public class GsMailer implements Plugin {
         }
 
         public GsMailConfiguration addRecipient( RecipientType type, String email, String name){
-            Mailer mailer = new Mailer().setName( name ).setEmail( email );
+           return addRecipient( type, new Mailer().setName( name ).setEmail( email ));
+        }
+
+        public GsMailConfiguration addRecipient( RecipientType type, Mailer mailer ){
             switch ( type ) {
 
                 case TO:

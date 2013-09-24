@@ -133,6 +133,13 @@ public class Global extends GlobalSettings
         }catch(Exception e){
             logger.error("unable to reconfigure logback");
         }
+
+
+        try{
+            ApplicationContext.get().getMailSender().sendChangelog();
+        }catch(Exception e){
+            logger.error("unable to send changelog email",e);
+        }
 	}
 
     private void uploadInitialData( Application app )

@@ -19,6 +19,8 @@ import beans.GsMailer;
 import utils.Utils;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * User: guym
@@ -144,6 +146,13 @@ public class Conf {
         public GsMailer.Mailer poolEmpty = new GsMailer.Mailer().setEmail("widget@cloudifysource.org").setName("Cloudify Widget Team");
         public GsMailer.Mailer registrationCc = new GsMailer.Mailer();
         public GsMailer.Mailer logErrors = new GsMailer.Mailer();
+
+        public UpgradeLogMail changeLog = new UpgradeLogMail();
+    }
+
+    public static class UpgradeLogMail{
+        public File file = Utils.getFileByRelativePath("/automatic_changelog");
+        public List<GsMailer.Mailer> addresses = new LinkedList<GsMailer.Mailer>();
     }
 
 

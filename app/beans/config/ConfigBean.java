@@ -16,6 +16,9 @@
 package beans.config;
 
 import com.google.common.base.Predicates;
+import com.typesafe.config.ConfigList;
+import com.typesafe.config.ConfigObject;
+import com.typesafe.config.ConfigValue;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
@@ -27,10 +30,9 @@ import play.libs.Time;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.*;
 
 /**
  * User: guym
@@ -179,7 +181,27 @@ public class ConfigBean {
                 }
             } else { // this is probably an Object. need to instantiate
                 try {
-                    if ( conf.getConfig( configKey ) != null ) {
+                    if ( List.class.isAssignableFrom(field.getType()) ){
+                        Field confField = conf.getClass().getDeclaredField("conf");
+                        confField.setAccessible(true);
+                        play.api.Configuration innerConf = ( play.api.Configuration ) confField.get(conf);
+                        ConfigList configValues = innerConf.underlying().getList( field.getName()  );
+
+                        // get the actual type
+                        Type type = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+
+                        List fieldValue = new LinkedList();
+
+                        for (ConfigValue configValue : configValues) {
+                            Object listItem = ((Class)type).newInstance();
+                            injectConfiguration( listItem, new Configuration(
+                                    new play.api.Configuration( ((ConfigObject)configValue).toConfig() )));
+                            fieldValue.add(listItem);
+                        }
+
+                        field.set( obj, fieldValue );
+                    }
+                    else if ( conf.getConfig( configKey ) != null ) {
 
                         // important : we assume the field is not null.
                         // this way we will be able to refresh configuration on command.

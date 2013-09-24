@@ -19,6 +19,7 @@ import beans.config.Conf;
 import controllers.routes;
 import models.Lead;
 import models.User;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.api.mvc.Call;
@@ -27,6 +28,8 @@ import server.ApplicationContext;
 import server.Hmac;
 import server.MailSender;
 import beans.GsMailer.GsMailConfiguration;
+import utils.CollectionUtils;
+import utils.StringUtils;
 
 import javax.inject.Inject;
 import java.net.URLEncoder;
@@ -82,6 +85,51 @@ public class MailSenderImpl implements MailSender {
         }
 
         ApplicationContext.get().getMailer().send(mConf);
+    }
+
+    @Override
+    public void sendChangelog() {
+        logger.info("sending change log");
+        try{
+            Conf.UpgradeLogMail changeLog = conf.mails.changeLog;
+            String changes = null;
+            try{
+                changes = FileUtils.readFileToString( changeLog.file );
+            }catch(Exception e){
+                logger.info("unable to read changelog" + e.getMessage());
+            }
+
+            String mailContent = views.html.mail.changeLog.render(changes).body();
+
+            if (!StringUtils.isEmptyOrSpaces( changes )){
+                GsMailConfiguration mConf = new GsMailConfiguration();
+                mConf.setBodyHtml( mailContent )
+                        .setBodyText( mailContent )
+                        .setFrom( conf.smtp.user, conf.mailer.name )
+                        .setReplyTo( conf.mailer )
+                        .setSubject( conf.application.name + " was upgraded. ");
+
+                if (!CollectionUtils.isEmpty(conf.mails.changeLog.addresses )){
+                    for (GsMailer.Mailer address : conf.mails.changeLog.addresses) {
+                        if ( address.isValid() ){
+                            mConf.addRecipient( GsMailer.RecipientType.TO, address );
+                        }else{
+                            logger.error("change log address [{}] is invalid. ignoring.", address);
+                        }
+                    }
+                }
+                logger.info("found changes to email. sending email");
+                ApplicationContext.get().getMailer().send(mConf);
+                FileUtils.deleteQuietly( changeLog.file ); // remove changes
+                logger.info("email sent successfully, file deleted");
+
+            }else{
+                logger.info("changelog is empty, skipping email");
+            }
+        }catch(Exception e){
+            logger.error("unable to send changelog",e);
+        }
+
     }
 
     @Override
