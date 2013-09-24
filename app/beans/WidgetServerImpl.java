@@ -15,10 +15,7 @@
 package beans;
 
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -29,13 +26,13 @@ import models.ServerNodeEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import play.cache.Cache;
 import play.i18n.Messages;
 
 import models.ServerNode;
 import models.Widget;
 import models.Widget.Status;
 import models.WidgetInstance;
+import play.libs.Json;
 import server.*;
 import utils.CollectionUtils;
 import utils.Utils;
@@ -65,6 +62,10 @@ public class WidgetServerImpl implements WidgetServer
 
     @Inject
     private DeployManager deployManager;
+
+
+    // for logging purposes.
+    private Set<Long> serverNodeIds = new HashSet<Long>();
 
     private static Map<Recipe.Type, Pattern> installationFinishedRegexMap = null;
 
@@ -151,6 +152,9 @@ public class WidgetServerImpl implements WidgetServer
                     {
                         result.setState( Status.State.STOPPED );
                         result.setMessage( event.getMsg() );
+
+                        logWidgetInstanceError( server, result, "WidgetInstance threw an error\n");
+
                         return result;
                     }
                     case INFO:
@@ -204,7 +208,28 @@ public class WidgetServerImpl implements WidgetServer
             result.setTimeleftMillis(timeLeft);
 
         }
+
+        logWidgetInstanceError( server, result, "widgetInstance is taking too long. More than ", Long.toString(conf.cloudify.deployTimeoutError) , " millis \n");
+
         return result;
+    }
+
+
+
+    private void logWidgetInstanceError( ServerNode serverNode, Widget.Status status, String ... prefix ){
+        if ( !serverNodeIds.contains( serverNode.getId() )){
+            serverNodeIds.add( serverNode.getId() );
+            StringBuilder sb = new StringBuilder();
+
+            for (String s : prefix) {
+                sb.append(s);
+            }
+
+            sb.append( Json.stringify(Json.toJson( status )) );
+
+            logger.error(sb.toString());
+        }
+
     }
 
     public void setServerPool(ServerPool serverPool) {

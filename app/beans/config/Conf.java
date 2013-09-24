@@ -128,6 +128,9 @@ public class Conf {
         
         public long bootstrapCloudWatchDogProcessTimeoutMillis = Utils.parseTimeToMillis( "10mn" );
 
+        // time from "play" until we decide something is wrong and we send error
+        public long deployTimeoutError = Utils.parseTimeToMillis("3mn");
+
         public File deployScript=Utils.getFileByRelativePath( "/bin/deployer.sh" );
 
         public File uninstallServiceScript = Utils.getFileByRelativePath( "/bin/uninstall_service.sh" );
