@@ -152,14 +152,10 @@ extends Model
             } else {
                 return Math.max(EXPIRED_TIME, creationTime + widgetInstance.getWidget().getLifeExpectancy() - System.currentTimeMillis());
             }
-        }else{
-            if ( isBusy() ){
-                logger.error("unstable status - widget instance is null, but server node is marked busy. expiring the server node [id,serverId, publicIp, privateIp] =  [{} , {}, {}, {}]", new Object[]{this.id, this.serverId, this.publicIP, this.privateIP} );
-                return EXPIRED_TIME;
-            }else{
-                return null;
-            }
+
         }
+        // server nodes can be busy but without a widget if we just took them from the pool and have yet assigned them a widget instance.
+        return null;
 
     }
 

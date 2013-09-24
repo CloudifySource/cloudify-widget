@@ -188,16 +188,15 @@ public class ServerPoolImpl implements ServerPool
 	
 	/** @return a ServerNode from the pool, otherwise <code>null</code> if no free server available */
     @Override
-	synchronized public ServerNode get( long lifeExpectancy )
+	synchronized public ServerNode get(  )
 	{
-        logger.info( "getting a server node with lifeExpectancy [{}]", lifeExpectancy );
+        logger.info( "getting a server node" );
 
-        List<ServerNode> freeServers = null;
-        freeServers = ServerNode.findByCriteria(new ServerNode.QueryConf().setMaxRows(10).criteria().setBusy(false).setRemote(false).done());
+        List<ServerNode> freeServers = ServerNode.findByCriteria(new ServerNode.QueryConf().setMaxRows(10).criteria().setBusy(false).setRemote(false).done());
         ServerNode selectedServer = null;
         if ( !CollectionUtils.isEmpty( freeServers )){
             for ( ServerNode freeServer : freeServers ) {
-                if ( tryToGetFreeServer( freeServer, lifeExpectancy )){
+                if ( tryToGetFreeServer( freeServer )){
                     logger.info( "successfully got a free server [{}]", freeServer );
                     selectedServer = freeServer;
                     break;
@@ -227,7 +226,7 @@ public class ServerPoolImpl implements ServerPool
      * @param serverNode - the server node we are trying to get
      * @return - true iff successfully got the serverNode
      */
-    private boolean tryToGetFreeServer( ServerNode serverNode, long lifeExpectancy )
+    private boolean tryToGetFreeServer( ServerNode serverNode )
     {
         try{
             BootstrapValidationResult result = serverBootstrapper.validateBootstrap( serverNode );
