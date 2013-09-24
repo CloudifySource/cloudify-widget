@@ -109,19 +109,25 @@ public class MailSenderImpl implements MailSender {
                         .setReplyTo( conf.mailer )
                         .setSubject( conf.application.name + " was upgraded. ");
 
+                boolean hasValidEmail = false;
                 if (!CollectionUtils.isEmpty(conf.mails.changeLog.addresses )){
                     for (GsMailer.Mailer address : conf.mails.changeLog.addresses) {
                         if ( address.isValid() ){
+                            hasValidEmail = true;
                             mConf.addRecipient( GsMailer.RecipientType.TO, address );
                         }else{
                             logger.error("change log address [{}] is invalid. ignoring.", address);
                         }
                     }
                 }
-                logger.info("found changes to email. sending email");
-                ApplicationContext.get().getMailer().send(mConf);
-                FileUtils.deleteQuietly( changeLog.file ); // remove changes
-                logger.info("email sent successfully, file deleted");
+                if ( hasValidEmail ){
+                    logger.info("found changes to email. sending email");
+                    ApplicationContext.get().getMailer().send(mConf);
+                    FileUtils.deleteQuietly( changeLog.file ); // remove changes
+                    logger.info("email sent successfully, file deleted");
+                }else{
+                    logger.info("no valid email address to send to. skipping email. addresses are [{}]",  conf.mails.changeLog.addresses );
+                }
 
             }else{
                 logger.info("changelog is empty, skipping email");
