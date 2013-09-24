@@ -29,6 +29,10 @@
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>%d{HH:mm:ss.SSS}  %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
         </layout>
+        <cyclicBufferTracker class="ch.qos.logback.core.spi.CyclicBufferTrackerImpl">
+            <!-- send just one log entry per email -->
+            <bufferSize>10</bufferSize>
+        </cyclicBufferTracker>
     </appender>
 
 

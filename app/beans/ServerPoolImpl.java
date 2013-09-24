@@ -101,12 +101,8 @@ public class ServerPoolImpl implements ServerPool
         for ( ServerNode serverNode : pool ) {
             BootstrapValidationResult bootstrapValidationResult = serverBootstrapper.validateBootstrap( serverNode );
             if ( !bootstrapValidationResult.isValid( ) ){
-                if ( bootstrapValidationResult.testCompleted() ){
                     logger.info( "found a bad bootstrap on server [{}]. The test result showed the following [{}]. I should destroy this server..", serverNode, bootstrapValidationResult );
                     destroy( serverNode );
-                }else{
-                    logger.error("unable to complete bootstrap test on [{}], result is [{}], nothing to do",serverNode, bootstrapValidationResult );
-                }
             }else{
                 logger.info( "Found a working management server [{}], adding to clean pool", serverNode );
                 cleanPool.add( serverNode );
@@ -208,11 +204,6 @@ public class ServerPoolImpl implements ServerPool
 
 		addNewServerToPool( NoOpCallback.instance );
 
-        if ( selectedServer != null ){
-            selectedServer.setCreationTime( System.currentTimeMillis() );
-            selectedServer.save();
-        }
-
 		return selectedServer;
 	}
 
@@ -231,7 +222,7 @@ public class ServerPoolImpl implements ServerPool
         try{
             BootstrapValidationResult result = serverBootstrapper.validateBootstrap( serverNode );
             if ( result.isValid() ) {
-                serverNode.setBusy( true );
+                serverNode.setBusySince( System.currentTimeMillis() );
                 serverNode.save(); // optimistic locking
                 return true;
             } else {

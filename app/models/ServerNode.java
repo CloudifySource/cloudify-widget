@@ -61,7 +61,7 @@ extends Model
     private Lead lead;
 
 
-    private Long creationTime;
+    private Long busySince;
 
 	@XStreamAsAttribute
 	private String publicIP;  // todo : change case to Ip
@@ -69,8 +69,6 @@ extends Model
 	@XStreamAsAttribute
 	private String privateIP;  // todo : change case to Ip
 
-	@XStreamAsAttribute
-	private Boolean busy = false;
 
 	@XStreamAsAttribute
     @Lob
@@ -148,9 +146,9 @@ extends Model
         }
         if (widgetInstance != null) {
             if ( lead != null) {
-                return creationTime + lead.getLeadExtraTimeout() - System.currentTimeMillis();
+                return busySince + lead.getLeadExtraTimeout() - System.currentTimeMillis();
             } else {
-                return Math.max(EXPIRED_TIME, creationTime + widgetInstance.getWidget().getLifeExpectancy() - System.currentTimeMillis());
+                return Math.max(EXPIRED_TIME, busySince + widgetInstance.getWidget().getLifeExpectancy() - System.currentTimeMillis());
             }
 
         }
@@ -159,12 +157,12 @@ extends Model
 
     }
 
-    public Long getCreationTime() {
-        return creationTime;
+    public Long getBusySince() {
+        return busySince;
     }
 
-    public void setCreationTime(Long creationTime) {
-        this.creationTime = creationTime;
+    public void setBusySince(Long busySince) {
+        this.busySince = busySince;
     }
 
     public boolean isExpired()
@@ -175,13 +173,9 @@ extends Model
 
 	public boolean isBusy()
 	{
-		return busy;
+		return busySince != null;
 	}
 
-	public void setBusy( boolean isBusy )
-	{
-		this.busy = isBusy;
-	}
 
 	static public int count()
 	{
@@ -201,7 +195,12 @@ extends Model
             ExpressionList<ServerNode> conjuction = disjunction.conjunction();
             conjuction.eq("1","1"); // solves issues where criteria is actually empty.
             if (criteria.busy != null) {
-                conjuction.eq("busy", criteria.busy);
+                if (criteria.busy) {
+                    conjuction.isNotNull("busySince");
+                } else {
+                    conjuction.isNull("busySince");
+                }
+
             }
 
             if (criteria.remote != null) {
@@ -241,7 +240,7 @@ extends Model
 	}
 
 	public String toDebugString() {
-		return String.format("ServerNode{id='%s', serverId='%s', expirationTime=%d, publicIP='%s', privateIP='%s', busy=%s}", id, serverId, getTimeLeft(), publicIP, privateIP, busy);
+		return String.format("ServerNode{id='%s', serverId='%s', expirationTime=%d, publicIP='%s', privateIP='%s', busySince=%s}", id, serverId, getTimeLeft(), publicIP, privateIP, busySince);
 	}
 
     @Override
@@ -253,7 +252,7 @@ extends Model
                 ", expirationTime=" + getTimeLeft() +
                 ", publicIP='" + publicIP + '\'' +
                 ", privateIP='" + privateIP + '\'' +
-                ", busy=" + busy +
+                ", busySince=" + busySince +
                 ", remote=" + remote +
                 ", project='" + project + '\'' +
                 '}';
