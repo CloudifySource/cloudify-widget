@@ -21,8 +21,8 @@ package server;
  *
  */
 public interface WriteEventListener {
-    	
-   public void writeEvent(int b);
+
+    public void writeEvent( String s, int i);
         
    public void setKey(String key);
 

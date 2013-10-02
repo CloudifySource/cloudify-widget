@@ -8,6 +8,26 @@
         </encoder>
     </appender>
 
+
+    <appender name="CLI_OUTPUT" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <!-- in the absence of the class attribute, it is assumed that the
+             desired discriminator type is
+             ch.qos.logback.classic.sift.MDCBasedDiscriminator -->
+        <discriminator>
+            <key>servernodeid</key>
+            <defaultValue>unknown</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${userid}" class="ch.qos.logback.core.FileAppender">
+                <file>logs/cliOutput-nodeid-${servernodeid}.log</file>
+                <append>false</append>
+                <layout class="ch.qos.logback.classic.PatternLayout">
+                    <pattern>%d [%thread] %level %mdc %logger{35} - %msg%n</pattern>
+                </layout>
+            </appender>
+        </sift>
+    </appender>
+
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logFile.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -40,6 +60,9 @@
         <!--<appender-ref ref="STDOUT"/>-->
     <!--</logger>-->
 
+    <logger name="cliOutput" level="info" additivity="false">
+        <appender-ref ref="CLI_OUTPUT"/>
+    </logger>
 
     <logger name="application" level="info" additivity="false">
         <appender-ref ref="EMAIL"/>

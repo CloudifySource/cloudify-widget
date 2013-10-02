@@ -33,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.slf4j.MDC;
 import server.ApplicationContext;
 import server.DeployManager;
 import server.ProcExecutor;
@@ -178,6 +179,13 @@ public class DeployManagerImpl implements DeployManager
             cmdLine.addArgument( recipePath.replaceAll( "\\\\", "/" ) ); // support for windows.
             cmdLine.addArgument( recipeType.commandParam );
             cmdLine.addArgument( widget.toInstallName() );
+
+
+            Logger cliOutputLogger = LoggerFactory.getLogger("cliOutput");
+            MDC.put("servernodeid", server.getId().toString());
+            cliOutputLogger.info("deploying " + widget.toDebugString() );
+            cliOutputLogger.info("on machine " + server.toDebugString() );
+            cliOutputLogger.info("running command " + cmdLine.toString());
 
             execute( cmdLine, server );
             return widget.addWidgetInstance( server, recipeDir );
