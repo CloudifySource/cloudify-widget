@@ -148,6 +148,7 @@ public class Conf {
     public static class Mails{
         public GsMailer.Mailer poolEmpty = new GsMailer.Mailer().setEmail("widget@cloudifysource.org").setName("Cloudify Widget Team");
         public GsMailer.Mailer registrationCc = new GsMailer.Mailer();
+        public GsMailer.Mailer registrationFrom = new GsMailer.Mailer().setEmail("appcatalog@cloudifysource.org").setName("Application Catalog");
         public GsMailer.Mailer logErrors = new GsMailer.Mailer();
 
         public UpgradeLogMail changeLog = new UpgradeLogMail();

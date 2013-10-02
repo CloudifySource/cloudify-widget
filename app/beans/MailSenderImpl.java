@@ -76,9 +76,9 @@ public class MailSenderImpl implements MailSender {
         mConf.addRecipient( GsMailer.RecipientType.TO,  lead.email, null)
                 .setBodyHtml( mailContent )
                 .setBodyText( mailContent )
-                .setFrom( conf.smtp.user, conf.mailer.name )
+                .setFrom( conf.mails.registrationFrom.email, conf.mails.registrationFrom.name )
                 .setReplyTo( conf.mailer )
-                .setSubject( "Cloud Activation" );
+                .setSubject( "Your Cloud Player Trial Verification" );
 
         if ( conf.mails.registrationCc.isValid() ){
             mConf.addRecipient( GsMailer.RecipientType.BCC, conf.mails.registrationCc.email, conf.mails.registrationCc.name );
