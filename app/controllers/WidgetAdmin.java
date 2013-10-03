@@ -15,6 +15,7 @@
 package controllers;
 
 import com.avaje.ebean.Ebean;
+import controllers.compositions.UserCheck;
 import data.validation.GsConstraints;
 import models.*;
 import org.apache.commons.io.IOUtils;
@@ -30,6 +31,7 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+import play.mvc.With;
 import server.ApplicationContext;
 import server.HeaderMessage;
 import server.exceptions.ServerException;
@@ -446,6 +448,12 @@ public class WidgetAdmin extends Controller
 		return ok(OK_STATUS).as("application/json");
 	}
 
+
+    @With( UserCheck.class )
+    public static Result listWidgets( Long userId, String authToken ){
+        User user = ( User) ctx().args.get("user");
+        return ok(Json.toJson(Widget.findByUser( user )));
+    }
 
 	public static Result disableWidget( String authToken, String apiKey )
 	{
