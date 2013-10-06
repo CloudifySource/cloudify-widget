@@ -16,6 +16,7 @@ package beans;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import play.cache.Cache;
 import server.WriteEventListener;
 
@@ -34,6 +35,8 @@ public class ProcExecutorWriteEventListener implements WriteEventListener {
 	private String serverNodeId;
 
     private static Logger logger = LoggerFactory.getLogger( ProcExecutorWriteEventListener.class );
+
+    private static Logger cliOutput = LoggerFactory.getLogger( "cliOutput");
 	
 	private StringBuilder sb = null;
 	
@@ -73,11 +76,14 @@ public class ProcExecutorWriteEventListener implements WriteEventListener {
     }
 
     @Override
-	public void writeEvent(int b) {
-		sb.append(Character.toChars(b));
-	}
-	
-	public void setKeyFormat( String keyFormat ){
+    public void writeEvent(String s, int i) {
+        sb.append( s ).append("\n");
+        MDC.put( "servernodeid", serverNodeId );
+        cliOutput.info(s);
+
+    }
+
+    public void setKeyFormat( String keyFormat ){
 		this.keyFormat = keyFormat;
 	}
 

@@ -19,6 +19,7 @@ import beans.config.Conf;
 import controllers.routes;
 import models.Lead;
 import models.User;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.api.mvc.Call;
@@ -27,6 +28,8 @@ import server.ApplicationContext;
 import server.Hmac;
 import server.MailSender;
 import beans.GsMailer.GsMailConfiguration;
+import utils.CollectionUtils;
+import utils.StringUtils;
 
 import javax.inject.Inject;
 import java.net.URLEncoder;
@@ -73,15 +76,66 @@ public class MailSenderImpl implements MailSender {
         mConf.addRecipient( GsMailer.RecipientType.TO,  lead.email, null)
                 .setBodyHtml( mailContent )
                 .setBodyText( mailContent )
-                .setFrom( conf.smtp.user, conf.mailer.name )
+                .setFrom( conf.mails.registrationFrom.email, conf.mails.registrationFrom.name )
                 .setReplyTo( conf.mailer )
-                .setSubject( "Cloud Activation" );
+                .setSubject( "Your Cloud Player Trial Verification" );
 
         if ( conf.mails.registrationCc.isValid() ){
             mConf.addRecipient( GsMailer.RecipientType.BCC, conf.mails.registrationCc.email, conf.mails.registrationCc.name );
         }
 
         ApplicationContext.get().getMailer().send(mConf);
+    }
+
+    @Override
+    public void sendChangelog() {
+        logger.info("sending change log");
+        try{
+            Conf.UpgradeLogMail changeLog = conf.mails.changeLog;
+            String changes = null;
+            try{
+                changes = FileUtils.readFileToString( changeLog.file );
+            }catch(Exception e){
+                logger.info("unable to read changelog" + e.getMessage());
+            }
+
+            String mailContent = views.html.mail.changeLog.render(changes).body();
+
+            if (!StringUtils.isEmptyOrSpaces( changes )){
+                GsMailConfiguration mConf = new GsMailConfiguration();
+                mConf.setBodyHtml( mailContent )
+                        .setBodyText( mailContent )
+                        .setFrom( conf.smtp.user, conf.mailer.name )
+                        .setReplyTo( conf.mailer )
+                        .setSubject( conf.application.name + " was upgraded. ");
+
+                boolean hasValidEmail = false;
+                if (!CollectionUtils.isEmpty(conf.mails.changeLog.addresses )){
+                    for (GsMailer.Mailer address : conf.mails.changeLog.addresses) {
+                        if ( address.isValid() ){
+                            hasValidEmail = true;
+                            mConf.addRecipient( GsMailer.RecipientType.TO, address );
+                        }else{
+                            logger.error("change log address [{}] is invalid. ignoring.", address);
+                        }
+                    }
+                }
+                if ( hasValidEmail ){
+                    logger.info("found changes to email. sending email");
+                    ApplicationContext.get().getMailer().send(mConf);
+                    FileUtils.deleteQuietly( changeLog.file ); // remove changes
+                    logger.info("email sent successfully, file deleted");
+                }else{
+                    logger.info("no valid email address to send to. skipping email. addresses are [{}]",  conf.mails.changeLog.addresses );
+                }
+
+            }else{
+                logger.info("changelog is empty, skipping email");
+            }
+        }catch(Exception e){
+            logger.error("unable to send changelog",e);
+        }
+
     }
 
     @Override

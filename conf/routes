@@ -35,6 +35,8 @@ POST    /api/user/:userId/lead/:leadId/validate                      controllers
 GET     /api/admin/:userId/lead/list                                controllers.LeadsController.getAdminLeads( userId:String, authToken:String )
 POST    /api/user/:userId/lead/:leadId/prolong/:instanceId          controllers.LeadsController.assignLeadToWidgetInstance( userId:String , authToken:String , leadId:Long , instanceId:Long )
 
+GET     /api/user/:userId/widgets                                   controllers.WidgetAdmin.listWidgets( userId:Long, authToken:String )
+
 
 # Admin API
 GET     /user/widgetsTemplate           controllers.WidgetAdmin.getUserWidgetTemplate

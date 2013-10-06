@@ -27,7 +27,7 @@ import java.util.Collection;
  */
 public interface ServerPool 
 {
-    public ServerNode get( long lifeExpectancy );
+    public ServerNode get(  );
 
     public void destroy( ServerNode server );
 

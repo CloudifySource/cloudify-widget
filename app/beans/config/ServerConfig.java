@@ -70,9 +70,9 @@ public class ServerConfig {
         @Config( ignoreNullValues = true )
         public long expirationTimeMillis = Utils.parseTimeToMillis("60mn");
         @Config( ignoreNullValues = true )
-        public long maxExpirationTimeMillis = Utils.parseTimeToMillis("30mn");
+        public long maxExpirationTimeMillis = Utils.parseTimeToMillis("60mn");
         @Config( ignoreNullValues = true )
-        public long minExpiryTimeMillis = Utils.parseTimeToMillis("10mn");
+        public long minExpiryTimeMillis = Utils.parseTimeToMillis("20mn");
 
     }
 

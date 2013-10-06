@@ -44,4 +44,11 @@ public class MailSenderMock implements MailSender {
     public void sendRegistrationMail( Lead lead ){
         logger.info( "sending registration mail");
     }
+
+    @Override
+    public void sendChangelog() {
+        logger.info("sending changelog");
+    }
+
+
 }
