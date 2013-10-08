@@ -4,9 +4,6 @@ import models.ServerNode;
 import models.User;
 import models.Widget;
 import models.WidgetInstance;
-import org.jclouds.openstack.nova.v2_0.domain.Server;
-import org.jclouds.openstack.v2_0.domain.Resource;
-import tyrex.services.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -65,12 +62,12 @@ public class PoolEvent<T extends PoolEvent> {
     }
 
     public static class MachineStateEvent extends PoolEvent<MachineStateEvent>{
-        public Resource resource;
+//        public Resource resource;
 
-        public MachineStateEvent setResource(Resource resource) {
+/*        public MachineStateEvent setResource(Resource resource) {
             this.resource = resource;
             return this;
-        }
+        }*/
     }
 
     public T setErrorMessage( String errorMessage){

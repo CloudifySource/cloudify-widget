@@ -14,18 +14,22 @@
  */
 package beans;
 
-import beans.api.ExecutorFactory;
-import beans.cloudify.CloudifyRestClient;
-import beans.config.CloudProvider;
-import beans.config.Conf;
-import beans.pool.PoolEvent;
-import beans.pool.PoolEventListener;
-import beans.pool.PoolEventManager;
-import com.google.common.base.Predicate;
-import com.google.common.net.HostAndPort;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+
+import javax.inject.Inject;
+
 import models.ServerNode;
+
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.io.FileUtils;
@@ -34,18 +38,9 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.config.NullLoggingModule;
-import org.jclouds.openstack.nova.v2_0.NovaApi;
-import org.jclouds.openstack.nova.v2_0.NovaAsyncApi;
-import org.jclouds.openstack.nova.v2_0.domain.Server;
-import org.jclouds.openstack.nova.v2_0.domain.Server.Status;
-import org.jclouds.openstack.nova.v2_0.domain.ServerCreated;
-import org.jclouds.openstack.nova.v2_0.features.ServerApi;
-import org.jclouds.openstack.nova.v2_0.options.CreateServerOptions;
-import org.jclouds.openstack.nova.v2_0.options.RebuildServerOptions;
 import org.jclouds.rest.AuthorizationException;
 import org.jclouds.rest.RestContext;
 import org.jclouds.ssh.SshClient;
@@ -53,6 +48,7 @@ import org.jclouds.sshj.config.SshjSshClientModule;
 import org.jclouds.util.Strings2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import play.i18n.Messages;
 import server.ApplicationContext;
 import server.DeployManager;
@@ -62,20 +58,24 @@ import server.exceptions.ServerException;
 import utils.CloudifyUtils;
 import utils.CollectionUtils;
 import utils.Utils;
+import beans.api.ExecutorFactory;
+import beans.cloudify.CloudifyRestClient;
+import beans.config.CloudProvider;
+import beans.config.Conf;
+import beans.pool.PoolEvent;
+import beans.pool.PoolEventListener;
+import clouds.base.CloudApi;
+import clouds.base.CloudCreateServerOptions;
+import clouds.base.CloudServer;
+import clouds.base.CloudServerApi;
+import clouds.base.CloudServerCreated;
+import clouds.base.CloudServerStatus;
 
-import javax.inject.Inject;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
+import com.google.common.base.Predicate;
+import com.google.common.net.HostAndPort;
+import com.google.common.reflect.TypeToken;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 
 /**
@@ -117,6 +117,8 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
     @Inject
     private CloudifyRestClient cloudifyRestClient;
+    
+    private CloudProvider cloudProvider; 
 
     public List<ServerNode> createServers( int numOfServers )
 	{
@@ -161,7 +163,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                     logger.info("successful bootstrap on [{}]", serverNode);
                 } else { // bootstrap failed
                     logger.info("bootstrap failed, deleting server");
-                    deleteServer(tmpNode.getNodeId()); // deleting the machine from HP.                }
+                    deleteServer(tmpNode.getNodeId()); // deleting the machine from cloud.
                 }
             } else { // create server failed
                 logger.info("unable to create machine. try [{}/{}]", i + 1, retries);
@@ -226,7 +228,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	}
 
     @Override
-    public List<Server> getAllMachines(NovaCloudCredentials cloudCredentials){
+    public List<CloudServer> getAllMachines(NovaCloudCredentials cloudCredentials){
         return getAllMachinesWithTag(new NovaContext(cloudCredentials));
     }
 
@@ -240,57 +242,56 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
        This function in turn should get all machines in the pool.
      * @return - all machines that contain all these tags.
      */
-    public List<Server> getAllMachinesWithTag( NovaContext context){
+    public List<CloudServer> getAllMachinesWithTag( NovaContext context){
         String confTags =  conf.server.bootstrap.tags;
         logger.info( "getting all machines with tag [{}]", confTags );
-        List<Server> servers = new LinkedList<Server>();
+        List<CloudServer> servers = new LinkedList<CloudServer>();
         if ( StringUtils.isEmpty( confTags ) ){
             logger.info( "confTags is null, not finding all machines" );
             return servers;
         }
 
-        else{ // get all servers with tags matching my configuration.
-            return getAllMachinesWithPredicate( new ServerTagPredicate(), context );
-        }
+        // get all servers with tags matching my configuration.
+        return getAllMachinesWithPredicate( new ServerTagPredicate(), context );
     }
 
-    public List<Server> getAllMachinesWithPredicate( Predicate<Server> predicate, NovaContext context ){
+    public List<CloudServer> getAllMachinesWithPredicate( Predicate<CloudServer> predicate, NovaContext context ){
         logger.info( "getting all machine by predicate [{}]", predicate );
-        return ( List<Server> ) context.getApi().listInDetail().concat()
-                            .filter( predicate )
-                            .toImmutableList();
+        return context.getApi().listInDetail().concat().filter( predicate ).toImmutableList();
     }
 
-    class TruePredicate implements Predicate<Server>{
+    class TruePredicate implements Predicate<CloudServer>{
         @Override
-        public boolean apply(Server server) {
+        public boolean apply(CloudServer server) {
             return server != null;
         }
 
+        @Override
         public String toString(){
             return "always true predicate";
         }
     }
 
-    class ServerNamePrefixPredicate implements Predicate<Server>{
+    class ServerNamePrefixPredicate implements Predicate<CloudServer>{
         String prefix = conf.server.cloudBootstrap.existingManagementMachinePrefix;
 
 
         @Override
-        public boolean apply( Server server )
+        public boolean apply( CloudServer server )
         {
             // return true iff server is not null, prefix is not empty and prefix is prefix of server.getName
             return server != null && !StringUtils.isEmpty( prefix ) && server.getName().indexOf( prefix ) == 0;
 
         }
-
+        
+        @Override
         public String toString(){
              return String.format("name has prefix [%s]", prefix);
         }
     }
 
 
-    class ServerTagPredicate implements Predicate<Server> {
+    class ServerTagPredicate implements Predicate<CloudServer> {
 
         String confTags =  conf.server.bootstrap.tags;
         List<String> confTagsList = null;
@@ -302,7 +303,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         }
 
         @Override
-        public boolean apply( Server server )
+        public boolean apply( CloudServer server )
         {
             if ( server == null ) {
                 return false;
@@ -331,10 +332,10 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     public List<ServerNode> recoverUnmonitoredMachines(){
         List<ServerNode> result = new ArrayList<ServerNode>(  );
         logger.info( "recovering all list machines" );
-        List<Server> allMachinesWithTag = getAllMachinesWithTag( novaContext );
+        List<CloudServer> allMachinesWithTag = getAllMachinesWithTag( novaContext );
         logger.info( "found [{}] total machines with matching tags filtering lost", CollectionUtils.size( allMachinesWithTag )  );
         if ( !CollectionUtils.isEmpty( allMachinesWithTag )){
-            for ( Server server : allMachinesWithTag ) {
+            for ( CloudServer server : allMachinesWithTag ) {
                 ServerNode serverNode = ServerNode.getServerNode( server.getId() );
                 if ( serverNode == null ){
                     ServerNode newServerNode = new ServerNode( server );
@@ -348,15 +349,18 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
     public void init(){
         novaContext = new NovaContext(conf.server.bootstrap.cloudProvider,conf.server.bootstrap.api.project, conf.server.bootstrap.api.key, conf.server.bootstrap.api.secretKey, conf.server.bootstrap.zoneName, false  );
+        cloudProvider = novaContext.cloudProvider;
     }
 
     public static class NovaContext{
-        ComputeServiceContext context;
-        String zone;
+        final ComputeServiceContext context;
+        final String zone;
 
-        ServerApi api = null;
-        RestContext<NovaApi, NovaAsyncApi> nova = null;
+        CloudServerApi api = null;
+//        RestContext<NovaApi, NovaAsyncApi> nova = null;
+        RestContext cloud = null;
         ComputeService computeService = null;
+        final CloudProvider cloudProvider;
 
         public NovaContext(NovaCloudCredentials cloudCredentials) {
             logger.info("initializing bootstrapper with cloudCredentials [{}]", cloudCredentials.toString());
@@ -364,9 +368,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             if (cloudCredentials.apiCredentials) {
                 overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
             }
-
-
-
+            cloudProvider = cloudCredentials.cloudProvider;
             context = ContextBuilder.newBuilder( cloudCredentials.cloudProvider.label )
                     .credentials(cloudCredentials.getIdentity(), cloudCredentials.getCredential())
                     .overrides(overrides)
@@ -386,20 +388,26 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                      .setSecretKey(secretKey));
         }
 
-        private RestContext<NovaApi, NovaAsyncApi> getNova(){
-            if ( nova == null ){
-                nova  = context.unwrap(  );
+        private RestContext getCloud(){
+            if ( cloud == null ){
+            	TypeToken<?> backendType = context.getBackendType();
+            	cloud = context.unwrap();
             }
-            return nova;
+            return cloud;
         }
 
-        public ServerApi getApi(  ){
-            if ( api == null ){
-                api = getNova().getApi().getServerApiForZone( zone );
+        public CloudServerApi getApi(  ){
+            if( api == null ){
+            	RestContext cloudRestContext = getCloud();
+            	Object cloudRestContextApi = cloudRestContext.getApi();
+            	CloudApi cloudApiLocal = ApplicationContext.getCloudifyFactory().createCloudApi( cloudProvider, cloudRestContextApi ); 
+            	CloudApi cloudApi = cloudApiLocal;
+            	CloudServerApi serverApiForZone = cloudApi.getServerApiForZone( zone );
+                api = serverApiForZone;
             }
             return api;
         }
-
+        
         public ComputeService getCompute(){
             if ( computeService == null ){
                 computeService = context.getComputeService();
@@ -416,10 +424,10 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     private ServerNode createMachine(){
         logger.info( "Starting to create new Server [imageId={}, flavorId={}]", conf.server.bootstrap.imageId, conf.server.bootstrap.flavorId );
 
-        final ServerApi serverApi = novaContext.getApi();
-        CreateServerOptions serverOpts = new CreateServerOptions();
+        final CloudServerApi serverApi = novaContext.getApi();
+//        CreateServerOptions serverOptions = new CreateServerOptions();
 
-        Map<String,String> metadata = new HashMap<String, String>();
+/*        Map<String,String> metadata = new HashMap<String, String>();
 
         List<String> tags = new LinkedList<String>();
 
@@ -428,15 +436,25 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         }
 
         metadata.put("tags", StringUtils.join(tags, ","));
-        serverOpts.metadata(metadata);
-        serverOpts.keyPairName( conf.server.bootstrap.keyPair );
-        serverOpts.securityGroupNames(conf.server.bootstrap.securityGroup);
+        serverOptions.metadata(metadata);
+        serverOptions.keyPairName( conf.server.bootstrap.keyPair );
+        serverOptions.securityGroupNames(conf.server.bootstrap.securityGroup);
+*/
+        CloudCreateServerOptions serverOpts = ApplicationContext.getCloudifyFactory().
+        									createCloudCreateServerOptions( cloudProvider, conf );
 
-        final ServerCreated serverCreated = serverApi.create( conf.server.bootstrap.serverNamePrefix + incNodeId.incrementAndGet(), conf.server.bootstrap.imageId , conf.server.bootstrap.flavorId, serverOpts);
+
+//        final ServerCreated serverCreated = serverApi.create( 
+//        		conf.server.bootstrap.serverNamePrefix + incNodeId.incrementAndGet(), 
+//        		conf.server.bootstrap.imageId , conf.server.bootstrap.flavorId, serverOpts);
+        
+        final CloudServerCreated serverCreated = serverApi.create( 
+        		conf.server.bootstrap.serverNamePrefix + incNodeId.incrementAndGet(), 
+        		conf.server.bootstrap.imageId, conf.server.bootstrap.flavorId, serverOpts );
 
         logger.info("waiting for serverId activation [{}]", serverCreated.getId());
         // start the event
-        PoolEvent.MachineStateEvent poolEvent = new PoolEvent.MachineStateEvent().setType(PoolEvent.Type.CREATE).setResource(serverCreated);
+        PoolEvent.MachineStateEvent poolEvent = new PoolEvent.MachineStateEvent().setType(PoolEvent.Type.CREATE)/*.setResource(serverCreated)TODO?*/;
         poolEventManager.handleEvent(poolEvent);
         final ActiveWait wait = new ActiveWait();
         if ( wait
@@ -446,12 +464,12 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                     @Override
                     public boolean resolved() {
                         logger.info("Waiting for a server activation... Left timeout: {} sec", wait.getTimeLeftMillis() / 1000);
-                        return serverApi.get(serverCreated.getId()).getStatus().equals(Status.ACTIVE);
+                        return serverApi.get(serverCreated.getId()).getStatus().equals(CloudServerStatus.ACTIVE);
                     }
                 }))
         {
-            Server server = serverApi.get( serverCreated.getId());
-            poolEventManager.handleEvent(poolEvent.setResource(server).setType(PoolEvent.Type.UPDATE));
+        	CloudServer server = serverApi.get( serverCreated.getId());
+            poolEventManager.handleEvent(poolEvent./*setResource(server).TODO?*/setType(PoolEvent.Type.UPDATE));
             logger.info("Server created.{} ", server.getAddresses());
             return new ServerNode( server );
         }
@@ -461,7 +479,8 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
     }
 
-    @Override
+
+	@Override
     public boolean reboot(ServerNode serverNode){
         rebuild( serverNode);
         return bootstrap( serverNode );
@@ -469,11 +488,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
     private void rebuild( ServerNode serverNode ){
         logger.info("rebuilding machine");
-        ServerApi serverApi = novaContext.getApi();
+        CloudServerApi serverApi = novaContext.getApi();
         try {
-
-            RebuildServerOptions rebuildServerOptions = RebuildServerOptions.Builder.withImage(ApplicationContext.get().conf().server.bootstrap.imageId);
-            serverApi.rebuild(serverNode.getNodeId(), rebuildServerOptions );
+            serverApi.rebuild( serverNode.getNodeId() );
         } catch (RuntimeException e) {
             logger.error("error while rebuilding machine [{}]", serverNode, e);
         }
@@ -522,7 +539,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         serverNode.setRemote( true );
         // get existing management machine
 
-        List<Server> existingManagementMachines = null;
+        List<CloudServer> existingManagementMachines = null;
         try{
             existingManagementMachines = getAllMachinesWithPredicate( new ServerNamePrefixPredicate(), new NovaContext( conf.server.cloudBootstrap.cloudProvider,serverNode.getProject(), serverNode.getKey(), serverNode.getSecretKey(),conf.server.cloudBootstrap.zoneName, true ) );
         }catch(Exception e){
@@ -537,7 +554,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
         if ( !CollectionUtils.isEmpty( existingManagementMachines ) ) {
 
-            Server managementMachine = CollectionUtils.first( existingManagementMachines );
+        	CloudServer managementMachine = CollectionUtils.first( existingManagementMachines );
 
             // GUY - for some reason
 
@@ -574,11 +591,13 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             String apiKey = serverNode.getKey();
             logger.info( "Creating cloud folder with specific user credentials. Project: [{}], api key: [{}]", project, apiKey );
             jCloudsContext = CloudifyUtils.createJcloudsContext( project, apiKey, secretKey );
-            cloudFolder = CloudifyUtils.createCloudFolder( project, apiKey, secretKey, jCloudsContext );
+            cloudFolder = ApplicationContext.getCloudifyFactory().
+            		createCloudFolder( cloudProvider, project, apiKey, secretKey, jCloudsContext );
             logger.info( "cloud folder is at [{}]", cloudFolder );
 
             logger.info( "Creating security group for user." );
-            CloudifyUtils.createCloudifySecurityGroup( jCloudsContext );
+            ApplicationContext.getCloudifyFactory().
+            						createCloudifySecurityGroup( cloudProvider, jCloudsContext );
 
             //Command line for bootstrapping remote cloud.
             CommandLine cmdLine = new CommandLine( conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile() );
@@ -646,14 +665,14 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	public void deleteServer( String serverId )
 	{
         try{
-            ServerApi api = novaContext.getApi();
-            Server server = api.get( serverId );
+        	CloudServerApi api = novaContext.getApi();
+            CloudServer server = api.get( serverId );
             if ( server != null ){
                 api.delete(serverId);
                 server = api.get( serverId );
 		        logger.info("Server id: {} was terminated.", serverId);
             }
-            poolEventManager.handleEvent(new PoolEvent.MachineStateEvent().setType(PoolEvent.Type.DELETE).setResource(server));
+            poolEventManager.handleEvent(new PoolEvent.MachineStateEvent().setType(PoolEvent.Type.DELETE)/*.setResource(server)TODO?*/);
         }catch(Exception e){
             logger.error("unable to delete server [{}]", serverId);
         }

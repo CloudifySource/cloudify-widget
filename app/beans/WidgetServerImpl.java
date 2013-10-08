@@ -22,26 +22,28 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import beans.config.Conf;
-import controllers.WidgetAdmin;
-
-import models.ServerNodeEvent;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import play.cache.Cache;
-import play.i18n.Messages;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 import models.ServerNode;
+import models.ServerNodeEvent;
 import models.Widget;
 import models.Widget.Status;
 import models.WidgetInstance;
-import server.*;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import play.i18n.Messages;
+import server.DeployManager;
+import server.MailSender;
+import server.ServerPool;
+import server.WidgetServer;
 import utils.CollectionUtils;
 import utils.Utils;
-
-import javax.annotation.PostConstruct;
-import javax.inject.Inject;
+import beans.config.Conf;
+import controllers.WidgetAdmin;
 
 /**
  * This class provides ability to deploy/undeploy new widget by apiKey.

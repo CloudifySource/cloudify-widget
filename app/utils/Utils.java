@@ -30,10 +30,11 @@ import java.util.zip.ZipException;
 
 import models.ServerNode;
 import org.apache.commons.io.FileUtils;
-import org.jclouds.openstack.nova.v2_0.domain.Address;
-import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import clouds.base.CloudAddress;
+import clouds.base.CloudServer;
 
 import play.Play;
 import play.cache.Cache;
@@ -332,12 +333,12 @@ public class Utils
         return result == null ? defaultResult : result;
     }
 
-    public static ServerIp getServerIp( Server server )
+    public static ServerIp getServerIp( CloudServer server )
     {
         ServerIp res = new ServerIp();
         try {
-            Collection<Address> aPrivate = server.getAddresses().get( "private" );
-            Address[] addresses = aPrivate.toArray( new Address[ aPrivate.size() ] );
+            Collection<CloudAddress> aPrivate = server.getAddresses().get( "private" );
+            CloudAddress[] addresses = aPrivate.toArray( new CloudAddress[ aPrivate.size() ] );
 
 
             res.publicIp = addresses[ 1 ].getAddr();

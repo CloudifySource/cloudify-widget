@@ -19,8 +19,6 @@ import models.ServerNode;
 import models.Widget;
 import models.WidgetInstance;
 
-import java.io.File;
-
 /**
  * The main abstraction to deploy recipe.
  *

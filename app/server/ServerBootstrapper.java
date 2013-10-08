@@ -17,10 +17,11 @@ package server;
 
 import java.util.List;
 
+import clouds.base.CloudServer;
+
 import beans.BootstrapValidationResult;
 import beans.NovaCloudCredentials;
 import models.ServerNode;
-import org.jclouds.openstack.nova.v2_0.domain.Server;
 import server.exceptions.BootstrapException;
 
 /**
@@ -59,7 +60,7 @@ public interface ServerBootstrapper
 
     public List<ServerNode> recoverUnmonitoredMachines();
 
-    List<Server> getAllMachines(NovaCloudCredentials cloudCredentials);
+    List<CloudServer> getAllMachines(NovaCloudCredentials cloudCredentials);
 
     /**
      *   Take this machine and make it work.

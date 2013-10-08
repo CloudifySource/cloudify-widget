@@ -18,15 +18,15 @@ package mocks;
 import java.util.Collections;
 import java.util.List;
 
-import beans.BootstrapValidationResult;
-import beans.NovaCloudCredentials;
 import models.ServerNode;
 
-import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import server.ServerBootstrapper;
+import beans.BootstrapValidationResult;
+import beans.NovaCloudCredentials;
+import clouds.base.CloudServer;
 
 public class ServerBootstrapperMock implements ServerBootstrapper 
 {
@@ -74,7 +74,7 @@ public class ServerBootstrapperMock implements ServerBootstrapper
     }
 
     @Override
-    public List<Server> getAllMachines(NovaCloudCredentials cloudCredentials) {
+    public List<CloudServer> getAllMachines(NovaCloudCredentials cloudCredentials) {
         logger.info("getting all machines");
         return Collections.emptyList();
     }

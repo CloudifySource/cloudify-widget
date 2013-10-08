@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.Play;
 import play.modules.spring.Spring;
+import utils.CloudifyFactory;
 import beans.GsMailer;
 import beans.HmacImpl;
 import beans.config.Conf;
@@ -189,7 +190,11 @@ public class ApplicationContext
     public static NovaCloudCredentials getNovaCloudCredentials(){
         return getBean("novaCloudCredentials");  // prototype, we cannot inject it.
     }
-
+    
+    public static CloudifyFactory getCloudifyFactory(){
+        return getBean("cloudifyFactory");
+    }
+    
     public void setPoolEventManager(PoolEventManager poolEventManager) {
         this.poolEventManager = poolEventManager;
     }

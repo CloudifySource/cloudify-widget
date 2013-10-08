@@ -29,10 +29,9 @@ public class Conf {
 
     public ApplicationConfiguration application = new ApplicationConfiguration();
 
-    public SmtpConf smtp = new SmtpConf();
-
+    public SmtpConf smtp = new SmtpConf();   
+    
     public Mails mails = new Mails();
-
 
     // who is sending the mail?
     public GsMailer.Mailer mailer = new GsMailer.Mailer();

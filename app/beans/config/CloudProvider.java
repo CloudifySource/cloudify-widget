@@ -7,7 +7,9 @@ package beans.config;
  * Time: 2:17 PM
  */
 public enum CloudProvider {
-    HP("hpcloud-compute");
+    HP("hpcloud-compute"),
+    IBM("ibmcloud"),
+    NA("na");
 
     public String label;
 

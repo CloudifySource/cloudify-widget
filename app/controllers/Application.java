@@ -16,8 +16,10 @@ package controllers;
 
 import static utils.RestUtils.OK_STATUS;
 
-import akka.util.Duration;
-import beans.config.Conf;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import models.ServerNode;
 import models.Widget;
 
@@ -39,7 +41,10 @@ import play.mvc.Result;
 import server.ApplicationContext;
 import server.HeaderMessage;
 import server.exceptions.ServerException;
-import beans.events.Events;
+import utils.StringUtils;
+import utils.Utils;
+import akka.util.Duration;
+import beans.config.Conf;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
@@ -47,12 +52,6 @@ import com.avaje.ebean.config.ServerConfig;
 import com.avaje.ebean.config.dbplatform.MySqlPlatform;
 import com.avaje.ebeaninternal.api.SpiEbeanServer;
 import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
-import utils.StringUtils;
-import utils.Utils;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Widget controller with the main functions like start(), stop(), getWidgetStatus().

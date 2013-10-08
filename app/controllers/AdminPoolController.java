@@ -6,16 +6,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import beans.NoOpCallback;
 import models.ServerNode;
 import models.Summary;
 import models.User;
 import models.Widget;
 import models.WidgetInstance;
 
-import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import clouds.base.CloudServer;
 
 import play.libs.Akka;
 import play.libs.Json;
@@ -28,10 +28,10 @@ import server.ServerPool;
 import server.WidgetServer;
 import utils.CollectionUtils;
 import beans.BootstrapValidationResult;
+import beans.NoOpCallback;
 import beans.ServerNodesPoolStats;
 import beans.config.Conf;
 import beans.config.ServerConfig;
-import beans.pool.WebSocketEventListener;
 import controllers.compositions.AdminUserCheck;
 
 /**
@@ -108,7 +108,7 @@ public class AdminPoolController extends UserPoolController {
                 Conf conf = ApplicationContext.get().conf();
                 ServerConfig.ApiCredentials apiCredentials = conf.server.bootstrap.api;
                 // get all machines with our tag.
-                List<Server> servers = serverBootstrapper.getAllMachines(ApplicationContext.getNovaCloudCredentials()
+                List<CloudServer> servers = serverBootstrapper.getAllMachines(ApplicationContext.getNovaCloudCredentials()
                         .setProject(apiCredentials.project)
                         .setKey(apiCredentials.key)
                         .setApiCredentials(false)

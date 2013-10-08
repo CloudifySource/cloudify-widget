@@ -15,24 +15,6 @@
 
 package bootstrap;
 
-import beans.config.Conf;
-import com.google.common.base.Predicate;
-import models.User;
-import models.Widget;
-import models.WidgetIcon;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.reflections.ReflectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import play.Play;
-import play.api.libs.MimeTypes;
-
-import javax.inject.Inject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Field;
@@ -42,6 +24,27 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.inject.Inject;
+
+import models.User;
+import models.Widget;
+import models.WidgetIcon;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.reflections.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import play.Play;
+import play.api.libs.MimeTypes;
+import beans.config.Conf;
+
+import com.google.common.base.Predicate;
 
 /**
  * User: guym

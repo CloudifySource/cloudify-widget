@@ -14,24 +14,35 @@
  */
 package models;
 
-import com.avaje.ebean.ExpressionList;
-import com.avaje.ebean.Junction;
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Version;
+
 import org.codehaus.jackson.annotate.JsonIgnore;
-import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import play.cache.Cache;
 import play.db.ebean.Model;
 import utils.CollectionUtils;
 import utils.Utils;
 
-import javax.persistence.*;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import clouds.base.CloudServer;
+
+import com.avaje.ebean.ExpressionList;
+import com.avaje.ebean.Junction;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 /**
  * The ServerNode keeps all metadata of all created and available/busy servers.
@@ -105,7 +116,7 @@ extends Model
 
 	} 
 
-	public ServerNode( Server srv )
+	public ServerNode( CloudServer srv )
 	{
 		this.serverId  = srv.getId();
         Utils.ServerIp serverIp = Utils.getServerIp( srv );
@@ -369,6 +380,8 @@ extends Model
         }
 
     }
+        
+    
     public static class Criteria{
         public Boolean remote = null;
         public Boolean stopped = null;

@@ -39,7 +39,8 @@
 
     <bean id="applicationContext" class="server.ApplicationContext"/>
     <bean id="novaCloudCredentials" class="beans.NovaCloudCredentials" scope="prototype" init-method="init"/>
-
+    
+    <bean id="cloudifyFactory" class="utils.CloudifyFactory"/>
 
     <context:annotation-config />
     <context:component-scan base-package="beans" />	

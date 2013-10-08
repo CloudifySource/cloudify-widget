@@ -15,12 +15,11 @@
 
 package beans.cloudify;
 
-import org.apache.commons.exec.util.StringUtils;
-import org.codehaus.jackson.annotate.JsonProperty;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
  * User: guym
