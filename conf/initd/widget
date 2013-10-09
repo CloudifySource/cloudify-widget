@@ -30,7 +30,7 @@ stop() {
         echo
 }
 upgrade(){
-    initlog -c "echo -n Upgrading Widget server: "
+#    initlog -c "echo -n Upgrading Widget server: "
     cd $WIDGET_HOME
     ./upgrade_server.sh
     success $"Widget server upgraded"
