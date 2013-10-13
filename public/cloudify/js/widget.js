@@ -197,7 +197,7 @@ $(function () {
     // read more at https://github.com/carhartl/jquery-cookie
     var WidgetState = function(){
         var widgetIsPlaying = false;
-        var cookieName = "widgetCookie" + origin_page_url;
+        var cookieName = "widgetCookie" + origin_page_url + apiKey;
         function _get(){
             try{
                 var cookieValue = JSON.parse( $.cookie(cookieName) );
@@ -425,6 +425,7 @@ $(function () {
             widgetState.showPlayButton();
             stop_instance( data.status.message );
         } else {// status == running
+            widgetState.isPlaying(true);
             setTimeoutForUpdateStatus();
         }
     }
