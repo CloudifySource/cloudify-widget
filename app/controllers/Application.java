@@ -317,7 +317,6 @@ public class Application extends Controller
                         routes.javascript.WidgetAdmin.regenerateWidgetApiKey(),
                         routes.javascript.WidgetAdmin.enableWidget(),
                         routes.javascript.WidgetAdmin.disableWidget(),
-//                        routes.javascript.WidgetAdmin.addIcon(),
 
                         routes.javascript.Application.downloadPemFile(),
                         routes.javascript.Application.encrypt(),

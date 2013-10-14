@@ -20,7 +20,6 @@ import beans.config.CloudProvider;
 import beans.config.Conf;
 import beans.pool.PoolEvent;
 import beans.pool.PoolEventListener;
-import beans.pool.PoolEventManager;
 import com.google.common.base.Predicate;
 import com.google.common.net.HostAndPort;
 import com.google.inject.Guice;
@@ -34,7 +33,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.domain.ExecResponse;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.config.NullLoggingModule;
@@ -140,7 +138,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
      * 1. Getting a machine up and running
      * 2. Installing Cloudify on the machine.
      *
-     * If any of the above fails, it is the "createServer" responsibility to clean the workspace.
+     * If any of the above fails, it is the "createServer" responsibility Applicationto clean the workspace.
      * In this case - the method will return NULL.
      *
      * @return ServerNode if creation was successful.

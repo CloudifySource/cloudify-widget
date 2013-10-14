@@ -24,6 +24,7 @@ import beans.config.ServerConfig;
 import org.apache.commons.collections.Predicate;
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import org.codehaus.jackson.map.annotate.JsonRootName;
@@ -51,6 +52,7 @@ import utils.StringUtils;
 @Entity
 @XStreamAlias("widget")
 @SuppressWarnings("serial")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Widget
 	extends Model
 {

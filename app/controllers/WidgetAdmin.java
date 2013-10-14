@@ -92,7 +92,7 @@ public class WidgetAdmin extends Controller
     public static Result icon( String apiKey ){
         WidgetIcon widgetItem = WidgetIcon.findByWidgetApiKey( apiKey );
         if ( widgetItem == null ){
-            return ok(  );
+            return notFound(  );
         }
         return ok( widgetItem.getData() ).as( widgetItem.getContentType() );
     }
@@ -330,22 +330,38 @@ public class WidgetAdmin extends Controller
 		return resultAsJson(users);
 	}
 
-    public static Result postWidget( String authToken ){
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode jsonNode = request().body().asJson();
+    /**
+     * This function will save the widget.
+     * It receives the user's authToken, the widget in JSON format, and icon file in the request body.
+     *
+     * This method handles 2 scenarios (not best practice, we know),
+     *  - if widget exists
+     *  - if widget does not exists - we create it
+     *
+     *
+     * Removing an icon is decided if form gets "removeIcon" key.
+     * @return the widget as JSON - without the icon data.
+     */
+    public static Result postWidget( ){
 
-        User user = null;
+        // read everything from the form.
+        Http.MultipartFormData body = request().body().asMultipartFormData();
+        String widgetString = body.asFormUrlEncoded().get( "widget" )[0];
+        boolean removeIcon = body.asFormUrlEncoded().containsKey("removeIcon");
+        String authToken = body.asFormUrlEncoded().get( "authToken" )[0];
+        Http.MultipartFormData.FilePart picture = body.getFile( "icon" );
+
+        JsonNode jsonNode = Json.parse(widgetString);
         Widget w = null;
+        User user = null;
         if ( jsonNode.has( "id" ) ){
             String widgetApiKey = jsonNode.get("apiKey").asText();
             w = getWidgetSafely( authToken, widgetApiKey );
-
-
         }else{
             user = User.validateAuthToken( authToken );
         }
 
-        String bodyRequest = jsonNode.toString();
+        ObjectMapper mapper = new ObjectMapper();
 
         Form<Widget> validator = form( Widget.class ).bind( jsonNode );
 
@@ -372,18 +388,48 @@ public class WidgetAdmin extends Controller
                 user.addNewWidget( w );
             }
 
-
-
             w.save(  );
             w.refresh( );
 
+            if ( removeIcon ){
+                WidgetIcon icon = WidgetIcon.findByWidgetApiKey( w.getApiKey() );
+                if ( icon != null ){
+                    w.setIcon(null);
+                    w.save();
+                    icon.delete();
+                }
+            }
+
+            // now lets handle the icon - but only if one was posted.
+            if ( picture != null ) {
+
+                // decide if widget already has an icon or not
+                WidgetIcon icon = WidgetIcon.findByWidgetApiKey( w.getApiKey() );
+
+                if ( icon == null ){
+                    icon = new WidgetIcon();
+                }
+                String fileName = picture.getFilename();
+                String contentType = picture.getContentType();
+
+                File file = picture.getFile();
+                byte[] iconData = IOUtils.toByteArray( new FileInputStream( file ) );
+
+                icon.setName( fileName );
+                icon.setContentType( contentType );
+                icon.setData( iconData );
+                Ebean.save( icon ); // supports both save and update.
+                w.setIcon( icon );
+                w.save(  );
+                return ok( "Added icon successfully" );
+            }
 
 
             return ok(  Json.toJson( w ) );
         } catch ( IOException e ) {
             logger.error( "unable to turn body to Json",e  );
         }
-        logger.info( "saving widget [{}]", bodyRequest );
+        logger.info( "saving widget [{}]", widgetString );
         return ok(  );
     }
 
@@ -581,51 +627,4 @@ public class WidgetAdmin extends Controller
         return ok( angularjs_widget.render() );
     }
 
-
-    public static Result addIcon()
-    {
-        try {
-
-            Http.MultipartFormData body = request().body().asMultipartFormData();
-
-            Long widgetId = Long.parseLong( body.asFormUrlEncoded().get( "widgetId" )[0] );
-            String authToken = body.asFormUrlEncoded().get( "authToken" )[0];
-
-            Widget w = getWidgetSafely( authToken, widgetId, false );
-            WidgetIcon icon = WidgetIcon.findByWidgetApiKey( w.getApiKey() );
-
-            if ( icon == null ){
-                icon = new WidgetIcon();
-            }
-
-
-            Http.MultipartFormData.FilePart picture = body.getFile( "icon" );
-            if ( picture != null ) {
-                String fileName = picture.getFilename();
-                String contentType = picture.getContentType();
-
-                File file = picture.getFile();
-                byte[] iconData = IOUtils.toByteArray( new FileInputStream( file ) );
-
-                icon.setName( fileName );
-                icon.setContentType( contentType );
-                icon.setData( iconData );
-                Ebean.save( icon ); // supports both save and update.
-                w.setIcon( icon );
-                w.save(  );
-                return ok( "Added icon successfully" );
-            } else {
-                return ok( "Error: no file" );
-            }
-        } catch ( Exception e ) {
-            return ok( "Error: " + e.getMessage() );
-        }
-    }
-
-    public static Result removeIcon ( String authToken, Long widgetId ){
-        Widget w = getWidgetSafely( authToken, widgetId, false );
-        WidgetIcon icon = WidgetIcon.findByWidgetApiKey( w.getApiKey() );
-        icon.delete(  );
-        return ok(  );
-    }
 }

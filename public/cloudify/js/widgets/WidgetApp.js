@@ -15,7 +15,8 @@
  *              https://www.youtube.com/watch?feature=player_embedded&v=Klqn73uzQao
  *
  * TODO - I need to add interceptors here for HTTP 401 and other error codes.
- * TODO - use angularJS resource http://docs.angularjs.org/api/ngResource.$resource
+ * TODO - ** might not be relevant since we are using "type=file" input field and angularJS does not support it **
+ *        use angularJS resource http://docs.angularjs.org/api/ngResource.$resource
  *
  * @param $routeProvider
  */
@@ -33,6 +34,90 @@ var widgetConfig = function($routeProvider, $locationProvider, $httpProvider){
 
 console.log("loading WidgetApp");
 var WidgetApp = angular.module( 'WidgetApp', ["ui.bootstrap","ui",   "WidgetModules"] ).config( widgetConfig );
+
+// a directive that allows us to preview the icon.
+WidgetApp.directive("fileread", [function () {
+    return {
+        restrict:'CA',
+        transclude:true,
+        scope: {
+            filemodel: "=",
+            preview: "="
+        },
+        template: '<div ng-transclude></div>',
+//        replace:true,
+        link: function (scope, element, attributes) {
+            console.log(["my scope",scope]);
+
+            var reader = new FileReader();
+            reader.onload = function (loadEvent) {
+                scope.$apply(function () {
+                    console.log("updating scope fileread");
+
+                    scope.preview = loadEvent.target.result;
+                });
+            };
+            if ( element.is("input")){ // file input.. listen on value changeevent
+                console.log("setting up an input field");
+                element.on("change", function (changeEvent) {
+                    console.log("handling file changed");
+                    scope.$apply(function () {
+                        console.log("updating scope fileread");
+                        scope.filemodel = changeEvent.target.files[0];
+                    });
+
+
+                    reader.readAsDataURL(changeEvent.target.files[0]);
+                });
+
+            }else{ // treat this as a drop zone
+                console.log(["defining drop zone",element]);
+
+                element.on("dragover",function(e){
+//                    scope.$apply(function(){
+//                        element.css("background-color","blue").css("height","200px");
+                        e.preventDefault();
+                        e.stopPropagation();
+//                        console.log("hello world!!!!");
+//                    });
+//                    console.log(["caught dragover",e.dataTransfer, e.originalEvent.dataTransfer]);
+                    return false;
+                });
+                $(element).on("drop", function(evt){
+                    evt.stopPropagation();
+                    evt.preventDefault();
+                    console.log(["printing event",evt, evt.originalEvent.dataTransfer]);
+                    var files = evt.originalEvent.dataTransfer.files;
+                    var count = files.length;
+//
+                    //Only call the handler if 1 or more files was dropped.
+                    if (count > 0) {
+                        reader.readAsDataURL(files[0]);
+                        scope.filemodel = files[0];
+                    }
+                    return false;
+                });
+            }
+
+        }
+    }
+}]);
+
+
+WidgetApp.directive('img', function(){
+    return {
+        restrict:'E',
+        link:function(scope,element){
+            element.error(function(){
+                $(this).hide();
+            });
+            element.load(function(){
+                $(this).show();
+            })
+        }
+    }
+});
+
 
 
 WidgetApp.controller('WidgetController',
@@ -57,11 +142,11 @@ WidgetApp.controller('WidgetController',
             consoleurl: "The URL to the product dashboard / UI. Use $HOST as the hostname placeholder, e.g.: http://$HOST:8080/tomcat/index.html"
         };
 
-        $scope.newWidget = function(){ $scope.actions = { "editWidget" : {} } };
+        $scope.newWidget = function(){ $scope.actions = { "editWidget" : {}, "editIcon":null } };
         $scope.goBack = function(){  $scope.showEmbedCode = false; $scope.actions = null; };
         $scope.viewInstances = function(widget){ $scope.actions = {"viewInstances" : widget }; };
         $scope.getEmbed = function( widget ){ $scope.showEmbedCode =  widget };
-        $scope.editWidget = function( widget ){ $scope.actions = {"editWidget" : widget }; };
+        $scope.editWidget = function( widget ){ $scope.actions = {"editWidget" : widget, "editIcon":null }; };
         $scope.delete = function(widget){
 
                var title = 'Are you sure?';
@@ -85,8 +170,10 @@ WidgetApp.controller('WidgetController',
         };
 
         $scope.regenerateKey = function(widget){
-            console.log(["regenerating key",widget]);
-            WidgetModel.regenerateKey( $scope.authToken, widget ).then( function(apiKey) { widget.apiKey =  apiKey; } );
+            if ( confirm('regenerating api key will break embedded instances for this widget') ){
+                console.log(["regenerating key",widget]);
+                WidgetModel.regenerateKey( $scope.authToken, widget ).then( function(apiKey) { widget.apiKey =  apiKey; } );
+            }
         };
 
         $scope.disable = function(widget){
@@ -104,10 +191,10 @@ WidgetApp.controller('WidgetController',
 
         };
 
-        $scope.saveWidget = function( widget, isDone ){
-            var widgetFormConstruct = this.widgetForm;
+        $scope.saveWidget = function( widget, icon, isDone ){
             console.log(["saving widget", widget ]);
-            WidgetModel.saveWidget( $scope.authToken, widget ).then( function( savedWidget ){
+            WidgetModel.saveWidget( $scope.authToken, widget, icon ).then( function( savedWidget ){
+                $scope.lastUpdated=new Date().getTime();
                 if ( !angular.isDefined(widget.id)){
                     widget.id = savedWidget.id;
                     $scope.widgets.push( savedWidget );
@@ -117,6 +204,30 @@ WidgetApp.controller('WidgetController',
                 }
             });
         };
+
+        // support removing the icon by setting "remove" string. the service should translate this to the correct form field.
+        $scope.removeIcon = function(){
+            $scope.actions.editIcon="remove";
+        };
+
+        $scope.restoreIcon = function(){
+            $scope.actions.editIcon = null;
+        }
+
+        $scope.widgetIconFile = "guy";
+        $scope.$watch('widgetIconFile', function( oldValue, newValue ){
+            console.log(["handling new value",oldValue,newValue]);
+            debugger;
+            if ( !!$scope.actions ){
+                $scope.actions.editIcon = newValue;
+            }
+        });
+        // support setting an icon to the widget. we just keep this to the scope. The file will be sent to server on save.
+//        $("[type=file]").on('change',function(e){
+//            $scope.$apply(function(){
+//                $scope.actions.editIcon =(e.srcElement || e.target).files[0];
+//            });
+//        });
 
         $scope.opts =  {
             backdropFade: true,
