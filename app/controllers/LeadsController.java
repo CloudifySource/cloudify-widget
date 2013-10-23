@@ -91,25 +91,28 @@ public class LeadsController extends Controller {
 
         Lead lead = Lead.find.byId( leadId );
 
-        if ( lead == null || !lead.owner.getId().equals( user.getId() )){
+
+        if ( lead == null || !lead.owner.getId().equals( user.getId() )){ // whether lead does not exist
             return notFound("no lead with id " + leadId );
         }
 
         // lets verify serverNode exists and is not assigned to another lead already.
         // if it is assigned to another lead, we want to give the same message as if the server node
         // does not exist.
-        if ( serverNode == null || ( serverNode.getLead() != null && !serverNode.getLead().getId().equals(lead.getId()))){
+        if ( serverNode == null || ( serverNode.getLead() != null && !serverNode.getLead().getId().equals(lead.getId()))){ // whether serverNode already assigned or does not exist
              return notFound("instanceId " + instanceId + " does not exist");
-        }
-        else if ( serverNode.getLead() == null){
+        }else if ( lead.getServerId() != null && !lead.getServerId().equals(serverNode.getId()) ){ // whether lead already assigned
+            return notFound("invalid params");
+        } else if ( serverNode.getLead() == null && lead.getServerId() == null ){
 
             serverNode.setLead( lead );
             serverNode.save();
 
             return ok();
-        }else if ( serverNode.getLead().getId().equals( lead.getId() )){
+        }else if ( serverNode.getLead() != null && serverNode.getLead().getId().equals( lead.getId() )){
             return ok();
         }
+
 
         return ok();
 

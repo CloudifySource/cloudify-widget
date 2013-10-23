@@ -43,6 +43,11 @@ public class Lead extends Model {
 
     public Boolean validated;
 
+    @JsonIgnore
+    @OneToOne(mappedBy = "lead")
+    public ServerNode serverNode;
+
+
     public Long createdTimestamp = System.currentTimeMillis();
 
     public Long trialTimeoutTimestamp = null; // allow calculation manual override.. for default use NULL here.
@@ -79,6 +84,12 @@ public class Lead extends Model {
         return Lead.find.where().eq("owner", owner).eq("id",id).eq("confirmationCode", confirmationCode).findUnique();
     }
 
+    public Widget getWidget(){
+        return serverNode != null ? serverNode.getWidgetInstance().getWidget() : null;
+    }
+
+
+
     public static Lead findByOwnerAndEmail( User owner, String email ){
         return Lead.find.where().eq( "owner", owner).eq( "email" , email ).findUnique();
     }
@@ -93,6 +104,10 @@ public class Lead extends Model {
 
     public Long getId() {
         return id;
+    }
+
+    public Long getServerId(){
+        return serverNode == null ? null : serverNode.getId();
     }
 
     public String toDebugString(){

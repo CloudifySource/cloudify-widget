@@ -401,7 +401,7 @@ public class Widget
 		this.apiKey = apiKey;
 	}
 
-    @JsonProperty("instances")
+    @JsonIgnore
     @Transient
     public List<WidgetInstance> getViableInstances(){
         if ( CollectionUtils.isEmpty( instances )){
@@ -705,5 +705,11 @@ public class Widget
     public void setRecipeName( String recipeName )
     {
         this.recipeName = recipeName;
+    }
+
+
+    public abstract static class IncludeInstancesMixin{
+        @JsonProperty("instances")
+        public abstract List<WidgetInstance> getViableInstances();
     }
 }

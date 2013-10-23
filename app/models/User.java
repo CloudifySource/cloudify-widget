@@ -94,7 +94,7 @@ public class User
 	private Long id;
 
     @ManyToOne( cascade = CascadeType.REMOVE, fetch = FetchType.EAGER )
-    private UserPermissions permissions;
+    private UserPermissions permissions = new UserPermissions();
 	
 	@XStreamOmitField
 	private String firstName;

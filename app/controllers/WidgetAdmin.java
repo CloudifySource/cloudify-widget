@@ -482,6 +482,9 @@ public class WidgetAdmin extends Controller
             list = user.getWidgets();
         }
 
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.getSerializationConfig().addMixInAnnotations( Widget.class, Widget.IncludeInstancesMixin.class );
         return ok( Json.toJson(list) );
 	}
 
