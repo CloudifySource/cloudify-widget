@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import org.apache.commons.io.FileUtils;
+import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import clouds.base.CloudCreateServerOptions;
 import clouds.hp.HPCloudApi;
 import clouds.hp.HPCloudCreateServerOptions;
 import clouds.hp.HPCloudUtils;
+import clouds.softlayer.SoftlayerCloudUtils;
 
 /**
  * 
@@ -59,6 +61,7 @@ public class CloudifyFactory {
             // GUY - Important - Note - Even though this is the "properties" files, it is not used for "properties" per say
             // we are actually writing a groovy file that defines variables.
             Collection<String> newLines = new LinkedList<String>();
+            newLines.add("");
             newLines.add("tenant="+ StringUtils.wrapWithQuotes(project));
             newLines.add("user="+ StringUtils.wrapWithQuotes(key));
             newLines.add("apiKey="+ StringUtils.wrapWithQuotes(secretKey));
@@ -88,8 +91,8 @@ public class CloudifyFactory {
     				throw new RuntimeException(e);
     			}	
     			break;
-    		default:
-    			throw createNotSupportedCloudRuntimeException( cloudProvider );
+   		default:
+   			throw createNotSupportedCloudRuntimeException( cloudProvider );
     	}
     	
     	return retValue;
@@ -102,23 +105,26 @@ public class CloudifyFactory {
 	 * @param context The jClouds context.
 	 */
 	public static void createCloudifySecurityGroup( CloudProvider cloudProvider, ComputeServiceContext context ) {
+		CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
     	switch( cloudProvider ){
     	case HP:
-    		CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
     		HPCloudUtils.createCloudifySecurityGroup( context, cloudConf );
     		break;
-    		
-    		default:
-    			throw createNotSupportedCloudRuntimeException( cloudProvider );
+    	case SOFTLAYER:
+    		SoftlayerCloudUtils.createCloudifySecurityGroup( context, cloudConf );
+    		break;    		
+   		default:
+   			throw createNotSupportedCloudRuntimeException( cloudProvider );
     	}
 	}
 	
-    public static CloudApi createCloudApi( CloudProvider cloudProvider, Object cloudRestContextApi ) {
+    public static CloudApi createCloudApi( ComputeService computeService, CloudProvider cloudProvider, Object cloudRestContextApi ) {
     	CloudApi cloudApi = null;
     	switch( cloudProvider ){
 		case HP:
-			cloudApi = new HPCloudApi( cloudRestContextApi );
+			cloudApi = new HPCloudApi( computeService, cloudRestContextApi );
 			break;
+			
 		default:
 			throw createNotSupportedCloudRuntimeException( cloudProvider );			
     	}
@@ -133,6 +139,7 @@ public class CloudifyFactory {
     		case HP:
     			serverOpts = new HPCloudCreateServerOptions( conf );
     			break;
+    	    			
     		default:
     			throw createNotSupportedCloudRuntimeException( cloudProvider );	    			
     	}
@@ -144,8 +151,8 @@ public class CloudifyFactory {
     	return new RuntimeException( "Cloud [" + cloudProvider.name() + "] is not supported" );
     }
     
-	private static String getTempSuffix() {
+	public static String getTempSuffix() {
 		String currTime = Long.toString(System.currentTimeMillis());
 		return currTime.substring(currTime.length() - 4);
-	}    
+	}
 }

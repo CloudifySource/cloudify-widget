@@ -179,7 +179,7 @@ public class ServerConfig {
         public String securityGroup = "cloudifySecurityGroup";
         public String cloudProvider = "hpcloud-compute";
         public String cloudifyEscDirRelativePath = "clouds";
-        public String existingManagementMachinePrefix = "cloudify-manager";
+        public String existingManagementMachinePrefix = "jenka-270m3-manager";//"cloudify-manager";
         @Config( ignoreNullValues =  true )
         public boolean removeCloudFolder; // used in dev environment to see the configuration in case it got corrupted.
 

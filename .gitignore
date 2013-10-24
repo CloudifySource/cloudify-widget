@@ -24,3 +24,4 @@ logFile.log
 nohup.out
 .ssh/
 cloudify-folder
+sass

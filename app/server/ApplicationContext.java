@@ -17,20 +17,24 @@ package server;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
-import beans.NovaCloudCredentials;
-import beans.pool.PoolEventListener;
-import beans.pool.PoolEventManager;
-import beans.tasks.DestroyServersTask;
-import bootstrap.InitialData;
 import mocks.EventMonitorMock;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import play.Play;
 import play.modules.spring.Spring;
 import utils.CloudifyFactory;
 import beans.GsMailer;
 import beans.HmacImpl;
+import beans.NovaCloudCredentials;
+import beans.config.CloudProvider;
 import beans.config.Conf;
+import beans.pool.PoolEventListener;
+import beans.pool.PoolEventManager;
+import beans.tasks.DestroyServersTask;
+import bootstrap.InitialData;
+import clouds.base.BootstrapCloudHandler;
 
 /**
  * A static class that helps to get an instance of different modules and keeps loose decoupling.
@@ -198,6 +202,27 @@ public class ApplicationContext
     public void setPoolEventManager(PoolEventManager poolEventManager) {
         this.poolEventManager = poolEventManager;
     }
+    
+    public static BootstrapCloudHandler getBootstrapCloudHandler( CloudProvider cloudProvider ){
+    	
+    	return ( BootstrapCloudHandler )getBean(cloudProvider.label + "BootstrapCloudHandler");
+    }
+    
+/*    public static class SoftlayerHandler implements BootstrapCloudHandler{
+    	
+    	@Override
+    	public Machine createMachine( ServerNode serverNode ){
+    		SoftlayerAdvancedParams params = Json.fromJson( Json.parse(serverNode.getAdvancedParams()), SoftlaterAdvancedParams.class);
+    	}
+    	
+//    	 { "type": "softlayer", "params":{"userId":"", "apiKey":"", "anotherKey":""}}}
+//    	 @author evgenyf
+    	     	 
+    	public static class SoftlayerAdvancedParams{
+    		String userId;
+    		String apiKey;
+    	}
+    }*/
 
     public PoolEventListener getPoolEventManager() {
         return poolEventManager;

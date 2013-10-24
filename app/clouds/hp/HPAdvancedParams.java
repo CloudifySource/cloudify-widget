@@ -1,0 +1,43 @@
+package clouds.hp;
+
+import clouds.base.AdvancedParams;
+
+/**
+ * JSON example:
+ 	{"type": "hpcloud-compute",
+	 "params": {"userId":"evgeny", "project":"il...-project", "key":"V7...", "secretKey":"bR.........O6"}
+	}
+
+ * @author evgenyf
+ *
+ */
+public class HPAdvancedParams implements AdvancedParams{
+
+	String project;
+	String userId;
+	String apiKey;
+	String key;
+	String secretKey;
+	
+	public HPAdvancedParams(){}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public String getApiKey() {
+		return apiKey;
+	}
+
+	public String getProject() {
+		return project;
+	}
+	
+	public String getKey() {
+		return key;
+	}	
+	
+    public String getSecretKey(){
+        return secretKey;
+    }	
+}

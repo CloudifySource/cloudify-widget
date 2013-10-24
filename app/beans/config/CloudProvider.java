@@ -8,7 +8,8 @@ package beans.config;
  */
 public enum CloudProvider {
     HP("hpcloud-compute"),
-    IBM("ibmcloud"),
+    AWS_EC2("aws-ec2"),
+    SOFTLAYER("softlayer"),
     NA("na");
 
     public String label;

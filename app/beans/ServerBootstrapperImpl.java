@@ -14,7 +14,6 @@
  */
 package beans;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,18 +29,16 @@ import javax.inject.Inject;
 
 import models.ServerNode;
 
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.domain.ExecResponse;
+import org.jclouds.compute.options.TemplateOptions;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.config.NullLoggingModule;
-import org.jclouds.rest.AuthorizationException;
 import org.jclouds.rest.RestContext;
 import org.jclouds.ssh.SshClient;
 import org.jclouds.sshj.config.SshjSshClientModule;
@@ -49,10 +46,8 @@ import org.jclouds.util.Strings2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import play.i18n.Messages;
 import server.ApplicationContext;
 import server.DeployManager;
-import server.ProcExecutor;
 import server.ServerBootstrapper;
 import server.exceptions.ServerException;
 import utils.CloudifyUtils;
@@ -64,6 +59,7 @@ import beans.config.CloudProvider;
 import beans.config.Conf;
 import beans.pool.PoolEvent;
 import beans.pool.PoolEventListener;
+import clouds.base.BootstrapCloudHandler;
 import clouds.base.CloudApi;
 import clouds.base.CloudCreateServerOptions;
 import clouds.base.CloudServer;
@@ -73,7 +69,6 @@ import clouds.base.CloudServerStatus;
 
 import com.google.common.base.Predicate;
 import com.google.common.net.HostAndPort;
-import com.google.common.reflect.TypeToken;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -126,7 +121,14 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		logger.info("creating {} new instances", numOfServers );
 		for( int i=0; i< numOfServers; i++ )
 		{
-            ServerNode server = createServer();
+            ServerNode server = null;
+			try {
+				server = createServer();
+			} 
+			catch (RunNodesException e) {
+				logger.error("Falied to created server", e);
+				e.printStackTrace();
+			}
             if ( server != null ){
                 poolEventManager.handleEvent(new PoolEvent.ServerNodeEvent().setServerNode(server).setType(PoolEvent.Type.CREATE));
                 servers.add( server );
@@ -147,7 +149,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
      *
      * @return ServerNode if creation was successful.
      */
-    public ServerNode createServer()
+    public ServerNode createServer() throws RunNodesException
     {
 
         ServerNode serverNode = null;
@@ -252,12 +254,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         }
 
         // get all servers with tags matching my configuration.
-        return getAllMachinesWithPredicate( new ServerTagPredicate(), context );
-    }
-
-    public List<CloudServer> getAllMachinesWithPredicate( Predicate<CloudServer> predicate, NovaContext context ){
-        logger.info( "getting all machine by predicate [{}]", predicate );
-        return context.getApi().listInDetail().concat().filter( predicate ).toImmutableList();
+        return CloudifyUtils.getAllMachinesWithPredicate( new ServerTagPredicate(), context );
     }
 
     class TruePredicate implements Predicate<CloudServer>{
@@ -271,25 +268,6 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             return "always true predicate";
         }
     }
-
-    class ServerNamePrefixPredicate implements Predicate<CloudServer>{
-        String prefix = conf.server.cloudBootstrap.existingManagementMachinePrefix;
-
-
-        @Override
-        public boolean apply( CloudServer server )
-        {
-            // return true iff server is not null, prefix is not empty and prefix is prefix of server.getName
-            return server != null && !StringUtils.isEmpty( prefix ) && server.getName().indexOf( prefix ) == 0;
-
-        }
-        
-        @Override
-        public String toString(){
-             return String.format("name has prefix [%s]", prefix);
-        }
-    }
-
 
     class ServerTagPredicate implements Predicate<CloudServer> {
 
@@ -358,9 +336,12 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
         CloudServerApi api = null;
 //        RestContext<NovaApi, NovaAsyncApi> nova = null;
-        RestContext cloud = null;
+//        RestContext cloud = null;
+        Object cloudApi;
         ComputeService computeService = null;
         final CloudProvider cloudProvider;
+		final ContextBuilder contextBuilder;
+		
 
         public NovaContext(NovaCloudCredentials cloudCredentials) {
             logger.info("initializing bootstrapper with cloudCredentials [{}]", cloudCredentials.toString());
@@ -369,10 +350,12 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                 overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
             }
             cloudProvider = cloudCredentials.cloudProvider;
-            context = ContextBuilder.newBuilder( cloudCredentials.cloudProvider.label )
+            contextBuilder = ContextBuilder.newBuilder( cloudCredentials.cloudProvider.label );
+            context = contextBuilder 
                     .credentials(cloudCredentials.getIdentity(), cloudCredentials.getCredential())
                     .overrides(overrides)
                     .buildView(ComputeServiceContext.class);
+            
             this.zone = cloudCredentials.zone;
         }
 
@@ -388,27 +371,41 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                      .setSecretKey(secretKey));
         }
 
+        /*
         private RestContext getCloud(){
             if ( cloud == null ){
             	TypeToken<?> backendType = context.getBackendType();
             	cloud = context.unwrap();
             }
             return cloud;
-        }
+        }*/
 
-        public CloudServerApi getApi(  ){
+        private Object getCloudApi(){
+        	if( cloudApi == null ){
+//        		cloudApi = CloudifyFactory.createCloudApi( getComputeService(), cloudProvider, getCloudApi() );
+        		
+        		RestContext restContext = context.unwrap();
+        		cloudApi = restContext.getApi();
+//        		cloudApi = contextBuilder.buildApi( 
+//        				(Class)( ( RestApiMetadata )contextBuilder.getApiMetadata() ).getApi() );
+        	}
+        	
+        	return cloudApi;
+        }
+        
+        public CloudServerApi getApi(){
             if( api == null ){
-            	RestContext cloudRestContext = getCloud();
-            	Object cloudRestContextApi = cloudRestContext.getApi();
-            	CloudApi cloudApiLocal = ApplicationContext.getCloudifyFactory().createCloudApi( cloudProvider, cloudRestContextApi ); 
-            	CloudApi cloudApi = cloudApiLocal;
-            	CloudServerApi serverApiForZone = cloudApi.getServerApiForZone( zone );
+//            	RestContext cloudRestContext = getCloud();
+//            	Object cloudRestContextApi = cloudRestContext.getApi();
+            	CloudApi cloudApiLocal = ApplicationContext.getCloudifyFactory().
+            					createCloudApi( getComputeService(), cloudProvider, getCloudApi() ); 
+            	CloudServerApi serverApiForZone = cloudApiLocal.getServerApiForZone( zone );
                 api = serverApiForZone;
             }
             return api;
         }
         
-        public ComputeService getCompute(){
+        public ComputeService getComputeService(){
             if ( computeService == null ){
                 computeService = context.getComputeService();
             }
@@ -421,29 +418,35 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         }
     }
 
-    private ServerNode createMachine(){
+    private ServerNode createMachine() throws RunNodesException{
         logger.info( "Starting to create new Server [imageId={}, flavorId={}]", conf.server.bootstrap.imageId, conf.server.bootstrap.flavorId );
 
         final CloudServerApi serverApi = novaContext.getApi();
 //        CreateServerOptions serverOptions = new CreateServerOptions();
 
-/*        Map<String,String> metadata = new HashMap<String, String>();
+//        Map<String,String> metadata = new HashMap<String, String>();
+//
+//        List<String> tags = new LinkedList<String>();
+//
+//        if ( !StringUtils.isEmpty(conf.server.bootstrap.tags) ){
+//            tags.add( conf.server.bootstrap.tags );
+//        }
+//
+//        metadata.put("tags", StringUtils.join(tags, ","));
+//        serverOptions.metadata(metadata);
+//        serverOptions.keyPairName( conf.server.bootstrap.keyPair );
+//        serverOptions.securityGroupNames(conf.server.bootstrap.securityGroup);
 
-        List<String> tags = new LinkedList<String>();
-
-        if ( !StringUtils.isEmpty(conf.server.bootstrap.tags) ){
-            tags.add( conf.server.bootstrap.tags );
-        }
-
-        metadata.put("tags", StringUtils.join(tags, ","));
-        serverOptions.metadata(metadata);
-        serverOptions.keyPairName( conf.server.bootstrap.keyPair );
-        serverOptions.securityGroupNames(conf.server.bootstrap.securityGroup);
-*/
         CloudCreateServerOptions serverOpts = ApplicationContext.getCloudifyFactory().
         									createCloudCreateServerOptions( cloudProvider, conf );
 
 
+        ComputeService computeService = novaContext.getComputeService();
+        
+        
+        TemplateOptions templateOptions = new TemplateOptions();
+        
+        
 //        final ServerCreated serverCreated = serverApi.create( 
 //        		conf.server.bootstrap.serverNamePrefix + incNodeId.incrementAndGet(), 
 //        		conf.server.bootstrap.imageId , conf.server.bootstrap.flavorId, serverOpts);
@@ -536,55 +539,22 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     @Override
     public ServerNode bootstrapCloud( ServerNode serverNode )
     {
-        serverNode.setRemote( true );
-        // get existing management machine
-
-        List<CloudServer> existingManagementMachines = null;
-        try{
-            existingManagementMachines = getAllMachinesWithPredicate( new ServerNamePrefixPredicate(), new NovaContext( conf.server.cloudBootstrap.cloudProvider,serverNode.getProject(), serverNode.getKey(), serverNode.getSecretKey(),conf.server.cloudBootstrap.zoneName, true ) );
-        }catch(Exception e){
-            if ( ExceptionUtils.indexOfThrowable( e, AuthorizationException.class ) > 0 ){
-                serverNode.errorEvent( "Invalid Credentials" ).save(  );
-                return null;
-            }
-            logger.error( "unrecognized exception, assuming only existing algorithm failed. ",e );
-        }
-
-        logger.info( "found [{}] management machines", CollectionUtils.size( existingManagementMachines ) );
-
-        if ( !CollectionUtils.isEmpty( existingManagementMachines ) ) {
-
-        	CloudServer managementMachine = CollectionUtils.first( existingManagementMachines );
-
-            // GUY - for some reason
-
-            // ((Address )managementMachine.getAddresses().get("private").toArray()[1]).getAddr()
-
-            Utils.ServerIp serverIp = Utils.getServerIp( managementMachine );
-
-            if ( !cloudifyRestClient.testRest( serverIp.publicIp ).isSuccess() ){
-                serverNode.errorEvent( "Management machine exists but unreachable" ).save(  );
-                logger.info( "unable to reach management machine. stopping progress." );
-                return null;
-            }
-            logger.info( "using first machine  [{}] with ip [{}]", managementMachine, serverIp );
-            serverNode.setServerId( managementMachine.getId() );
-            serverNode.infoEvent("Found management machine on :" + serverIp ).save(  );
-            serverNode.setPublicIP( serverIp.publicIp );
-            serverNode.save(  );
-            logger.info( "not searching for key - only needed for bootstrap" );
-        } else {
-            logger.info( "did not find an existing management machine, creating new machine" );
-            createNewMachine( serverNode );
-        }
-        return serverNode;
+    	
+    	
+        BootstrapCloudHandler bootstrapCloudHandler =
+        		ApplicationContext.get().getBootstrapCloudHandler( serverNode.getCloudProvider() );
+        return bootstrapCloudHandler.bootstrapCloud(serverNode, conf);    	
     }
 
+    /*
+    
     private void createNewMachine( ServerNode serverNode )
     {
         File cloudFolder = null;
         ComputeServiceContext jCloudsContext = null;
         try {
+        	JsValue parse = Json.parse( serverNode.getAdvancedParams() );
+        	
             // no existing management machine - create new server
             String project = serverNode.getProject();
             String secretKey = serverNode.getSecretKey();
@@ -661,6 +631,8 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			
 		}
 	}
+    
+    */
 
 	public void deleteServer( String serverId )
 	{

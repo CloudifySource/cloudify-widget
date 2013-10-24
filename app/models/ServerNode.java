@@ -33,9 +33,11 @@ import org.slf4j.LoggerFactory;
 
 import play.cache.Cache;
 import play.db.ebean.Model;
+import play.libs.Json;
 import utils.CollectionUtils;
+import utils.StringUtils;
 import utils.Utils;
-
+import beans.config.CloudProvider;
 import clouds.base.CloudServer;
 
 import com.avaje.ebean.ExpressionList;
@@ -105,6 +107,9 @@ extends Model
 
     @Version
     private long version = 0;
+    
+    @Lob
+    public String advancedParams = null;
 
     @JsonIgnore
     @OneToMany(mappedBy="serverNode", cascade = CascadeType.REMOVE)
@@ -148,6 +153,24 @@ extends Model
 	{
 		return publicIP;
 	}
+    
+    public String getAdvancedParams(){
+    	return advancedParams;
+    }
+    
+	public void setAdvancedParams(String text) {
+		// TODO Auto-generated method stub
+		advancedParams = text;
+	}
+	
+	public CloudProvider getCloudProvider(){
+		String typeStr = Json.parse( advancedParams ).get( "type" ).asText();
+		return CloudProvider.findByLabel( typeStr );
+	}
+    
+    public boolean hasAdvancedParams(){
+    	return !StringUtils.isEmptyOrSpaces(advancedParams); 
+    }
 
 	public void setPublicIP(String publicIP) {
 		this.publicIP = publicIP;
@@ -430,4 +453,9 @@ extends Model
             return this;
         }
     }
+
+
+
+    
+    
 }

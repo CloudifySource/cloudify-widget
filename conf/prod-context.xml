@@ -41,6 +41,11 @@
     <bean id="novaCloudCredentials" class="beans.NovaCloudCredentials" scope="prototype" init-method="init"/>
     
     <bean id="cloudifyFactory" class="utils.CloudifyFactory"/>
+    
+    <bean id="hpcloud-computeBootstrapCloudHandler" class="clouds.hp.HPBootstrapCloudHandler">
+    </bean>
+    <bean id="softlayerBootstrapCloudHandler" class="clouds.softlayer.SoftlayerBootstrapCloudHandler">
+    </bean>    
 
     <context:annotation-config />
     <context:component-scan base-package="beans" />	

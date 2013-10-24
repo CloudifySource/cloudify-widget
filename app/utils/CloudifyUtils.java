@@ -17,13 +17,24 @@ package utils;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.jclouds.ContextBuilder;
+import org.jclouds.collect.PagedIterable;
 import org.jclouds.compute.ComputeServiceContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import clouds.base.CloudServer;
+import clouds.base.CloudServerApi;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 
 import server.ApplicationContext;
+import beans.ServerBootstrapperImpl.NovaContext;
 import beans.config.ServerConfig.CloudBootstrapConfiguration;
 
 
@@ -33,6 +44,9 @@ import beans.config.ServerConfig.CloudBootstrapConfiguration;
  *
  */
 public class CloudifyUtils {
+	
+	
+	private static Logger logger = LoggerFactory.getLogger( CloudifyUtils.class );
 	
 	/**
 	 * returns the private key used for starting the remote machines.
@@ -91,4 +105,13 @@ public class CloudifyUtils {
 		}
 		return filesList[0];
 	}
+	
+    public static List<CloudServer> getAllMachinesWithPredicate( Predicate<CloudServer> predicate, NovaContext context ){
+        logger.info( "getting all machine by predicate [{}]", predicate );
+        CloudServerApi cloudServerApi = context.getApi();
+        logger.info( "cloudServerApi=", cloudServerApi );
+        PagedIterable<CloudServer> listInDetail = cloudServerApi.listInDetail();
+        FluentIterable<CloudServer> filter = listInDetail.concat().filter( predicate );
+        return filter.toImmutableList();
+    }
 }

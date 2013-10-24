@@ -24,12 +24,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipException;
 
 import models.ServerNode;
 import org.apache.commons.io.FileUtils;
+import org.jclouds.compute.domain.NodeMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -350,6 +352,24 @@ public class Utils
 
         return res;
     }
+    
+    public static ServerIp getServerIp( NodeMetadata nodeMetadata )
+    {
+        ServerIp res = new ServerIp();
+        try {
+        	
+        	Set<String> privateAddresses = nodeMetadata.getPrivateAddresses();
+        	Set<String> publicAddresses = nodeMetadata.getPublicAddresses();
+        	
+            res.publicIp = publicAddresses.isEmpty() ? null : ( String )CollectionUtils.first( publicAddresses );
+            res.privateIp = privateAddresses.isEmpty() ? null : ( String )CollectionUtils.first( privateAddresses );
+
+        } catch ( Exception e ) {
+            logger.error( "unable to get ips", e );
+        }
+
+        return res;
+    }    
 
     public static class ServerIp{
         public String publicIp = null;
