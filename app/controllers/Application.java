@@ -37,6 +37,7 @@ import play.libs.F;
 import play.libs.Json;
 import play.libs.WS;
 import play.mvc.Controller;
+import play.mvc.Http.RequestBody;
 import play.mvc.Result;
 import server.ApplicationContext;
 import server.HeaderMessage;
@@ -91,16 +92,18 @@ public class Application extends Controller
      * @param userId - in case required login authentication is used
      * @return - result
      */
-	public static Result start( String apiKey, String project, String key, String secretKey, String userId )
+	public static Result start( String apiKey/*, String project, String key, String secretKey*/, String userId )
 	{
 		try
 		{
-            logger.info( "starting widget with [apiKey, key, secretKey] = [{},{},{}]", new Object[]{apiKey, key, secretKey} );
+			
+            //! logger.info( "starting widget with [apiKey, key, secretKey] = [{},{},{}]", new Object[]{apiKey, key, secretKey} );
+			
  			Widget widget = Widget.getWidget( apiKey );
             ServerNode serverNode = null;
-           	if ( widget == null || !widget.isEnabled()) {
-                	new HeaderMessage().setError( Messages.get("widget.disabled.by.administrator") ).apply( response().getHeaders() );
-	                return badRequest(  );
+            if ( widget == null || !widget.isEnabled()) {
+            	new HeaderMessage().setError( Messages.get("widget.disabled.by.administrator") ).apply( response().getHeaders() );
+            	return badRequest(  );
             }
 
 
@@ -120,12 +123,10 @@ public class Application extends Controller
 //             ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ) );
 
             // credentials validation is made when we attempt to create a PEM file. if credentials are wrong, it will fail.
-            if ( !StringUtils.isEmpty( project ) && !StringUtils.isEmpty( key ) && !StringUtils.isEmpty( secretKey ) ){
+            RequestBody requestBody = request().body();
+            if ( requestBody != null && requestBody.asJson() != null && !StringUtils.isEmptyOrSpaces( requestBody.asJson().toString() ) ){
                 serverNode = new ServerNode();
-
-                serverNode.setProject( project);
-                serverNode.setKey( key );
-                serverNode.setSecretKey( secretKey );
+                serverNode.setAdvancedParams( requestBody.asJson().toString() );
                 serverNode.setRemote(true);
                 serverNode.save();
             }else{
@@ -316,7 +317,6 @@ public class Application extends Controller
                         routes.javascript.WidgetAdmin.regenerateWidgetApiKey(),
                         routes.javascript.WidgetAdmin.enableWidget(),
                         routes.javascript.WidgetAdmin.disableWidget(),
-//                        routes.javascript.WidgetAdmin.addIcon(),
 
                         routes.javascript.Application.downloadPemFile(),
                         routes.javascript.Application.encrypt(),
