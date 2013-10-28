@@ -29,6 +29,17 @@ stop() {
         killproc -p $pidfile
         echo
 }
+upgrade(){
+#    initlog -c "echo -n Upgrading Widget server: "
+    cd $WIDGET_HOME
+    ./upgrade_server.sh
+    success $"Widget server upgraded"
+    echo
+}
+tail(){
+    cd $WIDGET_HOME
+    tail -f nohup.log
+}
 ### main logic ###
 case "$1" in
   start)
@@ -40,12 +51,18 @@ case "$1" in
   status)
         status -p ${pidfile}
         ;;
+  upgrade)
+        upgrade
+        ;;
+  tail)
+        tail
+        ;;
   restart|reload|condrestart)
         stop
         start
         ;;
   *)
-        echo $"Usage: $0 {start|stop|restart|reload|status}"
+        echo $"Usage: $0 {start|stop|restart|status|upgrade|tail}"
         exit 1
 esac
 exit 0

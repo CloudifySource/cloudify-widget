@@ -48,7 +48,7 @@ public class BootstrapValidationResult {
     }
 
     public boolean isValid( String version ){
-        return getResult( version );
+        return testCompleted() && getResult( version );
     }
 
     private boolean checkTrue( Boolean ... args ){

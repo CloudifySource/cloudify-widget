@@ -29,4 +29,6 @@ public interface MailSender {
     public void sendPoolIsEmptyMail( String stats );
 
     public void sendRegistrationMail( Lead lead  );
+
+    public void sendChangelog();
 }

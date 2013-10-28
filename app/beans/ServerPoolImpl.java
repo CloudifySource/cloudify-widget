@@ -101,12 +101,8 @@ public class ServerPoolImpl implements ServerPool
         for ( ServerNode serverNode : pool ) {
             BootstrapValidationResult bootstrapValidationResult = serverBootstrapper.validateBootstrap( serverNode );
             if ( !bootstrapValidationResult.isValid( ) ){
-                if ( bootstrapValidationResult.testCompleted() ){
                     logger.info( "found a bad bootstrap on server [{}]. The test result showed the following [{}]. I should destroy this server..", serverNode, bootstrapValidationResult );
                     destroy( serverNode );
-                }else{
-                    logger.error("unable to complete bootstrap test on [{}], result is [{}], nothing to do",serverNode, bootstrapValidationResult );
-                }
             }else{
                 logger.info( "Found a working management server [{}], adding to clean pool", serverNode );
                 cleanPool.add( serverNode );
@@ -188,16 +184,15 @@ public class ServerPoolImpl implements ServerPool
 	
 	/** @return a ServerNode from the pool, otherwise <code>null</code> if no free server available */
     @Override
-	synchronized public ServerNode get( long lifeExpectancy )
+	synchronized public ServerNode get(  )
 	{
-        logger.info( "getting a server node with lifeExpectancy [{}]", lifeExpectancy );
+        logger.info( "getting a server node" );
 
-        List<ServerNode> freeServers = null;
-        freeServers = ServerNode.findByCriteria(new ServerNode.QueryConf().setMaxRows(10).criteria().setBusy(false).setRemote(false).done());
+        List<ServerNode> freeServers = ServerNode.findByCriteria(new ServerNode.QueryConf().setMaxRows(10).criteria().setBusy(false).setRemote(false).done());
         ServerNode selectedServer = null;
         if ( !CollectionUtils.isEmpty( freeServers )){
             for ( ServerNode freeServer : freeServers ) {
-                if ( tryToGetFreeServer( freeServer, lifeExpectancy )){
+                if ( tryToGetFreeServer( freeServer )){
                     logger.info( "successfully got a free server [{}]", freeServer );
                     selectedServer = freeServer;
                     break;
@@ -208,11 +203,6 @@ public class ServerPoolImpl implements ServerPool
         }
 
 		addNewServerToPool( NoOpCallback.instance );
-
-        if ( selectedServer != null ){
-            selectedServer.setCreationTime( System.currentTimeMillis() );
-            selectedServer.save();
-        }
 
 		return selectedServer;
 	}
@@ -227,12 +217,12 @@ public class ServerPoolImpl implements ServerPool
      * @param serverNode - the server node we are trying to get
      * @return - true iff successfully got the serverNode
      */
-    private boolean tryToGetFreeServer( ServerNode serverNode, long lifeExpectancy )
+    private boolean tryToGetFreeServer( ServerNode serverNode )
     {
         try{
             BootstrapValidationResult result = serverBootstrapper.validateBootstrap( serverNode );
             if ( result.isValid() ) {
-                serverNode.setBusy( true );
+                serverNode.setBusySince( System.currentTimeMillis() );
                 serverNode.save(); // optimistic locking
                 return true;
             } else {

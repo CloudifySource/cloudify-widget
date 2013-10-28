@@ -24,4 +24,5 @@ logFile.log
 nohup.out
 .ssh/
 cloudify-folder
+automatic_changelog
 sass

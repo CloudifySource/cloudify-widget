@@ -6,6 +6,8 @@ if [ "$?" -ne "0" ]; then       # we need to consider using hard reset here inst
     exit 1
 fi
 
+git log --oneline --abbrev=30 ORIG_HEAD.. >> automatic_changelog
+
 # note: this script does not need an update. it is edited on production and never committed to CVS.
 . /etc/sysconfig/play
 

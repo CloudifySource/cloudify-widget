@@ -19,6 +19,8 @@ import beans.GsMailer;
 import utils.Utils;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * User: guym
@@ -29,9 +31,10 @@ public class Conf {
 
     public ApplicationConfiguration application = new ApplicationConfiguration();
 
-    public SmtpConf smtp = new SmtpConf();   
-    
+    public SmtpConf smtp = new SmtpConf();
+
     public Mails mails = new Mails();
+
 
     // who is sending the mail?
     public GsMailer.Mailer mailer = new GsMailer.Mailer();
@@ -125,6 +128,9 @@ public class Conf {
         
         public long bootstrapCloudWatchDogProcessTimeoutMillis = Utils.parseTimeToMillis( "10mn" );
 
+        // time from "play" until we decide something is wrong and we send error
+        public long deployTimeoutError = Utils.parseTimeToMillis("3mn");
+
         public File deployScript=Utils.getFileByRelativePath( "/bin/deployer.sh" );
 
         public File uninstallServiceScript = Utils.getFileByRelativePath( "/bin/uninstall_service.sh" );
@@ -142,7 +148,15 @@ public class Conf {
     public static class Mails{
         public GsMailer.Mailer poolEmpty = new GsMailer.Mailer().setEmail("widget@cloudifysource.org").setName("Cloudify Widget Team");
         public GsMailer.Mailer registrationCc = new GsMailer.Mailer();
+        public GsMailer.Mailer registrationFrom = new GsMailer.Mailer().setEmail("appcatalog@cloudifysource.org").setName("Application Catalog");
         public GsMailer.Mailer logErrors = new GsMailer.Mailer();
+
+        public UpgradeLogMail changeLog = new UpgradeLogMail();
+    }
+
+    public static class UpgradeLogMail{
+        public File file = Utils.getFileByRelativePath("/automatic_changelog");
+        public List<GsMailer.Mailer> addresses = new LinkedList<GsMailer.Mailer>();
     }
 
 

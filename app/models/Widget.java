@@ -120,6 +120,8 @@ public class Widget
 
     private static Logger logger = LoggerFactory.getLogger( Widget.class );
 
+
+
     @XStreamAlias("status")
     @JsonRootName("status")
     final static public class Status {
@@ -345,6 +347,9 @@ public class Widget
         return consoleURL;
     }
 
+    public static List<Widget> findByUser(User user) {
+        return find.where().eq("user", user ).findList();
+    }
 
     public static Widget findByUserAndId( User user, Long widgetId )
     {

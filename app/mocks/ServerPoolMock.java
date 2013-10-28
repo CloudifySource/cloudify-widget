@@ -46,7 +46,7 @@ public class ServerPoolMock implements ServerPool
         return new ServerNodesPoolStats();
     }
 
-    public ServerNode get( long lifeExpectancy )
+    public ServerNode get(  )
     {
         logger.info( "getting server node" );
         return null;

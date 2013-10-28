@@ -14,8 +14,9 @@
  */
 package server;
 
-import java.io.IOException;
-import java.io.OutputStream;
+
+
+import org.apache.commons.exec.LogOutputStream;
 
 /**
  * A process OutputStream that writes output the stream to the play cache.
@@ -23,16 +24,16 @@ import java.io.OutputStream;
  * @author adaml
  *
  */
-public class ProcOutputStream extends OutputStream {
+public class ProcOutputStream extends LogOutputStream {
 
 	WriteEventListener procExecListener;
-	@Override
-	public void write(int b) throws IOException {
-		procExecListener.writeEvent(b);
+    @Override
+    protected void processLine(String s, int i) {
+       procExecListener.writeEvent( s, i );
 
-	}
-	
-	public void setProcEventListener(WriteEventListener listener) {
+    }
+
+    public void setProcEventListener(WriteEventListener listener) {
 		this.procExecListener = listener;
 	}
 

@@ -197,7 +197,7 @@ $(function () {
     // read more at https://github.com/carhartl/jquery-cookie
     var WidgetState = function(){
         var widgetIsPlaying = false;
-        var cookieName = "widgetCookie" + origin_page_url;
+        var cookieName = "widgetCookie" + origin_page_url + apiKey;
         function _get(){
             try{
                 var cookieValue = JSON.parse( $.cookie(cookieName) );
@@ -384,7 +384,7 @@ $(function () {
     function handleUpdateStatusSuccess( data )
     {
         $.postMessage( JSON.stringify({name:"widget_status", comment:"status_was_updated", status:data.status}), origin_page_url , parent );
-        if ( data.status.timeleft ) {
+        if ( !isNaN(data.status.timeleft) ) {
             $("#time_left").show();
             $("#time_left_counter").text( (parseInt(data.status.timeleft) + 1) + " minutes");
         }
@@ -425,6 +425,7 @@ $(function () {
             widgetState.showPlayButton();
             stop_instance( data.status.message );
         } else {// status == running
+            widgetState.isPlaying(true);
             setTimeoutForUpdateStatus();
         }
     }

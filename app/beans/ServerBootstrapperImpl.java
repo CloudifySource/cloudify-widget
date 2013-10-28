@@ -126,8 +126,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 				server = createServer();
 			} 
 			catch (RunNodesException e) {
-				logger.error("Falied to created server", e);
-				e.printStackTrace();
+				logger.error( "Falied to created server, " + e.toString(), e );
 			}
             if ( server != null ){
                 poolEventManager.handleEvent(new PoolEvent.ServerNodeEvent().setServerNode(server).setType(PoolEvent.Type.CREATE));
