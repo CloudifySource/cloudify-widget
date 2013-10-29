@@ -129,7 +129,7 @@ public class LeadsController extends Controller {
         }else{
             lead.validated = true;
             lead.save();
-            return ok();
+            return ok( Json.toJson(lead));
         }
     }
 
