@@ -109,13 +109,13 @@ public class LeadsController extends Controller {
             serverNode.setLead( lead );
             serverNode.save();
 
-            return ok();
+            return ok("assigned");
         }else if ( serverNode.getLead() != null && serverNode.getLead().getId().equals( lead.getId() )){
-            return ok();
+            return ok("already assigned");
         }
 
 
-        return ok();
+        return ok("nothing to do");
 
     }
 
