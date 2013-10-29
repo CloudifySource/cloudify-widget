@@ -85,6 +85,7 @@ public class LeadsController extends Controller {
 
         logger.info(user.getPermissions().toString());
         if ( !user.getPermissions().isCanAssignLeads() ){
+           logger.error("user {} tried to assign lead {} to instanceId {} but failed due to permissions", new Object[]{user.toDebugString(), leadId, instanceId});
            return forbidden("You need permission to assign leads");
         }
         ServerNode serverNode = ServerNode.find.byId( instanceId );
