@@ -31,8 +31,6 @@ $(function () {
         }
 
         function _save( data ){
-            var date = new Date();
-            date.setMonth( ( date.getMonth() + 1 ) % 12 );
             $.cookie(cookieName, data, {"path" :"/", expires:10000 });
         }
 
@@ -139,32 +137,6 @@ $(function () {
             advanced(v, advancedCookie.key(), advancedCookie.secretKey());
         }
     });
-
-    function show_walkthrough(){
-
-        var polling_ptr = null;
-
-        function show_walkthrough(){
-            $("#walkthrough" ).show();
-        }
-
-        function dismiss(){
-            $.cookie("walkthrough", "walkthrough", {"path":"/"});
-
-            $("#walkthrough" ).hide();
-        }
-
-        function poll_is_dismissed(){
-           clearInterval(polling_ptr);
-        }
-
-        function is_dismissed(){
-            return $.cookie("walkthrough", {path:"/"}) != null;
-        }
-
-        setInterval(poll_is_dismissed,1000);
-
-    }
 
 
     function is_requires_login(){
@@ -384,7 +356,8 @@ $(function () {
     function handleUpdateStatusSuccess( data )
     {
         $.postMessage( JSON.stringify({name:"widget_status", comment:"status_was_updated", status:data.status}), origin_page_url , parent );
-        if ( !isNaN(data.status.timeleft) ) {
+        if ( !!data.status.timeleft && !isNaN(data.status.timeleft) ) {
+            console.log(["isNan", data.status.timeleft, isNaN(data.status.timeleft), parseInt(data.status.timeleft)]);
             $("#time_left").show();
             $("#time_left_counter").text( (parseInt(data.status.timeleft) + 1) + " minutes");
         }
@@ -700,38 +673,5 @@ $(function () {
         widgetState.onPlay();
         return false;
     });
-
-    // code for walkthrough on the widget end.
-//    var checkWTInterval = null;
-//    // handle walkthrough
-//    function shouldShowWalkthrough(){
-//           return $.cookie("dismissWT") != "true";
-//       }
-//
-//    function hideWT(){
-//        $.cookie("dismissWT",true, {path:"/"});
-//        console.log("hiding walkthrough");
-//        $("#walkthrough" ).remove();
-//        if ( checkWTInterval != null ){
-//            clearInterval(checkWTInterval);
-//        }
-//    }
-//       function checkWalkthrough(){
-//           if ( !shouldShowWalkthrough() ){
-//               hideWT();
-//           }
-//       }
-//
-//       if ( shouldShowWalkthrough() ){
-//           $("#walkthrough" ).show();
-//           $("#walkthrough" ).click(function(){
-//               hideWT();
-//
-//               });
-//           checkWTInterval = setInterval( checkWalkthrough , 1000 );
-//       } else{
-//           hideWT();
-//       }
-
 
 });

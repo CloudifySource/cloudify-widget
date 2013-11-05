@@ -146,6 +146,7 @@ public class Widget
         private String message; // for errors
         private Boolean instanceIsAvailable; // if install finished
         private Boolean cloudifyUiIsAvailable;
+        private Boolean completed; // whether installation completed successfully
 
 
 
@@ -157,6 +158,14 @@ public class Widget
 
         public void setCloudifyUiIsAvailable(Boolean cloudifyUiIsAvailable) {
             this.cloudifyUiIsAvailable = cloudifyUiIsAvailable;
+        }
+
+        public Boolean getCompleted() {
+            return completed;
+        }
+
+        public void setCompleted(Boolean completed) {
+            this.completed = completed;
         }
 
         public Boolean getInstanceIsAvailable() {

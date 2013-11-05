@@ -8,9 +8,14 @@
     <link rel="stylesheet" type="text/css" href="/public/style/relevant-dropdown.css">
     <script src="@routes.Application.javascriptRoutes()" type="text/javascript"></script>
     <script src="/public/js/modernizr/modernizr.custom.13010.js"></script>
+
     <script src="/public/js/jquery.min.js"></script>
     <script src="/public/js/jquery.cookie.js"></script>
-    <script src="/public/js/widget.js"></script>
+      <script src="/public/js/angularjs/angular.min.js"></script>
+      <script src="/public/js/angularjs/angular-cookies.min.js"></script>
+
+
+      <script src="/public/js/widget_angular.js"></script>
     <script type="text/javascript" src="/public/js/jquery.ba-postmessage.min.js"></script>
     @if(mixpanelKey != null){
       <!-- start Mixpanel --><script type="text/javascript">(function(e,b){if(!b.__SV){var a,f,i,g;window.mixpanel=b;a=e.createElement("script");a.type="text/javascript";a.async=!0;a.src=("https:"===e.location.protocol?"https:":"http:")+'//cdn.mxpnl.com/libs/mixpanel-2.2.min.js';f=e.getElementsByTagName("script")[0];f.parentNode.insertBefore(a,f);b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==
@@ -21,18 +26,24 @@
         <script>mixpanel = { track:function(){} }</script>
     }
   </head>
-  <body @if(widget.isRequiresLogin()){data-requires-login="requires-login"} >
+  <body @if(widget.isRequiresLogin()){data-requires-login="requires-login"} ng-app="widget" ng-controller="widgetCtrl">
     <img src="/img/beta.png" class="beta-ribbon"/>
-    <span id="title"></span>
+    <span id="title">{{params.title}}</span>
 
-        <a herf="javascript:void(0)" id="start_btn" class="button" ></a>
-        <a herf="javascript:void(0)" id="stop_btn" class="button" style="display:none"></a>
-    <ul id="log"></ul>
-    <ul id="links">
-      <li class="mock"><span class="mock_text">Manage Your App</span><a id="cloudify_dashboard_link" href="#" target="_blank">Manage Your App</a></li>
-      <li class="mock" id="custom_link"><span class="mock_text">@widget.getConsoleName</span></li>
+        <a herf="javascript:void(0)" id="start_btn" class="button" ng-show="showPlay()" ng-click="play()"></a>
+        <a herf="javascript:void(0)" id="stop_btn" class="button" ng-show="showStop()" ng-click="stop()"></a>
+    <ul id="log">
+        <li ng-show="pendingOutput()">Acquiring machine. This might take a few seconds, please wait...</li>
+        <li ng-show="!widgetStatus.message && !isCompleted()" ng-repeat="o in widgetStatus.output" ng-bind-html-unsafe="o"></li>
+        <li ng-show="!widgetStatus.message && !widgetStatus.completed && !isCompleted() && !widgetStatus.reset">{{ellipsis}}</li>
+        <li class="error" ng-show="!!widgetStatus.message">{{widgetStatus.message}}</li>
+        <li class="important" ng-show="isCompleted()">Test drive successfully completed! <br/><a class='download_link successfully_completed_msg' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a></li>
     </ul>
-    <span id="time_left" style="display:none;">Time left: <span id="time_left_counter"></span></span>
+    <ul id="links">
+      <li><span ng-show="!widgetStatus.cloudifyUiIsAvailable">Manage Your App</span><a href="http://{{widgetStatus.publicIp}}:8099" target="_blank" ng-show="!!widgetStatus.cloudifyUiIsAvailable">Manage Your App</a></li>
+      <li ng-show="!!widgetStatus.instanceIsAvailable"><a href="{{widgetStatus.consoleLink.url}}">{{widgetStatus.consoleLink.title}}</a></li>
+    </ul>
+    <span id="time_left" ng-show="!!widgetStatus.timeleftMillis">Time left: <span id="time_left_counter">{{getTimeLeft()}}</span></span>
     <div id="video_container">
 
         @if(widget.getYoutubeVideoKey() != null ){
@@ -40,21 +51,30 @@
         }
     </div>
 
-<div class="advanced_section">
+<div class="advanced_section" ng-class="{'collapsed':!!showAdvanced}">
     <div class="remember_creds">
         <div class="remember_me_title">Remember me?</div>
-        <div class="remember_option"><button class="yes" onclick="$(this).trigger('yes');">Yes</button></div>
-        <div class="remember_option"><button class="no" onclick="$(this).trigger('no');">No</button></div>
+        <div class="remember_option"><button class="yes" ng-click="rememberAdvanced(); showRemember=false">Yes</button></div>
+        <div class="remember_option"><button class="no" ng-click="showRemember=false">No</button></div>
     </div>
     <div class="advanced_header">
-            <a href="javascript:void(0)" class="advanced_title" onclick="$(this).closest('.advanced_section').toggleClass('collapsed');">Advanced</a>
+            <a href="javascript:void(0)" class="advanced_title" ng-click="showAdvanced=!showAdvanced">Advanced</a>
             <a id="pemFileLink" class="download-link download-pem-link" href="javascript:void(0)"> PEM </a>
     </div>
     <!-- need to set autocomplete=off explicitly in order to turn off the browser's built-in autocomplete -->
-    <form class="advanced_form" autocomplete="off">
-        <input name="project_name" autocomplete="off" placeholder="project"/>
-        <input name="hpcs_key" autocomplete="off" placeholder="HPCS Key"/>
-        <input name="hpcs_secret_key" placeholder="HPCS Secret Key" type="password"/>
+    <form class="advanced_form" autocomplete="off" ng-submit="submitAdvancedData()">
+        <span ng-switch="cloudType">
+            <span ng-switch-when="hp">
+                <input ng-model="advancedParams.hp.params.project" placeholder="Project"/>
+                <input ng-model="advancedParams.hp.params.key" placeholder="HPCS Key"/>
+                <input ng-model="advancedParams.hp.params.secretKey" placeholder="HPCS Secret Key" type="password"/>
+            </span>
+            <span ng-switch-when="softlayer">
+                <input ng-model="advancedParams.softlayer.params.userId" placeholder="User ID"/>
+                <input ng-model="advancedParams.softlayer.params.project" placeholder="Project"/>
+                <input ng-model="advancedParams.softlayer.params.secretKey" placeholder="Secret Key" type="password"/>
+            </span>
+        </span>
         <div class="form-footer-links">
             <a class="form-footer-links" href="http://youtu.be/lHtOBXpouyo" target="_blank">Help</a>
             <a style="display:none" id="hp_console_link" class="form-footer-links" href="http://console.hpcloud.com" target="_blank">HP Console</a>
@@ -63,18 +83,6 @@
     </form>
 </div>
 
-<div style="display:none" class="previous_advanced_section">
-//    <a id="show_advanced" href="javascript:void(0)"><img src="/img/widget_advanced_collapsed.png"></a>
-@**@
-//    <a id="pemFileLink" class="download-link" href="javascript:void(0)">PEM</a>
-//    <div id="advanced" style="display:none;">
-//      <a id="hide_advanced" href="javascript:void(0)"><img src="/img/widget_advanced_head.png"></a>
-//      <form>
-        <input name="hpcs_key" placeholder="myuser@@mydomain.com:66579898000" title="<project-name>:<access-key>">
-        <input name="hpcs_secret_key" placeholder="HPCS Secret Key" title="<secret-key>">
-      </form>
-    </div>
-</div>
 
     <div id="footer">
       Powered by: <a href="http://hpcloud.com" target="_blank"><img class="brand_btns" src="/img/hp_cloud_icon.png"></a>
@@ -82,14 +90,14 @@
       <a herf="javascript:void(0)" id="patent_pending">&nbsp;&nbsp;(Patent Pending)</a>
           <div class="put_left">
               <!-- TODO update image for embed button -->
-              <span id="embed_btn"><img src="/img/share_widget.png"></span>
+              <span id="embed_btn" ng-click="showEmbed=true"><img src="/img/share_widget.png"></span>
               <a class="share_link" id="facebook_share_link" href="#"><img src="/img/share_facebook.png"></a>
               <a class="share_link" id="google_plus_share_link" href="#"><img src="/img/share_google.png"></a>
               <a class="share_link" id="twitter_share_link" href="#"><img src="/img/share_twitter.png"></a>
           </div>
     </div>
-    <div id="embed-code-box">
-        <i class="close"></i>
+    <div id="embed-code-box" ng-show="!!showEmbed">
+        <i class="close" ng-click="showEmbed=false"></i>
         <h3>Embed Code</h3>
         <p>Copy the code below to embed the widget on your website.</p>
         <textarea class="autoselect" readonly="readonly">@embedCode.render( widget.getApiKey(), widget.getTitle(), widget.getYoutubeVideoUrl(), request.host()).body</textarea>

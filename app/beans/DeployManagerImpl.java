@@ -149,14 +149,23 @@ public class DeployManagerImpl implements DeployManager
     // todo - Widget should only be a template. We are installing a single instance.
 	public WidgetInstance fork(ServerNode server, Widget widget)
 	{
-        File unzippedDir = Utils.downloadAndUnzip( widget.getRecipeURL(), widget.getApiKey() );
-        File recipeDir = unzippedDir;
-        if ( widget.getRecipeRootPath() != null ) {
-            recipeDir = new File( unzippedDir, widget.getRecipeRootPath() );
-        }
-        logger.info( "Deploying an instance for recipe at : [{}] ", recipeDir );
+        File unzippedDir = null;
+        File recipeDir = null;
+        Recipe.Type recipeType = null;
 
-        Recipe.Type recipeType = new Recipe( recipeDir ).getRecipeType();
+        try {
+            unzippedDir = Utils.downloadAndUnzip(widget.getRecipeURL(), widget.getApiKey());
+            recipeDir = unzippedDir;
+            if (widget.getRecipeRootPath() != null) {
+                recipeDir = new File(unzippedDir, widget.getRecipeRootPath());
+            }
+            logger.info("Deploying an instance for recipe at : [{}] ", recipeDir);
+
+            recipeType = new Recipe(recipeDir).getRecipeType();
+        } catch (RuntimeException e) {
+            server.createEvent(e.getMessage(), ServerNodeEvent.Type.ERROR).save();
+            throw e;
+        }
 
         if ( alreadyInstalled( server, widget, recipeType ) ){
             logger.info( "[{}] [{}] is already installed", recipeType, widget.toInstallName()  );

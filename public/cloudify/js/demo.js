@@ -10,7 +10,9 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
 
         // return the cached widget or couchbase.
         var selectedWidget = angular.isDefined(cachedWidget) ? cachedWidget : $.grep(data.data, function(item,index){ return item.productName == "Couchbase"});
-        selectedWidget =  selectedWidget.length > 0  ? selectedWidget[0] : null; // remove array from JQuery
+
+        selectedWidget =  selectedWidget.length > 0  ? selectedWidget[0] : selectedWidget; // remove array from JQuery
+
 
         $scope.completedWT = false;
         var completedOverlayShown = false;
@@ -41,6 +43,7 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
         return data.data;
     } );
     $scope.menuClick = function( widget ){
+
         $scope.selectedWidget = widget;
         $cookieStore.put("widgetId",widget.id);
     };

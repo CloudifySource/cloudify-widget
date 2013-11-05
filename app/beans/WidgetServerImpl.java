@@ -124,8 +124,26 @@ public class WidgetServerImpl implements WidgetServer
         List<String> output = new LinkedList<String>();
         result.setOutput(output);
 
-        if (server == null) {
+
+        // avoid autoboxing - causes NPEs.
+        Long timeLeft = null;
+        if ( server != null ){
+            Long timeLeftFromServer = server.getTimeLeft();
+            if ( timeLeftFromServer != null ){
+                timeLeft = timeLeftFromServer;
+            }
+
+        }
+        // server is remote we don't count time
+        if (server != null && !server.isRemote() && timeLeft != null) {
+            result.setTimeleft((int) TimeUnit.MILLISECONDS.toMinutes(timeLeft));
+            result.setTimeleftMillis(timeLeft);
+
+        }
+
+        if (server == null || ( timeLeft != null && timeLeft.longValue() == 0 ) ) {
             result.setState(Status.State.STOPPED);
+
             output.add(Messages.get("test.drive.successfully.complete"));
             return result;
         }else{
@@ -190,6 +208,7 @@ public class WidgetServerImpl implements WidgetServer
 
                 logger.debug("detected finished installation");
                 output.add( "Installation completed successfully" );
+                result.setCompleted(true);
                 result.setInstanceIsAvailable(Boolean.TRUE);
                 result.setConsoleLink(widgetInstance.getLink());
             }
@@ -201,13 +220,7 @@ public class WidgetServerImpl implements WidgetServer
             result.setCloudifyUiIsAvailable(Boolean.TRUE);
         }
 
-        // server is remote we don't count time
-        Long timeLeft = server.getTimeLeft();
-        if (!server.isRemote() && timeLeft != null) {
-            result.setTimeleft((int) TimeUnit.MILLISECONDS.toMinutes(timeLeft));
-            result.setTimeleftMillis(timeLeft);
 
-        }
 
         logWidgetInstanceError( server, result, "widgetInstance is taking too long. More than ", Long.toString(conf.cloudify.deployTimeoutError) , " millis \n");
 
