@@ -17,6 +17,8 @@ package beans;
 import beans.api.ProcessStreamHandler;
 import models.ServerNode;
 
+import org.apache.commons.exec.DefaultExecuteResultHandler;
+import org.apache.commons.exec.ExecuteResultHandler;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +69,11 @@ public class ExecutorFactoryImpl implements ExecutorFactory {
 
         return executor ;
 	}
+
+    @Override
+    public DefaultExecuteResultHandler getResultHandler( String name){
+        return new ExecuteResultHandlerImpl().setName(name);
+    }
 
 	@Override
 	public ProcExecutor getDeployExecutor( ServerNode server ) {

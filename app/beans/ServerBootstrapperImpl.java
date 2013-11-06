@@ -27,6 +27,7 @@ import com.google.inject.Injector;
 import models.ServerNode;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
+import org.apache.commons.exec.ExecuteResultHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -582,14 +583,14 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             CommandLine cmdLine = new CommandLine( conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile() );
             cmdLine.addArgument( cloudFolder.getName() );
 
-            DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+            DefaultExecuteResultHandler resultHandler = executorFactory.getResultHandler(cmdLine.toString());
             ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor( serverNode );
 
-            logger.info( "Executing command line: " + cmdLine );
-            bootstrapExecutor.execute( cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler );
-            logger.info( "waiting for output" );
+            logger.info("Executing command line: " + cmdLine);
+            bootstrapExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler);
+            logger.info("waiting for output");
             resultHandler.waitFor();
-            logger.info( "finished waiting , exit value is [{}]", resultHandler.getExitValue() );
+            logger.info("finished waiting , exit value is [{}]", resultHandler.getExitValue());
 
 
             String output = Utils.getOrDefault( Utils.getCachedOutput( serverNode ), "" );
