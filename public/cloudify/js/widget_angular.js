@@ -7,7 +7,7 @@ var widgetModule = angular.module('widget', ['ngCookies']);
 widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService, mixpanelService, paramsService, dbService) {
 
 
-    var hpcloud = 'hp';
+    var hpcloud = 'hpcloud-compute';
     var softlayer = 'softlayer';
     var play = 'RUNNING';
     var stop = 'STOPPED';
@@ -177,7 +177,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
     console.log(["saved status", savedStatus]);
     // place params on scope
     $scope.params = paramsService.params;
-    $scope.cloudType = hpcloud;
+    $scope.cloudType = myConf.cloudProvider;
 
     var apiKey = $scope.params.apiKey;
     var shareUrl= encodeURI("http://launch.cloudifysource.org/d");
