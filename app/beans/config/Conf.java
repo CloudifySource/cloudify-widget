@@ -60,7 +60,8 @@ public class Conf {
 
     @Config(playKey = "application.secret")
     public String applicationSecret;
-
+    
+    public UiConf uiConf = new UiConf();
 
     public static class SettingsConfig{
         @Config( ignoreNullValues = true )
@@ -159,5 +160,7 @@ public class Conf {
         public List<GsMailer.Mailer> addresses = new LinkedList<GsMailer.Mailer>();
     }
 
-
+    public static class CloudType{
+    	public String type = CloudProvider.SOFTLAYER.label;
+    }
 }

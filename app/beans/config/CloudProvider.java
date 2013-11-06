@@ -1,5 +1,6 @@
 package beans.config;
 
+
 /**
  * Created with IntelliJ IDEA.
  * User: guym

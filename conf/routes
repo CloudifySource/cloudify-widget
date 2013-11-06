@@ -19,6 +19,7 @@ GET     /api/demo/widget/list           controllers.DemosController.listWidgetFo
 
 
 # Widget
+GET 	 /widget/getConf           			controllers.Application.getConf( name : String ) 
 POST     /widget/start		     	    controllers.Application.start( apiKey: String, userId:String?="" )
 POST     /widget/:instanceId/stop	    controllers.Application.stop( apiKey: String, instanceId: String)
 GET      /widget/:instanceId/status     controllers.Application.getWidgetStatus( apiKey: String, instanceId: String )
