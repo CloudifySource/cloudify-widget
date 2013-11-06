@@ -24,6 +24,7 @@ import models.ServerNode;
 import models.Widget;
 
 import org.apache.commons.lang.NumberUtils;
+import org.codehaus.jackson.JsonNode;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +77,14 @@ public class Application extends Controller
     }
 */
 
+    
+    public static Result getConf( String name ){
+    	
+		JsonNode json = Json.toJson( ApplicationContext.get().conf().uiConf );
+    	String jsVarResult ="var myConf=" + json.toString() + ";";
+		return ok( jsVarResult );
+    }
+    
     // guy - todo - apiKey should be an encoded string that contains the userId and widgetId.
     //              we should be able to decode it, verify user's ownership on the widget and go from there.
     /**
