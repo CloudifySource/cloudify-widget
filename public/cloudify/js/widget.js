@@ -430,11 +430,14 @@ $(function () {
         }
     }
 
+    // urrrrghhh!!! damn explorer!!!!!! it seems that explorer automatically caches the response! can you believe this?
+    // so we add a timestamp to the polling request.
+    // yes - we might want to add a "no-cache" header in the backend later on.
   function update_status() {
       if ( widgetState.instanceId() ){  // guy - double check. saw that sometimes it misses.
             $.ajax({
                 type:'get',
-                url: "/widget/"+ widgetState.instanceId() + "/status?apiKey=" + apiKey,
+                url: "/widget/"+ widgetState.instanceId() + "/status?apiKey=" + apiKey + "&timestamp=" + new Date().getTime(),
                 success:function( data ){ handleUpdateStatusSuccess(data); },
                 error:function(){ setTimeoutForUpdateStatus() }
             });
