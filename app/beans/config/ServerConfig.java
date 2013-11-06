@@ -57,7 +57,7 @@ public class ServerConfig {
 
     public DefaultAdmin admin = new DefaultAdmin();
     
-    public CloudProvider cloudProvider = CloudProvider.NA;
+    public String cloudProvider = cloudBootstrap.cloudProvider;
 
     @Config( ignoreNullValues = true )
     public long sessionTimeoutMillis = Utils.parseTimeToMillis( "15mn" );
