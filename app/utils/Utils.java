@@ -30,6 +30,7 @@ import java.util.zip.ZipException;
 
 import models.ServerNode;
 import org.apache.commons.io.FileUtils;
+import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.openstack.nova.v2_0.domain.Address;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.slf4j.Logger;
@@ -332,6 +333,13 @@ public class Utils
         return result == null ? defaultResult : result;
     }
 
+
+    public static ServerIp getServerIp (NodeMetadata metadata ){
+        ServerIp serverIp = new ServerIp();
+        serverIp.privateIp = CollectionUtils.first( metadata.getPrivateAddresses() );
+        serverIp.publicIp = CollectionUtils.first( metadata.getPublicAddresses() );
+        return serverIp;
+    }
     public static ServerIp getServerIp( Server server )
     {
         ServerIp res = new ServerIp();
