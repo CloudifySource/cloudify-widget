@@ -48,6 +48,8 @@ public class CloudifyUtils {
 	
 	
 	private static Logger logger = LoggerFactory.getLogger( CloudifyUtils.class );
+
+       /** guy mograbi **/ 
 	
 	/**
 	 * returns the private key used for starting the remote machines.
