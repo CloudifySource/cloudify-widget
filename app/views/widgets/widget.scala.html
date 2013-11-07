@@ -64,7 +64,7 @@
     <!-- need to set autocomplete=off explicitly in order to turn off the browser's built-in autocomplete -->
     <form class="advanced_form" autocomplete="off" ng-submit="submitAdvancedData()">
         <span ng-switch="cloudType">
-            <span ng-switch-when="hp">
+            <span ng-switch-when="hpcloud-compute">
                 <input ng-model="advancedParams.hp.params.project" placeholder="Project"/>
                 <input ng-model="advancedParams.hp.params.key" placeholder="HPCS Key"/>
                 <input ng-model="advancedParams.hp.params.secretKey" placeholder="HPCS Secret Key" type="password"/>
