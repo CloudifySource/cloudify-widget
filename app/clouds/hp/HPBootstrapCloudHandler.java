@@ -153,7 +153,7 @@ public class HPBootstrapCloudHandler implements BootstrapCloudHandler {
         	
             existingManagementMachines = 
             		CloudifyUtils.getAllMachinesWithPredicate( new ServerNamePrefixPredicate(conf), 
-            		new NovaContext( conf.server.cloudBootstrap.cloudProvider,
+            		new NovaContext( conf.server.cloudProvider,
             				project, key, secretKey,
             				conf.server.cloudBootstrap.zoneName, true ) );
         }

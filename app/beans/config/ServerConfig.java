@@ -57,7 +57,7 @@ public class ServerConfig {
 
     public DefaultAdmin admin = new DefaultAdmin();
     
-    public String cloudProvider = cloudBootstrap.cloudProvider;
+    public String cloudProvider = CloudProvider.HP.label;
 
     @Config( ignoreNullValues = true )
     public long sessionTimeoutMillis = Utils.parseTimeToMillis( "15mn" );
@@ -151,7 +151,6 @@ public class ServerConfig {
         public SshConfiguration ssh = new SshConfiguration();
         public String apiKey="<HP cloud Password>";
         public String username="<tenant>:<user>";
-        public String cloudProvider=CloudProvider.HP.label;
         public File script;
         public String tags = null;
         @Config(ignoreNullValues = true)
@@ -179,7 +178,6 @@ public class ServerConfig {
         public String hardwareId = "102";
         public String linuxImageId = "221";
         public String securityGroup = "cloudifySecurityGroup";
-        public String cloudProvider = "hpcloud-compute";
         public String cloudifyEscDirRelativePath = "clouds";
         public String existingManagementMachinePrefix = "cloudify-manager";
         @Config( ignoreNullValues =  true )

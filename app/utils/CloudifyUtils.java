@@ -35,6 +35,7 @@ import com.google.common.collect.FluentIterable;
 
 import server.ApplicationContext;
 import beans.ServerBootstrapperImpl.NovaContext;
+import beans.config.ServerConfig;
 import beans.config.ServerConfig.CloudBootstrapConfiguration;
 
 
@@ -76,11 +77,11 @@ public class CloudifyUtils {
      *
 	 */
 	public static ComputeServiceContext createJcloudsContext(String project, String key, String secretKey ) {
-		CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
+		ServerConfig serverConfig = ApplicationContext.get().conf().server;
 		ComputeServiceContext context;
 		Properties overrides = new Properties();
 		overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
-		context = ContextBuilder.newBuilder( cloudConf.cloudProvider )
+		context = ContextBuilder.newBuilder( serverConfig.cloudProvider )
 				.credentials( project + ":" + key, secretKey )
 				.overrides(overrides)
 				.buildView(ComputeServiceContext.class);

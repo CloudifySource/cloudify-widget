@@ -325,7 +325,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     }
 
     public void init(){
-        novaContext = new NovaContext(conf.server.bootstrap.cloudProvider,conf.server.bootstrap.api.project, conf.server.bootstrap.api.key, conf.server.bootstrap.api.secretKey, conf.server.bootstrap.zoneName, false  );
+        novaContext = new NovaContext(conf.server.cloudProvider,conf.server.bootstrap.api.project, conf.server.bootstrap.api.key, conf.server.bootstrap.api.secretKey, conf.server.bootstrap.zoneName, false  );
         cloudProvider = novaContext.cloudProvider;
     }
 
