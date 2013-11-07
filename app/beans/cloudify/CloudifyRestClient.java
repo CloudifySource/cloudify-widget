@@ -40,7 +40,11 @@ public class CloudifyRestClient {
 
     public CloudifyRestResult.TestRest testRest( String ip )
     {
-        return getResult( CloudifyRestResult.TestRest.class, TEST_REST_FORMAT, ip  );
+        try{
+            return getResult( CloudifyRestResult.TestRest.class, TEST_REST_FORMAT, ip  );
+        }catch(Exception e){
+            return new CloudifyRestResult.TestRest();
+        }
     }
 
     private String getUrl( String pattern, String ... args){

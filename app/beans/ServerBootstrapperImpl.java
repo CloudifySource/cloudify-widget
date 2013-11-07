@@ -547,10 +547,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
             // ((Address )managementMachine.getAddresses().get("private").toArray()[1]).getAddr()
 
-
-            if ( !cloudifyRestClient.testRest( serverIp.publicIp ).isSuccess() ){
-                serverNode.errorEvent( "Management machine exists but unreachable" ).save(  );
-                logger.info( "unable to reach management machine. stopping progress." );
+            if (!cloudifyRestClient.testRest(serverIp.publicIp).isSuccess()) {
+                serverNode.errorEvent("Management machine exists but unreachable").save();
+                logger.info("unable to reach management machine. stopping progress.");
                 return null;
             }
             logger.info( "using first machine  [{}] with ip [{}]", nodeMetaData, serverIp );
