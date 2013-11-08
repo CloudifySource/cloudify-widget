@@ -6,11 +6,11 @@ import models.ServerNode;
 
 public interface BootstrapCloudHandler {
 	
-	String PARAMS = "params";
+	public String PARAMS = "params";
+
+	public void createNewMachine( ServerNode serverNode, Conf conf );
 	
-	void createNewMachine( ServerNode serverNode, Conf conf );
+	public ServerNode bootstrapCloud( ServerNode serverNode, Conf conf );
 	
-	ServerNode bootstrapCloud( ServerNode serverNode, Conf conf );
-	
-	CloudProvider getCloudProvider();
+	public CloudProvider getCloudProvider();
 }

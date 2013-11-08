@@ -324,9 +324,14 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         return result;
     }
 
-    public void init(){
-        novaContext = new NovaContext(conf.server.cloudProvider,conf.server.bootstrap.api.project, conf.server.bootstrap.api.key, conf.server.bootstrap.api.secretKey, conf.server.bootstrap.zoneName, false  );
-        cloudProvider = novaContext.cloudProvider;
+    public void init() {
+        try {
+            novaContext = new NovaContext(conf.server.cloudProvider, conf.server.bootstrap.api.project, conf.server.bootstrap.api.key, conf.server.bootstrap.api.secretKey, conf.server.bootstrap.zoneName, false);
+            cloudProvider = novaContext.cloudProvider;
+        } catch (RuntimeException e) {
+            logger.error("unable to initialize server bootstrapper", e);
+            throw e;
+        }
     }
 
     public static class NovaContext{
@@ -358,11 +363,11 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             this.zone = cloudCredentials.zone;
         }
 
-        public NovaContext( String cloudProvider, String project, String key, String secretKey, String zone, boolean apiCredentials )
+        public NovaContext( CloudProvider cloudProvider, String project, String key, String secretKey, String zone, boolean apiCredentials )
         {
             // todo : ugly - we should resort to "credentials factory" - will be required once we support other platforms other than Nova.
              this( ApplicationContext.getNovaCloudCredentials()
-                     .setCloudProvider(CloudProvider.findByLabel(cloudProvider))
+                     .setCloudProvider(cloudProvider)
                      .setProject(project)
                      .setKey(key)
                      .setApiCredentials(apiCredentials)

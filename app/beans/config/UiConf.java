@@ -4,7 +4,7 @@ import server.ApplicationContext;
 
 public class UiConf {
 	
-	public String getCloudProvider(){
+	public CloudProvider getCloudProvider(){
 	     return ApplicationContext.get().conf().server.cloudProvider; 
 	}
 }

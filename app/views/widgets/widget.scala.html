@@ -63,13 +63,13 @@
     </div>
     <!-- need to set autocomplete=off explicitly in order to turn off the browser's built-in autocomplete -->
     <form class="advanced_form" autocomplete="off" ng-submit="submitAdvancedData()">
-        <span ng-switch="cloudType">
-            <span ng-switch-when="hpcloud-compute">
+        <span ng-switch="cloudType" cloud-type={{cloudType}}>
+            <span ng-switch-when="HP">
                 <input ng-model="advancedParams.hp.params.project" placeholder="Project"/>
                 <input ng-model="advancedParams.hp.params.key" placeholder="HPCS Key"/>
                 <input ng-model="advancedParams.hp.params.secretKey" placeholder="HPCS Secret Key" type="password"/>
             </span>
-            <span ng-switch-when="softlayer">
+            <span ng-switch-when="SOFTLAYER">
                 <input ng-model="advancedParams.softlayer.params.userId" placeholder="User ID"/>
                 <input ng-model="advancedParams.softlayer.params.project" placeholder="Project"/>
                 <input ng-model="advancedParams.softlayer.params.secretKey" placeholder="Secret Key" type="password"/>

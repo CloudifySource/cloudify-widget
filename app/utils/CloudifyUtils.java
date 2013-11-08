@@ -83,7 +83,7 @@ public class CloudifyUtils {
 		ComputeServiceContext context;
 		Properties overrides = new Properties();
 		overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
-		context = ContextBuilder.newBuilder( serverConfig.cloudProvider )
+		context = ContextBuilder.newBuilder( serverConfig.cloudProvider.label )
 				.credentials( project + ":" + key, secretKey )
 				.overrides(overrides)
 				.buildView(ComputeServiceContext.class);

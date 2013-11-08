@@ -69,13 +69,19 @@ public class ConfigBean {
 
     public Conf getConfiguration()
     {
-        Conf root = new Conf();
-        injectConfiguration( root, Play.application().configuration() );
         try{
-            logger.info( "getting configuration : {}" , Json.stringify( Json.toJson( root ) ));
-            logger.debug( System.getProperty( "java.class.path" ) );
-        }catch(RuntimeException e){ }
-        return root;
+            Conf root = new Conf();
+            injectConfiguration( root, Play.application().configuration() );
+            return root;
+        }catch(RuntimeException e){
+            logger.error("unable to get configuration",e);
+            throw e;
+        }
+
+//        try{
+//            logger.info( "getting configuration : {}" , Json.stringify( Json.toJson( root ) ));
+//            logger.debug( System.getProperty( "java.class.path" ) );
+//        }catch(RuntimeException e){ }
     }
 
     private abstract static class ConfigValueHandler<T> {
@@ -181,7 +187,14 @@ public class ConfigBean {
                 }
             } else { // this is probably an Object. need to instantiate
                 try {
-                    if ( List.class.isAssignableFrom(field.getType()) ){
+                    if ( field.getType().isEnum() ){
+                        String configValue = conf.getString(configKey);
+                        if ( StringUtils.isNotEmpty(configValue) ){
+                            field.set(obj, Enum.valueOf( (Class<? extends Enum>) field.getType(), configValue));
+                        }
+
+                    }
+                    else if ( List.class.isAssignableFrom(field.getType()) ){
                         Field confField = conf.getClass().getDeclaredField("conf");
                         confField.setAccessible(true);
                         play.api.Configuration innerConf = ( play.api.Configuration ) confField.get(conf);
