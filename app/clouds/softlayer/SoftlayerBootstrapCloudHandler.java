@@ -36,21 +36,18 @@ public class SoftlayerBootstrapCloudHandler extends AbstractBootstrapCloudHandle
 		JsonNode parsedParams = Json.parse( serverNode.getAdvancedParams() );
 		SoftlayerAdvancedParams params = 
 			Json.fromJson( parsedParams.get( PARAMS ), SoftlayerAdvancedParams.class);
-		
-		String userId = params.getUserId();
-		String project = params.getProject();
-		String secretKey = params.getSecretKey();
+
 		
         File cloudFolder = null;
         try {
-            logger.info( "Creating cloud folder with specific user credentials. Project: [{}], userId: [{}]", project, userId );
+            logger.info( "Creating cloud folder with specific user credentials.  userId: [{}]", params.userId );
 
-            cloudFolder = SoftlayerCloudUtils.createSoftlayerCloudFolder( userId, secretKey, conf );
+            cloudFolder = SoftlayerCloudUtils.createSoftlayerCloudFolder( params.userId, params.apiKey, conf );
             logger.info( "cloud folder is at [{}]", cloudFolder );
 
             logger.info( "Creating security group for user." );
             ApplicationContext.getCloudifyFactory().createCloudifySecurityGroup( 
-            		cloudProvider, getComputeServiceContext( userId, secretKey ) );
+            		cloudProvider, getComputeServiceContext( params.userId, params.apiKey ) );
 
             //Command line for bootstrapping remote cloud.
             CommandLine cmdLine = 
@@ -133,10 +130,10 @@ public class SoftlayerBootstrapCloudHandler extends AbstractBootstrapCloudHandle
 	@Override
 	protected Set<? extends NodeMetadata> listExistingManagementMachines( AdvancedParams advancedParameters, Conf conf ){
 		
-		String userId = ( ( SoftlayerAdvancedParams )advancedParameters ).getUserId();
-		String secretKey = ( ( SoftlayerAdvancedParams )advancedParameters ).getSecretKey(); 
+		String userId = ( ( SoftlayerAdvancedParams )advancedParameters ).userId;
+		String apiKey = ( ( SoftlayerAdvancedParams )advancedParameters ).apiKey;
 		
-		return getComputeService( userId, secretKey ).
+		return getComputeService( userId, apiKey ).
 				listNodesDetailsMatching( new MachineNamePrefixPredicate( conf ) );
 	}
 }

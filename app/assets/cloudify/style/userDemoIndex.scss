@@ -1,0 +1,30 @@
+html,body, body>div, .container, .content/*.content>iframe*/{ height :100% }
+* { padding:0; margin:0;}
+
+
+body.SOFTLAYER{
+  background:url('http://static.softlayer.com/images/blackTheme/layout/bg_pattern.png');
+  .content{
+    background:url('/public/img/demo/ibm-frame.png') no-repeat;
+    width:1600px;
+    height:135px;
+    margin:0 auto;
+    img{
+      display:none;
+
+    }
+    iframe{
+      width:985px; margin-left:3px; margin-top:135px; height:740px;
+    }
+  }
+}
+
+body.HP{
+  font-family: arial, serif; padding: 0; margin: 0; background: url('/public/img/demo/bgTopX.png') repeat-x;
+  .content { padding: 100px 10px 10px; margin: auto; width: 1037px; }
+  .container { background: url('/public/img/demo/background.png') no-repeat; width: 1600px; margin-left: auto; margin-right: auto; }
+  iframe{ width:985px; margin-left: 26px; margin-top: 0; height: 740px; }
+  .container, .content , img{ max-width:none; }
+
+}
+body{  }

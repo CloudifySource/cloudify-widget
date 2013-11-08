@@ -65,14 +65,14 @@
     <form class="advanced_form" autocomplete="off" ng-submit="submitAdvancedData()">
         <span ng-switch="cloudType" cloud-type={{cloudType}}>
             <span ng-switch-when="HP">
-                <input ng-model="advancedParams.hp.params.project" placeholder="Project"/>
-                <input ng-model="advancedParams.hp.params.key" placeholder="HPCS Key"/>
-                <input ng-model="advancedParams.hp.params.secretKey" placeholder="HPCS Secret Key" type="password"/>
+                <input ng-model="advancedParams.HP.params.project" placeholder="Project"/>
+                <input ng-model="advancedParams.HP.params.key" placeholder="HPCS Key"/>
+                <input ng-model="advancedParams.HP.params.secretKey" placeholder="HPCS Secret Key" type="password"/>
             </span>
             <span ng-switch-when="SOFTLAYER">
-                <input ng-model="advancedParams.softlayer.params.userId" placeholder="User ID"/>
-                <input ng-model="advancedParams.softlayer.params.project" placeholder="Project"/>
-                <input ng-model="advancedParams.softlayer.params.secretKey" placeholder="Secret Key" type="password"/>
+                <input ng-model="advancedParams.SOFTLAYER.params.userId" placeholder="User ID"/>
+                @*<input ng-model="advancedParams.SOFTLAYER.params.password" placeholder="Password" type="password"/>*@
+                <input ng-model="advancedParams.SOFTLAYER.params.apiKey" placeholder="API Key"/>
             </span>
         </span>
         <div class="form-footer-links">

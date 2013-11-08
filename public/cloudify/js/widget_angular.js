@@ -7,13 +7,13 @@ var widgetModule = angular.module('widget', ['ngCookies']);
 widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService, mixpanelService, paramsService, dbService) {
 
 
-    var hpcloud = 'hpcloud-compute';
-    var softlayer = 'softlayer';
+    var hpcloud = 'HP';
+    var softlayer = 'SOFTLAYER';
     var play = 'RUNNING';
     var stop = 'STOPPED';
 
 
-
+    $scope.widgetStatus = {};
 
     function _getAdvanced(){
         return $scope.advancedParams[$scope.cloudType];
@@ -21,7 +21,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
 
     $scope.advancedParams = {};
     $scope.advancedParams[hpcloud] = {'type':'hpcloud-compute','params':{'project':null, 'key':null, 'secretKey':null}};
-    $scope.advancedParams[softlayer] = {'type':'softlayer', 'params' : {'project':null, 'userId':null, 'secretKey':null} };
+    $scope.advancedParams[softlayer] = {'type':'softlayer', 'params' : {'password':null, 'userId':null, 'apiKey':null} };
 
     function _hasAdvanced(){
         var aData = _getAdvanced();
@@ -141,7 +141,9 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
     };
 
     $scope.getTimeLeft = function(){
-
+        if ( !$scope.widgetStauts || !$scope.widgetStatus.timeleftMillis ){
+            return "";
+        }
         var timeLeft = $scope.widgetStatus.timeleftMillis;
         if ( !!timeLeft ){
             timeLeft = timeLeft / 1000;

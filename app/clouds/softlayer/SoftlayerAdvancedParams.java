@@ -13,21 +13,8 @@ import clouds.base.AdvancedParams;
  */
 public class SoftlayerAdvancedParams implements AdvancedParams{
 
-	String project;
-	String userId;
-	String secretKey;
-	
-	public SoftlayerAdvancedParams(){}
+	public String password;
+	public String userId;
+	public String apiKey;
 
-	public String getProject() {
-		return project;
-	}
-	
-	public String getUserId() {
-		return userId;
-	}	
-	
-    public String getSecretKey(){
-        return secretKey;
-    }	
 }
