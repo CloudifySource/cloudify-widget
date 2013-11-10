@@ -1,6 +1,13 @@
 // a general file for demo javascript
 $(function () {
 
+    function documentOrigin(){
+        if (!window.location.origin) {
+            window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+        }
+    }
+    documentOrigin();
+
     var msgSource = $("#cloudify-widget").attr("src").split("/js")[0];
     console.log("registering event for " + msgSource);
     var callbacks = {};

@@ -38,7 +38,7 @@ upgrade(){
 }
 tail(){
     cd $WIDGET_HOME
-    tail -f nohup.log
+    tail -f nohup.out
 }
 ### main logic ###
 case "$1" in

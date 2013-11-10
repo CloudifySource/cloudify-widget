@@ -20,7 +20,6 @@ import beans.config.CloudProvider;
 import beans.config.Conf;
 import beans.pool.PoolEvent;
 import beans.pool.PoolEventListener;
-import beans.pool.PoolEventManager;
 import com.google.common.base.Predicate;
 import com.google.common.net.HostAndPort;
 import com.google.inject.Guice;
@@ -34,8 +33,9 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.RunNodesException;
+import org.jclouds.compute.domain.ComputeMetadata;
 import org.jclouds.compute.domain.ExecResponse;
+import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.config.NullLoggingModule;
 import org.jclouds.openstack.nova.v2_0.NovaApi;
@@ -67,13 +67,7 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -140,7 +134,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
      * 1. Getting a machine up and running
      * 2. Installing Cloudify on the machine.
      *
-     * If any of the above fails, it is the "createServer" responsibility to clean the workspace.
+     * If any of the above fails, it is the "createServer" responsibility Applicationto clean the workspace.
      * In this case - the method will return NULL.
      *
      * @return ServerNode if creation was successful.
@@ -254,6 +248,13 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         }
     }
 
+    public Collection<? extends NodeMetadata> getAllMachinesWithPredicate(Predicate<ComputeMetadata> predicate, NovaContext context){
+        logger.info( "getting all machine by predicate [{}]", predicate );
+
+        return context.getCompute().listNodesDetailsMatching(predicate);
+
+    }
+
     public List<Server> getAllMachinesWithPredicate( Predicate<Server> predicate, NovaContext context ){
         logger.info( "getting all machine by predicate [{}]", predicate );
         return ( List<Server> ) context.getApi().listInDetail().concat()
@@ -272,15 +273,15 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         }
     }
 
-    class ServerNamePrefixPredicate implements Predicate<Server>{
+    class ServerNamePrefixPredicate implements Predicate<ComputeMetadata>{
         String prefix = conf.server.cloudBootstrap.existingManagementMachinePrefix;
 
 
         @Override
-        public boolean apply( Server server )
+        public boolean apply( ComputeMetadata metaData )
         {
             // return true iff server is not null, prefix is not empty and prefix is prefix of server.getName
-            return server != null && !StringUtils.isEmpty( prefix ) && server.getName().indexOf( prefix ) == 0;
+            return metaData != null && !StringUtils.isEmpty( prefix ) && metaData.getName().indexOf( prefix ) == 0;
 
         }
 
@@ -377,7 +378,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         public NovaContext( String cloudProvider, String project, String key, String secretKey, String zone, boolean apiCredentials )
         {
             // todo : ugly - we should resort to "credentials factory" - will be required once we support other platforms other than Nova.
-             this( ApplicationContext.getNovaCloudCredentials()
+             this(ApplicationContext.getNovaCloudCredentials()
                      .setCloudProvider(CloudProvider.findByLabel(cloudProvider))
                      .setProject(project)
                      .setKey(key)
@@ -395,7 +396,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
         public ServerApi getApi(  ){
             if ( api == null ){
-                api = getNova().getApi().getServerApiForZone( zone );
+                api = getNova().getApi().getServerApiForZone(zone);
             }
             return api;
         }
@@ -522,7 +523,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         serverNode.setRemote( true );
         // get existing management machine
 
-        List<Server> existingManagementMachines = null;
+        Collection<? extends NodeMetadata> existingManagementMachines = null;
         try{
             existingManagementMachines = getAllMachinesWithPredicate( new ServerNamePrefixPredicate(), new NovaContext( conf.server.cloudBootstrap.cloudProvider,serverNode.getProject(), serverNode.getKey(), serverNode.getSecretKey(),conf.server.cloudBootstrap.zoneName, true ) );
         }catch(Exception e){
@@ -537,21 +538,22 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
         if ( !CollectionUtils.isEmpty( existingManagementMachines ) ) {
 
-            Server managementMachine = CollectionUtils.first( existingManagementMachines );
+
+            NodeMetadata nodeMetaData = (NodeMetadata) CollectionUtils.first(existingManagementMachines);
+            Utils.ServerIp serverIp = Utils.getServerIp( nodeMetaData );
+
 
             // GUY - for some reason
 
             // ((Address )managementMachine.getAddresses().get("private").toArray()[1]).getAddr()
 
-            Utils.ServerIp serverIp = Utils.getServerIp( managementMachine );
-
-            if ( !cloudifyRestClient.testRest( serverIp.publicIp ).isSuccess() ){
-                serverNode.errorEvent( "Management machine exists but unreachable" ).save(  );
-                logger.info( "unable to reach management machine. stopping progress." );
+            if (!cloudifyRestClient.testRest(serverIp.publicIp).isSuccess()) {
+                serverNode.errorEvent("Management machine exists but unreachable").save();
+                logger.info("unable to reach management machine. stopping progress.");
                 return null;
             }
-            logger.info( "using first machine  [{}] with ip [{}]", managementMachine, serverIp );
-            serverNode.setServerId( managementMachine.getId() );
+            logger.info( "using first machine  [{}] with ip [{}]", nodeMetaData, serverIp );
+            serverNode.setServerId( nodeMetaData.getId() );
             serverNode.infoEvent("Found management machine on :" + serverIp ).save(  );
             serverNode.setPublicIP( serverIp.publicIp );
             serverNode.save(  );
@@ -584,20 +586,20 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             CommandLine cmdLine = new CommandLine( conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile() );
             cmdLine.addArgument( cloudFolder.getName() );
 
-            DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+            DefaultExecuteResultHandler resultHandler = executorFactory.getResultHandler(cmdLine.toString());
             ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor( serverNode );
 
-            logger.info( "Executing command line: " + cmdLine );
-            bootstrapExecutor.execute( cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler );
-            logger.info( "waiting for output" );
+            logger.info("Executing command line: " + cmdLine);
+            bootstrapExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler);
+            logger.info("waiting for output");
             resultHandler.waitFor();
-            logger.info( "finished waiting , exit value is [{}]", resultHandler.getExitValue() );
+            logger.info("finished waiting , exit value is [{}]", resultHandler.getExitValue());
 
 
             String output = Utils.getOrDefault( Utils.getCachedOutput( serverNode ), "" );
             if ( resultHandler.getException() != null ) {
                 logger.info( "we have exceptions, checking for known issues" );
-                if ( output.contains( "found existing management machines" ) ) {
+                if ( output.contains( "Found existing servers matching the name" ) ) {
                     logger.info( "found 'found existing management machines' - issuing cloudify already exists message" );
                     throw new ServerException( Messages.get( "cloudify.already.exists" ) );
                 }

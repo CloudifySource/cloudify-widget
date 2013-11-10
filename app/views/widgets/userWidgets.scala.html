@@ -1,25 +1,16 @@
 @field( id:String, title:String, required:Boolean, value:String, fType:String="text"  )={
+
 <div class="control-group" ng-class="{'error': formErrors['@id'] != null }">
     <label class="control-label" for="@id">@title @if(required){<abbr class="required_mark">*</abbr>}</label>
     <div class="controls">
         <input ng-model="@value" type="@fType" id="@id" name="@id" class="@if(required){required}" popover="{{formErrors['@id'] | i18n }}" popover-placement="right"/>
-        <i ui-if="infoTooltips['@id']" title="{{infoTooltips['@id']}}" class='info-icon' ui-jq="tooltip"></i>
+        <i ng-show="infoTooltips['@id']" title="{{infoTooltips['@id']}}" class='info-icon' ui-jq="tooltip"></i>
     </div>
 </div>
 }
+<div id="main" class="widgets-dashboard" ng-show="!actions">
 
-<div id="main" class="widgets-dashboard" ui-if="!actions">
-
-    @* TODO use the i18n filter *@
-    <div style="text-align: center;">
-        <div class="alert">
-            Welcome to the new dashboard! <a href="javascript:$.cookie('newDashboard',null,{'path':'/'}); document.location='/admin/widgets'">Click here</a> to return to the old one. @* use i18n for this somehow.. need to figure out how to embed link *@
-        </div>
-
-
-    </div>
-
-    <div class="hero-unit" id="welcome_window" ui-if="!widgets.length && angular.isDefined(widgets)">
+    <div class="hero-unit" id="welcome_window" ng-show="!widgets.length && angular.isDefined(widgets)">
         <h1>Welcome to the Cloudify Widget Dashboard!</h1>
         <p>We are thrilled to have you on board. This dashboard helps you to create a new Widget, embed the widget into your website and then monitor and administrate the running widget instances.</p>
         <p>
@@ -29,7 +20,7 @@
         </p>
     </div>
 
-    <div class="" ui-if="widgets.length">
+    <div class="" ng-show="widgets.length">
         <div class="row" id="search_panel">
             <div class="span1">
                 <form class="form-search">
@@ -49,7 +40,8 @@
             <table class="table table-bordered table-striped">
                 <thead class="list_head">
                 <tr>
-                    <th id="user_name_column" ui-if="admin">User name</th>
+                    <th id="user_name_column" ng-show="admin">User name</th>
+                    <th>Icon</th>
                     <th>Product name</th>
                     <th>Product version</th>
                     <th>Provider URL</th>
@@ -64,14 +56,15 @@
                 <tbody>
                 <!-- Use this to use enable/disable options in CSS {{widget.enabled && 'enabled-widget' || 'disabled-widget'}}-->
                 <tr ng-repeat="widget in widgets" class="widget"  data-widget_id="{{widget.id}}" data-api_key="{{widget.apiKey}}" id="widget_{{widget.id}}">
-                    <td ui-if="admin">{{widget.username}}</td>
+                    <td ng-show="admin">{{widget.username}}</td>
+                    <td><img ng-show="!!widget.apiKey" style="height:40px; width:40px;" ng-src="/widget/icon?apiKey={{widget.apiKey}}&d={{lastUpdated}}"/></td>
                     <td>{{widget.productName}}</td>
                     <td>{{widget.productVersion}}</td>
                     <td><a href="{{widget.providerURL}}">{{widget.providerURL}}</a></td>
                     <td><div class="fixed-width-column">{{widget.title}}</div></td>
                     <td>
-                        <a ui-if="widget.youtubeVideoUrl" href="{{widget.youtubeVideoUrl}}" target="_blank">View</a>
-                        <span ui-if="!widget.youtubeVideoUrl">N/A</span>
+                        <a ng-show="widget.youtubeVideoUrl" href="{{widget.youtubeVideoUrl}}" target="_blank">View</a>
+                        <span ng-show="!widget.youtubeVideoUrl">N/A</span>
                     </td>
                     <td><a href="{{widget.recipeURL}}">Download</a></td>
                     <td><i title="view instances" class="icon-cog " ng-click="viewInstances(widget)"></i> <span class="badge">{{widget.numOfInstances}} / {{widget.launches}}</span></td>
@@ -81,8 +74,8 @@
                         <i title="edit" class="icon-edit" ng-click="editWidget(widget)"></i>
                         <i title="get embed code" class="icon-share " ng-click="getEmbed(widget)"></i>
                         <i title="delete" class="icon-trash " ng-click="delete(widget)"></i>
-                        <i title="disabled - click to enable" class="icon-globe" style="color:red" ui-if="!widget.enabled" ng-click="enable(widget)"></i>
-                        <i title="enabled - click to disable" class="icon-globe" style="color:green" ui-if="widget.enabled" ng-click="disable(widget)"></i>
+                        <i title="disabled - click to enable" class="icon-globe" style="color:red" ng-show="!widget.enabled" ng-click="enable(widget)"></i>
+                        <i title="enabled - click to disable" class="icon-globe" style="color:green" ng-show="widget.enabled" ng-click="disable(widget)"></i>
                     </td>
                 </tr>
                 </tbody>
@@ -96,7 +89,7 @@
 <!-- dialogs -->
 
 <!-- running instances dialog -->
-<div ui-if="actions.viewInstances" class="action-panel">
+<div ng-show="actions.viewInstances" class="action-panel">
     <div class="modal-header">
         <h3>{{selectedWidget.instanceCount}} Running instances</h3>
     </div>
@@ -108,7 +101,7 @@
         <div class="alert pull-right"><i class="icon-warning-sign" style="padding-right:10px"></i>Not showing instances
             outside my cloud.
         </div>
-        <table class="table table-hover" ui-if="selectedWidget.instances.length">
+        <table class="table table-hover" ng-show="selectedWidget.instances.length">
             <thead class="list_head">
             <tr>
                 <th>Id</th>
@@ -124,7 +117,7 @@
                 </tr>
             </tbody>
         </table>
-        <div ui-if="!selectedWidget.instances.length">
+        <div ng-show="!selectedWidget.instances.length">
             There are no running instances
         </div>
     </div>
@@ -145,17 +138,18 @@
 </div>
 
 <!-- require login modal -->
-<div ui-if="actions.editWidget" id="editWidget" class="action-panel">
+<div ng-show="actions.editWidget" id="editWidget" class="action-panel {{editSection}}">
     <div class="modal-header"><h1>Edit Widget</h1><h2> {{editSection}} </h2><h3> {{actions.editWidget.productName}} - {{actions.editWidget.productVersion}}</h3></div>
 
     <div class="btn-group dialog-switch" data-toggle="buttons-checkbox">
         <button type="button" class="btn btn-primary" ng-model="editSection" btn-radio="'Details'">Details</button>
         <button type="button" class="btn btn-primary" ng-model="editSection" btn-radio="'Description'">Description</button>
+        @*<button type="button" class="btn btn-primary" ng-model="editSection"  btn-radio="'Image'">Image</button>*@
     </div>
     <form name="widgetForm" class="form-horizontal" style="margin-bottom:0;">
         <div class="modal-body" ng-switch="editSection" style="overflow:hidden">
 
-            <fieldset ng-switch-default>
+            <fieldset ng-show="!editSection || editSection == 'Details'">
                 <div class="container-fluid" style="display:block; width:965px;margin:auto;">
                     <div class="span6" style="border-right:1px solid #EEE">
                         <div>
@@ -188,12 +182,33 @@
                                 <i style="margin-left:10px;" title="Click to regenerate key" class='icon-refresh' ui-jq="tooltip" ng-click="regenerateKey(actions.editWidget)"></i>
                             </div>
                         </div>
+                        <div class="control-group">
+                            <label class="control-label" for="icon">Icon</label>
+                            <div class="controls">
+                            @*<input type="file" file="widgetIcon" preview="widgetIconPreview" fileread/><br/>*@
+                            <span class="drop-zone span4" filemodel="widgetIconFile" fileread preview="widgetIconPreview" ng-class="{'preview':actions.editIcon!=null, 'nopreview':actions.editIcon == null}" style="border:5px dashed grey; padding:10px; display:inline-block; border-radius: 10px; width:60px; height:60px; margin-left:0;">
+                                <img ng-src="{{widgetIconPreview}}" style="height:60px; width:80px; border:none; background:transparent;" ng-show="actions.editIcon != null && actions.editIcon != 'remove'"/>
+                                <img ng-show="actions.editIcon == null" style="height:60px; width:80px;" ng-src="/widget/icon?apiKey={{actions.editWidget.apiKey}}&d={{lastUpdated}}"/>
+                            </span>
+                                <div class="span2" style="margin-left:10px; vertical-align: top">
+                                    <button class="btn"  ng-click="removeIcon()">Remove Icon</button>
+                                    <button class="btn"  ng-click="restoreIcon()">Restore</button>
+                                    <label class="filebutton btn" for="myfile">
+                                        Browse For File!
+                                        <span><input type="file" fileread preview="widgetIconPreview" filemodel="widgetIconFile" id="myfile" name="myfile"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+
+
+                        </div>
                     </div>
                 </div>
             </fieldset>
 
-            <fieldset ng-switch-when="Description">
-            <textarea  ui-codemirror="{theme:'monokai'}" ng-model="actions.editWidget.description" id="description" name="description"></textarea>
+            <fieldset ng-show="editSection == 'Description'">
+                <textarea  ui-codemirror="{theme:'monokai'}" ng-model="actions.editWidget.description" id="description" name="description"></textarea>
             </fieldset>
 
         </div>
@@ -201,8 +216,8 @@
 
             <div class="control-label"> <abbr style="color:red"> * </abbr> Mandatory fields </div>
             <button class="btn" ng-click="goBack()">Cancel</button>
-            <input type="submit" class="btn btn-primary"  value="Save" ng-click="saveWidget(actions.editWidget)"/>
-            <button class="btn btn-primary" ng-click="saveWidget(actions.editWidget, true)"> Save and Done</button>
+            <input type="submit" class="btn btn-primary"  value="Save" ng-click="saveWidget(actions.editWidget, actions.editIcon, false)"/>
+            <button class="btn btn-primary" ng-click="saveWidget(actions.editWidget, actions.editIcon, true)"> Save and Done</button>
         </div>
       </form>
 </div>

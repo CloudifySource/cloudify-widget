@@ -15,6 +15,7 @@
 package beans.api;
 
 import models.ServerNode;
+import org.apache.commons.exec.DefaultExecuteResultHandler;
 import server.ProcExecutor;
 
 /**
@@ -40,5 +41,7 @@ public interface ExecutorFactory {
 	 * @return process executor.
 	 */
 	ProcExecutor getDeployExecutor( ServerNode server );
+
+    DefaultExecuteResultHandler getResultHandler( String name );
 	
 }

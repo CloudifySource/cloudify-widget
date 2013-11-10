@@ -82,18 +82,6 @@ public class ConfigBean {
         public abstract T getValue( Configuration conf, String key );
     }
 
-    private static class ListHandler extends ConfigValueHandler<List>{
-        @Override
-        public List getValue( Configuration conf, String key )
-        {
-            try{
-                com.typesafe.config.Config typesafeConf = (( play.api.Configuration ) conf.getClass().getField( "conf" ).get( conf )).underlying();
-                return typesafeConf.getAnyRefList( key );
-            }catch(Exception e){
-                throw new RuntimeException( "unable to get list for " + key );
-            }
-        }
-    }
 
     private static class IntegerHandler extends ConfigValueHandler<Integer> {
         @Override
