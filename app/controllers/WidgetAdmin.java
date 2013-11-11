@@ -19,6 +19,7 @@ import controllers.compositions.UserCheck;
 import data.validation.GsConstraints;
 import models.*;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonNode;
@@ -91,7 +92,7 @@ public class WidgetAdmin extends Controller
 
     public static Result icon( String apiKey ){
         WidgetIcon widgetItem = WidgetIcon.findByWidgetApiKey( apiKey );
-        if ( widgetItem == null ){
+        if ( widgetItem == null || ArrayUtils.isEmpty(widgetItem.getData()) ){
             return notFound(  );
         }
         return ok( widgetItem.getData() ).as( widgetItem.getContentType() );
