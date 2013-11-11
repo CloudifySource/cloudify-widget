@@ -26,8 +26,8 @@ import models.ServerNodeEvent;
 import models.Widget;
 import models.WidgetInstance;
 import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.exec.ExecuteResultHandler;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -204,8 +204,8 @@ public class DeployManagerImpl implements DeployManager
     private void execute( CommandLine cmdLine, ServerNode server )
     {
         try {
-            DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
             ProcExecutor executor = executorFactory.getDeployExecutor( server );
+            ExecuteResultHandler resultHandler = executorFactory.getResultHandler(cmdLine.toString());
             logger.info( "executing command [{}]", cmdLine );
             executor.execute( cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler );
             logger.info( "The process instanceId: {}", executor.getId() );

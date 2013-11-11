@@ -62,14 +62,12 @@ POST     /widget/disable				controllers.WidgetAdmin.disableWidget( authToken: St
 POST     /widget/enable 				controllers.WidgetAdmin.enableWidget( authToken: String, apiKey: String )
 GET      /user/list	   					controllers.WidgetAdmin.getAllUsers( authToken: String )
 POST     /widget/new              	    controllers.WidgetAdmin.createNewWidget( widgetId:String ?= null, authToken: String, productName: String, productVersion: String, title: String, youtubeVideoUrl: String, providerURL: String, recipeURL: String, consolename: String, consoleurl: String, rootpath:String, recipeName:String, consoleUrlService:String )
-POST     /widget/edit                   controllers.WidgetAdmin.postWidget( authToken:String )
+POST     /widget/edit                   controllers.WidgetAdmin.postWidget
 GET      /widget/list 					controllers.WidgetAdmin.getAllWidgets( authToken: String )
 POST    /widget/delete                  controllers.WidgetAdmin.deleteWidget( authToken:String, apiKey:String )
 
 GET     /widget/previewWidget           controllers.WidgetAdmin.previewWidget( apiKey:String )
 GET     /widget/icon                    controllers.WidgetAdmin.icon( apiKey: String)
-POST    /widget/icon                    controllers.WidgetAdmin.addIcon
-POST    /widget/removeIcon              controllers.WidgetAdmin.removeIcon( authToken: String, widgetId:Long )
 GET     /server/headers               	controllers.WidgetAdmin.headers
 GET     /widget/widget                  controllers.WidgetAdmin.getWidget( apiKey:String )
 GET     /widget/single/:apiKey          controllers.WidgetAdmin.getWidgetSinglePage( apiKey:String )

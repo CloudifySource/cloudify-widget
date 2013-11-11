@@ -53,10 +53,6 @@ WidgetModules.service("SessionService", function( WidgetCookies ){
 
     this.applySession = function ($scope) {
         try {
-            if (!WidgetCookies.newDashboard() && document.location.href.indexOf("user/widgets")>= 0) {
-                document.location = "/admin/widgets";
-            }
-
             $scope.authToken = WidgetCookies.authToken();
             $scope.admin = WidgetCookies.admin();
             console.log("loaded SessionController successfully");
@@ -89,7 +85,7 @@ WidgetModules.service("WidgetCookies", function( $http, $q ){
             function doEncrypt( cookie ){
                 return cookie.hasOwnProperty("encrypt") && cookie.encrypt;
             }
-            if ( doEnc)
+
             var r = $q.defer();
             r.resolve($.map( cachedResults, function(v,k){ return v; }));
 
@@ -164,8 +160,24 @@ WidgetModules.service('WidgetModel', function( $http ){
         return $http.get(jsRoutes.controllers.WidgetAdmin.getAllWidgets( authToken ).url ).then(function( data ){ return data.data; }); //, function(a,b,c,d){  console.log("got an error"); });
     };
 
-    this.saveWidget = function( authToken, widget ){
-        return $http.post(jsRoutes.controllers.WidgetAdmin.postWidget( authToken ).url, widget ).then( function( data ){ return data.data });
+    this.saveWidget = function( authToken, widget, file ){
+        var payload = new FormData();
+        if( !!file ){
+            if ( file === "remove" ){
+                payload.append("removeIcon",true);
+            }else{
+                payload.append( "icon", file );
+            }
+        }
+        payload.append( "authToken", authToken );
+        payload.append( "widget", JSON.stringify(widget) );
+
+// populate payload
+        return $http.post( jsRoutes.controllers.WidgetAdmin.postWidget().url , payload, {
+            headers: { 'Content-Type': false },
+            transformRequest: function(data) { return data; }
+        }).then( function(result){ return result.data });
+
     };
 
     this.getSummary = function (authToken ){
@@ -179,7 +191,9 @@ WidgetModules.service('WidgetModel', function( $http ){
     };
 
     this.regenerateKey = function( authToken, widget ){
+
         return $http.post( jsRoutes.controllers.WidgetAdmin.regenerateWidgetApiKey(authToken, widget.apiKey ).url ).then( function(result){ return result.data.widget.apiKey; } );
+
     };
 
     this.enableWidget = function( authToken, widget ){
@@ -188,7 +202,9 @@ WidgetModules.service('WidgetModel', function( $http ){
 
     this.disableWidget = function( authToken, widget ){
         return $http.post( jsRoutes.controllers.WidgetAdmin.disableWidget( authToken, widget.apiKey ).url );
-    }
+    };
+
+
 
 });
 

@@ -24,6 +24,7 @@ import beans.config.ServerConfig;
 import org.apache.commons.collections.Predicate;
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import org.codehaus.jackson.map.annotate.JsonRootName;
@@ -51,6 +52,7 @@ import utils.StringUtils;
 @Entity
 @XStreamAlias("widget")
 @SuppressWarnings("serial")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Widget
 	extends Model
 {
@@ -408,7 +410,7 @@ public class Widget
 		this.apiKey = apiKey;
 	}
 
-    @JsonProperty("instances")
+    @JsonIgnore
     @Transient
     public List<WidgetInstance> getViableInstances(){
         if ( CollectionUtils.isEmpty( instances )){
@@ -712,5 +714,11 @@ public class Widget
     public void setRecipeName( String recipeName )
     {
         this.recipeName = recipeName;
+    }
+
+
+    public abstract static class IncludeInstancesMixin{
+        @JsonProperty("instances")
+        public abstract List<WidgetInstance> getViableInstances();
     }
 }
