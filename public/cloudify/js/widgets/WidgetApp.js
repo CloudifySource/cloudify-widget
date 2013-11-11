@@ -196,7 +196,9 @@ WidgetApp.controller('WidgetController',
             WidgetModel.saveWidget( $scope.authToken, widget, icon ).then( function( savedWidget ){
                 $scope.lastUpdated=new Date().getTime();
                 if ( !angular.isDefined(widget.id)){
+                    // todo : test if we should override entire widget
                     widget.id = savedWidget.id;
+                    widget.apiKey = savedWidget.apiKey;
                     $scope.widgets.push( savedWidget );
                 }
                 if ( isDone ){
