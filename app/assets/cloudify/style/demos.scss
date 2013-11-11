@@ -1,6 +1,8 @@
 
 @import "../../bourbon/bourbon";
 
+$widget_width: 600px;
+
 html,body,body>div, .nav-links{
   height:100%;
 }
@@ -15,7 +17,7 @@ body{
   top:55px;
   right:30px;
   height:473px;
-  width:600px;
+  width:$widget_width;
   padding-left:40px;
   padding-right:33px;
   padding-bottom:172px;
@@ -72,7 +74,7 @@ body{
 }
 
 iframe {
-  width: 600px;
+  width: $widget_width;
   height: 473px;
   border: none;
   overflow: hidden;
@@ -88,6 +90,7 @@ iframe {
 .description{
   color:#231f20;
   font-size:14px;
+  width: $widget_width;
 }
 
 .nav-links{
