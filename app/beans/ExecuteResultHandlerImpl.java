@@ -2,7 +2,6 @@ package beans;
 
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.ExecuteResultHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

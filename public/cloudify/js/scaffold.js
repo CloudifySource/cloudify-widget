@@ -65,7 +65,9 @@ $( function ()
 
     window.username = $.cookie( "username" );
     $("#username").text(username);
-
+    
+    $("body").addClass(myConf.cloudProvider);
+    
     if ($.cookie("admin") != "true"){
         $(".adminOnly").remove();
     }

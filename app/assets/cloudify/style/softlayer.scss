@@ -1,0 +1,17 @@
+.cloud-logo-icon{ /* common CSS rules regardless to brand */ 
+     display:inline-block;
+}
+
+body.SOFTLAYER{
+
+    .cloud-logo-icon{ 
+        content:url('/img/common/softlayer_logo.png');
+        vertical-align: bottom;
+     }
+
+     .cloud-min-logo-icon{
+       
+         content:url('/img/softlayer_min.png');
+         vertical-align: bottom;
+     }
+}

@@ -6,6 +6,8 @@
     <title>Widget</title>
     <link rel="stylesheet" type="text/css" href="/public/style/widget.css">
     <link rel="stylesheet" type="text/css" href="/public/style/relevant-dropdown.css">
+    <link href="/public/style/hpcloud-compute.css" rel="stylesheet">
+    <link href="/public/style/softlayer.css" rel="stylesheet">
     <script src="@routes.Application.javascriptRoutes()" type="text/javascript"></script>
     <script src="/public/js/modernizr/modernizr.custom.13010.js"></script>
 
@@ -26,7 +28,7 @@
         <script>mixpanel = { track:function(){} }</script>
     }
   </head>
-  <body @if(widget.isRequiresLogin()){data-requires-login="requires-login"} ng-app="widget" ng-controller="widgetCtrl">
+  <body @if(widget.isRequiresLogin()){data-requires-login="requires-login"} ng-app="widget" ng-controller="widgetCtrl" class="{{cloudType}}">
     <img src="/img/beta.png" class="beta-ribbon"/>
     <span id="title">{{params.title}}</span>
 
@@ -85,7 +87,7 @@
 
 
     <div id="footer">
-      Powered by: <a href="http://hpcloud.com" target="_blank"><img class="brand_btns" src="/img/hp_cloud_icon.png"></a>
+      Powered by: <a href="http://hpcloud.com" target="_blank"><span class="cloud-min-logo-icon brand_btns"/><!--img class="brand_btns" src="/img/hp_cloud_icon.png"--></a>
       <a href="http://cloudifysource.org" target="_blank"><img class="brand_btns" src="/img/cloudify_icon.png"></a>
       <a herf="javascript:void(0)" id="patent_pending">&nbsp;&nbsp;(Patent Pending)</a>
           <div class="put_left">
@@ -105,4 +107,5 @@
 
     @*<div id="walkthrough" style="display:none">&nbsp; <a href="javascript:void(0)">Click to close</a> </div>*@
   </body>
+  
 </html>
