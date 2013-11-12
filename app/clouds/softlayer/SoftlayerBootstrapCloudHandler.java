@@ -86,16 +86,16 @@ public class SoftlayerBootstrapCloudHandler extends AbstractBootstrapCloudHandle
             }
             logger.info( "ip is [{}], saving to serverNode", publicIp );
 
-            String privateKey = CloudifyUtils.getCloudPrivateKey( cloudFolder );
-            if ( StringUtils.isEmpty( privateKey ) ) {
-                throw new RuntimeException( "Bootstrap failed. No pem file found in cloud directory." );
-            }
+//            String privateKey = CloudifyUtils.getCloudPrivateKey( cloudFolder );
+//            if ( StringUtils.isEmpty( privateKey ) ) {
+//                throw new RuntimeException( "Bootstrap failed. No pem file found in cloud directory." );
+//            }
             logger.info( "found PEM string" );
             logger.info( "Bootstrap cloud command ended successfully" );
 
             logger.info( "updating server node with new info" );
             serverNode.setPublicIP( publicIp );
-            serverNode.setPrivateKey( privateKey );
+//            serverNode.setPrivateKey( privateKey );
 
             serverNode.save();
             logger.info("server node updated and saved");
