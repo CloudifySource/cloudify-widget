@@ -55,6 +55,10 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
     var ellipsisIndex = 0;
     var ellipsis='......';
 
+    function _scrollLog() {
+        var log = $('#log')[0];
+        log.scrollTop = log.scrollHeight;
+    }
 
     function handleStatus( status, myTimeout ){
 
@@ -64,6 +68,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
         ellipsisIndex = ellipsisIndex +1;
         $scope.widgetStatus = status;
         $timeout(pollStatus, myTimeout || 3000) ;
+        _scrollLog();
 
     }
 

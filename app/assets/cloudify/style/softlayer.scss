@@ -18,4 +18,8 @@ body.SOFTLAYER{
      .form-footer-links{
        display:none;
      }
+
+  .login{ margin-left: 332px; margin-top: 266px; &:before{  content: "(Optional) Use your Softlayer credentials to launch the app or service under your account with no instance or time restrictions"; margin-top: 20px; width: 255px; margin-left: 42px; } }
 }
+
+
