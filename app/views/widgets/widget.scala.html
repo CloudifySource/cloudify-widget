@@ -72,9 +72,9 @@
                 <input ng-model="advancedParams.HP.params.secretKey" placeholder="HPCS Secret Key" type="password"/>
             </span>
             <span ng-switch-when="SOFTLAYER">
-                <input ng-model="advancedParams.SOFTLAYER.params.userId" placeholder="User ID"/>
+                <input ng-model="advancedParams.SOFTLAYER.params.userId" placeholder="User ID" title="User ID"/>
                 @*<input ng-model="advancedParams.SOFTLAYER.params.password" placeholder="Password" type="password"/>*@
-                <input ng-model="advancedParams.SOFTLAYER.params.apiKey" placeholder="API Key"/>
+                <input ng-model="advancedParams.SOFTLAYER.params.apiKey" type="password" title="API Key" placeholder="API Key"/>
             </span>
         </span>
         <div class="form-footer-links">
