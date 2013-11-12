@@ -31,8 +31,7 @@ import java.util.zip.ZipException;
 
 import models.ServerNode;
 import org.apache.commons.io.FileUtils;
-import org.jclouds.compute.domain.NodeMetadata;
-import org.slf4j.Logger;
+import org.jclouds.compute.domain.NodeMetadata;import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import clouds.base.CloudAddress;
@@ -335,8 +334,7 @@ public class Utils
         return result == null ? defaultResult : result;
     }
 
-    public static ServerIp getServerIp( CloudServer server )
-    {
+	public static ServerIp getServerIp( CloudServer server )    {
         ServerIp res = new ServerIp();
         try {
             Collection<CloudAddress> aPrivate = server.getAddresses().get( "private" );

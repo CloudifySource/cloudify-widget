@@ -70,7 +70,7 @@ extends Model
 	private String serverId;
 
 
-    @ManyToOne
+    @OneToOne
     private Lead lead;
 
 

@@ -8,6 +8,13 @@
 
 $( function ()
 {
+    console.log("registering an img error handler");
+
+    // fix for selecting the same file in input file. We want it to fire "change" event.
+    $('input[type=file]').on('click',function(){
+        $(this).attr("value", "");
+    });
+
     $( document ).ajaxError(function ( event, jqXHR, ajaxSettings, thrownError )
     {
         console.log( ["handling error", jqXHR.getAllResponseHeaders(), jqXHR.getResponseHeader( "session-expired" )] );
@@ -24,7 +31,7 @@ $( function ()
                 var displayMessage = JSON.parse( jqXHR.getResponseHeader( "display-message" ) );
                 $( ".global-message" ).trigger( "showMessage", displayMessage );
                 if ( ajaxSettings.form && displayMessage.formErrors ){
-                    var $form = $(ajaxSettings.form)
+                    var $form = $(ajaxSettings.form);
                     var formField = null;
                     for ( formField in displayMessage.formErrors ){
                         var msg = displayMessage.formErrors[formField];
@@ -58,7 +65,9 @@ $( function ()
 
     window.username = $.cookie( "username" );
     $("#username").text(username);
-
+    
+    $("body").addClass(myConf.cloudProvider);
+    
     if ($.cookie("admin") != "true"){
         $(".adminOnly").remove();
     }

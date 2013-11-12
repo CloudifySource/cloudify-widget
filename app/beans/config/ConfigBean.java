@@ -15,24 +15,29 @@
 
 package beans.config;
 
-import com.google.common.base.Predicates;
-import com.typesafe.config.ConfigList;
-import com.typesafe.config.ConfigObject;
-import com.typesafe.config.ConfigValue;
-import org.apache.commons.lang3.StringUtils;
-import org.reflections.ReflectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import play.Configuration;
-import play.Play;
-import play.libs.Json;
-import play.libs.Time;
-
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.reflections.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import play.Configuration;
+import play.Play;
+import play.libs.Time;
+
+import com.google.common.base.Predicates;
+import com.typesafe.config.ConfigList;
+import com.typesafe.config.ConfigObject;
+import com.typesafe.config.ConfigValue;
 
 /**
  * User: guym
@@ -88,18 +93,6 @@ public class ConfigBean {
         public abstract T getValue( Configuration conf, String key );
     }
 
-    private static class ListHandler extends ConfigValueHandler<List>{
-        @Override
-        public List getValue( Configuration conf, String key )
-        {
-            try{
-                com.typesafe.config.Config typesafeConf = (( play.api.Configuration ) conf.getClass().getField( "conf" ).get( conf )).underlying();
-                return typesafeConf.getAnyRefList( key );
-            }catch(Exception e){
-                throw new RuntimeException( "unable to get list for " + key );
-            }
-        }
-    }
 
     private static class IntegerHandler extends ConfigValueHandler<Integer> {
         @Override

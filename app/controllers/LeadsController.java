@@ -85,33 +85,37 @@ public class LeadsController extends Controller {
 
         logger.info(user.getPermissions().toString());
         if ( !user.getPermissions().isCanAssignLeads() ){
+           logger.error("user {} tried to assign lead {} to instanceId {} but failed due to permissions", new Object[]{user.toDebugString(), leadId, instanceId});
            return forbidden("You need permission to assign leads");
         }
         ServerNode serverNode = ServerNode.find.byId( instanceId );
 
         Lead lead = Lead.find.byId( leadId );
 
-        if ( lead == null || !lead.owner.getId().equals( user.getId() )){
+
+        if ( lead == null || !lead.owner.getId().equals( user.getId() )){ // whether lead does not exist
             return notFound("no lead with id " + leadId );
         }
 
         // lets verify serverNode exists and is not assigned to another lead already.
         // if it is assigned to another lead, we want to give the same message as if the server node
         // does not exist.
-        if ( serverNode == null || ( serverNode.getLead() != null && !serverNode.getLead().getId().equals(lead.getId()))){
+        if ( serverNode == null || ( serverNode.getLead() != null && !serverNode.getLead().getId().equals(lead.getId()))){ // whether serverNode already assigned or does not exist
              return notFound("instanceId " + instanceId + " does not exist");
-        }
-        else if ( serverNode.getLead() == null){
+        }else if ( lead.getServerId() != null && !lead.getServerId().equals(serverNode.getId()) ){ // whether lead already assigned
+            return notFound("invalid params");
+        } else if ( serverNode.getLead() == null && lead.getServerId() == null ){
 
             serverNode.setLead( lead );
             serverNode.save();
 
-            return ok();
-        }else if ( serverNode.getLead().getId().equals( lead.getId() )){
-            return ok();
+            return ok("assigned");
+        }else if ( serverNode.getLead() != null && serverNode.getLead().getId().equals( lead.getId() )){
+            return ok("already assigned");
         }
 
-        return ok();
+
+        return ok("nothing to do");
 
     }
 
@@ -125,7 +129,7 @@ public class LeadsController extends Controller {
         }else{
             lead.validated = true;
             lead.save();
-            return ok();
+            return ok( Json.toJson(lead));
         }
     }
 

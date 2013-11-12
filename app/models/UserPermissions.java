@@ -22,7 +22,7 @@ public class UserPermissions extends Model {
     @Column
     // this permissions prevents hackers from snatching widget instances.
     // this is not a perfect solution as 2 users with this permission can still snatch each others' instances.
-    private boolean canAssignLeads;
+    private boolean canAssignLeads = false;
 
     @Override
     public String toString() {

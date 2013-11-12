@@ -159,8 +159,4 @@ public class Conf {
         public File file = Utils.getFileByRelativePath("/automatic_changelog");
         public List<GsMailer.Mailer> addresses = new LinkedList<GsMailer.Mailer>();
     }
-
-    public static class CloudType{
-    	public String type = CloudProvider.SOFTLAYER.label;
-    }
 }

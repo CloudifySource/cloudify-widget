@@ -5,8 +5,7 @@
 @context.set("navmenu"){
     <li><a href="/admin/account" id="account">Account</a></li>
     @*<li><a href="/admin/pool/manage" class="adminOnly">Manage Pool</a></li>*@
-    <li><a href="javascript:eval($('li a#username').attr('href'));">Dashboard</a></li>
-    <li><a href="javascript: if ( $.cookie('newDashboard') == null ) { document.location = '/admin/widgets' } else { document.location = '/user/widgets' }" id="username">Dashboard</a></li>
+    <li><a href="/user/widgets" id="username">Dashboard</a></li>
     <li><a href="/admin/logout" id="logout">Logout</a></li>
 }
 

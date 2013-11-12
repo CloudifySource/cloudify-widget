@@ -71,8 +71,6 @@ import com.google.common.base.Predicate;
 import com.google.common.net.HostAndPort;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-
-
 /**
  * This class manages a compute cloud provider by JCloud openstack nova infrastructure.
  * It provides ability to create/delete specific server with desired flavor configuration.
@@ -143,7 +141,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
      * 1. Getting a machine up and running
      * 2. Installing Cloudify on the machine.
      *
-     * If any of the above fails, it is the "createServer" responsibility to clean the workspace.
+     * If any of the above fails, it is the "createServer" responsibility Applicationto clean the workspace.
      * In this case - the method will return NULL.
      *
      * @return ServerNode if creation was successful.
@@ -256,8 +254,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         return CloudifyUtils.getAllMachinesWithPredicate( new ServerTagPredicate(), context );
     }
 
-    class TruePredicate implements Predicate<CloudServer>{
-        @Override
+	class TruePredicate implements Predicate<CloudServer>{        @Override
         public boolean apply(CloudServer server) {
             return server != null;
         }
@@ -269,7 +266,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     }
 
     class ServerTagPredicate implements Predicate<CloudServer> {
-
+	
         String confTags =  conf.server.bootstrap.tags;
         List<String> confTagsList = null;
 
@@ -366,7 +363,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         public NovaContext( CloudProvider cloudProvider, String project, String key, String secretKey, String zone, boolean apiCredentials )
         {
             // todo : ugly - we should resort to "credentials factory" - will be required once we support other platforms other than Nova.
-             this( ApplicationContext.getNovaCloudCredentials()
+             this(ApplicationContext.getNovaCloudCredentials()
                      .setCloudProvider(cloudProvider)
                      .setProject(project)
                      .setKey(key)
@@ -407,8 +404,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                 api = serverApiForZone;
             }
             return api;
-        }
-        
+        }        
         public ComputeService getComputeService(){
             if ( computeService == null ){
                 computeService = context.getComputeService();
@@ -543,8 +539,6 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     @Override
     public ServerNode bootstrapCloud( ServerNode serverNode )
     {
-    	
-    	
         BootstrapCloudHandler bootstrapCloudHandler =
         		ApplicationContext.get().getBootstrapCloudHandler( serverNode.getCloudProvider() );
         return bootstrapCloudHandler.bootstrapCloud(serverNode, conf);    	
@@ -577,20 +571,20 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             CommandLine cmdLine = new CommandLine( conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile() );
             cmdLine.addArgument( cloudFolder.getName() );
 
-            DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
+            DefaultExecuteResultHandler resultHandler = executorFactory.getResultHandler(cmdLine.toString());
             ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor( serverNode );
 
-            logger.info( "Executing command line: " + cmdLine );
-            bootstrapExecutor.execute( cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler );
-            logger.info( "waiting for output" );
+            logger.info("Executing command line: " + cmdLine);
+            bootstrapExecutor.execute(cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler);
+            logger.info("waiting for output");
             resultHandler.waitFor();
-            logger.info( "finished waiting , exit value is [{}]", resultHandler.getExitValue() );
+            logger.info("finished waiting , exit value is [{}]", resultHandler.getExitValue());
 
 
             String output = Utils.getOrDefault( Utils.getCachedOutput( serverNode ), "" );
             if ( resultHandler.getException() != null ) {
                 logger.info( "we have exceptions, checking for known issues" );
-                if ( output.contains( "found existing management machines" ) ) {
+                if ( output.contains( "Found existing servers matching the name" ) ) {
                     logger.info( "found 'found existing management machines' - issuing cloudify already exists message" );
                     throw new ServerException( Messages.get( "cloudify.already.exists" ) );
                 }

@@ -1,0 +1,16 @@
+.cloud-logo-icon{ /* common CSS rules regardless to brand */ 
+     display:inline-block; 
+}
+
+body.HP{
+
+    .cloud-logo-icon{ 
+        content:url('/img/common/hp_cloud_logo.png');
+        vertical-align: bottom;
+     }
+
+     .cloud-min-logo-icon{
+         content:url('/img/hp_cloud_icon.png');
+         vertical-align: bottom;
+     }
+}
