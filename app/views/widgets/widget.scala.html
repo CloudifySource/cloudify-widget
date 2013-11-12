@@ -87,7 +87,10 @@
 
 
     <div id="footer">
-      Powered by: <a href="http://hpcloud.com" target="_blank"><span class="cloud-min-logo-icon brand_btns"/><!--img class="brand_btns" src="/img/hp_cloud_icon.png"--></a>
+      Powered by: <a ng-href="{{poweredByUrl[cloudType]}}" target="_blank">
+          <span class="cloud-min-logo-icon brand_btns"></span>
+              <!--img class="brand_btns" src="/img/hp_cloud_icon.png"-->
+      </a>
       <a href="http://cloudifysource.org" target="_blank"><img class="brand_btns" src="/img/cloudify_icon.png"></a>
       <a herf="javascript:void(0)" id="patent_pending">&nbsp;&nbsp;(Patent Pending)</a>
           <div class="put_left">
