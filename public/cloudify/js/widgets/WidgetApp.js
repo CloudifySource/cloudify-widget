@@ -214,11 +214,10 @@ WidgetApp.controller('WidgetController',
 
         $scope.restoreIcon = function(){
             $scope.actions.editIcon = null;
-        }
+        };
 
-        $scope.widgetIconFile = "guy";
-        $scope.$watch('widgetIconFile', function( oldValue, newValue ){
-            console.log(["handling new value",oldValue,newValue]);
+        $scope.$watch('widgetIconFile', function(  newValue ){
+            console.log(["handling new value",newValue]);
             debugger;
             if ( !!$scope.actions ){
                 $scope.actions.editIcon = newValue;
