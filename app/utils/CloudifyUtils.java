@@ -80,6 +80,7 @@ public class CloudifyUtils {
             // GUY - Important - Note - Even though this is the "properties" files, it is not used for "properties" per say
             // we are actually writing a groovy file that defines variables.
             Collection<String> newLines = new LinkedList<String>();
+            newLines.add("");
             newLines.add("tenant="+ StringUtils.wrapWithQuotes(project));
             newLines.add("user="+ StringUtils.wrapWithQuotes(key));
             newLines.add("apiKey="+ StringUtils.wrapWithQuotes(secretKey));
