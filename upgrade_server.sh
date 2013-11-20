@@ -17,19 +17,11 @@ echo "changing mode for sh files"
 chmod 755 $WIDGET_HOME/*.sh
 chmod 755 $WIDGET_HOME/bin/*.sh
 
-if [ $CLOUDIFY_UPGRADE == "MANUAL" ]; then
-  echo "Upgrade can be performed only manually"
-  exit 1
-fi
-
-echo "Upgrading of cloudify is not backward compatible, are you sure you want to continue( y/n )?"
-read ANSWER
-
-if [ $ANSWER != "y" ]; then
-  exit 1
-fi
-
 # http://repository.cloudifysource.org/org/cloudifysource/2.7.0-5985-M3/gigaspaces-cloudify-2.7.0-M3-b5985.zip
+
+echo "CLOUDIFY_UPGRADE="$CLOUDIFY_UPGRADE
+
+if [ $CLOUDIFY_UPGRADE != "MANUAL" ]; then
 
 CLOUDIFY_VERSION=2.7.0
 BUILD_NUMBER=5985
@@ -58,7 +50,9 @@ else
         ln -Tfs /root/${CLOUDIFY_FOLDER} cloudify-folder
     fi
 fi
-
+else
+  echo "Cloudify upgrade can be performed only manually"
+fi
 
 echo "overriding webui-context.xml in cloudify installation"
 \cp -f conf/cloudify/webui-context.xml cloudify-folder/config/cloudify-webui-context-override.xml
