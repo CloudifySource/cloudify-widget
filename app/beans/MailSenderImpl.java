@@ -73,7 +73,7 @@ public class MailSenderImpl implements MailSender {
 
         String mailContent = views.html.mail.registration.render(lead).body();
         GsMailConfiguration mConf = new GsMailConfiguration();
-        mConf.addRecipient( GsMailer.RecipientType.TO,  lead.email, null)
+        mConf.addRecipient( GsMailer.RecipientType.TO,  lead.email, "HP Cloud Registration")
                 .setBodyHtml( mailContent )
                 .setBodyText( mailContent )
                 .setFrom( conf.mails.registrationFrom.email, conf.mails.registrationFrom.name )
