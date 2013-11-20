@@ -16,6 +16,7 @@
 package beans;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.apache.commons.lang3.StringUtils;
@@ -25,13 +26,14 @@ import org.apache.commons.mail.HtmlEmail;
 import org.apache.commons.mail.MultiPartEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
 
 import play.Application;
 import play.api.Plugin;
 import play.libs.F;
+import scala.actors.threadpool.Arrays;
 import server.ApplicationContext;
 import beans.config.SmtpConf;
+import utils.CollectionUtils;
 
 /**
  * This is a GigaSpaces mailer plugin implementation for play 2.0.
@@ -134,6 +136,11 @@ public class GsMailer implements Plugin {
             return this;
         }
 
+        public GsMailConfiguration setFrom( Mailer mailer ){
+            this.from = mailer;
+            return this;
+        }
+
         public GsMailConfiguration setFrom( String email, String name  )
         {
             this.from = new Mailer().setEmail( email ).setName( name );
@@ -155,19 +162,51 @@ public class GsMailer implements Plugin {
            return addRecipient( type, new Mailer().setName( name ).setEmail( email ));
         }
 
-        public GsMailConfiguration addRecipient( RecipientType type, Mailer mailer ){
-            switch ( type ) {
+        public GsMailConfiguration addRecipients(  Collection<Mailer> to ,  Collection<Mailer> cc ,  Collection<Mailer> bcc  ) {
+            addRecipients(RecipientType.TO, to);
+            addRecipients(RecipientType.CC, cc);
+            addRecipients(RecipientType.BCC, bcc);
+            return this;
+        }
 
-                case TO:
-                    to.add( mailer );
-                    break;
-                case CC:
-                    cc.add( mailer );
-                    break;
-                case BCC:
-                    bcc.add( mailer );
-                    break;
+        public GsMailConfiguration addRecipients( RecipientType type, Collection<Mailer> mailers ){
+            if ( CollectionUtils.isEmpty(mailers)){ // not empty
+                for (Mailer mailer : mailers) { // each
+                    if (mailer.isValid()) { // valid
+                        getMailerCollection( type ).add(mailer); // add
+                    }
+                }
             }
+
+            return this;
+        }
+
+        public boolean hasValidEmail(){
+            boolean result = false;
+            for (Mailer mailer : to) {
+                if ( mailer.isValid() ){
+                    result = true;
+                }
+            }
+            return result;
+        }
+
+        private MailerCollection getMailerCollection(RecipientType type ){
+            switch (type) {
+                case TO:
+                    return to;
+                case CC:
+                    return cc;
+                case BCC:
+                    return bcc;
+            }
+            throw new IllegalArgumentException("unknown type : " +  type);
+        }
+
+        public GsMailConfiguration addRecipient(RecipientType type, Mailer ... mailers) {
+             if ( !CollectionUtils.isEmpty( mailers )){
+                 addRecipients( type, Arrays.asList( mailers ));
+             }
             return this;
         }
 
@@ -208,7 +247,7 @@ public class GsMailer implements Plugin {
     }
 
 
-    public static abstract class CustomCollection<T>{
+    public static abstract class CustomCollection<T> implements Iterable<T>{
         Collection<T> innerCollection = new LinkedList<T>(  );
 
         public void foreach( F.Function<T, ?> function ){
@@ -223,9 +262,16 @@ public class GsMailer implements Plugin {
             }
         }
 
+        @Override
+        public Iterator<T> iterator() {
+            return innerCollection.iterator();
+        }
+
         public void add( T ... t )
         {
-            add( CollectionUtils.arrayToList( t ) );
+            if ( !CollectionUtils.isEmpty(t)){
+                add ( Arrays.asList(t));
+            }
         }
 
         public void add( Collection<T> t )

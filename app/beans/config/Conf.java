@@ -147,12 +147,43 @@ public class Conf {
 
     public static class Mails{
         public GsMailer.Mailer poolEmpty = new GsMailer.Mailer().setEmail("widget@cloudifysource.org").setName("Cloudify Widget Team");
-        public GsMailer.Mailer registrationCc = new GsMailer.Mailer();
-        public GsMailer.Mailer registrationFrom = new GsMailer.Mailer().setEmail("appcatalog@cloudifysource.org").setName("Application Catalog");
+        public MailConfiguration registration = new MailConfiguration()
+                .setSubject("Your App Catalog Free Trial Verification")
+                .setFrom(new GsMailer.Mailer().setEmail("appcatalog@cloudifysource.org").setName("Application Catalog"));
         public GsMailer.Mailer logErrors = new GsMailer.Mailer();
 
         public UpgradeLogMail changeLog = new UpgradeLogMail();
     }
+
+
+    public static class MailConfiguration{
+        public GsMailer.Mailer from = new GsMailer.Mailer();
+        public List<GsMailer.Mailer> to = new LinkedList<GsMailer.Mailer>();
+        public List<GsMailer.Mailer> cc = new LinkedList<GsMailer.Mailer>();
+        public List<GsMailer.Mailer> bcc = new LinkedList<GsMailer.Mailer>();
+        public String subject;
+
+        public MailConfiguration setFrom( GsMailer.Mailer mailer ){
+            this.from = mailer;
+            return this;
+        }
+
+        public MailConfiguration addCc( GsMailer.Mailer mailer ){
+            cc.add( mailer );
+            return this;
+        }
+
+        public MailConfiguration addBcc( GsMailer.Mailer mailer ){
+            bcc.add( mailer );
+            return this;
+        }
+
+        public MailConfiguration setSubject(String subject) {
+            this.subject = subject;
+            return this;
+        }
+    }
+
 
     public static class UpgradeLogMail{
         public File file = Utils.getFileByRelativePath("/automatic_changelog");

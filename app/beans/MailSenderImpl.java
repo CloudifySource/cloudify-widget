@@ -76,15 +76,13 @@ public class MailSenderImpl implements MailSender {
         mConf.addRecipient( GsMailer.RecipientType.TO,  lead.email, "HP Cloud Registration")
                 .setBodyHtml( mailContent )
                 .setBodyText( mailContent )
-                .setFrom( conf.mails.registrationFrom.email, conf.mails.registrationFrom.name )
+                .setFrom( conf.mails.registration.from )
                 .setReplyTo( conf.mailer )
-                .setSubject( "Your Cloud Player Trial Verification" );
-
-        if ( conf.mails.registrationCc.isValid() ){
-            mConf.addRecipient( GsMailer.RecipientType.BCC, conf.mails.registrationCc.email, conf.mails.registrationCc.name );
-        }
+                .addRecipients(GsMailer.RecipientType.BCC,conf.mails.registration.bcc )
+                .setSubject(conf.mails.registration.subject);
 
         ApplicationContext.get().getMailer().send(mConf);
+
     }
 
     @Override
