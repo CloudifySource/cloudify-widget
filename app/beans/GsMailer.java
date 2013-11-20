@@ -170,7 +170,7 @@ public class GsMailer implements Plugin {
         }
 
         public GsMailConfiguration addRecipients( RecipientType type, Collection<Mailer> mailers ){
-            if ( CollectionUtils.isEmpty(mailers)){ // not empty
+            if ( !CollectionUtils.isEmpty(mailers)){ // not empty
                 for (Mailer mailer : mailers) { // each
                     if (mailer.isValid()) { // valid
                         getMailerCollection( type ).add(mailer); // add
