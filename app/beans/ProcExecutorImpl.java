@@ -15,9 +15,12 @@
 package beans;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 
 import models.ServerNode;
 
+import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 
 import server.DeployManager;
@@ -55,5 +58,11 @@ public class ProcExecutorImpl extends DefaultExecutor implements ProcExecutor
 	public void setId(String id) {
 		this.id = id;
 	}
+
+    @Override
+    protected Process launch(CommandLine command, Map env, File dir) throws IOException {
+        return super.launch(command, env, dir);
+    }
+
 
 }

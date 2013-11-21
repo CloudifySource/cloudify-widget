@@ -43,7 +43,7 @@
         </encoder>
     </appender>
 
-    <appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
+    <appender name="EMAIL" class="logappenders.GsSmtpAppender">
 
         <subject>ERROR : %logger{20} - %m</subject>
         <layout class="ch.qos.logback.classic.PatternLayout">

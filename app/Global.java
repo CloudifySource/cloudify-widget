@@ -18,7 +18,7 @@ import annotations.AnonymousUsers;
 import beans.config.Conf;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.net.SMTPAppender;
+import logappenders.GsSmtpAppender;
 import models.User;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.LoggerFactory;
@@ -108,26 +108,12 @@ public class Global extends GlobalSettings
 
                 for (Logger _logger : loggerContext.getLoggerList()) {
 
-                    SMTPAppender smtpAppender = ( SMTPAppender )_logger.getAppender("EMAIL");
+                    GsSmtpAppender smtpAppender = (GsSmtpAppender)_logger.getAppender("EMAIL");
                     if ( smtpAppender != null ){
-                        smtpAppender.setPassword( conf.smtp.password );
-                        smtpAppender.setSTARTTLS( conf.smtp.tls );
-                        smtpAppender.setUsername( conf.smtp.user );
-                        smtpAppender.setFrom( conf.smtp.user );
-                        smtpAppender.setSMTPHost( conf.smtp.host );
-                        smtpAppender.setSMTPPort( conf.smtp.port );
-
-                        String subject = smtpAppender.getSubject();
-                        smtpAppender.setSubject( conf.application.name + " " + subject );
-
-                        smtpAppender.addTo( conf.mails.logErrors.email );
+                        GsSmtpAppender.conf = conf;
                         smtpAppender.start();
-                        logger.info(_logger.getName() + " has appender " + smtpAppender.getName() + " fully configured");
                         break;
                     }
-//                    }else{
-//                        logger.info("logger [" + _logger.getName() + "] does not have emails appender");
-//                    }
                 }
             }
         }catch(Exception e){
@@ -140,6 +126,8 @@ public class Global extends GlobalSettings
         }catch(Exception e){
             logger.error("unable to send changelog email",e);
         }
+
+        logger.error("testing");
 	}
 
     private void uploadInitialData( Application app )

@@ -16,15 +16,18 @@ public class ExecuteResultHandlerImpl extends DefaultExecuteResultHandler {
     private static Logger logger = LoggerFactory.getLogger(ExecuteResultHandlerImpl.class);
 
     private String name;
+    private boolean finished = false;
     @Override
     public void onProcessComplete(int i) {
         logger.info("process [{}] has finished with exit code [{}]", name, i);
+        finished = true;
         super.onProcessComplete( i );
     }
 
     @Override
     public void onProcessFailed(ExecuteException e) {
         logger.error("process [{}] failed due to error", name, e);
+        finished = true;
         super.onProcessFailed( e );
     }
 

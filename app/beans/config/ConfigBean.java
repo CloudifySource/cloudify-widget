@@ -68,19 +68,17 @@ public class ConfigBean {
     }
 
 
-
-    public Conf getConfiguration()
-    {
-        if ( root == null ){
-            try {
-                root = new Conf();
-                injectConfiguration(root, Play.application().configuration());
-            } catch (Exception e) {
-                logger.error("unable to inject ", e);
-            }
+    public Conf getConfiguration() {
+        try {
+            Conf root = new Conf();
+            logger.info("injecting configuration");
+            injectConfiguration(root, Play.application().configuration());
+            logger.info("FINISHED: injecting configuration");
+            return root;
+        } catch (RuntimeException e) {
+            logger.error("unable to inject ", e);
+            throw e;
         }
-        return root;
-
     }
 
     private abstract static class ConfigValueHandler<T> {
@@ -152,7 +150,6 @@ public class ConfigBean {
 
     private void injectConfiguration( Object obj, Configuration conf )
     {
-        logger.info("injecting configuration");
         Set<Field> allFields = ReflectionUtils.getAllFields( obj.getClass(), Predicates.alwaysTrue() );
         for ( Field field : allFields ) {
             String configKey = field.getName();
@@ -210,7 +207,6 @@ public class ConfigBean {
                     throw new RuntimeException( String.format( "unable to populate configuration for key %s.%s", obj.getClass(), field.getName()), e );
                 }
             }
-            logger.info("FINISHED: injecting configuration");
 
 
         }

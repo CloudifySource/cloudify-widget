@@ -373,8 +373,9 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                         .overrides(overrides)
                         .buildView(ComputeServiceContext.class);
                 this.zone = cloudCredentials.zone;
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 logger.error("unable to initialize nova context", e);
+                throw e;
             }
         }
 
