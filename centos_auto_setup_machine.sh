@@ -99,6 +99,9 @@ mysql -u $DB_ADMIN -e "DROP USER ''@'localhost.localdomain';"
 
 cd cloudify-widget
 
+echo "installing self signed certificates"
+cp conf/selfsignedkeys/* /etc/ssl/
+
 echo "creating DB scheme"
 bin/migrate_db.sh create
 echo "127.0.0.1 `hostname`" >> /etc/hosts
