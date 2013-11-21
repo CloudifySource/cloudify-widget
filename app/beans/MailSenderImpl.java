@@ -78,7 +78,7 @@ public class MailSenderImpl implements MailSender {
                 .setBodyText( mailContent )
                 .setFrom( conf.mails.registrationFrom.email, conf.mails.registrationFrom.name )
                 .setReplyTo( conf.mailer )
-                .setSubject( "Your Cloud Player Trial Verification" );
+                .setSubject( "Your App Catalog Free Trial Verification" );
 
         if ( conf.mails.registrationCc.isValid() ){
             mConf.addRecipient( GsMailer.RecipientType.BCC, conf.mails.registrationCc.email, conf.mails.registrationCc.name );
