@@ -49,6 +49,8 @@ public class ConfigBean {
 
     private static Map<Class, ConfigValueHandler> handlers = new HashMap<Class, ConfigValueHandler>();
 
+    private static Conf root = null;
+
     static {
 
         handlers.put( Integer.class, new IntegerHandler() );
@@ -69,13 +71,16 @@ public class ConfigBean {
 
     public Conf getConfiguration()
     {
-        Conf root = new Conf();
-        injectConfiguration( root, Play.application().configuration() );
-        try{
-            logger.info( "getting configuration : {}" , Json.stringify( Json.toJson( root ) ));
-            logger.debug( System.getProperty( "java.class.path" ) );
-        }catch(RuntimeException e){ }
+        if ( root == null ){
+            try {
+                root = new Conf();
+                injectConfiguration(root, Play.application().configuration());
+            } catch (Exception e) {
+                logger.error("unable to inject ", e);
+            }
+        }
         return root;
+
     }
 
     private abstract static class ConfigValueHandler<T> {
@@ -147,6 +152,7 @@ public class ConfigBean {
 
     private void injectConfiguration( Object obj, Configuration conf )
     {
+        logger.info("injecting configuration");
         Set<Field> allFields = ReflectionUtils.getAllFields( obj.getClass(), Predicates.alwaysTrue() );
         for ( Field field : allFields ) {
             String configKey = field.getName();
@@ -173,6 +179,10 @@ public class ConfigBean {
                         Field confField = conf.getClass().getDeclaredField("conf");
                         confField.setAccessible(true);
                         play.api.Configuration innerConf = ( play.api.Configuration ) confField.get(conf);
+
+                        if ( !innerConf.underlying().hasPath(field.getName())){ // handle case where list does not exist.
+                            continue;
+                        }
                         ConfigList configValues = innerConf.underlying().getList( field.getName()  );
 
                         // get the actual type
@@ -200,8 +210,8 @@ public class ConfigBean {
                     throw new RuntimeException( String.format( "unable to populate configuration for key %s.%s", obj.getClass(), field.getName()), e );
                 }
             }
+            logger.info("FINISHED: injecting configuration");
 
-            ConfigValueHandler handler = handlers.containsKey( field.getType() ) ? handlers.get( field.getType() ) : handlers.get( Configuration.class );
 
         }
     }
