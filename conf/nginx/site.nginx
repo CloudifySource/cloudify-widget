@@ -11,7 +11,7 @@ upstream my-backend {
 server{
     listen 443;
 
-
+    ssl on;
     ssl_certificate     /etc/ssl/widget.crt;
     ssl_certificate_key /etc/ssl/widget.key;
 
