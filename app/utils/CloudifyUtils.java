@@ -19,10 +19,12 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.jclouds.ContextBuilder;
+import org.jclouds.collect.PagedIterable;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.openstack.nova.v2_0.NovaApi;
 import org.jclouds.openstack.nova.v2_0.NovaAsyncApi;
@@ -33,13 +35,17 @@ import org.jclouds.openstack.nova.v2_0.domain.SecurityGroup;
 import org.jclouds.openstack.nova.v2_0.extensions.KeyPairApi;
 import org.jclouds.openstack.nova.v2_0.extensions.SecurityGroupApi;
 import org.jclouds.rest.RestContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import server.ApplicationContext;
+import beans.ServerBootstrapperImpl.NovaContext;
 import beans.config.ServerConfig;
 import beans.config.ServerConfig.CloudBootstrapConfiguration;
+import clouds.base.CloudServer;
+import clouds.base.CloudServerApi;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 
 
@@ -207,4 +213,13 @@ public class CloudifyUtils {
 		}
 		return filesList[0];
 	}
+	
+    public static List<CloudServer> getAllMachinesWithPredicate( Predicate<CloudServer> predicate, NovaContext context ){
+        logger.info( "getting all machine by predicate [{}]", predicate );
+        CloudServerApi cloudServerApi = context.getApi();
+        logger.info( "cloudServerApi=", cloudServerApi );
+        PagedIterable<CloudServer> listInDetail = cloudServerApi.listInDetail();
+        FluentIterable<CloudServer> filter = listInDetail.concat().filter( predicate );
+        return filter.toImmutableList();
+    }	
 }
