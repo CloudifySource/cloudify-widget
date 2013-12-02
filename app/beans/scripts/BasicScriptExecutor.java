@@ -63,8 +63,12 @@ public class BasicScriptExecutor implements ScriptExecutor{
 			logger.info( "waiting for output" );
 			resultHandler.waitFor();
 			logger.info( "finished waiting , exit value is [{}]", resultHandler.getExitValue() );
-
-			String output = Utils.getOrDefault( Utils.getCachedOutput( serverNode ), "" );
+			logger.info( "> serverNode ID:", serverNode.getId() );
+			String cachedOutput = Utils.getCachedOutput( serverNode );
+			logger.info( "> cachedOutput:", cachedOutput );
+			String output = Utils.getOrDefault( cachedOutput, "" );
+			logger.info( "> output:", output );
+			
 			if ( resultHandler.getException() != null ) {
 				logger.info( "we have exceptions, checking for known issues" );
 				if ( output.contains( "found existing management machines" ) ) {
