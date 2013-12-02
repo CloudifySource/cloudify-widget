@@ -63,11 +63,11 @@ public class BasicScriptExecutor implements ScriptExecutor{
 			logger.info( "waiting for output" );
 			resultHandler.waitFor();
 			logger.info( "finished waiting , exit value is [{}]", resultHandler.getExitValue() );
-			logger.info( "> serverNode ID:", serverNode.getId() );
+			logger.info( "> serverNode ID:" + serverNode.getId() );
 			String cachedOutput = Utils.getCachedOutput( serverNode );
-			logger.info( "> cachedOutput:", cachedOutput );
+			logger.info( "> cachedOutput:" + cachedOutput );
 			String output = Utils.getOrDefault( cachedOutput, "" );
-			logger.info( "> output:", output );
+			logger.info( "> output:" + output );
 			
 			if ( resultHandler.getException() != null ) {
 				logger.info( "we have exceptions, checking for known issues" );
