@@ -232,8 +232,8 @@ public class Application extends Controller
     private static Result statusToResult( Widget.Status status ){
         Map<String,Object> result = new HashMap<String, Object>();
         result.put("status", status );
-        logger.info( "~~~ status=" + status );
-        logger.info("statusToResult > result: [{}]", result);
+        logger.debug( "~~~ status=" + status );
+        logger.debug("statusToResult > result: [{}]", result);
         return ok( Json.toJson( result ));
     }
 
@@ -269,19 +269,19 @@ public class Application extends Controller
 	{
 		try
 		{
-			logger.info( "~~~ getWidgetStatus, instanceId=" + instanceId );
+			logger.debug( "~~~ getWidgetStatus, instanceId=" + instanceId );
             if (!NumberUtils.isNumber( instanceId )){
                 return badRequest();
             }
             
-            logger.info( "~~~ Before find" );
+            logger.debug( "~~~ Before find" );
             
             ServerNode serverNode = ServerNode.find.byId( Long.parseLong(instanceId) );
             
-            logger.info( "~~~ serverNode=" + serverNode );
+            logger.debug( "~~~ serverNode=" + serverNode );
 
 			Widget.Status wstatus = ApplicationContext.get().getWidgetServer().getWidgetStatus(serverNode);
-			logger.info( "~~~ wstatus=" + wstatus );
+			logger.debug( "~~~ wstatus=" + wstatus );
 			return statusToResult(wstatus);
 		}catch(ServerException ex)
 		{
