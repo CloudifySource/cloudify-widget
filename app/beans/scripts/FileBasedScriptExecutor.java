@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import models.ServerNode;
 
 import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecuteResultHandler;
+import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.JsonNode;
 import org.jclouds.compute.ComputeServiceContext;
@@ -52,7 +52,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 							ComputeServiceContext jCloudsContext, File cloudFolder,
 							CloudBootstrapConfiguration cloudBootstrapConfiguration, 
 							boolean isHandlePrivateKey ) {
-		
+
 		String commandLine = cmdLine.toString();
 		String serverNodeId = String.valueOf(  serverNode.getId() );
 		Map<String,String> environment = ApplicationContext.get().conf().server.environment.getEnvironment();
@@ -68,8 +68,11 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		addCommonProps( map, serverNode );
 
 		writeToJsonFile( serverNodeId, BOOTSTRAP, map );
-		
-		while( !isBoostrappingSucceeded( serverNodeId ) ){
+
+
+		logger.info( "waiting for status..." );
+
+		while( !isBootstrappingFinished( serverNodeId, serverNodeId ) ){
 			try{
 				Thread.sleep( 3* 1000 );
 			} 
@@ -78,24 +81,32 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 			}
 		}
 		
+		logger.info( "status found..." );
+
 		try{
-			
+/*
 			DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-			
-			/*
+
+
 			ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor( serverNode );
 
 			logger.info( "Executing command line: " + cmdLine );
 			//Command line for bootstrapping remote cloud.
 			bootstrapExecutor.execute( cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler );
-			*/
-			
-			logger.info( "waiting for output" );
-			resultHandler.waitFor();
-			logger.info( "finished waiting , exit value is [{}]", resultHandler.getExitValue() );
+*/
 
-			String output = Utils.getOrDefault( Utils.getCachedOutput( serverNode ), "" );
-			if ( resultHandler.getException() != null ) {
+//			resultHandler.waitFor();
+			logger.info( "finished waiting , exit value is [{}]", getBootstrappingExitStatus( serverNodeId, serverNodeId ) );
+			logger.info( ">>> serverNodeId=" + serverNode.getId() );
+			String cachedOutput = Utils.getCachedOutput( serverNode );
+			logger.info( ">>> cachedOutput=" + cachedOutput );
+			String output = Utils.getOrDefault( cachedOutput, "" );
+			logger.info( ">>> output=" + output );
+
+			ExecuteException executeException = null;//resultHandler.getException();
+			logger.info( ">>> Bootstrap execution output=" + output );
+
+			if( executeException != null ) {
 				logger.info( "we have exceptions, checking for known issues" );
 				if ( output.contains( "found existing management machines" ) ) {
 					logger.info( "found 'found existing management machines' - issuing cloudify already exists message" );
@@ -103,7 +114,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 				}
 				logger.info( "Command execution ended with errors: {}", output );
 				throw new RuntimeException( "Failed to bootstrap cloudify machine: "
-						+ output, resultHandler.getException() );
+						+ output, executeException );
 			}
 
 			logger.info( "finished handling errors, extracting IP" );
@@ -111,7 +122,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 			if ( StringUtils.isEmpty( publicIp ) ) {
 				logger.warn( "No public ip address found in bootstrap output. " + output );
 				throw new RuntimeException( "Bootstrap failed. No IP address found in bootstrap output."
-						+ output, resultHandler.getException() );
+						+ output, executeException );
 			}
 			logger.info( "ip is [{}], saving to serverNode", publicIp );
 
@@ -123,7 +134,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 				logger.info( "found PEM string" );
 				serverNode.setPrivateKey( privateKey );
 			}
-			
+
 			logger.info( "Bootstrap cloud command ended successfully" );
 
 			logger.info( "updating server node with new info" );
@@ -146,20 +157,41 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 			serverNode.setStopped(true);
 		}
 	}
-	
-	private static boolean isBoostrappingSucceeded( String subFolderName ) {
 
-		boolean succeeded = false;
+	private static int getBootstrappingExitStatus( String subFolderName, String serverNodeId ) {
+
+		int retValue = -1;
 		
 		try {
-			JsonNode parsedJson = getBootstrapStatusJson( subFolderName );
+			JsonNode parsedJson = getStatusJson( subFolderName, BOOTSTRAP, serverNodeId );
+			if( parsedJson != null ){
+				JsonNode statusJsonNode = parsedJson.get( EXIT_STATUS_PROPERTY );
+//				JsonNode errorMessageJsonNode = parsedJson.get( ERROR_MESSAGE_PROPERTY );
+				if( statusJsonNode != null ){
+					retValue = statusJsonNode.getIntValue();
+				}
+			}
+		} 
+		catch (IOException e) {
+			logger.error( e.toString(), e );
+		}
+		
+		return retValue;
+	}	
+	
+	private static boolean isBootstrappingFinished( String subFolderName, String serverNodeId ) {
+
+		boolean succeeded = false;
+
+		try {
+			JsonNode parsedJson = getStatusJson( subFolderName, BOOTSTRAP, serverNodeId );
 			if( parsedJson != null ){
 				JsonNode statusJsonNode = parsedJson.get( EXIT_STATUS_PROPERTY );
 //				JsonNode errorMessageJsonNode = parsedJson.get( ERROR_MESSAGE_PROPERTY );
 				if( statusJsonNode != null ){
 
 					logger.info( "statusJsonNode.getIntValue():" + statusJsonNode.getIntValue() );
-					logger.info( "statusJsonNode.getTextValue():" + statusJsonNode.getTextValue() );
+//					logger.info( "statusJsonNode.getTextValue():" + statusJsonNode.getTextValue() );
 
 					succeeded = true;
 				}
@@ -168,17 +200,17 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		catch (IOException e) {
 			logger.error( e.toString(), e );
 		}
-		
+
 		return succeeded;
 	}
 	
-	private static JsonNode getBootstrapStatusJson( String subFolderName ) throws IOException {
+	private static JsonNode getStatusJson( String subFolderName, String opName, String serverNodeId ) throws IOException {
 
 		JsonNode retValue = null;
-		
+	
 		File resultJsonFile = FileUtils.getFile( EXECUTING_SCRIPTS_FOLDER_PATH +  
-								subFolderName + File.separator + BOOTSTRAPPING_STATUS_FILE_NAME );
-		
+					subFolderName + File.separator + serverNodeId + SERVER_NODE_ID_DELIMETER + opName + "_status.json" );
+	
 		if( !resultJsonFile.exists() ){
 			return null;
 		}
@@ -208,18 +240,6 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		catch( IOException e ){
 			logger.error( e.toString(), e );
 		}
-		
-		/*
-		try {
-			PrintWriter out = new PrintWriter( jsonFile );
-			out.write( json.toString() );
-			out.flush();
-			out.close();
-			logger.info( "Created json file:" + jsonFile.getPath() );
-		} 
-		catch ( FileNotFoundException e ) {
-			logger.error( e.toString(), e );
-		}*/		
 	}
 
 	/**
@@ -266,7 +286,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
     }
     
     private static void addCommonProps( Map<String,String> map, ServerNode serverNode ){
-    	
+	
     	map.put( SERVER_NODE_ID_PROPERTY, String.valueOf( serverNode.getId() ) );
 		map.put( ADVANCED_PARAMS_PROPERTY, String.valueOf( serverNode.getAdvancedParams() ) );
 		if( serverNode.getPublicIP() != null ){
