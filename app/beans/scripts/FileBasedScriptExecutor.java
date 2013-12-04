@@ -59,7 +59,6 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 				", Environment=" + environment + ", serverNode.id=" + serverNodeId +
 				", serverNode.getSecretKey=" + serverNode.getSecretKey() );
 		
-		
 		Map<String,String> map = new HashMap<String, String>();
 		map.put( CMD_LINE_PROPERTY, commandLine );
 		map.put( IS_HANDLE_PRIVATE_PROPERTY, String.valueOf( isHandlePrivateKey ) );
@@ -67,7 +66,6 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		addCommonProps( map, serverNode );
 
 		writeToJsonFile( serverNodeId, BOOTSTRAP, map );
-
 
 		logger.info( "waiting for status..." );
 
@@ -310,8 +308,35 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
     }
 
 	@Override
-	public String getOutput(ServerNode serverNode) {
-		return Utils.getCachedOutput( serverNode );
+	public String getOutput( ServerNode serverNode ) {
+		
+		long nodeId = serverNode.getId();
+		String outputFileName = EXECUTING_SCRIPTS_FOLDER_PATH +  
+					nodeId + File.separator + OUTPUT_FILE_NAME_PREFIX + nodeId + ".log";
+		
+		if( logger.isDebugEnabled() ){
+			logger.debug( "> outputFileName=" + outputFileName );
+		}
+		
+		File outputFile = new File( outputFileName );
+		if( logger.isDebugEnabled() ){
+			logger.debug( "> output File exists=" + outputFile.exists() );
+		}		
+		
+		if( !outputFile.exists() ){
+			return "";
+		}
+		
+		String retValue;
+		try {
+			retValue = FileUtils.readFileToString( outputFile );
+		} 
+		catch( IOException e ) {
+			logger.warn( e.toString(), e );
+			retValue = "";
+		}
+		
+		return retValue;
 	}
 	
 	private static String getBootstrapErrorMessage( String subFolderName, String serverNodeId ) {

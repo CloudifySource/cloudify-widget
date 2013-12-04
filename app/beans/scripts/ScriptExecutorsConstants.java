@@ -18,8 +18,9 @@ public interface ScriptExecutorsConstants {
 	String SCRIPTS_FOLDER_PATH = "." + File.separator + "_scripts";
 	String NEW_SCRIPTS_FOLDER_PATH = SCRIPTS_FOLDER_PATH + File.separator + "new" + File.separator;
 	String EXECUTING_SCRIPTS_FOLDER_PATH = SCRIPTS_FOLDER_PATH + File.separator + "executing" + File.separator;
-	String EXECUTED_SCRIPTS_FOLDER_PATH= SCRIPTS_FOLDER_PATH + File.separator + "executed" + File.separator;
-	
+	String EXECUTED_SCRIPTS_FOLDER_PATH = SCRIPTS_FOLDER_PATH + File.separator + "executed" + File.separator;
+	String OUTPUT_FILE_NAME_PREFIX = "output-nodeid-";
+		
 	String SERVER_NODE_ID_DELIMETER= "_";
 	String BOOTSTRAP = "bootstrap";
 	String INSTALL = "install";
