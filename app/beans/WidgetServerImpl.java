@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import beans.config.Conf;
+import beans.scripts.ScriptExecutor;
 import controllers.WidgetAdmin;
 
 import models.ServerNodeEvent;
@@ -62,7 +63,9 @@ public class WidgetServerImpl implements WidgetServer
 
     @Inject
     private DeployManager deployManager;
-
+    
+	@Inject
+	private ScriptExecutor scriptExecutor;    
 
     // for logging purposes.
     private Set<Long> serverNodeIds = new HashSet<Long>();
@@ -151,7 +154,7 @@ public class WidgetServerImpl implements WidgetServer
             result.setInstanceId( Long.toString(server.getId()) ); // will need this to register users on specific nodes.
         }
 
-        String cachedOutput = Utils.getCachedOutput( server );// need to sort out the cache before we decide if the installation finished.
+        String cachedOutput = scriptExecutor.getOutput(server);// need to sort out the cache before we decide if the installation finished.
         logger.debug( "cachedOutput=" + cachedOutput );
         result.setRawOutput( Utils.split( cachedOutput, "\n" ) );
 

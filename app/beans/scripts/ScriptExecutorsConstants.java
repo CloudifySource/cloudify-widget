@@ -25,7 +25,7 @@ public interface ScriptExecutorsConstants {
 	String INSTALL = "install";
 	String UNINSTALL = "uninstall";
 	
-	String BOOTSTRAPPING_STATUS_FILE_NAME = "bootstrapping_status.json";
-	String ERROR_MESSAGE_PROPERTY = "message";
+	//String BOOTSTRAPPING_STATUS_FILE_NAME = "bootstrapping_status.json";
+	String ERROR_MESSAGE_PROPERTY = "exception";
 	String EXIT_STATUS_PROPERTY = "exitStatus";
 }

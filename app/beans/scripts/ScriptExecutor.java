@@ -30,4 +30,6 @@ public interface ScriptExecutor {
 	 * @param server
 	 */
     public void runInstallationManagementScript( CommandLine cmdLine, ServerNode server );
+
+    public String getOutput( ServerNode serverNode );
 }

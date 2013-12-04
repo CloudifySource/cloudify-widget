@@ -12,7 +12,7 @@ import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteResultHandler;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jclouds.compute.ComputeServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,4 +148,9 @@ public class BasicScriptExecutor implements ScriptExecutor{
             throw new ServerException( "Failed to execute process.", e );
         }
     }
+
+	@Override
+	public String getOutput( ServerNode serverNode ) {
+		return Utils.getCachedOutput( serverNode );
+	}
 }

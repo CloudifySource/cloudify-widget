@@ -10,8 +10,8 @@ import javax.inject.Inject;
 import models.ServerNode;
 
 import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonNode;
 import org.jclouds.compute.ComputeServiceContext;
 import org.slf4j.Logger;
@@ -22,7 +22,6 @@ import play.libs.Json;
 import server.ApplicationContext;
 import server.exceptions.ServerException;
 import utils.CloudifyUtils;
-import utils.StringUtils;
 import utils.Utils;
 import beans.api.ExecutorFactory;
 import beans.config.ServerConfig.CloudBootstrapConfiguration;
@@ -94,16 +93,17 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 			//Command line for bootstrapping remote cloud.
 			bootstrapExecutor.execute( cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler );
 */
-
 //			resultHandler.waitFor();
-			logger.info( "finished waiting , exit value is [{}]", getBootstrappingExitStatus( serverNodeId, serverNodeId ) );
+			logger.info( "finished waiting , exit value is [{}]", 
+					getBootstrappingExitStatus( serverNodeId, serverNodeId ) );
 			logger.info( ">>> serverNodeId=" + serverNode.getId() );
 			String cachedOutput = Utils.getCachedOutput( serverNode );
 			logger.info( ">>> cachedOutput=" + cachedOutput );
 			String output = Utils.getOrDefault( cachedOutput, "" );
 			logger.info( ">>> output=" + output );
 
-			ExecuteException executeException = null;//resultHandler.getException();
+			String executeException = 
+					getBootstrapErrorMessage( serverNodeId, serverNodeId );
 			logger.info( ">>> Bootstrap execution output=" + output );
 
 			if( executeException != null ) {
@@ -113,8 +113,8 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 					throw new ServerException( Messages.get( "cloudify.already.exists" ) );
 				}
 				logger.info( "Command execution ended with errors: {}", output );
-				throw new RuntimeException( "Failed to bootstrap cloudify machine: "
-						+ output, executeException );
+				throw new RuntimeException( "Failed to bootstrap cloudify machine: " + 
+							executeException + "\n" + output );
 			}
 
 			logger.info( "finished handling errors, extracting IP" );
@@ -122,7 +122,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 			if ( StringUtils.isEmpty( publicIp ) ) {
 				logger.warn( "No public ip address found in bootstrap output. " + output );
 				throw new RuntimeException( "Bootstrap failed. No IP address found in bootstrap output."
-						+ output, executeException );
+						+ output/*, executeException*/ );
 			}
 			logger.info( "ip is [{}], saving to serverNode", publicIp );
 
@@ -181,19 +181,15 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 	
 	private static boolean isBootstrappingFinished( String subFolderName, String serverNodeId ) {
 
-		boolean succeeded = false;
+		boolean retValue = false;
 
 		try {
 			JsonNode parsedJson = getStatusJson( subFolderName, BOOTSTRAP, serverNodeId );
 			if( parsedJson != null ){
 				JsonNode statusJsonNode = parsedJson.get( EXIT_STATUS_PROPERTY );
-//				JsonNode errorMessageJsonNode = parsedJson.get( ERROR_MESSAGE_PROPERTY );
 				if( statusJsonNode != null ){
-
-					logger.info( "statusJsonNode.getIntValue():" + statusJsonNode.getIntValue() );
-//					logger.info( "statusJsonNode.getTextValue():" + statusJsonNode.getTextValue() );
-
-					succeeded = true;
+					logger.info( "Exit code:" + statusJsonNode.getIntValue() );
+					retValue = true;
 				}
 			}
 		} 
@@ -201,7 +197,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 			logger.error( e.toString(), e );
 		}
 
-		return succeeded;
+		return retValue;
 	}
 	
 	private static JsonNode getStatusJson( String subFolderName, String opName, String serverNodeId ) throws IOException {
@@ -296,4 +292,28 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 			map.put( PRIVATE_IP_PROPERTY, String.valueOf( serverNode.getPrivateIP() ) );
 		}
     }
+
+	@Override
+	public String getOutput(ServerNode serverNode) {
+		return Utils.getCachedOutput( serverNode );
+	}
+	
+	private static String getBootstrapErrorMessage( String subFolderName, String serverNodeId ) {
+
+		String retValue = null;
+		try {
+			JsonNode parsedJson = getStatusJson( subFolderName, BOOTSTRAP, serverNodeId );
+			if( parsedJson != null ){
+				JsonNode errorMessageJsonNode = parsedJson.get( ERROR_MESSAGE_PROPERTY );
+				if( errorMessageJsonNode != null ){
+					retValue = errorMessageJsonNode.getTextValue();
+				}
+			}
+		} 
+		catch (IOException e) {
+			logger.error( e.toString(), e );
+		}
+		
+		return retValue;
+	}	
 }

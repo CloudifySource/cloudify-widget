@@ -32,7 +32,7 @@ if( filesCount  > 0 ){
 	
 		//handle first found folder, move it first to executing folder
 		var firstFile = files[ 0 ];
-		var serverNodeId = firstFile.substring( 0, firstFile.indexOf("_") );
+		var serverNodeId = firstFile.substring( 0, firstFile.indexOf('_') );
 		var serverNodeIdDir = executingDir + serverNodeId + path.sep;
 		
 		createNewExecutingDir( serverNodeIdDir );
@@ -93,7 +93,7 @@ function executeCommand( firstFile, data, commandArgs ){
 	console.log( '~~~executeCommand, JSON:' + data);
 	data = JSON.parse(data);
 	
-	var cmdLine = data.cmdLine;
+	var cmdLine = 'D:\\gigaspaces-xap-premium-9.7.0-m7-b10491-236\\bin\\gs-ui.bat';//data.cmdLine;
 	var args = data.args;
 	var advancedparams = data.advancedparams;
 	var serverNodeId = data.serverNodeId;
@@ -108,7 +108,7 @@ function executeCommand( firstFile, data, commandArgs ){
 
 	process.env['CLOUDIFY_HOME'] = cloudifyHome;
 	
-	var logFile = serverNodeIdDir + 'cliOutput-nodeid-' + serverNodeId +'.log';
+	var logFile = serverNodeIdDir + 'output-nodeid-' + serverNodeId +'.log';
 	
 	console.log( '~~~~~~~~~~~ created logFile=' + logFile );
 	
@@ -118,8 +118,16 @@ function executeCommand( firstFile, data, commandArgs ){
 	myCmd = spawn( cmdLine );
 
 	myCmd.stdout.on("data", function (stdoutData) {
+		console.log( '~~~~~~~myCmd.pid=' +  myCmd.pid );
 		console.log("~~~~~~stdoutData" + stdoutData); 
 		fileLogStream1.write(stdoutData);
+		/*
+		//check for exit indication
+		if( stdoutData.indexOf('Good Bye!') >= 0 ) {
+			writeStatusJsonFile( serverNodeIdDir, firstFile, null );
+			fileLogStream1.
+			fileLogStream2.
+		}*/
 	});
 	
 	myCmd.stderr.on('data', function (stderrData) {
@@ -129,7 +137,12 @@ function executeCommand( firstFile, data, commandArgs ){
 	
 	myCmd.on('error', function (err) {
 		console.log('!!!!!!!! error thrown:', err);
-		writeStatusJsonFile( serverNodeIdDir, firstFile, err );
+		writeStatusJsonFile( serverNodeIdDir, firstFile, err, 1 );
+	});
+	
+	myCmd.on('close', function (code) {
+		console.log('!!!!!!!!!!!! process exited with code ' + code );
+		writeStatusJsonFile( serverNodeIdDir, firstFile, null, code );
 	});
 }
 
@@ -141,6 +154,46 @@ function createWriteStream( fileName, flag, mode ){
 	});
 }
 
+function writeStatusJsonFile( serverNodeIdDir, jsonFileName, error, exitCode ){
+
+		/*
+			Example: Write json status file
+		*/
+		var statusData
+		if( error == null ){
+			statusData = {
+				exitStatus:exitCode
+			}	
+		}
+		else{
+			statusData = {
+				exitStatus:exitCode,
+				exception:error
+			}		
+		}
+		
+		var extensionIndex = jsonFileName.indexOf(".json");
+		var fileNameWithoutExtension;
+		if( extensionIndex > 0 ){
+			fileNameWithoutExtension = jsonFileName.substring( 0, extensionIndex );
+			console.log( '>>> fileNameWithouExtension1=' + fileNameWithoutExtension );
+		}
+		else{
+			fileNameWithoutExtension = jsonFileName;
+			console.log( '>>> fileNameWithouExtension2=' + fileNameWithoutExtension );
+		}
+		
+		fs.writeFile( serverNodeIdDir + fileNameWithoutExtension + "_status.json", JSON.stringify(statusData, null, 4), function(err) {
+			if(err) {
+				console.log(err);
+			} 
+			else {
+				console.log("JSON saved to file");
+			}
+		}); 
+}
+
+/*
 function performBootstrap( data ){
 	console.log( '~~~performBootstrap, JSON:' + data);
 	data = JSON.parse(data);
@@ -188,42 +241,4 @@ function performInstall( data ){
 			console.log('performInstall, exec error: ' + error);
 		}
 	});
-}
-
-function writeStatusJsonFile( serverNodeIdDir, jsonFileName, error ){
-
-		/*
-			Example: Write json status file
-		*/
-		if( error == null ){
-			var statusData = {
-				exitStatus:'0'
-			}	
-		}
-		else{
-			var statusData = {
-				exitStatus:'1',
-				exception:error
-			}		
-		}
-		
-		var extensionIndex = jsonFileName.indexOf(".json");
-		var fileNameWithoutExtension;
-		if( extensionIndex > 0 ){
-			fileNameWithoutExtension = jsonFileName.substring( 0, extensionIndex );
-			console.log( '>>> fileNameWithouExtension1=' + fileNameWithoutExtension );
-		}
-		else{
-			fileNameWithoutExtension = jsonFileName;
-			console.log( '>>> fileNameWithouExtension2=' + fileNameWithoutExtension );
-		}
-		
-		fs.writeFile( serverNodeIdDir + fileNameWithoutExtension + "_status.json", JSON.stringify(statusData, null, 4), function(err) {
-			if(err) {
-				console.log(err);
-			} 
-			else {
-				console.log("JSON saved to file");
-			}
-		}); 
-}
+}*/
