@@ -7,7 +7,7 @@ var args = [];
  
 console.log( 'start' );
 
-var scriptsDir = '..\\_scripts\\';
+var scriptsDir = '..' + path.sep + '_scripts' + path.sep;
 var newDir = scriptsDir + 'new' + path.sep;
 var executingDir = scriptsDir + 'executing' + path.sep;
 var executedDir = scriptsDir + 'executed' + path.sep;
