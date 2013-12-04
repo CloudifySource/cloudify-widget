@@ -7,7 +7,7 @@ var args = [];
  
 console.log( 'start' );
 
-var scriptsDir = 'D:\\workspace\\cloudify-widget-v1\\_scripts\\';
+var scriptsDir = '..\\_scripts\\';
 var newDir = scriptsDir + 'new' + path.sep;
 var executingDir = scriptsDir + 'executing' + path.sep;
 var executedDir = scriptsDir + 'executed' + path.sep;
@@ -93,7 +93,7 @@ function executeCommand( firstFile, data, commandArgs ){
 	console.log( '~~~executeCommand, JSON:' + data);
 	data = JSON.parse(data);
 	
-	var cmdLine = 'D:\\gigaspaces-xap-premium-9.7.0-m7-b10491-236\\bin\\gs-ui.bat';//data.cmdLine;
+	var cmdLine = data.cmdLine;//'D:\\gigaspaces-xap-premium-9.7.0-m7-b10491-236\\bin\\gs-ui.bat';//data.cmdLine;
 	var args = data.args;
 	var advancedparams = data.advancedparams;
 	var serverNodeId = data.serverNodeId;
