@@ -93,14 +93,18 @@ function executeCommand( firstFile, data, commandArgs ){
 	console.log( '~~~executeCommand, JSON:' + data);
 	data = JSON.parse(data);
 	
-	var cmdLine = data.cmdLine;//'D:\\gigaspaces-xap-premium-9.7.0-m7-b10491-236\\bin\\gs-ui.bat';//data.cmdLine;
-	var args = data.args;
+	var executable = data.executable;
+	var arguments = data.arguments;
 	var advancedparams = data.advancedparams;
 	var serverNodeId = data.serverNodeId;
 	var cloudifyHome = data.cloudifyHome;
 	var handlePrivateKey = data.handlePrivateKey;
+	var argumentsArray = arguments.split(',');
 	
-	console.log( '>cmdLine=' + cmdLine );
+	console.log( '>commandArgs=' + commandArgs );
+	console.log( '>executable=' + executable );
+	console.log( '>arguments=' + arguments );
+	console.log( '>splitted arguments=' + argumentsArray );
 	console.log( '>advancedparams=' + advancedparams );
 	console.log( '>serverNodeId=' + serverNodeId );
 	console.log( '>cloudifyHome=' + cloudifyHome );
@@ -115,19 +119,14 @@ function executeCommand( firstFile, data, commandArgs ){
 	var fileLogStream1 = createWriteStream( logFile, 'a', 0644 );
 	var fileLogStream2 = createWriteStream( logFile, 'a', 0644 );
 	
-	myCmd = spawn( cmdLine );
+	var concatArray = commandArgs.concat( argumentsArray );
+	console.log( 'concatArray=' + concatArray );
+	myCmd = spawn( 	executable, concatArray );
 
 	myCmd.stdout.on("data", function (stdoutData) {
 		console.log( '~~~~~~~myCmd.pid=' +  myCmd.pid );
 		console.log("~~~~~~stdoutData" + stdoutData); 
 		fileLogStream1.write(stdoutData);
-		/*
-		//check for exit indication
-		if( stdoutData.indexOf('Good Bye!') >= 0 ) {
-			writeStatusJsonFile( serverNodeIdDir, firstFile, null );
-			fileLogStream1.
-			fileLogStream2.
-		}*/
 	});
 	
 	myCmd.stderr.on('data', function (stderrData) {

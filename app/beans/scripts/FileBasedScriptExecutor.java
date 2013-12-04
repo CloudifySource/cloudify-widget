@@ -2,6 +2,7 @@ package beans.scripts;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,18 +53,21 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 							CloudBootstrapConfiguration cloudBootstrapConfiguration, 
 							boolean isHandlePrivateKey ) {
 
-		String commandLine = cmdLine.toString();
+		String executable = cmdLine.getExecutable();
+		String[] arguments = cmdLine.getArguments();
+		
 		String serverNodeId = String.valueOf(  serverNode.getId() );
-		Map<String,String> environment = ApplicationContext.get().conf().server.environment.getEnvironment();
-		logger.info( "commandLine:" + commandLine + ", isHandlePrivateKey=" + isHandlePrivateKey + 
-				", Environment=" + environment + ", serverNode.id=" + serverNodeId +
+		if( logger.isDebugEnabled() ){
+			logger.debug( "executable:" + executable + ", arguments=" + Arrays.toString( arguments ) + 
+				", isHandlePrivateKey=" + isHandlePrivateKey + 
+				", Environment=" + ApplicationContext.get().conf().server.environment.getEnvironment() +
+				", serverNode.id=" + serverNodeId +
 				", serverNode.getSecretKey=" + serverNode.getSecretKey() );
+		}
 		
 		Map<String,String> map = new HashMap<String, String>();
-		map.put( CMD_LINE_PROPERTY, commandLine );
 		map.put( IS_HANDLE_PRIVATE_PROPERTY, String.valueOf( isHandlePrivateKey ) );
-		map.put( CLOUDIFY_HOME_PROPERTY, environment.get( CLOUDIFY_HOME ) );
-		addCommonProps( map, serverNode );
+		addCommonProps( cmdLine, map, serverNode );
 
 		writeToJsonFile( serverNodeId, BOOTSTRAP, map );
 
@@ -260,17 +264,16 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
     @Override
 	public void runInstallationManagementScript( CommandLine cmdLine, ServerNode serverNode ){
     	
-    	String commandLine = cmdLine.toString();
-    	Map<String, String> environment = 
-    						ApplicationContext.get().conf().server.environment.getEnvironment();
-		logger.info( "Run script, commandLine:" + commandLine + ", Environment=" +  environment +
-				", serverNode.id=" + serverNode.getId()
-				+ ", serverNode.getSecretKey=" + serverNode.getSecretKey() );
+    	if( logger.isDebugEnabled() ){
+    		logger.debug( "Run script, command executable:" + cmdLine.getExecutable() + 
+    				", arguments:" + Arrays.toString( cmdLine.getArguments() ) +
+    				", Environment=" +  ApplicationContext.get().conf().server.environment.getEnvironment() +
+    				", serverNode.id=" + serverNode.getId()
+    				+ ", serverNode.getSecretKey=" + serverNode.getSecretKey() );
+    	}
 		
 		Map<String,String> map = new HashMap<String, String>();
-		map.put( CMD_LINE_PROPERTY, commandLine );
-		map.put( CLOUDIFY_HOME_PROPERTY, environment.get( CLOUDIFY_HOME ) );
-		addCommonProps( map, serverNode );
+		addCommonProps( cmdLine, map, serverNode );
 		
 		writeToJsonFile( String.valueOf( serverNode.getId() ), INSTALL, map );
     	
@@ -295,10 +298,19 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
         }*/
     }
     
-    private static void addCommonProps( Map<String,String> map, ServerNode serverNode ){
+    private static void addCommonProps( CommandLine cmdLine, Map<String,String> map, ServerNode serverNode ){
 	
+    	Map<String, String> environment = 
+				ApplicationContext.get().conf().server.environment.getEnvironment();
+
+		String executable = cmdLine.getExecutable();
+		String[] arguments = cmdLine.getArguments();
+		
+		map.put( CMD_EXECUTABLE, executable );
+		map.put( CMD_ARGUMENTS, StringUtils.join( arguments, "," ) );
     	map.put( SERVER_NODE_ID_PROPERTY, String.valueOf( serverNode.getId() ) );
 		map.put( ADVANCED_PARAMS_PROPERTY, String.valueOf( serverNode.getAdvancedParams() ) );
+		map.put( CLOUDIFY_HOME_PROPERTY, environment.get( CLOUDIFY_HOME ) );
 		if( serverNode.getPublicIP() != null ){
 			map.put( PUBLIC_IP_PROPERTY, String.valueOf( serverNode.getPublicIP() ) );
 		}
