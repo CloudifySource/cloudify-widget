@@ -184,9 +184,18 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		boolean retValue = false;
 
 		try {
+			if( logger.isDebugEnabled() ){
+				logger.debug( "---START isBootstrappingFinished()" );
+			}
 			JsonNode parsedJson = getStatusJson( subFolderName, BOOTSTRAP, serverNodeId );
+			if( logger.isDebugEnabled() ){
+				logger.debug( "---isBootstrappingFinished(), parsedJson=" + parsedJson );
+			}
 			if( parsedJson != null ){
 				JsonNode statusJsonNode = parsedJson.get( EXIT_STATUS_PROPERTY );
+				if( logger.isDebugEnabled() ){
+					logger.debug( "---isBootstrappingFinished(), statusJsonNode=" + statusJsonNode );
+				}
 				if( statusJsonNode != null ){
 					logger.info( "Exit code:" + statusJsonNode.getIntValue() );
 					retValue = true;
@@ -204,14 +213,21 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 
 		JsonNode retValue = null;
 	
-		File resultJsonFile = FileUtils.getFile( EXECUTING_SCRIPTS_FOLDER_PATH +  
-					subFolderName + File.separator + serverNodeId + SERVER_NODE_ID_DELIMETER + opName + "_status.json" );
-	
+		String path = EXECUTING_SCRIPTS_FOLDER_PATH +  
+				subFolderName + File.separator + serverNodeId + SERVER_NODE_ID_DELIMETER + opName + "_status.json";
+		File resultJsonFile = FileUtils.getFile( path );
+		if( logger.isDebugEnabled() ){
+			logger.debug( "---getStatusJson(), statusJsonNodeFile=" + path + ", exists:" + resultJsonFile.exists() );
+		}
+		
 		if( !resultJsonFile.exists() ){
 			return null;
 		}
 		
 		String fileContent = FileUtils.readFileToString( resultJsonFile );
+		if( logger.isDebugEnabled() ){
+			logger.debug( "---getStatusJson(), fileContent=" + fileContent  );
+		}
 		retValue = Json.parse( fileContent );
 		
 		return retValue;

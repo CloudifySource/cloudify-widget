@@ -113,7 +113,9 @@ public class WidgetServerImpl implements WidgetServer
 	}
 
     private static boolean isFinished( Recipe.Type recipeType, String line ){
-        logger.debug("checking to see if [{}] has finished using [{}]", recipeType, line );
+    	if( logger.isDebugEnabled() ){
+    		logger.debug("checking to see if [{}] has finished using [{}]", recipeType, line );
+    	}
         Pattern pattern = installationFinishedRegexMap.get(recipeType);
         return pattern != null && !StringUtils.isEmpty(line) && pattern.matcher(line).matches();
     }
@@ -142,20 +144,32 @@ public class WidgetServerImpl implements WidgetServer
 
         }
 
-        logger.debug( "Before if" );
+        if( logger.isDebugEnabled() ){
+        	logger.debug( "Before if" );
+        }
         if (server == null || ( timeLeft != null && timeLeft.longValue() == 0 ) ) {
-        	logger.debug( "Within if, set state stopped" );
+        	if( logger.isDebugEnabled() ){
+        		if( logger.isDebugEnabled() ){
+        			logger.debug( "Within if, set state stopped" );
+        		}
+        	}
             result.setState(Status.State.STOPPED);
 
             output.add(Messages.get("test.drive.successfully.complete"));
             return result;
         }else{
-        	logger.debug( "Within else, set instanceId=" + server.getId() );
+        	if( logger.isDebugEnabled() ){
+        		if( logger.isDebugEnabled() ){
+        			logger.debug( "Within else, set instanceId=" + server.getId() );
+        		}
+        	}
             result.setInstanceId( Long.toString(server.getId()) ); // will need this to register users on specific nodes.
         }
 
         String cachedOutput = scriptExecutor.getOutput(server);// need to sort out the cache before we decide if the installation finished.
-        logger.debug( "cachedOutput=" + cachedOutput );
+        if( logger.isDebugEnabled() ){
+        	logger.debug( "cachedOutput=" + cachedOutput );
+        }
         result.setRawOutput( Utils.split( cachedOutput, "\n" ) );
 
         result.setRemote( server.isRemote() ).setHasPemFile( !StringUtils.isEmpty(server.getPrivateKey()) ); // let UI know this is a remote bootstrap.
@@ -194,10 +208,14 @@ public class WidgetServerImpl implements WidgetServer
 
         output.addAll(Utils.formatOutput(cachedOutput, server.getPrivateIP() + "]", filterOutputLines, filterOutputStrings));
 
-        logger.debug( ">> output=" + Arrays.toString( output.toArray( new String[ output.size() ] ) ) );
+        if( logger.isDebugEnabled() ){
+        	logger.debug( ">> output=" + Arrays.toString( output.toArray( new String[ output.size() ] ) ) );
+        }
         
         WidgetInstance widgetInstance = WidgetInstance.findByServerNode(server);
-        logger.debug("checking if installation finished for {} on the following output {}" , widgetInstance, output );
+        if( logger.isDebugEnabled() ){
+        	logger.debug("checking if installation finished for {} on the following output {}" , widgetInstance, output );
+        }
         if (widgetInstance != null ){
             if (doneFromEvent || isFinished(widgetInstance.getRecipeType(), (String)CollectionUtils.last(output))){
 
@@ -212,7 +230,9 @@ public class WidgetServerImpl implements WidgetServer
                     }
                 }
 
-                logger.debug("detected finished installation");
+                if( logger.isDebugEnabled() ){
+                	logger.debug("detected finished installation");
+                }
                 output.add( "Installation completed successfully" );
                 result.setCompleted(true);
                 result.setInstanceIsAvailable(Boolean.TRUE);
