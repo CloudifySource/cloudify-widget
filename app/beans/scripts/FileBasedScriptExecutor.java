@@ -320,7 +320,9 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		
 		File outputFile = new File( outputFileName );
 		if( logger.isDebugEnabled() ){
-			logger.debug( "> output File exists=" + outputFile.exists() );
+			logger.debug( "> output File exists=" + outputFile.exists() + 
+					", absolute path:" + outputFile.getAbsolutePath() +
+					", path:" + outputFile.getPath() );
 		}		
 		
 		if( !outputFile.exists() ){

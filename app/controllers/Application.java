@@ -269,19 +269,19 @@ public class Application extends Controller
 	{
 		try
 		{
-			logger.debug( "~~~ getWidgetStatus, instanceId=" + instanceId );
+			if( logger.isDebugEnabled() ){
+				logger.debug( "~~~ getWidgetStatus, instanceId=" + instanceId );
+			}
             if (!NumberUtils.isNumber( instanceId )){
                 return badRequest();
             }
             
-            logger.debug( "~~~ Before find" );
-            
             ServerNode serverNode = ServerNode.find.byId( Long.parseLong(instanceId) );
-            
-            logger.debug( "~~~ serverNode=" + serverNode );
-
-			Widget.Status wstatus = ApplicationContext.get().getWidgetServer().getWidgetStatus(serverNode);
-			logger.debug( "~~~ wstatus=" + wstatus );
+			Widget.Status wstatus = 
+						ApplicationContext.get().getWidgetServer().getWidgetStatus(serverNode);
+			if( logger.isDebugEnabled() ){
+				logger.debug( "~~~ wstatus=" + wstatus );
+			}
 			return statusToResult(wstatus);
 		}catch(ServerException ex)
 		{
