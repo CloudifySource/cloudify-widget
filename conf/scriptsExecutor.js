@@ -124,13 +124,13 @@ function executeCommand( firstFile, data, commandArgs ){
 	myCmd = spawn( 	executable, concatArray );
 
 	myCmd.stdout.on("data", function (stdoutData) {
-		console.log( '~~~~~~~myCmd.pid=' +  myCmd.pid );
-		console.log("~~~~~~stdoutData" + stdoutData); 
+		//console.log( '~~~~~~~myCmd.pid=' +  myCmd.pid );
+		//console.log("~~~~~~stdoutData" + stdoutData); 
 		fileLogStream1.write(stdoutData);
 	});
 	
 	myCmd.stderr.on('data', function (stderrData) {
-		console.log('~~~~stderrData:' + stderrData);
+		//console.log('~~~~stderrData:' + stderrData);
 		fileLogStream2.write(stderrData);
 	});
 	

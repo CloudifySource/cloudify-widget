@@ -29,6 +29,8 @@ import beans.config.ServerConfig.CloudBootstrapConfiguration;
 
 public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsConstants{
 	
+	private final static long SLEEP_TIMEOUT = 3 *1000;
+	
     @Inject
     private ExecutorFactory executorFactory;
 	
@@ -71,18 +73,18 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 
 		writeToJsonFile( serverNodeId, BOOTSTRAP, map );
 
-		logger.info( "waiting for status..." );
+		logger.info( "waiting for bootstrap status..." );
 
 		while( !isBootstrappingFinished( serverNodeId, serverNodeId ) ){
 			try{
-				Thread.sleep( 3* 1000 );
+				Thread.sleep( SLEEP_TIMEOUT );
 			} 
 			catch (InterruptedException e) {
 				logger.warn( e.toString(), e );
 			}
 		}
 		
-		logger.info( "status found..." );
+		logger.info( "bootstrap status found..." );
 
 		try{
 /*
@@ -106,7 +108,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 
 			String executeException = 
 					getBootstrapErrorMessage( serverNodeId, serverNodeId );
-			logger.info( ">>> Bootstrap execution output=" + output );
+			logger.info( ">>> executeException=" + executeException );
 
 			if( executeException != null ) {
 				logger.info( "we have exceptions, checking for known issues" );
@@ -199,7 +201,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 					logger.debug( "---isBootstrappingFinished(), statusJsonNode=" + statusJsonNode );
 				}
 				if( statusJsonNode != null ){
-					logger.info( "Exit code:" + statusJsonNode.getIntValue() );
+					logger.info( "Bootstrap exit code:" + statusJsonNode.getIntValue() );
 					retValue = true;
 				}
 			}
@@ -210,6 +212,37 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 
 		return retValue;
 	}
+	
+	private static boolean isInstallFinished( String subFolderName, String serverNodeId ) {
+
+		boolean retValue = false;
+
+		try {
+			if( logger.isDebugEnabled() ){
+				logger.debug( "---START isInstallFinished()" );
+			}
+			JsonNode parsedJson = getStatusJson( subFolderName, INSTALL, serverNodeId );
+			if( logger.isDebugEnabled() ){
+				logger.debug( "---isInstallFinished(), parsedJson=" + parsedJson );
+			}
+			if( parsedJson != null ){
+				JsonNode statusJsonNode = parsedJson.get( EXIT_STATUS_PROPERTY );
+				if( logger.isDebugEnabled() ){
+					logger.debug( "---isInstallFinished(), statusJsonNode=" + statusJsonNode );
+				}
+				if( statusJsonNode != null ){
+					logger.info( "Install exit code:" + statusJsonNode.getIntValue() );
+					retValue = true;
+				}
+			}
+		} 
+		catch (IOException e) {
+			logger.error( e.toString(), e );
+		}
+
+		return retValue;
+	}	
+	
 	
 	private static JsonNode getStatusJson( String subFolderName, String opName, String serverNodeId ) throws IOException {
 
@@ -264,38 +297,38 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
     @Override
 	public void runInstallationManagementScript( CommandLine cmdLine, ServerNode serverNode ){
     	
+    	String serverNodeId = String.valueOf( serverNode.getId() );
     	if( logger.isDebugEnabled() ){
     		logger.debug( "Run script, command executable:" + cmdLine.getExecutable() + 
     				", arguments:" + Arrays.toString( cmdLine.getArguments() ) +
     				", Environment=" +  ApplicationContext.get().conf().server.environment.getEnvironment() +
-    				", serverNode.id=" + serverNode.getId()
-    				+ ", serverNode.getSecretKey=" + serverNode.getSecretKey() );
+    				", serverNode.id=" + serverNodeId +
+    				", serverNode.getSecretKey=" + serverNode.getSecretKey() );
     	}
 		
 		Map<String,String> map = new HashMap<String, String>();
 		addCommonProps( cmdLine, map, serverNode );
 		
-		writeToJsonFile( String.valueOf( serverNode.getId() ), INSTALL, map );
-    	
-    	/*
-        try {
-            ProcExecutor executor = executorFactory.getDeployExecutor( server );
-            ExecuteResultHandler resultHandler = executorFactory.getResultHandler(cmdLine.toString());
-            logger.info( "executing command [{}]", cmdLine );
-            executor.execute( cmdLine, 
-            	ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler );
-            logger.info( "The process instanceId: {}", executor.getId() );
-        } 
-        catch ( ExecuteException e ) {
-            logger.error( "Failed to execute process. Exit value: " + e.getExitValue(), e );
-
-            throw new ServerException( "Failed to execute process. Exit value: " + e.getExitValue(), e );
-        } 
-        catch ( IOException e ) {
-            logger.error( "Failed to execute process", e );
-
-            throw new ServerException( "Failed to execute process.", e );
-        }*/
+		writeToJsonFile( serverNodeId, INSTALL, map );
+		
+		logger.info( "waiting for install status..., serverNodeId=" + serverNodeId );
+		
+		while( !isInstallFinished( serverNodeId, serverNodeId ) ){
+			try{
+				Thread.sleep( SLEEP_TIMEOUT );
+			} 
+			catch (InterruptedException e) {
+				logger.warn( e.toString(), e );
+			}
+		}
+		
+		logger.info( "install status found..." );		
+		try {
+			moveExecutingContentToExecuted( serverNodeId );
+		} 
+		catch( IOException e ){
+			logger.error( e.toString(), e );
+		}
     }
     
     private static void addCommonProps( CommandLine cmdLine, Map<String,String> map, ServerNode serverNode ){
@@ -351,6 +384,18 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		}
 		
 		return retValue;
+	}
+	
+	private static void moveExecutingContentToExecuted( String nodeId ) throws IOException{
+		
+		String executingFolderName = EXECUTING_SCRIPTS_FOLDER_PATH + nodeId;
+		String executedFolderName = EXECUTED_SCRIPTS_FOLDER_PATH + nodeId;
+		File executedFolder = new File( executedFolderName );
+		if( !executedFolder.exists() ){
+			executedFolder.mkdirs();
+		}
+		
+		FileUtils.moveDirectoryToDirectory( new File( executingFolderName ), executedFolder, false );
 	}
 	
 	private static String getBootstrapErrorMessage( String subFolderName, String serverNodeId ) {
