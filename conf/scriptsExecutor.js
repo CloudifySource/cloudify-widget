@@ -47,11 +47,6 @@ if( filesCount  > 0 ){
 			console.log( 'After moving file' );
 		});		
 		
-/*
-		var isBootstrapOperation = firstFile.indexOf("_bootstrap") > 0;
-		var isInstallOperation = firstFile.indexOf("_install") > 0;
-		console.log(  'firstFile:' + firstFile + ',isBootstrapOperation=' + isBootstrapOperation + ',isInstallOperation=' + isInstallOperation + ',serverNodeId=' + serverNodeId + '\n');
-*/		
 		console.log( 'Before read fom JSON, file:' + executingDir + firstFile );
 		fs.readFile( serverNodeIdDir + firstFile, 'utf8', function (err, data) {
 			if (err) {
@@ -60,17 +55,7 @@ if( filesCount  > 0 ){
 			}
 			
 			executeCommand( firstFile, data, args );
-			
-			/*
-			if( isBootstrapOperation ){
-				performBootstrap( data );
-			}
-			else if( isInstallOperation ){
-				performInstall( data );
-			}*/
 		});
-	
-		//writeStatusJsonFile( serverNodeIdDir, firstFile );
 	}
 }
 
@@ -95,20 +80,16 @@ function executeCommand( firstFile, data, commandArgs ){
 	
 	var executable = data.executable;
 	var arguments = data.arguments;
-	var advancedparams = data.advancedparams;
 	var serverNodeId = data.serverNodeId;
 	var cloudifyHome = data.cloudifyHome;
-	var handlePrivateKey = data.handlePrivateKey;
 	var argumentsArray = arguments.split(',');
 	
 	console.log( '>commandArgs=' + commandArgs );
 	console.log( '>executable=' + executable );
 	console.log( '>arguments=' + arguments );
 	console.log( '>splitted arguments=' + argumentsArray );
-	console.log( '>advancedparams=' + advancedparams );
 	console.log( '>serverNodeId=' + serverNodeId );
 	console.log( '>cloudifyHome=' + cloudifyHome );
-	console.log( '>handlePrivateKey=' + handlePrivateKey );	
 
 	process.env['CLOUDIFY_HOME'] = cloudifyHome;
 	
@@ -175,11 +156,11 @@ function writeStatusJsonFile( serverNodeIdDir, jsonFileName, error, exitCode ){
 		var fileNameWithoutExtension;
 		if( extensionIndex > 0 ){
 			fileNameWithoutExtension = jsonFileName.substring( 0, extensionIndex );
-			console.log( '>>> fileNameWithouExtension1=' + fileNameWithoutExtension );
+			//console.log( '>>> fileNameWithouExtension1=' + fileNameWithoutExtension );
 		}
 		else{
 			fileNameWithoutExtension = jsonFileName;
-			console.log( '>>> fileNameWithouExtension2=' + fileNameWithoutExtension );
+			//console.log( '>>> fileNameWithouExtension2=' + fileNameWithoutExtension );
 		}
 		
 		fs.writeFile( serverNodeIdDir + fileNameWithoutExtension + "_status.json", JSON.stringify(statusData, null, 4), function(err) {
@@ -191,53 +172,3 @@ function writeStatusJsonFile( serverNodeIdDir, jsonFileName, error, exitCode ){
 			}
 		}); 
 }
-
-/*
-function performBootstrap( data ){
-	console.log( '~~~performBootstrap, JSON:' + data);
-	data = JSON.parse(data);
-	
-	var cmdLine = data.cmdLine;
-	var args = data.args;
-	var advancedparams = data.advancedparams;
-	var serverNodeId = data.serverNodeId;
-	var cloudifyHome = data.cloudifyHome;
-	var handlePrivateKey = data.handlePrivateKey;
-	
-	console.log( '>cmdLine=' + cmdLine );
-	console.log( '>advancedparams=' + advancedparams );
-	console.log( '>serverNodeId=' + serverNodeId );
-	console.log( '>cloudifyHome=' + cloudifyHome );
-	console.log( '>handlePrivateKey=' + handlePrivateKey );
-	
-	exec( cmdLine, function (error, stdout, stderr) {
-		console.log('performBootstrap, stdout: ' + stdout);
-		console.log('performBootstrap, stderr: ' + stderr);
-		if( error !== null ) {
-			console.log('performBootstrap,exec error: ' + error);
-		}
-	});
-}
-
-function performInstall( data ){
-	console.log( '~~~performInstall, JSON:' + data);
-	data = JSON.parse(data);
-
-	var cmdLine = data.cmdLine;
-	var advancedparams = data.advancedparams;
-	var serverNodeId = data.serverNodeId;
-	var cloudifyHome = data.cloudifyHome;
-	
-	console.log( '>cmdLine=' + cmdLine );
-	console.log( '>advancedparams=' + advancedparams );
-	console.log( '>serverNodeId=' + serverNodeId );
-	console.log( '>cloudifyHome=' + cloudifyHome );	
-	
-	exec( cmdLine, function (error, stdout, stderr) {
-		console.log('performInstall, stdout: ' + stdout);
-		console.log('performInstall, stderr: ' + stderr);
-		if( error !== null ) {
-			console.log('performInstall, exec error: ' + error);
-		}
-	});
-}*/
