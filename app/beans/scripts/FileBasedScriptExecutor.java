@@ -60,15 +60,13 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		
 		String serverNodeId = String.valueOf(  serverNode.getId() );
 		if( logger.isDebugEnabled() ){
-			logger.debug( "executable:" + executable + ", arguments=" + Arrays.toString( arguments ) + 
-				", isHandlePrivateKey=" + isHandlePrivateKey + 
+			logger.debug( 
+				"executable:" + executable + ", arguments=" + Arrays.toString( arguments ) + 
 				", Environment=" + ApplicationContext.get().conf().server.environment.getEnvironment() +
-				", serverNode.id=" + serverNodeId +
-				", serverNode.getSecretKey=" + serverNode.getSecretKey() );
+				", serverNode.id=" + serverNodeId  );
 		}
 		
 		Map<String,String> map = new HashMap<String, String>();
-		map.put( IS_HANDLE_PRIVATE_PROPERTY, String.valueOf( isHandlePrivateKey ) );
 		addCommonProps( cmdLine, map, serverNode );
 
 		writeToJsonFile( serverNodeId, BOOTSTRAP, map );
@@ -87,17 +85,6 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		logger.info( "bootstrap status found..." );
 
 		try{
-/*
-			DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
-
-
-			ProcExecutor bootstrapExecutor = executorFactory.getBootstrapExecutor( serverNode );
-
-			logger.info( "Executing command line: " + cmdLine );
-			//Command line for bootstrapping remote cloud.
-			bootstrapExecutor.execute( cmdLine, ApplicationContext.get().conf().server.environment.getEnvironment(), resultHandler );
-*/
-//			resultHandler.waitFor();
 			logger.info( "finished waiting , exit value is [{}]", 
 					getBootstrappingExitStatus( serverNodeId, serverNodeId ) );
 			logger.info( ">>> serverNodeId=" + serverNode.getId() );
@@ -342,14 +329,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		map.put( CMD_EXECUTABLE, executable );
 		map.put( CMD_ARGUMENTS, StringUtils.join( arguments, "," ) );
     	map.put( SERVER_NODE_ID_PROPERTY, String.valueOf( serverNode.getId() ) );
-		map.put( ADVANCED_PARAMS_PROPERTY, String.valueOf( serverNode.getAdvancedParams() ) );
 		map.put( CLOUDIFY_HOME_PROPERTY, environment.get( CLOUDIFY_HOME ) );
-		if( serverNode.getPublicIP() != null ){
-			map.put( PUBLIC_IP_PROPERTY, String.valueOf( serverNode.getPublicIP() ) );
-		}
-		if( serverNode.getPrivateIP() != null ){
-			map.put( PRIVATE_IP_PROPERTY, String.valueOf( serverNode.getPrivateIP() ) );
-		}
     }
 
 	@Override
@@ -389,8 +369,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 	private static void moveExecutingContentToExecuted( String nodeId ) throws IOException{
 		
 		String executingFolderName = EXECUTING_SCRIPTS_FOLDER_PATH + nodeId;
-		String executedFolderName = EXECUTED_SCRIPTS_FOLDER_PATH + nodeId;
-		File executedFolder = new File( executedFolderName );
+		File executedFolder = new File( EXECUTED_SCRIPTS_FOLDER_PATH );
 		if( !executedFolder.exists() ){
 			executedFolder.mkdirs();
 		}

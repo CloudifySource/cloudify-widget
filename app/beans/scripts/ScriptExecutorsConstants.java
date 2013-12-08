@@ -7,12 +7,8 @@ public interface ScriptExecutorsConstants {
 	String SERVER_NODE_ID_PROPERTY = "serverNodeId";
 	String CMD_EXECUTABLE = "executable";
 	String CMD_ARGUMENTS = "arguments";
-	String IS_HANDLE_PRIVATE_PROPERTY = "handlePrivateKey";
 	String CLOUDIFY_HOME_PROPERTY = "cloudifyHome";
-	String BOOTSTRAPPING_IN_PROGRESS_PROPERTY = "bootstrappingInProgress";
-	String ADVANCED_PARAMS_PROPERTY = "advancedparams";
-	String PUBLIC_IP_PROPERTY = "publicIp";
-	String PRIVATE_IP_PROPERTY = "privateIp";
+
 	
 	String CLOUDIFY_HOME = "CLOUDIFY_HOME";
 	
