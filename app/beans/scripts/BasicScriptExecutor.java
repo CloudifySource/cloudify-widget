@@ -64,7 +64,7 @@ public class BasicScriptExecutor implements ScriptExecutor{
 			resultHandler.waitFor();
 			logger.info( "finished waiting , exit value is [{}]", resultHandler.getExitValue() );
 			logger.info( "> serverNode ID:" + serverNode.getId() );
-			String cachedOutput = Utils.getCachedOutput( serverNode );
+			String cachedOutput = getOutput( serverNode );
 			logger.info( "> cachedOutput:" + cachedOutput );
 			String output = Utils.getOrDefault( cachedOutput, "" );
 			logger.info( "> output:" + output );

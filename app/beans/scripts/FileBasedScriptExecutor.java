@@ -99,7 +99,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 			logger.info( "finished waiting , exit value is [{}]", 
 					getBootstrappingExitStatus( serverNodeId, serverNodeId ) );
 			logger.info( ">>> serverNodeId=" + serverNode.getId() );
-			String cachedOutput = Utils.getCachedOutput( serverNode );
+			String cachedOutput = getOutput( serverNode );
 			logger.info( ">>> cachedOutput=" + cachedOutput );
 			String output = Utils.getOrDefault( cachedOutput, "" );
 			logger.info( ">>> output=" + output );
