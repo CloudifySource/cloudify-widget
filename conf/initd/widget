@@ -60,6 +60,9 @@ case "$1" in
   upgrade)
         upgrade
         ;;
+  executeScript)
+        executeScript
+        ;;
   tail)
         tail
         ;;
@@ -68,7 +71,7 @@ case "$1" in
         start
         ;;
   *)
-        echo $"Usage: $0 {start|stop|restart|status|upgrade|tail}"
+        echo $"Usage: $0 {start|stop|restart|status|upgrade|executeScript}"
         exit 1
 esac
 exit 0
