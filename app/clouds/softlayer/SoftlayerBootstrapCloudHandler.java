@@ -53,8 +53,7 @@ public class SoftlayerBootstrapCloudHandler extends AbstractBootstrapCloudHandle
             		new CommandLine( conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile() );
             cmdLine.addArgument( cloudFolder.getName() );
 
-            scriptExecutor.runBootstrapScript( 
-            		cmdLine, serverNode, null, cloudFolder, conf.server.cloudBootstrap, false );
+            scriptExecutor.runBootstrapScript( cmdLine, serverNode, null, cloudFolder, false );
     	}
     	catch( IOException ioe ){
     		logger.error( ioe.toString(), ioe );

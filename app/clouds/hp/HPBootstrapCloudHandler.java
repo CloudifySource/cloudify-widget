@@ -73,7 +73,7 @@ public class HPBootstrapCloudHandler implements BootstrapCloudHandler {
     		CommandLine cmdLine = new CommandLine( conf.server.cloudBootstrap.remoteBootstrap.getAbsoluteFile() );
     		cmdLine.addArgument( cloudFolder.getName() );
 
-    		scriptExecutor.runBootstrapScript( cmdLine, serverNode, jCloudsContext, cloudFolder, conf.server.cloudBootstrap, true );
+    		scriptExecutor.runBootstrapScript( cmdLine, serverNode, jCloudsContext, cloudFolder, true );
     	}
     	catch( IOException ioe ){
     		logger.error( ioe.toString(), ioe );
