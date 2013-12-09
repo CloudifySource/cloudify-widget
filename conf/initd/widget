@@ -32,7 +32,7 @@ stop() {
 
 executeScript(){
     cd $WIDGET_HOME/conf
-    node scriptExecutor.js >> $WIDGET_HOME/logs/scriptsExecutor.log 2>&1
+    node scriptsExecutor.js >> $WIDGET_HOME/logs/scriptsExecutor.log 2>&1
 }
 
 upgrade(){
