@@ -41,7 +41,6 @@
     <bean id="novaCloudCredentials" class="beans.NovaCloudCredentials" scope="prototype" init-method="init"/>
     
     <bean id="cloudifyFactory" class="utils.CloudifyFactory"/>
-    <bean id="scriptExecutor" class="beans.scripts.BasicScriptExecutor"/>
     
     <bean id="hpcloud-computeBootstrapCloudHandler" class="clouds.hp.HPBootstrapCloudHandler">
     </bean>
