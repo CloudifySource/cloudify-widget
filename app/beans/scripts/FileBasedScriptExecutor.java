@@ -25,6 +25,7 @@ import server.exceptions.ServerException;
 import utils.CloudifyUtils;
 import utils.Utils;
 import beans.api.ExecutorFactory;
+import beans.config.Conf;
 import beans.config.ServerConfig.CloudBootstrapConfiguration;
 
 public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsConstants{
@@ -33,6 +34,9 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 	
     @Inject
     private ExecutorFactory executorFactory;
+    
+    @Inject
+    private Conf conf;
 	
 	private static Logger logger = LoggerFactory.getLogger( FileBasedScriptExecutor.class );
 	
@@ -52,7 +56,6 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 	@Override
 	public void runBootstrapScript( CommandLine cmdLine, ServerNode serverNode, 
 							ComputeServiceContext jCloudsContext, File cloudFolder,
-							CloudBootstrapConfiguration cloudBootstrapConfiguration, 
 							boolean isHandlePrivateKey ) {
 
 		String executable = cmdLine.getExecutable();
@@ -67,12 +70,24 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		}
 		
 		Map<String,String> map = new HashMap<String, String>();
+		map.put( IS_HANDLE_PRIVATE_PROPERTY, String.valueOf( isHandlePrivateKey ) );
 		addCommonProps( cmdLine, map, serverNode );
 
 		writeToJsonFile( serverNodeId, BOOTSTRAP, map );
 
-		logger.info( "waiting for bootstrap status..." );
+		waitForFinishBootstrappingAndSaveServerNode( serverNode, cloudFolder, jCloudsContext, 
+													  isHandlePrivateKey );
+	}
 
+	private void waitForFinishBootstrappingAndSaveServerNode( ServerNode serverNode, 
+					File cloudFolder, 
+					ComputeServiceContext jCloudsContext,
+					boolean isHandlePrivateKey ){
+		
+		logger.info( "waiting for bootstrap status..." );
+		
+		String serverNodeId = String.valueOf( serverNode.getId() );
+		
 		while( !isBootstrappingFinished( serverNodeId, serverNodeId ) ){
 			try{
 				Thread.sleep( SLEEP_TIMEOUT );
@@ -139,6 +154,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 			throw new RuntimeException("Unable to bootstrap cloud", e);
 		} 
 		finally {
+			CloudBootstrapConfiguration cloudBootstrapConfiguration = conf.server.cloudBootstrap;
 			if( cloudFolder != null && cloudBootstrapConfiguration.removeCloudFolder ) {
 				FileUtils.deleteQuietly( cloudFolder );
 			}
@@ -146,9 +162,10 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 				jCloudsContext.close();
 			}
 			serverNode.setStopped(true);
-		}
+		}		
 	}
-
+	
+	
 	private static int getBootstrappingExitStatus( String subFolderName, String serverNodeId ) {
 
 		int retValue = -1;
@@ -235,8 +252,8 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 
 		JsonNode retValue = null;
 	
-		String path = EXECUTING_SCRIPTS_FOLDER_PATH +  
-				subFolderName + File.separator + serverNodeId + SERVER_NODE_ID_DELIMETER + opName + "_status.json";
+		String path = createOperationStatusJsonFileName( 
+							EXECUTING_SCRIPTS_FOLDER_PATH + subFolderName, serverNodeId, opName ); 
 		File resultJsonFile = FileUtils.getFile( path );
 		if( logger.isDebugEnabled() ){
 			logger.debug( "---getStatusJson(), statusJsonNodeFile=" + path + ", exists:" + resultJsonFile.exists() );
@@ -266,8 +283,8 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 			scriptsFolder.mkdirs();
 		}
 		
-		File jsonFile = new File( scriptsFolder.getPath() + 
-					File.separator + serverNodeId + SERVER_NODE_ID_DELIMETER + opName + ".json" );
+		File jsonFile = new File( 
+				createOperationJsonFileName( scriptsFolder.getPath(), serverNodeId, opName ) );
 		try {
 			FileUtils.write( jsonFile, json.toString() );
 		} 
@@ -394,5 +411,77 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		}
 		
 		return retValue;
-	}	
+	}
+
+	@Override
+	public void onLoad() {
+
+		File executingFolder = new File( EXECUTING_SCRIPTS_FOLDER_PATH );
+		//check if "existing" folder exists
+		if( executingFolder.exists() ){
+			//retrieve list of nodeid folders
+			File[] listNodeIdFolders = executingFolder.listFiles();
+
+			for( File nodeIdFolder : listNodeIdFolders ){
+				final String serverNodeId = nodeIdFolder.getName();
+				String nodeIdFolderPath = nodeIdFolder.getPath();
+				File bootstrapJsonFile = new File(
+					createOperationJsonFileName( nodeIdFolderPath, serverNodeId, BOOTSTRAP ) );
+				File bootstrapJsonStatusFile = new File(
+					createOperationStatusJsonFileName( nodeIdFolderPath, serverNodeId, BOOTSTRAP ) );				
+				
+				if( logger.isDebugEnabled() ){
+					logger.debug( ">serverNodeId=" + serverNodeId + 
+						", bootstrapJsonFile exists=" + bootstrapJsonFile.exists() + 
+						", bootstrapJsonStatusFile exists:" + bootstrapJsonStatusFile.exists() );
+				}
+				//check if xxx_bootstrap.json exists
+				if( bootstrapJsonFile.exists() ){
+					//check if xxx_bootstrap_status.json exists
+					if( bootstrapJsonStatusFile.exists() ){
+						
+					}
+					//if still does not exist then wait till will be created
+					else{
+						//TODO uncomment following code
+//						waitForFinishBootstrappingAndSaveServerNode( 
+//								serverNode, cloudFolder, jCloudsContext, isHandlePrivateKey );
+					}
+				}
+				else{
+					
+					File installJsonFile = new File(
+							createOperationJsonFileName( nodeIdFolderPath, serverNodeId, INSTALL ) );
+					File installJsonStatusFile = new File(
+							createOperationStatusJsonFileName( nodeIdFolderPath, serverNodeId, INSTALL ) );
+					
+					if( logger.isDebugEnabled() ){
+						logger.debug( " installJsonFile exists=" + installJsonFile.exists() + 
+							", installJsonStatusFile exists:" + installJsonStatusFile.exists() );
+					}
+					//check if xxx_install.json exists
+					if( installJsonFile.exists() ){
+						//check if xxx_install_status.json exists
+						if( installJsonStatusFile.exists() ){
+
+						}
+						//if still does not exist then wait till will be created
+						else{
+							//TODO uncomment following code
+//							waitForFinishBootstrappingAndSaveServerNode( 
+//									serverNode, cloudFolder, jCloudsContext, isHandlePrivateKey );
+						}					
+					}
+				}
+			}
+		}
+	}
+	
+	private static String createOperationJsonFileName( String parentFolderPath, String serverNodeId, String operationName ){  
+		return parentFolderPath + File.separator + serverNodeId + SERVER_NODE_ID_DELIMETER + operationName + ".json";
+	}
+			
+	private static String createOperationStatusJsonFileName( String parentFolderPath, String serverNodeId, String operationName ){			
+		return parentFolderPath + File.separator + serverNodeId + SERVER_NODE_ID_DELIMETER + operationName + STATUS_SUFFIX;
+	}
 }

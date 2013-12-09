@@ -7,6 +7,7 @@ public interface ScriptExecutorsConstants {
 	String SERVER_NODE_ID_PROPERTY = "serverNodeId";
 	String CMD_EXECUTABLE = "executable";
 	String CMD_ARGUMENTS = "arguments";
+	String IS_HANDLE_PRIVATE_PROPERTY = "handlePrivateKey";
 	String CLOUDIFY_HOME_PROPERTY = "cloudifyHome";
 
 	
@@ -17,6 +18,7 @@ public interface ScriptExecutorsConstants {
 	String EXECUTING_SCRIPTS_FOLDER_PATH = SCRIPTS_FOLDER_PATH + File.separator + "executing" + File.separator;
 	String EXECUTED_SCRIPTS_FOLDER_PATH = SCRIPTS_FOLDER_PATH + File.separator + "executed" + File.separator;
 	String OUTPUT_FILE_NAME_PREFIX = "output-nodeid-";
+	String STATUS_SUFFIX = "_status.json";
 		
 	String SERVER_NODE_ID_DELIMETER= "_";
 	String BOOTSTRAP = "bootstrap";

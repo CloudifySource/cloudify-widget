@@ -7,8 +7,6 @@ import models.ServerNode;
 import org.apache.commons.exec.CommandLine;
 import org.jclouds.compute.ComputeServiceContext;
 
-import beans.config.ServerConfig.CloudBootstrapConfiguration;
-
 public interface ScriptExecutor {
 	
     /**
@@ -22,7 +20,6 @@ public interface ScriptExecutor {
 	 */
 	public void runBootstrapScript( CommandLine cmdLine, ServerNode serverNode, 
 							ComputeServiceContext jCloudsContext, File cloudFolder,
-							CloudBootstrapConfiguration cloudBootstrapConfiguration, 
 							boolean isHandlePrivateKey );	
 	/**
 	 * used for running install and uninstall of applications
@@ -32,4 +29,6 @@ public interface ScriptExecutor {
     public void runInstallationManagementScript( CommandLine cmdLine, ServerNode server );
 
     public String getOutput( ServerNode serverNode );
+    
+    public void onLoad();
 }

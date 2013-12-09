@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import beans.api.ExecutorFactory;
+import beans.config.Conf;
 import beans.config.ServerConfig.CloudBootstrapConfiguration;
 
 import play.i18n.Messages;
@@ -31,6 +32,9 @@ public class BasicScriptExecutor implements ScriptExecutor{
 	
     @Inject
     private ExecutorFactory executorFactory;
+    
+    @Inject
+    private Conf conf;    
 
 	private static Logger logger = LoggerFactory.getLogger( BasicScriptExecutor.class );
 
@@ -50,7 +54,6 @@ public class BasicScriptExecutor implements ScriptExecutor{
 	@Override
 	public void runBootstrapScript( CommandLine cmdLine, ServerNode serverNode, 
 							ComputeServiceContext jCloudsContext, File cloudFolder,
-							CloudBootstrapConfiguration cloudBootstrapConfiguration, 
 							boolean isHandlePrivateKey ) {
 		
 		try{
@@ -111,6 +114,7 @@ public class BasicScriptExecutor implements ScriptExecutor{
 			throw new RuntimeException("Unable to bootstrap cloud", e);
 		} 
 		finally {
+			CloudBootstrapConfiguration cloudBootstrapConfiguration = conf.server.cloudBootstrap;
 			if( cloudFolder != null && cloudBootstrapConfiguration.removeCloudFolder ) {
 				FileUtils.deleteQuietly( cloudFolder );
 			}
@@ -152,5 +156,10 @@ public class BasicScriptExecutor implements ScriptExecutor{
 	@Override
 	public String getOutput( ServerNode serverNode ) {
 		return Utils.getCachedOutput( serverNode );
+	}
+
+	@Override
+	public void onLoad() {
+		
 	}
 }
