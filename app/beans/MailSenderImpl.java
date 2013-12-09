@@ -73,12 +73,12 @@ public class MailSenderImpl implements MailSender {
 
         String mailContent = views.html.mail.registration.render(lead).body();
         GsMailConfiguration mConf = new GsMailConfiguration();
-        mConf.addRecipient( GsMailer.RecipientType.TO,  lead.email, null)
+        mConf.addRecipient( GsMailer.RecipientType.TO,  lead.email, "HP Cloud Registration")
                 .setBodyHtml( mailContent )
                 .setBodyText( mailContent )
                 .setFrom( conf.mails.registrationFrom.email, conf.mails.registrationFrom.name )
                 .setReplyTo( conf.mailer )
-                .setSubject( "Your Cloud Player Trial Verification" );
+                .setSubject( "Your App Catalog Free Trial Verification" );
 
         if ( conf.mails.registrationCc.isValid() ){
             mConf.addRecipient( GsMailer.RecipientType.BCC, conf.mails.registrationCc.email, conf.mails.registrationCc.name );

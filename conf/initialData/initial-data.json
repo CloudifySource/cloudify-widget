@@ -198,7 +198,7 @@
                 "image": {
                     "selected": "ElasticSearch.jpeg"
                 },
-                "description": "A recipe for ElasticSEarch, a flexible and powerful open source, distributed real-time search and analytics engine for the cloud"
+                "description": "A recipe for ElasticSearch, a flexible and powerful open source, distributed real-time search and analytics engine for the cloud"
             }
         }
     }

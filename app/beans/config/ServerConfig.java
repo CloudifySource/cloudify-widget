@@ -108,7 +108,7 @@ public class ServerConfig {
 
         private Map<String,String> environment = null ;
 
-        public Map getEnvironment() {
+        public Map<String,String> getEnvironment() {
 
             try {
                 if (environment == null) {

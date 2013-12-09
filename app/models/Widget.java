@@ -128,7 +128,7 @@ public class Widget
     @JsonRootName("status")
     final static public class Status {
 
-        /**
+		/**
          * This class serves as status of the widget instance
          */
         public final static String STATE_RUNNING = "running";
@@ -279,6 +279,22 @@ public class Widget
         public WidgetInstance.ConsoleLink getConsoleLink() {
             return consoleLink;
         }
+        
+        @Override
+		public String toString() {
+			return "Status [state=" + state + ", output=" + 
+					( ( output == null ) ? "NULL" : Arrays.toString( output.toArray( new String[ output.size() ] ) ) ) 
+					+ ", rawOutput=" + 
+					( ( rawOutput == null ) ? "NULL" : Arrays.toString( rawOutput.toArray( new String[ rawOutput.size() ] ) ) )
+					+ ", timeleft=" + timeleft
+					+ ", timeleftMillis=" + timeleftMillis + ", publicIp="
+					+ publicIp + ", instanceId=" + instanceId + ", remote="
+					+ remote + ", hasPemFile=" + hasPemFile + ", consoleLink="
+					+ consoleLink + ", message=" + message
+					+ ", instanceIsAvailable=" + instanceIsAvailable
+					+ ", cloudifyUiIsAvailable=" + cloudifyUiIsAvailable
+					+ ", completed=" + completed + "]";
+		}        
     }
 
 
