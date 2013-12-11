@@ -97,6 +97,8 @@ public class Conf {
 
         @Config( ignoreNullValues = true )
         public boolean override = false; // true iff we want to write over existing objects
+        
+        public boolean isRecoverExecutions = true;
     }
 
     public static class FeaturesConfigItem {

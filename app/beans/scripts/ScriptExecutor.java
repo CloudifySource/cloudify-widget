@@ -7,7 +7,7 @@ import models.ServerNode;
 import org.apache.commons.exec.CommandLine;
 import org.jclouds.compute.ComputeServiceContext;
 
-public interface ScriptExecutor {
+public interface ScriptExecutor{
 	
     /**
 	 * Used for bootstrapping
@@ -28,7 +28,5 @@ public interface ScriptExecutor {
 	 */
     public void runInstallationManagementScript( CommandLine cmdLine, ServerNode server );
 
-    public String getOutput( ServerNode serverNode );
-    
-    public void onLoad();
+    public String getOutput( ServerNode serverNode );    
 }

@@ -13,15 +13,16 @@
  * limitations under the License.
  */
 
-import akka.util.Duration;
-import annotations.AnonymousUsers;
-import beans.config.Conf;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.net.SMTPAppender;
+import java.io.File;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+
 import models.User;
+
 import org.apache.commons.io.FileUtils;
 import org.slf4j.LoggerFactory;
+
 import play.Application;
 import play.GlobalSettings;
 import play.api.mvc.Results;
@@ -38,11 +39,13 @@ import server.ApplicationContext;
 import server.exceptions.ExceptionResponse;
 import server.exceptions.ExceptionResponseDetails;
 import utils.Utils;
-
-import java.io.File;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
+import akka.util.Duration;
+import annotations.AnonymousUsers;
+import beans.config.Conf;
+import beans.scripts.RestoreExecutionService;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.net.SMTPAppender;
 
 
 /**
@@ -55,6 +58,7 @@ public class Global extends GlobalSettings
     private static org.slf4j.Logger logger = LoggerFactory.getLogger( Global.class );
 
     private Conf conf;
+    
 	@Override
 	public void onStart(Application app)
 	{
@@ -140,9 +144,27 @@ public class Global extends GlobalSettings
         }catch(Exception e){
             logger.error("unable to send changelog email",e);
         }
+        
+        if( conf.settings.initialData.isRecoverExecutions ){
+        	try{
+        		restoreExecutions();
+        	}
+        	catch( Throwable t ){
+        		logger.error( t.toString(), t );
+        	}
+        }
 	}
 
-    private void uploadInitialData( Application app )
+    private static void restoreExecutions() {
+
+    	if( logger.isDebugEnabled() ){
+    		logger.debug( "---restoreExecutions" );
+    	}
+    	
+    	RestoreExecutionService.restoreExecutions();
+	}
+
+	private void uploadInitialData( Application app )
     {
         if ( !conf.settings.initialData.load ) {
             logger.info( "configuration set to not load initial data. skipping initial data" );

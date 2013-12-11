@@ -157,9 +157,4 @@ public class BasicScriptExecutor implements ScriptExecutor{
 	public String getOutput( ServerNode serverNode ) {
 		return Utils.getCachedOutput( serverNode );
 	}
-
-	@Override
-	public void onLoad() {
-		
-	}
 }

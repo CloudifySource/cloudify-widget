@@ -540,7 +540,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     public ServerNode bootstrapCloud( ServerNode serverNode )
     {
         BootstrapCloudHandler bootstrapCloudHandler =
-        		ApplicationContext.get().getBootstrapCloudHandler( serverNode.getCloudProvider() );
+        		ApplicationContext.getBootstrapCloudHandler( serverNode.getCloudProvider() );
         return bootstrapCloudHandler.bootstrapCloud(serverNode, conf);    	
     }
 

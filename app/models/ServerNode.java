@@ -111,6 +111,10 @@ extends Model
     @JsonIgnore
     @OneToMany(mappedBy="serverNode", cascade = CascadeType.REMOVE)
     public List<ServerNodeEvent> events = new LinkedList<ServerNodeEvent>();
+    
+    @JsonIgnore
+    @OneToOne( )
+    private Widget widget;    
 	
 	public static Finder<Long,ServerNode> find = new Finder<Long,ServerNode>(Long.class, ServerNode.class); 
 
@@ -209,6 +213,13 @@ extends Model
 		return busySince != null;
 	}
 
+    public void setWidget(Widget widget) {
+        this.widget = widget;
+    }
+    
+    public Widget getWidget(){
+    	return widget;
+    }
 
 	static public int count()
 	{
@@ -250,6 +261,15 @@ extends Model
                     conjuction.isNotNull("serverId");
                 }
             }
+            
+            if ( criteria.widgetIsNull != null ){
+            	if ( criteria.widgetIsNull ){
+            		conjuction.isNull("widget");
+            	}
+            	else{
+            		conjuction.isNotNull("widget");
+            	}
+            }
 
             if( criteria.nodeId != null ){
                 conjuction.eq("serverId", criteria.nodeId );
@@ -288,6 +308,7 @@ extends Model
                 ", busySince=" + busySince +
                 ", advancedParams=" + advancedParams +
                 ", remote=" + remote +
+                ", widget=" + widget +
                 ", project='" + project + '\'' +
                 '}';
     }
@@ -405,6 +426,7 @@ extends Model
         public String nodeId = null;
         private QueryConf conf;
         private Boolean serverIdIsNull;
+        private Boolean widgetIsNull;
         private User user;
 
         public Criteria(QueryConf conf) {
@@ -440,6 +462,11 @@ extends Model
             this.serverIdIsNull = serverIdIsNull;
             return this;
         }
+        
+        public Criteria setWidgetIsNull(boolean widgetIsNull) {
+            this.widgetIsNull = widgetIsNull;
+            return this;
+        }        
 
         public Criteria setUser(User user) {
             this.user = user;
