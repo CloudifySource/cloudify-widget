@@ -184,7 +184,7 @@ public class ScriptFilesUtilities implements ScriptExecutorsConstants{
 							EXECUTING_SCRIPTS_FOLDER_PATH + subFolderName, serverNodeId, opName ); 
 		File resultJsonFile = FileUtils.getFile( path );
 		if( logger.isDebugEnabled() ){
-			logger.debug( "---getJson(), jsonNodeFile=" + path + ", exists:" + resultJsonFile.exists() );
+			logger.debug( "---getJson(), jsonNodeFile=" + path + ", exists:" + resultJsonFile.exists() + ", serverNodeId=" + serverNodeId );
 		}
 		
 		if( !resultJsonFile.exists() ){
