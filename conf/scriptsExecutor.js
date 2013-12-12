@@ -5,7 +5,7 @@ var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
 var args = [];
  
-console.log( 'start' );
+//console.log( 'start' );
 
 var scriptsDir = '..' + path.sep + '_scripts' + path.sep;
 var newDir = scriptsDir + 'new' + path.sep;
@@ -20,12 +20,12 @@ if( !fs.existsSync( newDir ) ){
 }
 
 var files = fs.readdirSync( newDir );
-console.log( 'All files:' + files );
 
 var filesCount = files.length;
 console.log(  "files count:" + filesCount );
 
 if( filesCount  > 0 ){
+	console.log( 'All files:' + files );
 	var containsStop = files.indexOf( 'stop' ) >= 0;
 	console.log( 'Contains stop:' + containsStop );
 	if( !containsStop ){
