@@ -113,7 +113,7 @@ public class RestoreExecutionService implements ScriptExecutorsConstants {
         	if( !bootstrappingFinished ){
 
             	if( logger.isDebugEnabled() ){
-            		logger.debug( "--restoreBootstrappingServerNodes, before submitting server node to threads pool" + serverNodeId );
+            		logger.debug( "--restoreBootstrappingServerNodes, before submitting server node to threads pool:" + serverNodeId );
             	}
             	
         		//run waiting for bootstrap finishing in different thread
