@@ -124,6 +124,10 @@ public class WidgetServerImpl implements WidgetServer
     public Status getWidgetStatus(ServerNode server) {
         Status result = new Status();
 
+		if( logger.isDebugEnabled() ){
+			logger.debug( "--- getWidgetStatus serverniode id=" + server.getId() );
+		}        
+        
         List<String> output = new LinkedList<String>();
         result.setOutput(output);
 
@@ -168,7 +172,7 @@ public class WidgetServerImpl implements WidgetServer
 
         String cachedOutput = scriptExecutor.getOutput(server);// need to sort out the cache before we decide if the installation finished.
         if( logger.isDebugEnabled() ){
-        	logger.debug( "cachedOutput=" + cachedOutput );
+        	logger.debug( "cachedOutput for serverNode [" + server.getId() + "] :" + cachedOutput );
         }
         result.setRawOutput( Utils.split( cachedOutput, "\n" ) );
 
