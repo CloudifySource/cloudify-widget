@@ -1,0 +1,1 @@
+alter table server_node add column widget_id bigint;
