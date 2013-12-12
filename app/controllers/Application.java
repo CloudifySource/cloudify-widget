@@ -137,6 +137,7 @@ public class Application extends Controller
                 serverNode = new ServerNode();
                 serverNode.setAdvancedParams( requestBody.asJson().toString() );
                 serverNode.setRemote(true);
+                serverNode.setWidget(widget);
                 serverNode.save();
             }else{
                 serverNode = ApplicationContext.get().getServerPool().get();
