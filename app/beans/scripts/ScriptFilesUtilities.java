@@ -34,15 +34,17 @@ public class ScriptFilesUtilities implements ScriptExecutorsConstants{
 		try {
 			//find bootstrap json file and retrieve from it cloud folder path and isHandlePrivateKey flag value
 			JsonNode parsedJson = getJson( serverNodeId, BOOTSTRAP, serverNodeId );
+			//if appropriate json file found
+			if( parsedJson != null ){
+				JsonNode cloudFolderJsonNode = parsedJson.get( CLOUD_FOLDER_PROPERTY );
+				JsonNode isHandlePrivateKeyJsonNode = parsedJson.get( IS_HANDLE_PRIVATE_KEY_PROPERTY );
 
-			JsonNode cloudFolderJsonNode = parsedJson.get( CLOUD_FOLDER_PROPERTY );
-			JsonNode isHandlePrivateKeyJsonNode = parsedJson.get( IS_HANDLE_PRIVATE_KEY_PROPERTY );
+				File cloudFolder = new File( cloudFolderJsonNode.getTextValue() );
+				boolean isHandlePrivateKey = isHandlePrivateKeyJsonNode.getBooleanValue();
 
-			File cloudFolder = new File( cloudFolderJsonNode.getTextValue() );
-			boolean isHandlePrivateKey = isHandlePrivateKeyJsonNode.getBooleanValue();
-
-			waitForFinishBootstrappingAndSaveServerNode( serverNode, cloudFolder, jCloudsContext,
-					isHandlePrivateKey );			
+				waitForFinishBootstrappingAndSaveServerNode( serverNode, cloudFolder, jCloudsContext,
+						isHandlePrivateKey );
+			}
 		} 
 		catch( IOException e ) {
 			logger.error( e.toString(), e );
