@@ -93,7 +93,8 @@ public class RestoreExecutionService implements ScriptExecutorsConstants {
     			new ServerNode.QueryConf().setMaxRows( -1 ).
     				criteria().
     				setRemote( true ).
-    				setWidgetIsNull( true ).
+    				setWidgetIsNull( false ).
+    				setWidgetInstanceIsNull( true ).
     				done() );
     	
     	if( logger.isDebugEnabled() ){

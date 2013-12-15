@@ -12,7 +12,7 @@ var newDir = scriptsDir + 'new' + path.sep;
 var executingDir = scriptsDir + 'executing' + path.sep;
 var executedDir = scriptsDir + 'executed' + path.sep;
 
-console.log( "newDir exists:" + fs.existsSync( newDir ) );
+//console.log( "newDir exists:" + fs.existsSync( newDir ) );
 
 if( !fs.existsSync( newDir ) ){
 	console.log( '[' + newDir + '] directory does not exist');

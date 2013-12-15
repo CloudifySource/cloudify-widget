@@ -270,6 +270,15 @@ extends Model
             		conjuction.isNotNull("widget");
             	}
             }
+            
+            if ( criteria.widgetInstanceIsNull != null ){
+            	if ( criteria.widgetInstanceIsNull ){
+            		conjuction.isNull("widgetInstance");
+            	}
+            	else{
+            		conjuction.isNotNull("widgetInstance");
+            	}
+            }            
 
             if( criteria.nodeId != null ){
                 conjuction.eq("serverId", criteria.nodeId );
@@ -309,6 +318,7 @@ extends Model
                 ", advancedParams=" + advancedParams +
                 ", remote=" + remote +
                 ", widget=" + widget +
+                ", widgetInstance=" + widgetInstance +
                 ", project='" + project + '\'' +
                 '}';
     }
@@ -427,6 +437,7 @@ extends Model
         private QueryConf conf;
         private Boolean serverIdIsNull;
         private Boolean widgetIsNull;
+        private Boolean widgetInstanceIsNull;
         private User user;
 
         public Criteria(QueryConf conf) {
@@ -465,6 +476,11 @@ extends Model
         
         public Criteria setWidgetIsNull(boolean widgetIsNull) {
             this.widgetIsNull = widgetIsNull;
+            return this;
+        }
+        
+        public Criteria setWidgetInstanceIsNull(boolean widgetInstanceIsNull) {
+            this.widgetInstanceIsNull = widgetInstanceIsNull;
             return this;
         }        
 
