@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import models.ServerNode;
 import models.Widget;
-import models.WidgetInstance;
 
 import org.slf4j.LoggerFactory;
 
@@ -109,14 +108,14 @@ public class RestoreExecutionService implements ScriptExecutorsConstants {
     		logger.debug( "---restoreBootstrappingServerNodes=" + 
     				Arrays.toString( serverNodesBootstrapping.toArray( 
     						new ServerNode[ serverNodesBootstrapping.size() ] ) ) );
-    		
+    		/*
     		List<Widget> allWidgets = Widget.find.all();
     		logger.debug( "---All widgets=" + ( ( allWidgets == null ) ? "NULL" : 
     			Arrays.toString( allWidgets.toArray( new ServerNode[ allWidgets.size() ] ) ) ) );
     		List<WidgetInstance> allWidgetInstances = WidgetInstance.find.all();
     		logger.debug( "---allWidgetInstances=" + ( allWidgetInstances == null ? "NULL" :
     			Arrays.toString( allWidgetInstances.toArray( new ServerNode[ allWidgetInstances.size() ] ) ) ) );
-    		
+    			*/
     	}
     	for( final ServerNode serverNode : serverNodesBootstrapping ){
         	if( logger.isDebugEnabled() ){
