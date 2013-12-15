@@ -99,9 +99,6 @@ public class Widget
     private String loginVerificationUrl = null; // url to verify user IDs.
     private String webServiceKey=null; // secret key we add on the web service calls.
 
-    @OneToOne( cascade = CascadeType.REMOVE, mappedBy="widget" )
-    ServerNode serverNode = null;
-
     private long lifeExpectancy = 0;
     @JsonIgnore
     @ManyToOne( optional = false )
