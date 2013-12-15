@@ -1,5 +1,6 @@
 package beans.scripts;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -98,6 +99,10 @@ public class RestoreExecutionService implements ScriptExecutorsConstants {
     				setWidgetInstanceIsNull( true ).
     				done() );
     	
+    	if( serverNodesBootstrapping == null ){
+    		serverNodesBootstrapping = new ArrayList<ServerNode>( 0 );
+    	}
+    	
     	if( logger.isDebugEnabled() ){
     		logger.debug( "---restoreBootstrappingServerNodes, " +
     				"serverNodesBootstrapping size=" + serverNodesBootstrapping.size() );
@@ -106,11 +111,11 @@ public class RestoreExecutionService implements ScriptExecutorsConstants {
     						new ServerNode[ serverNodesBootstrapping.size() ] ) ) );
     		
     		List<Widget> allWidgets = Widget.find.all();
-    		logger.debug( "---All widgets=" + 
-    			Arrays.toString( allWidgets.toArray( new ServerNode[ allWidgets.size() ] ) ) );
+    		logger.debug( "---All widgets=" + ( ( allWidgets == null ) ? "NULL" : 
+    			Arrays.toString( allWidgets.toArray( new ServerNode[ allWidgets.size() ] ) ) ) );
     		List<WidgetInstance> allWidgetInstances = WidgetInstance.find.all();
-    		logger.debug( "---allWidgetInstances=" + 
-    			Arrays.toString( allWidgetInstances.toArray( new ServerNode[ allWidgetInstances.size() ] ) ) );
+    		logger.debug( "---allWidgetInstances=" + ( allWidgetInstances == null ? "NULL" :
+    			Arrays.toString( allWidgetInstances.toArray( new ServerNode[ allWidgetInstances.size() ] ) ) ) );
     		
     	}
     	for( final ServerNode serverNode : serverNodesBootstrapping ){
