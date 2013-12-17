@@ -18,6 +18,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import controllers.WidgetAdmin;
+import net.sf.cglib.core.CollectionUtils;
+import net.sf.cglib.core.Predicate;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -30,10 +32,7 @@ import server.ApplicationContext;
 import server.exceptions.ServerException;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * This class creates on sign-up, serves for authentication and keeps information about login and user's widgets.
@@ -367,6 +366,15 @@ public class User
 	{
 		return widgets;
 	}
+
+    public Collection<Widget> getEnabledWidgets(){
+        return CollectionUtils.filter( widgets, new Predicate() {
+            @Override
+            public boolean evaluate(Object o) {
+                return ((Widget)o).isEnabled();
+            }
+        });
+    }
 
 	public void setWidgets(List<Widget> widgets)
 	{
