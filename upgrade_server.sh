@@ -18,27 +18,20 @@ chmod 755 $WIDGET_HOME/*.sh
 chmod 755 $WIDGET_HOME/bin/*.sh
 
 
+# http://repository.cloudifysource.org/org/cloudifysource/2.7.0-5993-M8/gigaspaces-cloudify-2.7.0-m8-b5993.zip
 # http://repository.cloudifysource.org/org/cloudifysource/2.7.0-5985-M3/gigaspaces-cloudify-2.7.0-M3-b5985.zip
 
-CLOUDIFY_VERSION=2.7.0
-BUILD_NUMBER=5985
-MILESTONE=m3
-BUILD_TYPE=SNAPSHOT
-
-MILESTONE_UPPERCASE=`echo $MILESTONE | tr '[:lower:]' '[:upper:]'`
-BUILD_VERSION=${CLOUDIFY_VERSION}-${BUILD_NUMBER}-${MILESTONE_UPPERCASE}
-CLOUDIFY_MILESTONE=${CLOUDIFY_VERSION}-${BUILD_NUMBER}-${MILESTONE}
-CLOUDIFY_BUILD=${CLOUDIFY_VERSION}-${MILESTONE}-b${BUILD_NUMBER}
-echo "upgrading cloudify to version $CLOUDIFY_VERSION $CLOUDIFY_BUILD"
-CLOUDIFY_FOLDER=gigaspaces-cloudify-${CLOUDIFY_VERSION}-${MILESTONE}
-CLOUDIFY_ZIP_NAME=${CLOUDIFY_FOLDER}-b${BUILD_NUMBER}
+CLOUDIFY_URL=http://repository.cloudifysource.org/org/cloudifysource/2.7.0-5993-M8/gigaspaces-cloudify-2.7.0-m8-b5993.zip
+echo "upgrading cloudify to ${CLOUDIFY_URL}"
+CLOUDIFY_FOLDER=gigaspaces-cloudify-2.7.0-m8
+CLOUDIFY_ZIP_NAME=gigaspaces-cloudify-2.7.0-m8-b5993
 CLOUDIFY_FILE=${CLOUDIFY_ZIP_NAME}.zip
 echo searching if file [${CLOUDIFY_FILE}] already exists
 if [ -f /root/$CLOUDIFY_FILE ]; then
     echo "cloudify already installed, nothing to go"
 else
-    echo "executing wget on [http://repository.cloudifysource.org/org/cloudifysource/${BUILD_VERSION}/${CLOUDIFY_FILE}]"
-    wget "http://repository.cloudifysource.org/org/cloudifysource/${BUILD_VERSION}/${CLOUDIFY_FILE}" -O /root/$CLOUDIFY_FILE
+    echo "executing wget on [${CLOUDIFY_URL}]"
+    wget "${CLOUDIFY_URL}" -O /root/$CLOUDIFY_FILE
     if [ $? -ne 0 ]; then
         echo "wget failed. deleting the file"
         rm -f  /root/$CLOUDIFY_FILE
