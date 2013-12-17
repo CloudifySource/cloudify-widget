@@ -85,10 +85,23 @@ public class PoolEventModel extends Model {
     }
 
     public static List<PoolEventModel> findByCriteria( QueryConfig queryConfig ){
-        ExpressionList<PoolEventModel> where = find.where();
-        Junction<PoolEventModel> disjunction = where.disjunction();
-        for (QueryConfig.PoolModelCriteria criteria : queryConfig.criterias) {
-            Junction<PoolEventModel> conjunction = disjunction.conjunction();
+        return queryConfig.find().findList();
+    }
+
+    public static class QueryConfig extends QueryConf<QueryConfig.PoolModelCriteria, PoolEventModel> {
+
+        @Override
+        protected PoolModelCriteria newCriteria() {
+            return new PoolModelCriteria();
+        }
+
+        @Override
+        public Finder<Long, PoolEventModel> getFinder() {
+            return PoolEventModel.find;
+        }
+
+        @Override
+        protected void applyCriteria(PoolModelCriteria criteria, Junction<PoolEventModel> conjunction) {
             conjunction.eq("1", "1");
             if ( criteria.getEmpty() != null ){
                 conjunction.eq("empty", criteria.getEmpty());
@@ -122,20 +135,8 @@ public class PoolEventModel extends Model {
                 conjunction.ge("lastUpdate", criteria.getAfterUpdate());
             }
         }
-        if ( queryConfig.maxRows > 0 ){
-            where.setMaxRows( queryConfig.maxRows );
-        }
-        return where.findList();
-    }
 
-    public static class QueryConfig extends QueryConf<QueryConfig.PoolModelCriteria> {
-
-        @Override
-        protected PoolModelCriteria newCriteria() {
-            return new PoolModelCriteria();
-        }
-
-        public class PoolModelCriteria extends QueryConf<PoolModelCriteria>.Criteria{
+        public class PoolModelCriteria extends QueryConf<PoolModelCriteria, PoolEventModel>.Criteria{
             private Boolean empty;
             private Long timestamp;
             private Long lastUpdate;

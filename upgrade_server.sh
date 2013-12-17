@@ -107,6 +107,8 @@ chmod 755 /etc/init.d/widget
 echo "upgrading hp-cloud templates"
 \cp -f conf/cloudify/hp-cloud.groovy cloudify-folder/clouds/hp/hp-cloud.groovy
 \cp -f conf/cloudify/hp-cloud.properties cloudify-folder/clouds/hp/hp-cloud.properties
+\cp -f conf/cloudify/softlayer-cloud.groovy cloudify-folder/clouds/softlayer/softlayer-cloud.groovy
+\cp -f conf/cloudify/softlayer-cloud.properties cloudify-folder/clouds/softlayer/softlayer-cloud.properties
 
 
 echo "upgrading monit configurations"

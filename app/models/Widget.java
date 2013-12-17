@@ -21,6 +21,8 @@ import javax.persistence.*;
 
 import beans.Recipe;
 import beans.config.ServerConfig;
+import com.avaje.ebean.Junction;
+import models.query.QueryConf;
 import org.apache.commons.collections.Predicate;
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -734,5 +736,44 @@ public class Widget
     public abstract static class IncludeInstancesMixin{
         @JsonProperty("instances")
         public abstract List<WidgetInstance> getViableInstances();
+    }
+
+
+    public static class WidgetQueryConfig extends QueryConf<WidgetQueryConfig.WidgetCriteria, Widget> {
+        @Override
+        protected WidgetCriteria newCriteria() {
+            return new WidgetCriteria();
+        }
+
+        @Override
+        public Finder<Long, Widget> getFinder() {
+            return Widget.find;
+        }
+
+        @Override
+        protected void applyCriteria(WidgetCriteria criteria, Junction<Widget> conjunction) {
+            if (criteria.enabled != null) {
+                conjunction.eq("enabled", criteria.enabled);
+            }
+            if (criteria.user != null) {
+                conjunction.eq("user", criteria.user);
+            }
+
+        }
+
+        public class WidgetCriteria extends QueryConf<WidgetCriteria, Widget>.Criteria {
+            private Boolean enabled;
+            private User user;
+
+            public WidgetCriteria setEnabled(Boolean enabled) {
+                this.enabled = enabled;
+                return this;
+            }
+
+            public WidgetCriteria setUser(User user) {
+                this.user = user;
+                return this;
+            }
+        }
     }
 }

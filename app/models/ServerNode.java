@@ -17,14 +17,7 @@ package models;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Version;
+import javax.persistence.*;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
@@ -113,7 +106,7 @@ extends Model
     public List<ServerNodeEvent> events = new LinkedList<ServerNodeEvent>();
     
     @JsonIgnore
-    @OneToOne( )
+    @ManyToOne( )
     private Widget widget;    
 	
 	public static Finder<Long,ServerNode> find = new Finder<Long,ServerNode>(Long.class, ServerNode.class); 

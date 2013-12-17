@@ -48,7 +48,7 @@ public class DemosController extends Controller {
     }
 
     public static Result listWidgetForDemoUser( Long userId ){
-        return ok(Json.toJson(User.findById(userId).getWidgets()));
+        return ok(Json.toJson(new Widget.WidgetQueryConfig().criteria().setEnabled(true).setUser(User.findById(userId)).done().find().findList()));
     }
 
     public static Result getDemoPageForWidget( Long userId, String apiKey ){
