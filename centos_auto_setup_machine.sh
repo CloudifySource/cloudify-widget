@@ -24,6 +24,13 @@ if [ ! -f ${SYSCONF_FILE} ]; then
 fi
 
 
+# echo "installing node"
+# wget https://raw.github.com/isaacs/nave/master/nave.sh
+# ./nave.sh  install 0.10.22
+# ln -s /root/.nave/installed/0.10.22/bin/node /usr/bin/node
+# ln -s /root/.nave/installed/0.10.22/bin/npm /usr/bin/npm
+
+
 echo "installing java"
 yum  -y install java-1.6.0-openjdk-devel
 export JAVA_HOME=/usr/lib/jvm/java-1.6.0-openjdk.x86_64
