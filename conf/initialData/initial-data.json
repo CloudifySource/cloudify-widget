@@ -4,7 +4,7 @@
             "MongoDB": {
                 "version": "2.0.4",
                 "title": "Launch MongoDB",
-                "youtube": "http://www.youtube.com/embed/w5qr4sx5Vt0",
+                "youtube": "//www.youtube.com/embed/w5qr4sx5Vt0",
                 "provider": "http://www.mongodb.org",
                 "recipe": "http://s3.amazonaws.com/cloudify-widget/2.7/mongodb.zip",
                 "name":"mongod",
@@ -23,7 +23,7 @@
             "Petclinic-Simple": {
                 "version": "0.1",
                 "title": "Petclinic simple application example",
-                "youtube": "http://www.youtube.com/embed/anvYieQij94",
+                "youtube": "//www.youtube.com/embed/anvYieQij94",
                 "provider": "http://www.cloudifysource.org/",
                 "recipe": "http://s3.amazonaws.com/cloudify-widget/2.7/petclinic-simple.zip",
                 "name":"petclinic",
@@ -41,7 +41,7 @@
             "Couchbase": {
                 "version": "2.0.0",
                 "title": "Launch Couchbase",
-                "youtube": "http://www.youtube.com/embed/VkQ3ppHeGX4",
+                "youtube": "//www.youtube.com/embed/VkQ3ppHeGX4",
                 "name":"couchbase",
                 "provider": "http://www.couchbase.com",
                 "recipe": "http://s3.amazonaws.com/cloudify-widget/2.7/couchbase-2.0.zip",
@@ -59,7 +59,7 @@
             "MySQL": {
                 "version": "5.*",
                 "title": "MySQL",
-                "youtube": "http://www.youtube.com/embed/6Li_lCZXaKY",
+                "youtube": "//www.youtube.com/embed/6Li_lCZXaKY",
                 "name":"mysql",
                 "provider": "http://www.mysql.com/",
                 "recipe": "https://s3.amazonaws.com/cloudify-widget/2.7/mysql.zip",
@@ -78,7 +78,7 @@
                 "version": "7.1.0.Final",
                 "name":"jboss",
                 "title": "JBoss 7.1.0.Final",
-                "youtube": "",
+                "youtube": "//www.youtube.com/embed/yObv5cgED5A",
                 "provider": "http://www.jboss.org",
                 "recipe": "https://s3.amazonaws.com/cloudify-widget/2.7/jboss.zip",
                 "console": {
@@ -187,7 +187,7 @@
                 "version": "0.20.1",
                 "title": "ElasticSearch",
                 "name":"elasticsearch",
-                "youtube": "http://www.youtube.com/embed/K_d8St6NFs0",
+                "youtube": "//www.youtube.com/embed/K_d8St6NFs0",
                 "provider": "http://www.elasticsearch.org/",
                 "recipe": "https://s3.amazonaws.com/cloudify-widget/elasticsearch.zip",
                 "console": {
@@ -197,6 +197,24 @@
                 "path": "",
                 "image": {
                     "selected": "ElasticSearch.jpeg"
+                },
+                "description": "A recipe for ElasticSEarch, a flexible and powerful open source, distributed real-time search and analytics engine for the cloud"
+            },
+            "Xap": {
+                "version": "9.7.0",
+                "title": "GigaSpaces XAP",
+                "name":"GigaSpaces XAP",
+                "youtube": "//www.youtube.com/embed/P0rTANBRuWE",
+                "provider": "http://www.gigaspaces.com/xap-in-memory-computing-event-processing/Meet-XAP",
+                "recipe": "https://github.com/CloudifySource/cloudify-recipes/archive/master.zip",
+                "console": {
+                    "title": "XAP",
+                    "link": "http://$HOST:9099",
+                    "service":"xap-management"
+                },
+                "path": "cloudify-recipes-master/apps/xap9x-tiny/",
+                "image": {
+                    "selected": "xapSelected.png"
                 },
                 "description": "A recipe for ElasticSEarch, a flexible and powerful open source, distributed real-time search and analytics engine for the cloud"
             }

@@ -65,7 +65,7 @@ public class WidgetServerImpl implements WidgetServer
 
 
     // for logging purposes.
-    private Set<Long> serverNodeIds = new HashSet<Long>();
+    private Set<ErrorKey> serverNodeIds = new HashSet<ErrorKey>();
 
     private static Map<Recipe.Type, Pattern> installationFinishedRegexMap = null;
 
@@ -153,7 +153,7 @@ public class WidgetServerImpl implements WidgetServer
                         result.setState( Status.State.STOPPED );
                         result.setMessage( event.getMsg() );
 
-                        logWidgetInstanceError( server, result, "WidgetInstance threw an error\n");
+                        logWidgetInstanceError( new ErrorKey().setNodeId(server.getId()).setUid( "runtimeError"), result, "WidgetInstance threw an error\n");
 
                         return result;
                     }
@@ -209,16 +209,18 @@ public class WidgetServerImpl implements WidgetServer
 
         }
 
-        logWidgetInstanceError( server, result, "widgetInstance is taking too long. More than ", Long.toString(conf.cloudify.deployTimeoutError) , " millis \n");
+        if ( server.getBusyDuration() > conf.cloudify.deployTimeoutError ){
+                logWidgetInstanceError( new ErrorKey().setNodeId(server.getId()).setUid("timeout"), result, "widgetInstance is taking too long. More than ", Long.toString(conf.cloudify.deployTimeoutError) , " millis \n");
+        }
 
         return result;
     }
 
 
 
-    private void logWidgetInstanceError( ServerNode serverNode, Widget.Status status, String ... prefix ){
-        if ( !serverNodeIds.contains( serverNode.getId() )){
-            serverNodeIds.add( serverNode.getId() );
+    private void logWidgetInstanceError( ErrorKey errorKey, Widget.Status status, String ... prefix ){
+        if ( !serverNodeIds.contains( errorKey )){
+            serverNodeIds.add( errorKey );
             StringBuilder sb = new StringBuilder();
 
             for (String s : prefix) {
@@ -243,5 +245,41 @@ public class WidgetServerImpl implements WidgetServer
     public void setConf( Conf conf )
     {
         this.conf = conf;
+    }
+
+
+    public static class ErrorKey{
+        public Long nodeId;
+        public String uid;
+
+        public ErrorKey setNodeId(Long nodeId) {
+            this.nodeId = nodeId;
+            return this;
+        }
+
+        public ErrorKey setUid(String uid) {
+            this.uid = uid;
+            return this;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            ErrorKey errorKey = (ErrorKey) o;
+
+            if (nodeId != null ? !nodeId.equals(errorKey.nodeId) : errorKey.nodeId != null) return false;
+            if (uid != null ? !uid.equals(errorKey.uid) : errorKey.uid != null) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = nodeId != null ? nodeId.hashCode() : 0;
+            result = 31 * result + (uid != null ? uid.hashCode() : 0);
+            return result;
+        }
     }
 }

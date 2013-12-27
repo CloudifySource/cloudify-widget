@@ -157,6 +157,19 @@ extends Model
 
     }
 
+
+    // tell me how long is the server busy? default is 0 - got busy right now.
+    public Long getBusyDuration() {
+        try {
+            if (busySince != null) {
+                return Math.abs(System.currentTimeMillis() - busySince);
+            }
+        } catch (Exception e) {
+            logger.error("unable to calculate busyDuration", e);
+        }
+        return 0L;
+    }
+
     public Long getBusySince() {
         return busySince;
     }

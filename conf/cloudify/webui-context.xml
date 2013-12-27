@@ -23,6 +23,7 @@
     <bean id="repositoryDefinitionBean" class="org.cloudifysource.repository.definitions.GitRepositoryDefinition">
         <property name="uri" value="https://github.com/CloudifySource/cloudify-recipes.git"/>
         <property name="rootFolder" value="/tmp/cloudify_recipe_git_repository"/>
+        <!--<property name="branch" value="origin/development"/>-->
         <!--<property name="branch" value="refs/tags/2.7.0_m1_build5981_08_01_2013"/>-->
         <property name="existingMethod" value="USE_IF_VALID"/>
     </bean>

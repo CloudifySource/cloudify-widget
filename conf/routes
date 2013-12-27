@@ -98,5 +98,6 @@ GET     /*file        		     	    controllers.Assets.at(path="/public/cloudify",
 
 
 
+GET     /index                          controllers.WidgetAdmin.index
+GET     /                               controllers.DemosController.getDemoPageForUser(email="default_demo@gigaspaces.com")
 
-GET     /                               controllers.WidgetAdmin.index
