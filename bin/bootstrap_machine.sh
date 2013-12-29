@@ -16,8 +16,8 @@ sudo sed -i 's/^Defaults.*requiretty/#&/g' /etc/sudoers
 # http://repository.cloudifysource.org/org/cloudifysource/2.7.0-5993-M8/gigaspaces-cloudify-2.7.0-m8-b5993.zip
 # http://repository.cloudifysource.org/org/cloudifysource/2.7.0-5985-M3/gigaspaces-cloudify-2.7.0-M3-b5985.zip
 
-CLOUDIFY_URL="http://repository.cloudifysource.org/org/cloudifysource/2.7.0-5993-M8/gigaspaces-cloudify-2.7.0-m8-b5993.zip"
-CLOUDIFY_FOLDER=~/gigaspaces-cloudify-2.7.0-m8
+CLOUDIFY_URL="http://repository.cloudifysource.org/org/cloudifysource/community/gigaspaces-cloudify-2.7.0-rc-b5994.zip"
+CLOUDIFY_FOLDER=~/gigaspaces-cloudify-2.7.0-rc
 
 JAVA_64_URL="http://repository.cloudifysource.org/com/oracle/java/1.6.0_32/jdk-6u32-linux-x64.bin"
 

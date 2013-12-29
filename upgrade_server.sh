@@ -18,13 +18,14 @@ chmod 755 $WIDGET_HOME/*.sh
 chmod 755 $WIDGET_HOME/bin/*.sh
 
 
+# http://repository.cloudifysource.org/org/cloudifysource/community/gigaspaces-cloudify-2.7.0-rc-b5994.zip
 # http://repository.cloudifysource.org/org/cloudifysource/2.7.0-5993-M8/gigaspaces-cloudify-2.7.0-m8-b5993.zip
 # http://repository.cloudifysource.org/org/cloudifysource/2.7.0-5985-M3/gigaspaces-cloudify-2.7.0-M3-b5985.zip
 
-CLOUDIFY_URL=http://repository.cloudifysource.org/org/cloudifysource/2.7.0-5993-M8/gigaspaces-cloudify-2.7.0-m8-b5993.zip
+CLOUDIFY_URL=http://repository.cloudifysource.org/org/cloudifysource/community/gigaspaces-cloudify-2.7.0-rc-b5994.zip
 echo "upgrading cloudify to ${CLOUDIFY_URL}"
-CLOUDIFY_FOLDER=gigaspaces-cloudify-2.7.0-m8
-CLOUDIFY_ZIP_NAME=gigaspaces-cloudify-2.7.0-m8-b5993
+CLOUDIFY_FOLDER=gigaspaces-cloudify-2.7.0-rc
+CLOUDIFY_ZIP_NAME=gigaspaces-cloudify-2.7.0-rc-b5994
 CLOUDIFY_FILE=${CLOUDIFY_ZIP_NAME}.zip
 echo searching if file [${CLOUDIFY_FILE}] already exists
 if [ -f /root/$CLOUDIFY_FILE ]; then
