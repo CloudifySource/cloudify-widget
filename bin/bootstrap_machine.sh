@@ -63,4 +63,10 @@ echo "installing node"
 yum -y install npm
 
 cat nohup.out
+
+echo "cloudify agent public $CLOUDIFY_AGENT_ENV_PUBLIC_IP   "
+echo "cloudify agent private $CLOUDIFY_AGENT_ENV_PRIVATE_IP "
+echo "gs agent private $GIGASPACES_AGENT_ENV_PRIVATE_IP     "
+echo "gs agent public $GIGASPACES_AGENT_ENV_PUBLIC_IP       "
+
 exit 0
