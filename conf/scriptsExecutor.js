@@ -47,7 +47,7 @@ if( filesCount  > 0 ){
 			console.log( 'After moving file' );
 		});		
 		
-		console.log( 'Before read fom JSON, file:' + executingDir + firstFile );
+		console.log( 'Before read from JSON, file:' + executingDir + firstFile );
 		fs.readFile( serverNodeIdDir + firstFile, 'utf8', function (err, data) {
 			if (err) {
 				console.log('Read ' + firstFile + ' error: ' + err);

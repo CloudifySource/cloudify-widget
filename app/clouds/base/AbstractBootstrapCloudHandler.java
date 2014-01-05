@@ -69,7 +69,7 @@ abstract public class AbstractBootstrapCloudHandler implements BootstrapCloudHan
 
             if ( !cloudifyRestClient.testRest( serverIp.publicIp ).isSuccess() ){
                 serverNode.errorEvent( "Management machine exists but unreachable" ).save(  );
-                logger.info( "unable to reach management machine. stopping progress." );
+                logger.info( "unable to reach management machine on. stopping progress. Testet rest IP [{}]", serverIp );
                 return null;
             }
             logger.info( "using first machine  [{}] with ip [{}]", managementMachine, serverIp );
