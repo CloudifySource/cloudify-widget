@@ -1,5 +1,7 @@
 package clouds.base;
 
+import java.util.HashSet;
+
 import java.util.Properties;
 import java.util.Set;
 
@@ -60,6 +62,7 @@ abstract public class AbstractBootstrapCloudHandler implements BootstrapCloudHan
             logger.error( "unrecognized exception, assuming only existing algorithm failed. ",e );
         }
 
+        existingManagementMachines = new HashSet<NodeMetadata>();
         logger.info( "found [{}] management machines", CollectionUtils.size( existingManagementMachines ) );
 
         if ( !CollectionUtils.isEmpty( existingManagementMachines ) ) {
