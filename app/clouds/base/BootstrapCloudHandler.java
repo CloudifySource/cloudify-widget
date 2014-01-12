@@ -12,7 +12,7 @@ public interface BootstrapCloudHandler {
 
 	public void createNewMachine( ServerNode serverNode, Conf conf, ComputeServiceContext computeServiceContext );
 	
-	public ServerNode bootstrapCloud( ServerNode serverNode, Conf conf, ComputeServiceContext computeServiceContext );
+	public ServerNode bootstrapCloud( ServerNode serverNode, Conf conf );
 	
 	public CloudProvider getCloudProvider();
 }

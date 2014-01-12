@@ -88,7 +88,7 @@ public class HPBootstrapCloudHandler implements BootstrapCloudHandler {
 
 
 	@Override
-	public ServerNode bootstrapCloud(ServerNode serverNode, Conf conf, ComputeServiceContext computeServiceContext) {
+	public ServerNode bootstrapCloud(ServerNode serverNode, Conf conf) {
         
 		logger.info( "Bootstrap HP cloud" );
 		
@@ -142,7 +142,7 @@ public class HPBootstrapCloudHandler implements BootstrapCloudHandler {
         } 
         else {
             logger.info( "did not find an existing management machine, creating new machine" );
-            createNewMachine( serverNode, conf, computeServiceContext );
+            createNewMachine( serverNode, conf, null );
         }
         
         return serverNode;

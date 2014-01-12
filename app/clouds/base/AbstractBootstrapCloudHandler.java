@@ -1,6 +1,7 @@
 package clouds.base;
 
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -9,6 +10,7 @@ import models.ServerNode;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.domain.ComputeMetadata;
@@ -36,15 +38,19 @@ abstract public class AbstractBootstrapCloudHandler implements BootstrapCloudHan
     protected CloudifyRestClient cloudifyRestClient;
 	
 	@Override
-	public ServerNode bootstrapCloud( ServerNode serverNode, Conf conf, ComputeServiceContext computeServiceContext  ) {
+	public ServerNode bootstrapCloud( ServerNode serverNode, Conf conf ) {
 		logger.info( "Bootstrap [" + getCloudProvider().label + "] cloud" );
 		
 		serverNode.setRemote( true );
         // get existing management machine
 		Set<? extends NodeMetadata> existingManagementMachines = null;
+        ComputeServiceContext computeServiceContext = null;
         try{
-        	AdvancedParams params = getAdvancedParameters( serverNode );
-    		existingManagementMachines = listExistingManagementMachines( params, conf, computeServiceContext.getComputeService() );
+        	AdvancedParams advancedParameters = getAdvancedParameters( serverNode );
+        	computeServiceContext = createComputeServiceContext( advancedParameters );
+        	
+    		existingManagementMachines = listExistingManagementMachines( 
+    						advancedParameters, conf, computeServiceContext.getComputeService() );
         }
         catch(Exception e){
             if ( ExceptionUtils.indexOfThrowable( e, AuthorizationException.class ) > 0 ){
@@ -74,17 +80,33 @@ abstract public class AbstractBootstrapCloudHandler implements BootstrapCloudHan
             serverNode.save();
             logger.info( "not searching for key - only needed for bootstrap" );
         } 
-        else {
+        else if( computeServiceContext != null ){
             logger.info( "did not find an existing management machine, creating new machine" );
             createNewMachine( serverNode, conf, computeServiceContext );
-
+        }
+        else{
+        	throw new RuntimeException( "computeServiceContext was not initialized" );
         }
         return serverNode;
+	}
+	
+	protected ComputeServiceContext createComputeServiceContext( String key, String secretKey ){
+
+		Properties overrides = new Properties();
+		overrides.setProperty( 
+				"jclouds.timeouts.AccountClient.getActivePackages", String.valueOf( 10*60*1000 ) );
+		ContextBuilder contextBuilder = ContextBuilder.newBuilder( getCloudProvider().label );
+		return  contextBuilder 
+				.credentials( key, secretKey )
+				.overrides( overrides )
+				.buildView( ComputeServiceContext.class );
 	}
 
 	abstract protected Set<? extends NodeMetadata> listExistingManagementMachines( AdvancedParams advancedParameters, Conf conf, ComputeService computeService );
 	
 	abstract protected AdvancedParams getAdvancedParameters( ServerNode serverNode );
+	
+	abstract protected ComputeServiceContext createComputeServiceContext( AdvancedParams advancedParams );
 	
     public static class MachineNamePrefixPredicate implements Predicate<ComputeMetadata>{
     	

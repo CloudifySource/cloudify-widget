@@ -541,12 +541,10 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     {
     	BootstrapCloudHandler bootstrapCloudHandler =
     			ApplicationContext.getBootstrapCloudHandler( cloudProvider );
-    	ComputeServiceContext computeServiceContext = 
-    			createComputeServiceContext( cloudProvider, serverNode.getKey(), serverNode.getSecretKey() );
-    	return bootstrapCloudHandler.bootstrapCloud( serverNode, conf,  computeServiceContext );  	
+    	return bootstrapCloudHandler.bootstrapCloud( serverNode, conf );  	
     }
 
-
+/*
     private ComputeServiceContext createComputeServiceContext( 
     		CloudProvider cloudProvider, String key, String secretKey ){
 
@@ -560,6 +558,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     			.overrides( overrides )
     			.buildView( ComputeServiceContext.class );
     }    
+    */
     /*
     
     private void createNewMachine( ServerNode serverNode )

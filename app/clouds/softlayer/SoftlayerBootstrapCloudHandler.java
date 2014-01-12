@@ -84,9 +84,15 @@ public class SoftlayerBootstrapCloudHandler extends AbstractBootstrapCloudHandle
 	@Override
 	protected Set<? extends NodeMetadata> listExistingManagementMachines( AdvancedParams advancedParameters, Conf conf, ComputeService computeService ){
 		
-		String userId = ( ( SoftlayerAdvancedParams )advancedParameters ).userId;
-		String apiKey = ( ( SoftlayerAdvancedParams )advancedParameters ).apiKey;
-		
 		return computeService.listNodesDetailsMatching( new MachineNamePrefixPredicate( conf ) );
 	}
+	
+	@Override
+	protected ComputeServiceContext createComputeServiceContext( AdvancedParams advancedParams ){
+
+	    String userId = ( ( SoftlayerAdvancedParams )advancedParams ).userId;
+	    String apiKey = ( ( SoftlayerAdvancedParams )advancedParams ).apiKey;        	
+		return createComputeServiceContext( userId, apiKey );
+	}
+	
 }
