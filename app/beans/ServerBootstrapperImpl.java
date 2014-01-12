@@ -539,11 +539,27 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     @Override
     public ServerNode bootstrapCloud( ServerNode serverNode )
     {
-        BootstrapCloudHandler bootstrapCloudHandler =
-        		ApplicationContext.getBootstrapCloudHandler( serverNode.getCloudProvider() );
-        return bootstrapCloudHandler.bootstrapCloud(serverNode, conf);    	
+    	BootstrapCloudHandler bootstrapCloudHandler =
+    			ApplicationContext.getBootstrapCloudHandler( cloudProvider );
+    	ComputeServiceContext computeServiceContext = 
+    			createComputeServiceContext( cloudProvider, serverNode.getKey(), serverNode.getSecretKey() );
+    	return bootstrapCloudHandler.bootstrapCloud( serverNode, conf,  computeServiceContext );  	
     }
 
+
+    private ComputeServiceContext createComputeServiceContext( 
+    		CloudProvider cloudProvider, String key, String secretKey ){
+
+    	Properties overrides = new Properties();
+    	overrides.setProperty( 
+    			"jclouds.timeouts.AccountClient.getActivePackages", String.valueOf( 10*60*1000 ) );
+
+    	ContextBuilder contextBuilder = ContextBuilder.newBuilder( cloudProvider.label );
+    	return contextBuilder 
+    			.credentials( key, secretKey )
+    			.overrides( overrides )
+    			.buildView( ComputeServiceContext.class );
+    }    
     /*
     
     private void createNewMachine( ServerNode serverNode )

@@ -152,7 +152,9 @@ public class DeployManagerImpl implements DeployManager
         Recipe.Type recipeType = null;
 
         try {
-            unzippedDir = Utils.downloadAndUnzip(widget.getRecipeURL(), widget.getApiKey());
+        	String recipeURL = widget.getRecipeURL();
+        	logger.info(" Widget [{}] has recipe url [{}]", widget.getRecipeName(), recipeURL );
+            unzippedDir = Utils.downloadAndUnzip( recipeURL, widget.getApiKey());
             recipeDir = unzippedDir;
             if (widget.getRecipeRootPath() != null) {
                 recipeDir = new File(unzippedDir, widget.getRecipeRootPath());

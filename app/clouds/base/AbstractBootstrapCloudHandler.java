@@ -1,8 +1,6 @@
 package clouds.base;
 
 import java.util.HashSet;
-
-import java.util.Properties;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -11,7 +9,6 @@ import models.ServerNode;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.domain.ComputeMetadata;
@@ -38,13 +35,8 @@ abstract public class AbstractBootstrapCloudHandler implements BootstrapCloudHan
     @Inject
     protected CloudifyRestClient cloudifyRestClient;
 	
-    protected ContextBuilder contextBuilder;
-	protected ComputeServiceContext computeServiceContext;
-	protected ComputeService computeService;
-	
-
 	@Override
-	public ServerNode bootstrapCloud( ServerNode serverNode, Conf conf ) {
+	public ServerNode bootstrapCloud( ServerNode serverNode, Conf conf, ComputeServiceContext computeServiceContext  ) {
 		logger.info( "Bootstrap [" + getCloudProvider().label + "] cloud" );
 		
 		serverNode.setRemote( true );
@@ -52,7 +44,7 @@ abstract public class AbstractBootstrapCloudHandler implements BootstrapCloudHan
 		Set<? extends NodeMetadata> existingManagementMachines = null;
         try{
         	AdvancedParams params = getAdvancedParameters( serverNode );
-    		existingManagementMachines = listExistingManagementMachines( params, conf );
+    		existingManagementMachines = listExistingManagementMachines( params, conf, computeServiceContext.getComputeService() );
         }
         catch(Exception e){
             if ( ExceptionUtils.indexOfThrowable( e, AuthorizationException.class ) > 0 ){
@@ -84,46 +76,13 @@ abstract public class AbstractBootstrapCloudHandler implements BootstrapCloudHan
         } 
         else {
             logger.info( "did not find an existing management machine, creating new machine" );
-            createNewMachine( serverNode, conf );
+            createNewMachine( serverNode, conf, computeServiceContext );
 
         }
         return serverNode;
 	}
 
-	protected ComputeService getComputeService( String key, String secretKey ){
-		
-		if( computeService == null ){
-			computeService = getComputeServiceContext( key, secretKey ).getComputeService();
-		}
-		return computeService;
-	}
-	
-	protected ContextBuilder getContextBuilder(){
-		if( contextBuilder == null ){
-			contextBuilder = ContextBuilder.newBuilder( getCloudProvider().label );
-		}
-		
-		return contextBuilder;
-	}
-	
-	protected ComputeServiceContext getComputeServiceContext( String key, String secretKey ){
- 
-		if( computeServiceContext == null ){
-			
-			Properties overrides = new Properties();
-			overrides.setProperty( 
-				"jclouds.timeouts.AccountClient.getActivePackages", String.valueOf( 10*60*1000 ) );
-			
-			computeServiceContext = getContextBuilder() 
-					.credentials( key, secretKey )
-					.overrides( overrides )
-					.buildView( ComputeServiceContext.class );
-		}
-		
-		return computeServiceContext;
-	}
-	
-	abstract protected Set<? extends NodeMetadata> listExistingManagementMachines( AdvancedParams advancedParameters, Conf conf );
+	abstract protected Set<? extends NodeMetadata> listExistingManagementMachines( AdvancedParams advancedParameters, Conf conf, ComputeService computeService );
 	
 	abstract protected AdvancedParams getAdvancedParameters( ServerNode serverNode );
 	

@@ -11,6 +11,8 @@ import models.ServerNode;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.JsonNode;
+import org.jclouds.compute.ComputeService;
+import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.domain.NodeMetadata;
 
 import play.libs.Json;
@@ -27,7 +29,7 @@ public class SoftlayerBootstrapCloudHandler extends AbstractBootstrapCloudHandle
 	private ScriptExecutor scriptExecutor;	
 
 	@Override
-	public void createNewMachine( ServerNode serverNode, Conf conf ) {
+	public void createNewMachine( ServerNode serverNode, Conf conf, ComputeServiceContext computeServiceContext ) {
 		
 		CloudProvider cloudProvider = getCloudProvider();
 
@@ -46,7 +48,7 @@ public class SoftlayerBootstrapCloudHandler extends AbstractBootstrapCloudHandle
 
             logger.info( "Creating security group for user." );
             ApplicationContext.getCloudifyFactory().createCloudifySecurityGroup( 
-            		cloudProvider, getComputeServiceContext( params.userId, params.apiKey ) );
+            		cloudProvider, computeServiceContext );
 
             //Command line for bootstrapping remote cloud.
             CommandLine cmdLine = 
@@ -80,12 +82,11 @@ public class SoftlayerBootstrapCloudHandler extends AbstractBootstrapCloudHandle
 	}
 
 	@Override
-	protected Set<? extends NodeMetadata> listExistingManagementMachines( AdvancedParams advancedParameters, Conf conf ){
+	protected Set<? extends NodeMetadata> listExistingManagementMachines( AdvancedParams advancedParameters, Conf conf, ComputeService computeService ){
 		
 		String userId = ( ( SoftlayerAdvancedParams )advancedParameters ).userId;
 		String apiKey = ( ( SoftlayerAdvancedParams )advancedParameters ).apiKey;
 		
-		return getComputeService( userId, apiKey ).
-				listNodesDetailsMatching( new MachineNamePrefixPredicate( conf ) );
+		return computeService.listNodesDetailsMatching( new MachineNamePrefixPredicate( conf ) );
 	}
 }

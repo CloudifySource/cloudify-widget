@@ -44,7 +44,7 @@ public class HPBootstrapCloudHandler implements BootstrapCloudHandler {
     private static Logger logger = LoggerFactory.getLogger( HPBootstrapCloudHandler.class );
 	
     @Override
-    public void createNewMachine(ServerNode serverNode, Conf conf) {
+    public void createNewMachine(ServerNode serverNode, Conf conf, ComputeServiceContext computeServiceContext) {
 
     	CloudProvider cloudProvider = getCloudProvider();
 
@@ -88,7 +88,7 @@ public class HPBootstrapCloudHandler implements BootstrapCloudHandler {
 
 
 	@Override
-	public ServerNode bootstrapCloud(ServerNode serverNode, Conf conf) {
+	public ServerNode bootstrapCloud(ServerNode serverNode, Conf conf, ComputeServiceContext computeServiceContext) {
         
 		logger.info( "Bootstrap HP cloud" );
 		
@@ -142,7 +142,7 @@ public class HPBootstrapCloudHandler implements BootstrapCloudHandler {
         } 
         else {
             logger.info( "did not find an existing management machine, creating new machine" );
-            createNewMachine( serverNode, conf );
+            createNewMachine( serverNode, conf, computeServiceContext );
         }
         
         return serverNode;

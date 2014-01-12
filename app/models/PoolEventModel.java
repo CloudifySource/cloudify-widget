@@ -1,15 +1,16 @@
 package models;
 
-import com.avaje.ebean.ExpressionList;
-import com.avaje.ebean.Junction;
-import models.query.QueryConf;
-import play.db.ebean.Model;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Version;
-import java.util.List;
+
+import models.query.QueryConf;
+import play.db.ebean.Model;
+
+import com.avaje.ebean.Junction;
 
 /**
  * Created with IntelliJ IDEA.

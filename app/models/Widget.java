@@ -77,7 +77,7 @@ public class Widget
 	private String apiKey;
 
     @JsonIgnore
-	private Integer launches;
+	private Integer launches = 0;
 	private Boolean enabled;
 
     @JsonProperty(value="consolename")
