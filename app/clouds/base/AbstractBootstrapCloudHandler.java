@@ -120,11 +120,13 @@ abstract public class AbstractBootstrapCloudHandler implements BootstrapCloudHan
         public boolean apply( ComputeMetadata computeMetadata ){
             // return true if server is not null, prefix is not empty and prefix is prefix of server.getName
         	boolean startsWithPrefix = computeMetadata.getName().startsWith( prefix );
+        	boolean retValue = !StringUtils.isEmpty( prefix ) && startsWithPrefix;
         	logger.info( "Within MachineName apply()" +
         			", computeMetadata.getName()=" + computeMetadata.getName() + 
         			", prefix=" + prefix + 
-        			", startsWithPrefix=" + startsWithPrefix );
-            return !StringUtils.isEmpty( prefix ) && startsWithPrefix;
+        			", startsWithPrefix=" + startsWithPrefix +
+        			", retValue=" + retValue );
+            return retValue;
         }
         
         @Override
