@@ -44,18 +44,19 @@ if( filesCount  > 0 ){
 			console.log('Rename Error: ' + err);
 			return;
 		  }
-			console.log( 'After moving file' );
+
+		  console.log( 'After moving [' + firstFile + '] file' );
+
+		  console.log( 'Before read from JSON, file:' + executingDir + firstFile );
+		  fs.readFile( serverNodeIdDir + firstFile, 'utf8', function (err, data) {
+			  if (err) {
+				  console.log('Read ' + firstFile + ' error: ' + err);
+				  return;
+			  }
+
+			  executeCommand( firstFile, data, args );
+		  });			
 		});		
-		
-		console.log( 'Before read from JSON, file:' + executingDir + firstFile );
-		fs.readFile( serverNodeIdDir + firstFile, 'utf8', function (err, data) {
-			if (err) {
-				console.log('Read ' + firstFile + ' error: ' + err);
-				return;
-			}
-			
-			executeCommand( firstFile, data, args );
-		});
 	}
 }
 
