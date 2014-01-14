@@ -174,6 +174,7 @@ public class CloudifyUtils {
 		CloudBootstrapConfiguration cloudConf = ApplicationContext.get().conf().server.cloudBootstrap;
 		ComputeServiceContext context;
 		Properties overrides = new Properties();
+        overrides.put("openstack-keystone.api-version", String.valueOf( 2 ) );
 		overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
 		context = ContextBuilder.newBuilder( cloudConf.cloudProvider )
 				.credentials( project + ":" + key, secretKey )
