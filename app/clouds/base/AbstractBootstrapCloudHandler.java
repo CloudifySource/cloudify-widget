@@ -51,8 +51,6 @@ abstract public class AbstractBootstrapCloudHandler implements BootstrapCloudHan
         	
     		existingManagementMachines = listExistingManagementMachines( 
     						advancedParameters, conf, computeServiceContext.getComputeService() );
-    		
-    		logger.info( "found [{}] management machines", CollectionUtils.size( existingManagementMachines ) );
         }
         catch(Exception e){
             if ( ExceptionUtils.indexOfThrowable( e, AuthorizationException.class ) > 0 ){
@@ -61,8 +59,6 @@ abstract public class AbstractBootstrapCloudHandler implements BootstrapCloudHan
             }
             logger.error( "unrecognized exception, assuming only existing algorithm failed. ",e );
         }
-        
-//        existingManagementMachines = new HashSet<NodeMetadata>();
         
         logger.info( "found [{}] management machines", CollectionUtils.size( existingManagementMachines ) );
 
