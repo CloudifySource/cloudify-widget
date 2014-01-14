@@ -366,7 +366,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                 if (cloudCredentials.apiCredentials) {
                     overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
                 }
-
+                overrides.put("openstack-keystone.api-version", String.valueOf( 2 ) );
 
                 context = ContextBuilder.newBuilder(cloudCredentials.cloudProvider.label)
                         .credentials(cloudCredentials.getIdentity(), cloudCredentials.getCredential())
