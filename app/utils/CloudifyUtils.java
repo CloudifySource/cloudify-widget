@@ -17,11 +17,10 @@ package utils;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 import org.apache.commons.io.FileUtils;
 import org.jclouds.ContextBuilder;
 import org.jclouds.collect.PagedIterable;
@@ -177,16 +176,36 @@ public class CloudifyUtils {
      *
 	 */
 	public static ComputeServiceContext createJcloudsContext(String project, String key, String secretKey ) {
-		ServerConfig serverConfig = ApplicationContext.get().conf().server;
-		ComputeServiceContext context;
-		Properties overrides = new Properties();
-		overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
-		context = ContextBuilder.newBuilder( serverConfig.cloudProvider.label )
-				.credentials( project + ":" + key, secretKey )
-				.overrides(overrides)
-				.buildView(ComputeServiceContext.class);
-		return context;
+        ServerConfig serverConfig = ApplicationContext.get().conf().server;
+        return computeServiceContext(serverConfig.cloudProvider.label, project + ":" + key, secretKey, true);
+
 	}
+
+    public static ComputeServiceContext computeServiceContext(String provider, String identity, String credential, boolean api){
+        Set<Module> modules = new HashSet<Module>();
+        modules.add(new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(org.jclouds.softlayer.compute.functions.VirtualGuestToNodeMetadata.class).to(org.jclouds.softlayer.compute.functions.VirtualGuestToReducedNodeMetaData.class);
+            }
+        });
+
+
+        ComputeServiceContext context;
+        Properties overrides = new Properties();
+        overrides.put("jclouds.timeouts.AccountClient.getActivePackages", String.valueOf( 10*60*1000 ) );
+        if ( api) {
+
+
+            overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
+        }
+        context = ContextBuilder.newBuilder( provider )
+                .credentials( identity, credential )
+                .overrides(overrides)
+                .modules(modules)
+                .buildView(ComputeServiceContext.class);
+        return context;
+    }
 
 	private static String getTempSuffix() {
 		String currTime = Long.toString(System.currentTimeMillis());

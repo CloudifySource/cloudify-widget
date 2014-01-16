@@ -19,6 +19,7 @@ import org.jclouds.rest.AuthorizationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import utils.CloudifyUtils;
 import utils.CollectionUtils;
 import utils.Utils;
 import beans.api.ExecutorFactory;
@@ -91,14 +92,9 @@ abstract public class AbstractBootstrapCloudHandler implements BootstrapCloudHan
 	
 	protected ComputeServiceContext createComputeServiceContext( String key, String secretKey ){
 
-		Properties overrides = new Properties();
-		overrides.setProperty( 
-				"jclouds.timeouts.AccountClient.getActivePackages", String.valueOf( 10*60*1000 ) );
-		ContextBuilder contextBuilder = ContextBuilder.newBuilder( getCloudProvider().label );
-		return  contextBuilder 
-				.credentials( key, secretKey )
-				.overrides( overrides )
-				.buildView( ComputeServiceContext.class );
+
+        return CloudifyUtils.computeServiceContext(getCloudProvider().label, key, secretKey, false);
+
 	}
 
 	abstract protected Set<? extends NodeMetadata> listExistingManagementMachines( AdvancedParams advancedParameters, Conf conf, ComputeService computeService );

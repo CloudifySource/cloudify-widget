@@ -341,7 +341,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         Object cloudApi;
         ComputeService computeService = null;
         final CloudProvider cloudProvider;
-		final ContextBuilder contextBuilder;
+
 		
 
         public NovaContext(NovaCloudCredentials cloudCredentials) {
@@ -351,11 +351,8 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                 overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
             }
             cloudProvider = cloudCredentials.cloudProvider;
-            contextBuilder = ContextBuilder.newBuilder( cloudCredentials.cloudProvider.label );
-            context = contextBuilder 
-                    .credentials(cloudCredentials.getIdentity(), cloudCredentials.getCredential())
-                    .overrides(overrides)
-                    .buildView(ComputeServiceContext.class);
+            context = CloudifyUtils.computeServiceContext( cloudCredentials.cloudProvider.label ,cloudCredentials.getIdentity(), cloudCredentials.getCredential(), true );
+
             
             this.zone = cloudCredentials.zone;
         }

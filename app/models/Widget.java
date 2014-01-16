@@ -291,7 +291,7 @@ public class Widget
 					+ publicIp + ", instanceId=" + instanceId + ", remote="
 					+ remote + ", hasPemFile=" + hasPemFile + ", consoleLink="
 					+ consoleLink + ", message=" + message
-					+ ", instanceIsAvailable=" + instanceIsAvailable
+			    		+ ", instanceIsAvailable=" + instanceIsAvailable
 					+ ", cloudifyUiIsAvailable=" + cloudifyUiIsAvailable
 					+ ", completed=" + completed + "]";
 		}        
@@ -591,11 +591,17 @@ public class Widget
         return recipeRootPath;
     }
 
-    public void countLaunch()
-	{
-		launches++;
-		save();
-	}
+    public void countLaunch() {
+        try {
+            if (launches == null) {
+                launches = 0;
+            }
+            launches++;
+            save();
+        } catch (Exception e) {
+            logger.warn("unable to count launch", e.getMessage());
+        }
+    }
 
     @Override
     public String toString() {

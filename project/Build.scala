@@ -12,8 +12,7 @@ object ApplicationBuild extends Build {
       "commons-io" % "commons-io" % "2.4"  ,
       "commons-collections" % "commons-collections" % "3.0"   ,
       "org.apache.commons" % "commons-exec" % "1.1"  ,
-    "commons-configuration" % "commons-configuration" % "1.9",
-      "org.apache.jclouds" % "jclouds-allcompute" % "1.6.2-incubating"  ,
+      "commons-configuration" % "commons-configuration" % "1.9",
       "org.apache.jclouds.driver" % "jclouds-sshj" % "1.6.2-incubating"  ,
       "com.thoughtworks.xstream" % "xstream" % "1.4.3"  ,
       "org.reflections" % "reflections" % "0.9.8"  ,
@@ -26,7 +25,9 @@ object ApplicationBuild extends Build {
       "com.typesafe" %% "play-plugins-mailer" % "2.0.4",
       "com.mixpanel" % "mixpanel-java" % "1.0.1",
       "org.openid4java" % "openid4java" % "0.9.7",
-      "org.jasypt" % "jasypt" % "1.9.0"
+      "org.jasypt" % "jasypt" % "1.9.0",
+      "org.apache.jclouds.api"%"openstack-nova"%"1.6.2-incubating",
+      "org.apache.jclouds.provider"%"hpcloud-compute"%"1.6.2-incubating"
 
     )
 
