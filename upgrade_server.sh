@@ -109,9 +109,6 @@ echo "upgrading hp-cloud templates"
 \cp -f conf/cloudify/hp-cloud.properties cloudify-folder/clouds/hp/hp-cloud.properties
 \cp -f conf/cloudify/softlayer-cloud.groovy cloudify-folder/clouds/softlayer/softlayer-cloud.groovy
 \cp -f conf/cloudify/softlayer-cloud.properties cloudify-folder/clouds/softlayer/softlayer-cloud.properties
-echo "upgrading softlayer jar"
-\cp -f softlayer-1.6.2-incubating.jar ../repository/cache/org.apache.jclouds.provider/softlayer/bundles/softlayer-1.6.2-incubating.jar
-
 
 echo "upgrading monit configurations"
 cat conf/monit/conf.monit | sed 's,__monit_from__,'"$MONIT_FROM"',' | sed 's,__monit_to__,'"$MONIT_SET_ALERT"',' > /etc/monit.conf

@@ -1,7 +1,5 @@
 package clouds.base;
 
-import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -10,7 +8,6 @@ import models.ServerNode;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.domain.ComputeMetadata;
