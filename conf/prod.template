@@ -1,10 +1,116 @@
 include "cloudify-prod.conf"
 
-server={
-    pool : {
-                "coldInit" : false ,
-                "minNode" : 2 ,
-                "maxNodes" : 5,
-                "expirationTimeMillis" : "60mn"
-         }
- }
+"application.secret" = "generate a sha1 and paste it here"
+
+
+/** application level configuration **/
+
+"application" = {
+	"secret : "generate a sha1 and paste it here",
+	"name" : "give a meaningful name to the instance that will be used in emails and such",
+}
+
+/** email configuration **/
+
+"smtp" = {
+	"host" : "smtp host name",
+	"port" : 0000,
+	"tls" : true/false,
+	"mock" : true/false,
+	"enabled" : true/false,
+	"debug" : true/false,
+	"user" : "email username. if you use 'send as' for emails, this user should be able to assume identities",
+	"password" : "email password",
+	"ssl":true/false,
+	"auth":true/false
+}
+
+
+/** this partially implemented **/
+"mails" = {
+	"poolEmpty": {
+		"subject":"email subject",
+		"from" : {
+			"name" : "sender name",
+			"email" : "send@email"
+		}
+	},
+	 "registration" : {
+	 	... the same poolEmpty...
+	 },
+	 "logErrors" : {
+	    ... the same poolEmpty...
+	 },
+	 "changeLog" : {
+	 	"file" : "the change log file when upgrading",
+	 	"settings" : ... the same as poolEmpty ...
+	 }
+
+
+}
+
+/** demo user and initial data **/
+"demoUserEmailSuffix" = "suffix to demo users"
+
+
+/*** pool and bootstrap configurations ***/
+"server"={
+    "cloudProvider":"SOFTLAYER",
+	"pool":{
+		"minNode": 2,
+		"maxNodes": 5,
+		"expirationTimeMillis": "60mn",
+        # max/min help you protect yourself from erroneous values.
+		"maxExpirationTimeMillis" : "60mn",
+		"minExpiryTimeMillis": "20mn"
+	},
+
+	"environment" : {
+	    "cloudifyHome" : "path to cloudify home. usually a symlink",
+    },
+    "bootstrap" : {
+        "serverNamePrefix" : "some prefix to ID machines in pool. enables multiple pools in same account",
+
+         ... more softlayer related configurations to be added soon ...
+
+         "sleepBeforeBootstrapMillis" : "20s",
+
+    },
+
+    "cloudBootstrap" : {
+        "cloudName" : "the cloudify cloud folder name",
+        "remoteBootstrap" : "the script to run remote bootstrap with",
+        "cloudifyUploadDirName": "upload",
+        "cloudPropertiesFileName" : "cloudname-cloud.properties",
+
+
+        ... some softlayer related configurations to be added soon ...
+
+        "existingManagementMachinePrefix":"cloudify-manager"
+    },
+
+    "admin" : {
+        "username" :"admin's username",
+        "password" : "admin's password"
+    }
+}
+
+
+/*** general settings ***/
+
+"settings" = {
+    "initialData" : {
+         "load" : true/false,
+         "defaultPassword" : "default password for generated users",
+         "override": true/false,
+
+    }
+}
+
+"cloudify" = {
+    "version" : "2.7.0-Cloudify-ga", # used to manage the pool
+     "deployScript" : "the script we use to run deploy",
+     "uninstallServiceScript" : "the script we use to uninstall server",
+     "uninstallApplicationScript" : "the script we use to uninstall application"
+
+}
