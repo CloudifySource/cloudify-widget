@@ -1,0 +1,25 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
+    <version>1.0.0</version>
+    <groupId>cloudify.widget</groupId>
+    <artifactId>modules</artifactId>
+
+    <modules>
+        <module>cloudify-widget-api</module>
+        <module>cloudify-widget-softlayer</module>
+        <module>cloudify-widget-hpcloud</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

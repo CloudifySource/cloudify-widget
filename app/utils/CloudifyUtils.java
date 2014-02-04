@@ -182,6 +182,7 @@ public class CloudifyUtils {
 	}
 
     public static ComputeServiceContext computeServiceContext(String provider, String identity, String credential, boolean api){
+        logger.info("creating compute service context");
         Set<Module> modules = new HashSet<Module>();
         modules.add(new AbstractModule() {
             @Override
@@ -199,6 +200,7 @@ public class CloudifyUtils {
 
             overrides.put("jclouds.keystone.credential-type", "apiAccessKeyCredentials");
         }
+        logger.info("build new context");
         context = ContextBuilder.newBuilder( provider )
                 .credentials( identity, credential )
                 .overrides(overrides)

@@ -1,4 +1,4 @@
-package clouds.base;
+package cloudify.widget.api.clouds;
 
 import java.util.Map;
 
@@ -6,7 +6,7 @@ import com.google.common.collect.Multimap;
 
 /**
  * 
- * @author evgenyf
+ * @author evnmgenyf
  * Date: 10/7/13
  */
 public interface CloudServer {

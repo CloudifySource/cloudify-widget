@@ -1,4 +1,4 @@
-package beans.config;
+package cloudify.widget.api.clouds;
 
 
 /**

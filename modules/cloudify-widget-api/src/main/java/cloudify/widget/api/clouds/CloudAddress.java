@@ -1,4 +1,4 @@
-package clouds.base;
+package cloudify.widget.api.clouds;
 
 /**
  *  
