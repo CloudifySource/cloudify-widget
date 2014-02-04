@@ -15,12 +15,13 @@
 
 package server;
 
+import java.util.Collection;
 import java.util.List;
 
-import clouds.base.CloudServer;
 
 import beans.BootstrapValidationResult;
 import beans.NovaCloudCredentials;
+import cloudify.widget.api.clouds.CloudServer;
 import models.ServerNode;
 import server.exceptions.BootstrapException;
 
@@ -60,7 +61,7 @@ public interface ServerBootstrapper
 
     public List<ServerNode> recoverUnmonitoredMachines();
 
-    List<CloudServer> getAllMachines(NovaCloudCredentials cloudCredentials);
+    public Collection<CloudServer> getAllMachines(NovaCloudCredentials cloudCredentials);
 
     /**
      *   Take this machine and make it work.

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import cloudify.widget.api.clouds.CloudProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.ReflectionUtils;
 
@@ -152,7 +153,7 @@ public class ServerConfig {
         public String apiKey="<HP cloud Password>";
         public String username="<tenant>:<user>";
         public File script;
-        public String tags = null;
+        public String tag = null;
         @Config(ignoreNullValues = true)
         public long sleepBeforeBootstrapMillis = Utils.parseTimeToMillis("20s");
         public ApiCredentials api = new ApiCredentials();

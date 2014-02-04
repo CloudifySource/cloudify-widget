@@ -28,6 +28,8 @@ object ApplicationBuild extends Build {
       "org.apache.jclouds.driver" % "jclouds-sshj" % "1.6.2-incubating"  ,
       "org.apache.jclouds.api"%"openstack-nova"%"1.6.2-incubating",
       "org.apache.jclouds.provider"%"hpcloud-compute"%"1.6.2-incubating",
+
+      "cloudify.widget" % "api" % "1.0.0",
       "cloudify.widget" % "softlayer" % "1.0.0",
       "cloudify.widget" % "hpcloud" % "1.0.0"
 

@@ -19,6 +19,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.*;
 
+import cloudify.widget.api.clouds.CloudServer;
+import cloudify.widget.api.clouds.CloudServerApi;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import org.apache.commons.io.FileUtils;
@@ -41,8 +43,6 @@ import server.ApplicationContext;
 import beans.ServerBootstrapperImpl.NovaContext;
 import beans.config.ServerConfig;
 import beans.config.ServerConfig.CloudBootstrapConfiguration;
-import clouds.base.CloudServer;
-import clouds.base.CloudServerApi;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
@@ -235,12 +235,12 @@ public class CloudifyUtils {
 		return filesList[0];
 	}
 	
-    public static List<CloudServer> getAllMachinesWithPredicate( Predicate<CloudServer> predicate, NovaContext context ){
-        logger.info( "getting all machine by predicate [{}]", predicate );
-        CloudServerApi cloudServerApi = context.getApi();
-        logger.info( "cloudServerApi=", cloudServerApi );
-        PagedIterable<CloudServer> listInDetail = cloudServerApi.listInDetail();
-        FluentIterable<CloudServer> filter = listInDetail.concat().filter( predicate );
-        return filter.toImmutableList();
-    }	
+//    public static List<CloudServer> getAllMachinesWithPredicate( Predicate<CloudServer> predicate, NovaContext context ){
+//        logger.info( "getting all machine by predicate [{}]", predicate );
+//        CloudServerApi cloudServerApi = context.getApi();
+//        logger.info( "cloudServerApi=", cloudServerApi );
+//        PagedIterable<CloudServer> listInDetail = cloudServerApi.listInDetail();
+//        FluentIterable<CloudServer> filter = listInDetail.concat().filter( predicate );
+//        return filter.toImmutableList();
+//    }
 }

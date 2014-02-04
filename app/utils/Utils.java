@@ -14,35 +14,25 @@
  */
 package utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.ZipException;
-
 import models.ServerNode;
 import org.apache.commons.io.FileUtils;
-import org.jclouds.compute.domain.NodeMetadata;import org.slf4j.Logger;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import clouds.base.CloudAddress;
-import clouds.base.CloudServer;
-
 import play.Play;
 import play.cache.Cache;
 import play.i18n.Lang;
 import play.libs.Time;
 import play.mvc.Http;
 import server.exceptions.ServerException;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.ZipException;
 
 /**
  * This class provides different static utility methods.
@@ -334,52 +324,40 @@ public class Utils
         return result == null ? defaultResult : result;
     }
 
-	public static ServerIp getServerIp( CloudServer server )    {
-        ServerIp res = new ServerIp();
-        try {
-            Collection<CloudAddress> aPrivate = server.getAddresses().get( "private" );
-            CloudAddress[] addresses = aPrivate.toArray( new CloudAddress[ aPrivate.size() ] );
+//	public static ServerIp getServerIp( CloudServer server )    {
+//        ServerIp res = new ServerIp();
+//        try {
+//            Collection<CloudAddress> aPrivate = server.getAddresses().get( "private" );
+//            CloudAddress[] addresses = aPrivate.toArray( new CloudAddress[ aPrivate.size() ] );
+//
+//
+//            res.publicIp = addresses[ 1 ].getAddr();
+//            res.privateIp = addresses[ 0 ].getAddr();
+//
+//        } catch ( Exception e ) {
+//            logger.error( "unable to get ips", e );
+//        }
+//
+//        return res;
+//    }
+//
+//    public static ServerIp getServerIp( NodeMetadata nodeMetadata )
+//    {
+//        ServerIp res = new ServerIp();
+//        try {
+//
+//        	Set<String> privateAddresses = nodeMetadata.getPrivateAddresses();
+//        	Set<String> publicAddresses = nodeMetadata.getPublicAddresses();
+//
+//            res.publicIp = publicAddresses.isEmpty() ? null : ( String )CollectionUtils.first( publicAddresses );
+//            res.privateIp = privateAddresses.isEmpty() ? null : ( String )CollectionUtils.first( privateAddresses );
+//
+//        } catch ( Exception e ) {
+//            logger.error( "unable to get ips", e );
+//        }
+//
+//        return res;
+//    }
 
 
-            res.publicIp = addresses[ 1 ].getAddr();
-            res.privateIp = addresses[ 0 ].getAddr();
-
-        } catch ( Exception e ) {
-            logger.error( "unable to get ips", e );
-        }
-
-        return res;
-    }
-    
-    public static ServerIp getServerIp( NodeMetadata nodeMetadata )
-    {
-        ServerIp res = new ServerIp();
-        try {
-        	
-        	Set<String> privateAddresses = nodeMetadata.getPrivateAddresses();
-        	Set<String> publicAddresses = nodeMetadata.getPublicAddresses();
-        	
-            res.publicIp = publicAddresses.isEmpty() ? null : ( String )CollectionUtils.first( publicAddresses );
-            res.privateIp = privateAddresses.isEmpty() ? null : ( String )CollectionUtils.first( privateAddresses );
-
-        } catch ( Exception e ) {
-            logger.error( "unable to get ips", e );
-        }
-
-        return res;
-    }    
-
-    public static class ServerIp{
-        public String publicIp = null;
-        public String privateIp = null;
-
-        @Override
-        public String toString()
-        {
-            return "ServerIp{" +
-                    "publicIp='" + publicIp + '\'' +
-                    ", privateIp='" + privateIp + '\'' +
-                    '}';
-        }
-    }
 }

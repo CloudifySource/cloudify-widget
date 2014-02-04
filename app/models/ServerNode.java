@@ -19,6 +19,9 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import cloudify.widget.api.clouds.CloudProvider;
+import cloudify.widget.api.clouds.CloudServer;
+import cloudify.widget.api.clouds.ServerIp;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +32,6 @@ import play.libs.Json;
 import utils.CollectionUtils;
 import utils.StringUtils;
 import utils.Utils;
-import beans.config.CloudProvider;
-import clouds.base.CloudServer;
 
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Junction;
@@ -118,7 +119,7 @@ extends Model
 	public ServerNode( CloudServer srv )
 	{
 		this.serverId  = srv.getId();
-        Utils.ServerIp serverIp = Utils.getServerIp( srv );
+        ServerIp serverIp = srv.getServerIp();
         publicIP = serverIp.publicIp;
         privateIP = serverIp.privateIp;
 
