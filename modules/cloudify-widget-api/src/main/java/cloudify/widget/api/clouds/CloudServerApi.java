@@ -48,6 +48,17 @@ public interface CloudServerApi {
      */
     public CloudServerCreated create( MachineOptions machineOpts );
 
+    /**
+     * returns a PEM file content
+     * @return
+     */
+    public String createCertificate();
+
+
+    /**
+     * creates a security group
+     */
+    public void createSecurityGroup();
 
     @Deprecated // please use create(MachineOptions);
 	public CloudServerCreated create( String name, String imageRef, String flavorRef, CloudCreateServerOptions... options ) throws RunNodesException;

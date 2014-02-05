@@ -22,19 +22,17 @@ import mocks.EventMonitorMock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContextAware;
 import play.Play;
-import play.modules.spring.Spring;
 import utils.CloudifyFactory;
 import beans.GsMailer;
 import beans.HmacImpl;
-import beans.NovaCloudCredentials;
-import beans.config.CloudProvider;
 import beans.config.Conf;
 import beans.pool.PoolEventListener;
 import beans.pool.PoolEventManager;
 import beans.tasks.DestroyServersTask;
 import bootstrap.InitialData;
-import clouds.base.BootstrapCloudHandler;
 
 /**
  * A static class that helps to get an instance of different modules and keeps loose decoupling.
@@ -66,18 +64,27 @@ public class ApplicationContext
     @Inject private PoolEventListener poolEventManager;
     @Inject private DestroyServersTask destroyServersTask;
 
+    @Inject private static org.springframework.context.ApplicationContext applicationContext;
+
     private static ApplicationContext instance;
 
     public static ApplicationContext get(){
         if ( instance == null ){ // guy - in case of null, we want to show Spring Exception.. so lets try to reinitialize.
-            instance=(ApplicationContext) Spring.getBean("applicationContext");
+            instance= applicationContext.getBeansOfType(ApplicationContext.class).get("applicationContext");
         }
         return instance;
     }
 
+    @Inject
+    public void setSpringContext( org.springframework.context.ApplicationContext context ){
+        ApplicationContext.applicationContext = context;
+    }
+
     @PostConstruct
     public void init(){
-        instance = (ApplicationContext) Spring.getBean("applicationContext");
+        if ( applicationContext != null ){
+            instance = (ApplicationContext) applicationContext.getBean("applicationContext");
+        }
     }
 
 
@@ -101,7 +108,7 @@ public class ApplicationContext
     }
 
     private  static <T> T getBean( String bean ){
-        return (T) Spring.getBean( bean );
+        return (T) applicationContext.getBean( bean );
     }
 
     public  GsMailer.IMailer getMailer(){
@@ -191,9 +198,9 @@ public class ApplicationContext
         this.initialData = initialData;
     }
 
-    public static NovaCloudCredentials getNovaCloudCredentials(){
-        return getBean("novaCloudCredentials");  // prototype, we cannot inject it.
-    }
+//    public static NovaCloudCredentials getNovaCloudCredentials(){
+//        return getBean("novaCloudCredentials");  // prototype, we cannot inject it.
+//    }
     
     public static CloudifyFactory getCloudifyFactory(){
         return getBean("cloudifyFactory");
@@ -203,10 +210,10 @@ public class ApplicationContext
         this.poolEventManager = poolEventManager;
     }
     
-    public static BootstrapCloudHandler getBootstrapCloudHandler( CloudProvider cloudProvider ){
-    	
-    	return ( BootstrapCloudHandler )getBean(cloudProvider.label + "BootstrapCloudHandler");
-    }
+//    public static BootstrapCloudHandler getBootstrapCloudHandler( CloudProvider cloudProvider ){
+//
+//    	return ( BootstrapCloudHandler )getBean(cloudProvider.label + "BootstrapCloudHandler");
+//    }
     
 /*    public static class SoftlayerHandler implements BootstrapCloudHandler{
     	
@@ -235,6 +242,13 @@ public class ApplicationContext
     public void setDestroyServersTask(DestroyServersTask destroyServersTask) {
         this.destroyServersTask = destroyServersTask;
     }
+
+
+    public void setApplicationContext(org.springframework.context.ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+
 }
 
 

@@ -19,13 +19,10 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.*;
 
-import cloudify.widget.api.clouds.CloudServer;
-import cloudify.widget.api.clouds.CloudServerApi;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import org.apache.commons.io.FileUtils;
 import org.jclouds.ContextBuilder;
-import org.jclouds.collect.PagedIterable;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.openstack.nova.v2_0.NovaApi;
 import org.jclouds.openstack.nova.v2_0.NovaAsyncApi;
@@ -40,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import server.ApplicationContext;
-import beans.ServerBootstrapperImpl.NovaContext;
 import beans.config.ServerConfig;
 import beans.config.ServerConfig.CloudBootstrapConfiguration;
 

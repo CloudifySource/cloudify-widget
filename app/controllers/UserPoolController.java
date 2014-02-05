@@ -1,8 +1,6 @@
 package controllers;
 
-import beans.NovaCloudCredentials;
 import beans.ServerNodesPoolStats;
-import clouds.base.CloudServer;
 import controllers.compositions.AdminUserCheck;
 import controllers.compositions.UserCheck;
 import models.*;
@@ -12,7 +10,6 @@ import play.libs.Json;
 import play.mvc.*;
 import server.ApplicationContext;
 import server.ServerBootstrapper;
-import views.html.widgets.dashboard.serverNodePool;
 
 import java.util.List;
 
@@ -46,20 +43,23 @@ public class UserPoolController extends Controller {
     @With(UserCheck.class)
     public static Result getAllServers( String authToken, String project, String key, String secretKey )
     {
-        ServerBootstrapper serverBootstrapper = ApplicationContext.get().getServerBootstrapper();
-        List<CloudServer> servers = serverBootstrapper.getAllMachines( new NovaCloudCredentials().setProject(project).setKey(key).setSecretKey(secretKey));
-        for (CloudServer server : servers) {
+//        ServerBootstrapper serverBootstrapper = ApplicationContext.get().getServerBootstrapper();
+//        List<CloudServer> servers = serverBootstrapper.getAllMachines( new NovaCloudCredentials().setProject(project).setKey(key).setSecretKey(secretKey));
+//        for (CloudServer server : servers) {
+//
+//        }
+//        List<ServerNode> list = ServerNode.find.all();
+//        logger.debug("list of server nodes:\n{}", list);
+//        return ok( Json.toJson(list) );
 
-        }
-        List<ServerNode> list = ServerNode.find.all();
-        logger.debug("list of server nodes:\n{}", list);
-        return ok( Json.toJson(list) );
+        return ok();
     }
 
 
     @With(AdminUserCheck.class)
     public static Result getServerNodePoolPage(){
-        return ok( serverNodePool.render() );
+//        return ok( serverNodePool.render() );
+        return ok();
     }
 
     @With(UserCheck.class)

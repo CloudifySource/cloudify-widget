@@ -15,7 +15,6 @@ import models.WidgetInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import clouds.base.CloudServer;
 
 import play.libs.Akka;
 import play.libs.Json;
@@ -98,25 +97,28 @@ public class AdminPoolController extends UserPoolController {
 
     public static Result getCloudServers( String authToken ) {
 
-        return async(Akka.future(new Callable<Result>() {
-            @Override
-            public Result call() throws Exception {
-                ServerBootstrapper serverBootstrapper = ApplicationContext.get().getServerBootstrapper();
-                ServerPool serverPool = ApplicationContext.get().getServerPool();
+//        return async(Akka.future(new Callable<Result>() {
+//            @Override
+//            public Result call() throws Exception {
+//                ServerBootstrapper serverBootstrapper = ApplicationContext.get().getServerBootstrapper();
+//                ServerPool serverPool = ApplicationContext.get().getServerPool();
+//
+//                serverPool.getPool();
+//                Conf conf = ApplicationContext.get().conf();
+//                ServerConfig.ApiCredentials apiCredentials = conf.server.bootstrap.api;
+//                // get all machines with our tag.
+//                List<CloudServer> servers = serverBootstrapper.getAllMachines(ApplicationContext.getNovaCloudCredentials()
+//                        .setProject(apiCredentials.project)
+//                        .setKey(apiCredentials.key)
+//                        .setApiCredentials(false)
+//                        .setSecretKey(apiCredentials.secretKey)
+//                );
+//                return ok(Json.toJson(servers));
+//            }
+//        }));
 
-                serverPool.getPool();
-                Conf conf = ApplicationContext.get().conf();
-                ServerConfig.ApiCredentials apiCredentials = conf.server.bootstrap.api;
-                // get all machines with our tag.
-                List<CloudServer> servers = serverBootstrapper.getAllMachines(ApplicationContext.getNovaCloudCredentials()
-                        .setProject(apiCredentials.project)
-                        .setKey(apiCredentials.key)
-                        .setApiCredentials(false)
-                        .setSecretKey(apiCredentials.secretKey)
-                );
-                return ok(Json.toJson(servers));
-            }
-        }));
+        // TODO : fix this;
+        return ok();
     }
 
 

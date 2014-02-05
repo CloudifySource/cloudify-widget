@@ -17,6 +17,7 @@ package beans;
 import java.util.*;
 
 
+import cloudify.widget.api.clouds.CloudCredentials;
 import cloudify.widget.api.clouds.CloudServer;
 import models.ServerNode;
 
@@ -81,7 +82,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     }
 
     @Override
-    public Collection<CloudServer> getAllMachines(NovaCloudCredentials cloudCredentials) {
+    public Collection<CloudServer> getAllMachines(CloudCredentials cloudCredentials) {
         logger.info("getting all machines for credentials [{}]", cloudCredentials);
         return null;
     }
@@ -90,6 +91,10 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     public boolean reboot(ServerNode serverNode) {
         logger.info("rebooting [{}]", serverNode);
         return false;
+    }
+
+    public void init(){
+        logger.info("initializing the bootstrapper");
     }
 
     //

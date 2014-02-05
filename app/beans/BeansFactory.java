@@ -19,7 +19,7 @@ import beans.config.Conf;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import play.modules.spring.Spring;
+import org.springframework.context.ApplicationContext;
 import server.EventMonitor;
 
 import javax.inject.Inject;
@@ -32,6 +32,9 @@ import javax.inject.Inject;
 public class BeansFactory {
     @Inject
     private Conf conf;
+
+    @Inject
+    private ApplicationContext applicationContext;
 
     private static Logger logger = LoggerFactory.getLogger( BeansFactory.class );
 
@@ -49,10 +52,10 @@ public class BeansFactory {
         // to read more about this.
         if ( StringUtils.isEmpty(conf.mixpanelApiKey) ){
           logger.info( "using mock eventMonitor" );
-            return ( EventMonitor ) Spring.getBean( "eventMonitorMock" );// eventMonitorMock;
+            return ( EventMonitor ) applicationContext.getBean( "eventMonitorMock" );// eventMonitorMock;
         }else{
             logger.info( "using impl eventMonitor" );
-            return ( EventMonitor ) Spring.getBean( "eventMonitorImpl" ); // eventMonitor
+            return ( EventMonitor ) applicationContext.getBean( "eventMonitorImpl" ); // eventMonitor
         }
     }
 

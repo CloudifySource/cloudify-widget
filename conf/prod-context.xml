@@ -4,7 +4,11 @@
        xmlns:p="http://www.springframework.org/schema/p"
        xmlns:task="http://www.springframework.org/schema/task"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+           http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd
+           http://www.springframework.org/schema/task
+           http://www.springframework.org/schema/task/spring-task.xsd">
 
     <bean id="poolEventManager" class="beans.pool.PoolEventManagerMock"/>
     <!--<bean id="poolEventManager" class="beans.pool.PoolEventManager"/>-->
@@ -38,17 +42,38 @@
     <bean id="conf" factory-method="getConfiguration" factory-bean="confBean"/>
 
     <bean id="applicationContext" class="server.ApplicationContext"/>
-    <bean id="novaCloudCredentials" class="cloudify.widget.hpcloud.NovaCloudCredentials" scope="prototype" init-method="init"/>
-    
-    <bean id="cloudifyFactory" class="utils.CloudifyFactory"/>
-    <bean id="scriptExecutor" class="beans.scripts.FileBasedScriptExecutor"/>
-    
-    <bean id="hpcloud-computeBootstrapCloudHandler" class="clouds.hp.HPBootstrapCloudHandler">
-    </bean>
-    <bean id="softlayerBootstrapCloudHandler" class="clouds.softlayer.SoftlayerBootstrapCloudHandler">
-    </bean>    
 
-    <context:annotation-config />
-    <context:component-scan base-package="beans" />	
+    <bean id="scriptExecutor" class="beans.scripts.FileBasedScriptExecutor"/>
+
+    <!-- these two lines should be above the beans tags -->
+    <context:annotation-config/>
+    <context:component-scan base-package="beans" />
+
+
+
+    <beans profile="softlayer">
+
+    </beans>
+
+    <beans profile="stub">
+
+    </beans>
+
+
+    <beans profile="hpcloud">
+
+        <!--<bean id="novaCloudCredentials" class="cloudify.widget.hpcloud.NovaCloudCredentials" scope="prototype" init-method="init"/>-->
+
+        <!--<bean id="cloudifyFactory" class="utils.CloudifyFactory"/>-->
+
+
+        <!--<bean id="hpcloud-computeBootstrapCloudHandler" class="clouds.hp.HPBootstrapCloudHandler">-->
+        <!--</bean>-->
+        <!--<bean id="softlayerBootstrapCloudHandler" class="clouds.softlayer.SoftlayerBootstrapCloudHandler">-->
+        <!--</bean>-->
+    </beans>
+
+
+
 
 </beans>

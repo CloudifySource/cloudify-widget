@@ -15,9 +15,12 @@
 
 package mocks;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import cloudify.widget.api.clouds.CloudCredentials;
+import cloudify.widget.api.clouds.CloudServer;
 import models.ServerNode;
 
 import org.slf4j.Logger;
@@ -25,8 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import server.ServerBootstrapper;
 import beans.BootstrapValidationResult;
-import beans.NovaCloudCredentials;
-import clouds.base.CloudServer;
 
 public class ServerBootstrapperMock implements ServerBootstrapper 
 {
@@ -74,9 +75,8 @@ public class ServerBootstrapperMock implements ServerBootstrapper
     }
 
     @Override
-    public List<CloudServer> getAllMachines(NovaCloudCredentials cloudCredentials) {
-        logger.info("getting all machines");
-        return Collections.emptyList();
+    public Collection<CloudServer> getAllMachines(CloudCredentials cloudCredentials) {
+        return null;
     }
 
     @Override
