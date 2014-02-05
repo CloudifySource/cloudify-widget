@@ -19,6 +19,7 @@ import java.util.*;
 
 import cloudify.widget.api.clouds.CloudCredentials;
 import cloudify.widget.api.clouds.CloudServer;
+import cloudify.widget.api.clouds.CloudServerApi;
 import models.ServerNode;
 
 import org.slf4j.Logger;
@@ -26,9 +27,18 @@ import org.slf4j.LoggerFactory;
 
 import server.ServerBootstrapper;
 import server.exceptions.BootstrapException;
+import utils.CollectionUtils;
+
+import javax.inject.Inject;
 
 /**
- * This class manages a compute cloud provider by JCloud openstack nova infrastructure.
+ *
+ * This class bridges between {@link CloudServer} and {@link ServerNode} and allows the rest of the website
+ * to deal only with the model.
+ *
+ * It mediates machine create/destroy and bootstrap operations between the website the cloud driver.
+ *
+ * This class manages a compute cloud provider.
  * It provides ability to create/delete specific server with desired flavor configuration.
  * On each new server runs a bootstrap script that prepare machine for a server-pool,
  * it includes a setup of firewall, JDK, cloudify installation and etc...
@@ -36,11 +46,26 @@ import server.exceptions.BootstrapException;
  *
  *
  * @author Igor Goldenberg
+ *
+ *
+ *
+ *
  */
 public class ServerBootstrapperImpl implements ServerBootstrapper
 {
 
     private static Logger logger = LoggerFactory.getLogger( ServerBootstrapperImpl.class );
+
+    @Inject
+    private CloudServerApi serverApi;
+
+    /**
+     * The machine tag is a unique identifier to all machines related to this widget instance.
+     * It can manifest in many ways on the cloud - tag in hp-cloud, machine name in softlayer etc..
+     * as long as there's a way to get all machines by it, it is fine.
+     */
+//    @Inject
+    private String machineTag;
 
     @Override
     public List<ServerNode> createServers(int numOfServers) {
@@ -78,7 +103,20 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     @Override
     public List<ServerNode> recoverUnmonitoredMachines() {
         logger.info("recovering lost machines");
-        return null;
+                List<ServerNode> result = new ArrayList<ServerNode>(  );
+        Collection<CloudServer> allMachinesWithTag = serverApi.getAllMachinesWithTag( machineTag );
+        logger.info( "found [{}] total machines with matching tags. filtering lost", CollectionUtils.size(allMachinesWithTag)  );
+        if ( !CollectionUtils.isEmpty( allMachinesWithTag )){
+            for ( CloudServer server : allMachinesWithTag ) {
+                ServerNode serverNode = ServerNode.getServerNode( server.getId() );
+                if ( serverNode == null ){
+                    ServerNode newServerNode = new ServerNode( server );
+                    logger.info( "found an unmonitored machine - I should add it to the DB [{}]", newServerNode );
+                    result.add( newServerNode );
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -318,24 +356,6 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 //        }
 //    }
 //
-//    @Override
-//    public List<ServerNode> recoverUnmonitoredMachines(){
-//        List<ServerNode> result = new ArrayList<ServerNode>(  );
-//        logger.info( "recovering all list machines" );
-//        Collection<CloudServer> allMachinesWithTag = getAllMachinesWithTag( novaContext );
-//        logger.info( "found [{}] total machines with matching tags filtering lost", CollectionUtils.size( allMachinesWithTag )  );
-//        if ( !CollectionUtils.isEmpty( allMachinesWithTag )){
-//            for ( CloudServer server : allMachinesWithTag ) {
-//                ServerNode serverNode = ServerNode.getServerNode( server.getId() );
-//                if ( serverNode == null ){
-//                    ServerNode newServerNode = new ServerNode( server );
-//                    logger.info( "found an unmonitored machine - I should add it to the DB [{}]", newServerNode );
-//                    result.add( newServerNode );
-//                }
-//            }
-//        }
-//        return result;
-//    }
 //
 //    public void init() {
 //        try {
@@ -769,4 +789,11 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 //    }
 
 
+    public void setServerApi(CloudServerApi serverApi) {
+        this.serverApi = serverApi;
+    }
+
+    public void setMachineTag(String machineTag) {
+        this.machineTag = machineTag;
+    }
 }

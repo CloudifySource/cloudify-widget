@@ -68,25 +68,10 @@ public class Global extends GlobalSettings
 	public void onStart(Application app)
 	{
 
-        GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
-        ctx.getEnvironment().setActiveProfiles("standalone");
-        ctx.load("*Context.xml");
-        ctx.refresh();
+        loadSpringContext( app );
 
 
-        logger.info("loading spring context");
-        String contextPath = app.configuration().getString("spring.context");
-        String contextProfiles = app.configuration().getString("spring.profiles");
 
-        if (StringUtils.isEmptyOrSpaces(contextProfiles) || StringUtils.isEmptyOrSpaces(contextPath)  ){
-            throw new RuntimeException("you need to configure spring.context and spring.profiles");
-        }
-
-        logger.info("spring context is at : ["  + contextPath + "]");
-        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
-        applicationContext.getEnvironment().setActiveProfiles(contextProfiles.split(","));
-        applicationContext.setConfigLocation(contextPath);
-        applicationContext.refresh();
 		// print cloudify configuration
         logger.info("printing configuration");
         conf = ApplicationContext.get().conf();
@@ -94,7 +79,7 @@ public class Global extends GlobalSettings
 
         // initialize the server pool.
         // letting the bean do it is incorrect..
-        // TODO : this should open another thread.
+
         new Thread( new Runnable() { // guy - lets use this for now to fix #33
             @Override
             public void run()
@@ -272,4 +257,27 @@ public class Global extends GlobalSettings
 	{
 		ApplicationContext.get().getServerBootstrapper().close();
 	}
+
+    private ClassPathXmlApplicationContext loadSpringContext( Application app ){
+        GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
+        ctx.getEnvironment().setActiveProfiles("standalone");
+        ctx.load("*Context.xml");
+        ctx.refresh();
+
+
+        logger.info("loading spring context");
+        String contextPath = app.configuration().getString("spring.context");
+        String contextProfiles = app.configuration().getString("spring.profiles");
+
+        if (StringUtils.isEmptyOrSpaces(contextProfiles) || StringUtils.isEmptyOrSpaces(contextPath)  ){
+            throw new RuntimeException("you need to configure spring.context and spring.profiles");
+        }
+
+        logger.info("spring context is at : ["  + contextPath + "]");
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
+        applicationContext.getEnvironment().setActiveProfiles(contextProfiles.split(","));
+        applicationContext.setConfigLocation(contextPath);
+        applicationContext.refresh();
+        return applicationContext;
+    }
 }

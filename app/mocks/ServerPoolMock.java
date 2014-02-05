@@ -31,7 +31,7 @@ public class ServerPoolMock implements ServerPool
     @Override
     public void init()
     {
-
+       logger.info("mock pool initializing");
     }
 
     @Override

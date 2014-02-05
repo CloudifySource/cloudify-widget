@@ -23,7 +23,10 @@
 	<bean id="deployExecutor" scope="prototype" class="beans.ProcExecutorImpl"/>
 
     <bean id="destroyServersTask" class="beans.tasks.DestroyServersTaskImpl"/>
-    <bean id="serverBootstrapper" class="beans.ServerBootstrapperImpl" init-method="init"/>
+
+    <bean id="serverBootstrapper" class="beans.ServerBootstrapperImpl" init-method="init">
+        <property name="machineTag" value="#{conf.server.bootstrap.tag}"/>
+    </bean>
 
     <bean id="hmac" class="beans.HmacImpl"/>
 
@@ -56,7 +59,7 @@
     </beans>
 
     <beans profile="stub">
-
+        <bean id="cloudServerApi" class="mocks.cloud.CloudServerApiMock"/>
     </beans>
 
 
