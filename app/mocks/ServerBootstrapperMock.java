@@ -15,12 +15,8 @@
 
 package mocks;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
-import cloudify.widget.api.clouds.CloudCredentials;
-import cloudify.widget.api.clouds.CloudServer;
 import models.ServerNode;
 
 import org.slf4j.Logger;
@@ -67,6 +63,7 @@ public class ServerBootstrapperMock implements ServerBootstrapper
         return null;
     }
 
+
     @Override
     public BootstrapValidationResult validateBootstrap( ServerNode serverNode )
     {
@@ -74,10 +71,6 @@ public class ServerBootstrapperMock implements ServerBootstrapper
         return new BootstrapValidationResult();
     }
 
-    @Override
-    public Collection<CloudServer> getAllMachines(CloudCredentials cloudCredentials) {
-        return null;
-    }
 
     @Override
     public boolean reboot(ServerNode serverNode) {

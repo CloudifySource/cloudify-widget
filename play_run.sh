@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -e
 if [ -z "$PLAY_HOME" ]; then
     echo "need to set PLAY_HOME"
     exit 1
@@ -22,7 +23,7 @@ else
     echo "pom.xml was not found under $MODULES_HOME"
     exit 1;
 fi
-
+set +e
 #this file helps run play with personal configuration
 #the me.conf file should have as first line:
 #import "application.conf" (or some other file)

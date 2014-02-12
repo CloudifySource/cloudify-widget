@@ -15,19 +15,23 @@
 package beans;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
-import cloudify.widget.api.clouds.CloudCredentials;
-import cloudify.widget.api.clouds.CloudServer;
-import cloudify.widget.api.clouds.CloudServerApi;
+import beans.cloudify.CloudifyRestClient;
+import beans.config.ServerConfig;
+import cloudify.widget.api.clouds.*;
 import models.ServerNode;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import server.ServerBootstrapper;
 import server.exceptions.BootstrapException;
+import server.exceptions.ServerException;
 import utils.CollectionUtils;
+import utils.Utils;
 
 import javax.inject.Inject;
 
@@ -57,36 +61,162 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     private static Logger logger = LoggerFactory.getLogger( ServerBootstrapperImpl.class );
 
     @Inject
-    private CloudServerApi serverApi;
+    private CloudServerApi cloudServerApi;
+
+    @Inject
+    private MachineOptions bootstrapMachineOptions;
+
+    @Inject
+    private CloudifyRestClient cloudifyRestClient;
 
     /**
      * The machine tag is a unique identifier to all machines related to this widget instance.
      * It can manifest in many ways on the cloud - tag in hp-cloud, machine name in softlayer etc..
      * as long as there's a way to get all machines by it, it is fine.
      */
-//    @Inject
-    private String machineTag;
+
+    private ServerConfig.BootstrapConfiguration bootstrapConf;
 
     @Override
     public List<ServerNode> createServers(int numOfServers) {
         logger.info("creating [{}] new server", numOfServers);
-        return null;
+        List<ServerNode> newServers = new LinkedList<ServerNode>();
+        for ( int i = 0; i < numOfServers; i ++ ){
+            ServerNode serverNode = createServer();
+            if ( serverNode != null ){
+                newServers.add(serverNode);
+            }
+        }
+        return newServers;
+    }
+
+
+    private ServerNode createServer()
+    {
+
+        ServerNode serverNode = null;
+        int retries = bootstrapConf.createServerRetries;
+        for ( int i =0 ; i <  retries && serverNode == null ; i++){
+            logger.info( "creating new server node, try #[{}]",i );
+            final CloudServerCreated createdServer = CollectionUtils.first(cloudServerApi.create( bootstrapMachineOptions ));
+
+
+//            PoolEvent.ServerNodeEvent newServerNodeEvent = new PoolEvent.ServerNodeEvent().setType(PoolEvent.Type.CREATE).setServerNode(tmpNode);
+
+
+            if (createdServer != null) {
+                final CloudServerApi finalCloudServerApi = cloudServerApi;
+                 CloudServer server = cloudServerApi.get( createdServer.getId() );
+                ServerNode tmpNode = new ServerNode( server );
+
+                final ActiveWait wait = new ActiveWait();
+
+         wait
+                .setIntervalMillis(TimeUnit.SECONDS.toMillis(10))
+                .setTimeoutMillis(TimeUnit.SECONDS.toMillis(120))
+                .waitUntil(new Wait.Test() {
+                    @Override
+                    public boolean resolved() {
+                        logger.info("Waiting for a server activation... Left timeout: {} sec", wait.getTimeLeftMillis() / 1000);
+                        return finalCloudServerApi.get( createdServer.getId()).isRunning();
+                    }
+                });
+
+                if ( bootstrap(tmpNode)) { // bootstrap success
+//                    poolEventManager.handleEvent(newServerNodeEvent);
+                    serverNode = tmpNode;
+                    logger.info("successful bootstrap on [{}]", serverNode);
+                } else { // bootstrap failed
+                    logger.info("bootstrap failed, deleting server");
+                    deleteServer(tmpNode.getNodeId()); // deleting the machine from cloud.
+                }
+            } else { // create server failed
+                logger.info("unable to create machine. try [{}/{}]", i + 1, retries);
+            }
+
+        }
+        return serverNode;
+
+    }
+
+
+    private boolean bootstrap( ServerNode serverNode ){
+
+        long timeout = bootstrapConf.sleepBeforeBootstrapMillis;
+        int bootstrapRetries = bootstrapConf.bootstrapRetries;
+
+        logger.info("Server created, wait {} seconds before starting to bootstrap machine: {}", timeout, serverNode.getPublicIP());
+
+        Utils.threadSleep(timeout);
+
+
+        boolean bootstrapSuccess = false;
+        Exception lastBootstrapException = null;
+        for (int i = 0; i < bootstrapRetries && !bootstrapSuccess; i++) {
+            // bootstrap machine: firewall, jvm, start cloudify
+            logger.info("bootstrapping machine try #[{}]", i);
+            try {
+                bootstrapMachine(serverNode);
+                BootstrapValidationResult bootstrapValidationResult = validateBootstrap(serverNode);
+                if (bootstrapValidationResult.isValid()) {
+                    bootstrapSuccess = true;
+                } else {
+                    logger.info("machine [{}] did not bootstrap successfully [{}] retrying", serverNode, bootstrapValidationResult);
+                    cloudServerApi.rebuild( serverNode.getNodeId() );
+                }
+            } catch (RuntimeException e) {
+                lastBootstrapException = e;
+            }
+        }
+
+        if (!bootstrapSuccess) {
+//            poolEventManager.handleEvent(new PoolEvent.ServerNodeEvent()
+//                    .setType(PoolEvent.Type.UPDATE)
+//                    .setServerNode(serverNode)
+//                    .setErrorMessage(lastBootstrapException.getMessage())
+//                    .setErrorStackTrace(ExceptionUtils.getFullStackTrace(lastBootstrapException)));
+//            logger.error("unable to bootstrap machine", lastBootstrapException);
+        }
+        return bootstrapSuccess;
+
     }
 
     @Override
     public void destroyServer(ServerNode serverNode) {
+        if ( serverNode == null ){
+            return;
+        }
         logger.info("destroying server [{}]", serverNode);
+        deleteServer(serverNode.getNodeId());
+        if ( serverNode.getId() != null ){
+            logger.info("deleting serverNode");
+            serverNode.refresh();
+            serverNode.delete();
+        }
     }
 
     @Override
     public void deleteServer(String nodeId) {
         logger.info("destroying server [{}]", nodeId);
+        cloudServerApi.delete(nodeId);
     }
 
     @Override
     public BootstrapValidationResult validateBootstrap(ServerNode serverNode) {
+
         logger.info("validating bootstrap on [{}]", serverNode );
-        return null;
+        BootstrapValidationResult result = new BootstrapValidationResult();
+
+        if ( result.machineReachable == Boolean.TRUE ){
+            try{
+                result.managementVersion = cloudifyRestClient.getVersion( serverNode.getPublicIP() ).getVersion();
+                result.managementAvailable = true;
+            }catch( Exception e ){
+                logger.debug( "got exception while checking management version",e );
+                result.managementAvailable = false;
+            }
+        }
+        return result;
     }
 
     @Override
@@ -104,7 +234,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     public List<ServerNode> recoverUnmonitoredMachines() {
         logger.info("recovering lost machines");
                 List<ServerNode> result = new ArrayList<ServerNode>(  );
-        Collection<CloudServer> allMachinesWithTag = serverApi.getAllMachinesWithTag( machineTag );
+        Collection<CloudServer> allMachinesWithTag = cloudServerApi.getAllMachinesWithTag( bootstrapConf.tag );
         logger.info( "found [{}] total machines with matching tags. filtering lost", CollectionUtils.size(allMachinesWithTag)  );
         if ( !CollectionUtils.isEmpty( allMachinesWithTag )){
             for ( CloudServer server : allMachinesWithTag ) {
@@ -119,16 +249,41 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         return result;
     }
 
-    @Override
-    public Collection<CloudServer> getAllMachines(CloudCredentials cloudCredentials) {
-        logger.info("getting all machines for credentials [{}]", cloudCredentials);
-        return null;
-    }
+    private void bootstrapMachine( ServerNode server ){
+
+		try
+		{
+			logger.info("Starting bootstrapping for server:{} " , server );
+            logger.info("reading script from file [{}]", bootstrapConf.script);
+			String script = FileUtils.readFileToString(bootstrapConf.script);
+            script = script.replace("##publicip##", server.getPublicIP()).replace("##privateip##", server.getPrivateIP());
+
+			CloudExecResponse response = cloudServerApi.runScriptOnMachine( script, server.getPublicIP(), null );
+
+            logger.info("script finished");
+			logger.info("Bootstrap for server: {} finished successfully successfully. " +
+                    "ExitStatus: {} \nOutput:  {}", new Object[]{server,
+                    response.getExitStatus(),
+                    response.getOutput()} );
+		}catch(Exception ex)
+		{
+            logger.error("unable to bootstrap machine [{}]", server, ex);
+            try{
+                destroyServer( server );
+            }catch(Exception e){
+                logger.info("destroying server after failed bootstrap threw exception",e);
+            }
+			throw new ServerException("Failed to bootstrap cloudify machine: " + server.toDebugString(), ex);
+		}
+	}
+
 
     @Override
     public boolean reboot(ServerNode serverNode) {
         logger.info("rebooting [{}]", serverNode);
-        return false;
+        cloudServerApi.rebuild(serverNode.getNodeId());
+        bootstrapMachine(serverNode);
+        return true;
     }
 
     public void init(){
@@ -157,8 +312,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 //    @Inject
 //    private DeployManager deployManager;
 //
-//    @Inject
-//    private CloudifyRestClient cloudifyRestClient;
+
 //
 //    private CloudProvider cloudProvider;
 //
@@ -200,32 +354,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 //     *
 //     * @return ServerNode if creation was successful.
 //     */
-//    public ServerNode createServer() throws RunNodesException
-//    {
-//
-//        ServerNode serverNode = null;
-//        int i =0;
-//        for ( ; i < retries && serverNode == null ; i++){
-//            logger.info( "creating new server node, try #[{}]",i );
-//            ServerNode tmpNode = createMachine();
-//            PoolEvent.ServerNodeEvent newServerNodeEvent = new PoolEvent.ServerNodeEvent().setType(PoolEvent.Type.CREATE).setServerNode(tmpNode);
-//            if (tmpNode != null) {
-//                if (bootstrap(tmpNode)) { // bootstrap success
-//                    poolEventManager.handleEvent(newServerNodeEvent);
-//                    serverNode = tmpNode;
-//                    logger.info("successful bootstrap on [{}]", serverNode);
-//                } else { // bootstrap failed
-//                    logger.info("bootstrap failed, deleting server");
-//                    deleteServer(tmpNode.getNodeId()); // deleting the machine from cloud.
-//                }
-//            } else { // create server failed
-//                logger.info("unable to create machine. try [{}/{}]", i + 1, retries);
-//            }
-//
-//        }
-//        return serverNode;
-//
-//    }
+
 //
 //
 //    // guy - todo - need to ping machine first. If machine is down, we cannot validate - throw exception.
@@ -700,33 +829,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
 
 
-//	private void bootstrapMachine( ServerNode server )
-//	{
-//		try
-//		{
-//			logger.info("Starting bootstrapping for server:{} " , server );
 //
-//			String script = FileUtils.readFileToString( conf.server.bootstrap.script );
-//            script = script.replace("##publicip##", server.getPublicIP()).replace("##privateip##", server.getPrivateIP());
-//
-//			ExecResponse response = runScriptOnNode( conf, server.getPublicIP(), script );
-//
-//            logger.info("script finished");
-//			logger.info("Bootstrap for server: {} finished successfully successfully. " +
-//                    "ExitStatus: {} \nOutput:  {}", new Object[]{server,
-//                    response.getExitStatus(),
-//                    response.getOutput()} );
-//		}catch(Exception ex)
-//		{
-//            logger.error("unable to bootstrap machine [{}]", server, ex);
-//            try{
-//                destroyServer( server );
-//            }catch(Exception e){
-//                logger.info("destroying server after failed bootstrap threw exception",e);
-//            }
-//			throw new ServerException("Failed to bootstrap cloudify machine: " + server.toDebugString(), ex);
-//		}
-//	}
 //
 //	static public ExecResponse runScriptOnNode( Conf conf, String serverIP, String script)
 //			throws NumberFormatException, IOException
@@ -789,11 +892,11 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 //    }
 
 
-    public void setServerApi(CloudServerApi serverApi) {
-        this.serverApi = serverApi;
+    public void setCloudServerApi(CloudServerApi serverApi) {
+        this.cloudServerApi = serverApi;
     }
 
-    public void setMachineTag(String machineTag) {
-        this.machineTag = machineTag;
+    public void setBootstrapConf(ServerConfig.BootstrapConfiguration bootstrapConf) {
+        this.bootstrapConf = bootstrapConf;
     }
 }

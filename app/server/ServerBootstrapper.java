@@ -15,13 +15,10 @@
 
 package server;
 
-import java.util.Collection;
 import java.util.List;
 
 
 import beans.BootstrapValidationResult;
-import cloudify.widget.api.clouds.CloudCredentials;
-import cloudify.widget.api.clouds.CloudServer;
 import models.ServerNode;
 import server.exceptions.BootstrapException;
 
@@ -40,6 +37,12 @@ import server.exceptions.BootstrapException;
  */
 public interface ServerBootstrapper 
 {
+    /**
+     * Returns numOfServers serverNodes with localcloud cloudify bootstrap on them.
+     * Might return less if were unable to create all server nodes
+     * @param numOfServers - the number of servers to create
+     * @return a list of new servers.
+     */
     public List<ServerNode> createServers(int numOfServers);
 
     public void destroyServer(ServerNode serverNode);
@@ -61,7 +64,7 @@ public interface ServerBootstrapper
 
     public List<ServerNode> recoverUnmonitoredMachines();
 
-    public Collection<CloudServer> getAllMachines(CloudCredentials cloudCredentials);
+
 
     /**
      *   Take this machine and make it work.

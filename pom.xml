@@ -1,0 +1,25 @@
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>widget</groupId>
+    <artifactId>widget</artifactId>
+    <version>1.0.0</version>
+    <dependencies>
+        <dependency>
+            <groupId>cloudify.widget</groupId>
+            <artifactId>api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>cloudify.widget</groupId>
+            <artifactId>softlayer</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+    </dependencies>
+
+    <description>
+        This POM is a dummy. We do not use it. We use "play" to handle dependencies.
+        However, sometimes, play fails to import some dependencies to the IDE.
+        so we added this pom to sort IDE issues
+    </description>
+</project>

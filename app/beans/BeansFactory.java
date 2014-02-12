@@ -60,6 +60,8 @@ public class BeansFactory {
     }
 
 
+
+
     public void setConf( Conf conf )
     {
         this.conf = conf;

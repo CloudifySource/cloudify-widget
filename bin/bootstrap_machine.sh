@@ -1,6 +1,6 @@
 #! /bin/bash
 
-
+echo "JAVA_HOME is $JAVA_HOME"
 CLOUDIFY_AGENT_ENV_PUBLIC_IP=##publicip##
 CLOUDIFY_AGENT_ENV_PRIVATE_IP=##privateip##
 
@@ -30,44 +30,58 @@ JAVA_64_URL="http://repository.cloudifysource.org/com/oracle/java/1.6.0_32/jdk-6
 MILESTONE_UPPERCASE=`echo $MILESTONE | tr '[:lower:]' '[:upper:]'`
 CLOUDIFY_URL="http://repository.cloudifysource.org/org/cloudifysource/${CLOUDIFY_VERSION}-${BUILD_NUMBER}-${MILESTONE_UPPERCASE}/gigaspaces-cloudify-${CLOUDIFY_VERSION}-${MILESTONE}-b${BUILD_NUMBER}.zip"
 
-echo Downloading JDK from $JAVA_64_URL
-wget -q -O ~/java.bin $JAVA_64_URL
-chmod +x ~/java.bin
-echo -e "\n" > ~/input.txt
+if [ ! -z "$JAVA_HOME" ]; then
+   echo "Java file already exists. not installing java"
+   echo "JAVA_HOME is $JAVA_HOME"
+else
 
-echo Installing JDK
-./java.bin < ~/input.txt > /dev/null
-rm -f ~/input.txt
-rm -f ~/java.bin
+    echo Downloading JDK from $JAVA_64_URL
+    wget -q -O ~/java.bin $JAVA_64_URL
+    chmod +x ~/java.bin
+    echo -e "\n" > ~/input.txt
 
-echo Exporing JAVA_HOME
-# export JAVA_HOME="`pwd`/jdk1.6.0_32"
-# export PATH=$PATH:$JAVA_HOME/bin
-echo "export JAVA_HOME=`pwd`/jdk1.6.0_32" >> ~/.bashrc
-echo 'export PATH=$PATH:$JAVA_HOME/bin' >> ~/.bashrc
-source ~/.bashrc
+    echo Installing JDK
+    ./java.bin < ~/input.txt > /dev/null
+    rm -f ~/input.txt
+    rm -f ~/java.bin
 
-echo Downloading cloudify installation from $CLOUDIFY_URL
-
-wget -q $CLOUDIFY_URL -O ~/cloudify.zip
-if [ $? -ne 0 ]; then
-    echo "Failed downloading cloudify installation"
-    exit 1
+    echo Exporing JAVA_HOME
+    # export JAVA_HOME="`pwd`/jdk1.6.0_32"
+    # export PATH=$PATH:$JAVA_HOME/bin
+    echo "export JAVA_HOME=`pwd`/jdk1.6.0_32" >> ~/.bashrc
+    echo 'export PATH=$PATH:$JAVA_HOME/bin' >> ~/.bashrc
+    source ~/.bashrc
 fi
 
 
-echo Unzip cloudify installation
-unzip ~/cloudify.zip > /dev/null
-rm -rf ~/cloudify.zip
+if [ -f ~/cloudify.zip ];then
+    echo "cloudify already downloaded"
+else
+    echo Downloading cloudify installation from $CLOUDIFY_URL
 
-wget "https://raw.github.com/CloudifySource/cloudify-widget/master/conf/cloudify/webui-context.xml"   -O ${CLOUDIFY_FOLDER}/config/cloudify-webui-context-override.xml
-echo Starting Cloudify bootstrap-localcloud `hostname -I`
-nohup ${CLOUDIFY_FOLDER}/bin/cloudify.sh "bootstrap-localcloud"
- # -nic-address `hostname -I`"
+    wget -q $CLOUDIFY_URL -O ~/cloudify.zip
+    if [ $? -ne 0 ]; then
+        echo "Failed downloading cloudify installation"
+        exit 1
+    fi
 
+
+    echo Unzip cloudify installation
+    unzip ~/cloudify.zip > /dev/null
+
+    wget "https://raw.github.com/CloudifySource/cloudify-widget/master/conf/cloudify/webui-context.xml"   -O ${CLOUDIFY_FOLDER}/config/cloudify-webui-context-override.xml
+    echo Starting Cloudify bootstrap-localcloud `hostname -I`
+
+    # -nic-address `hostname -I`"
+fi
 
 echo "installing node"
 yum -y install npm
+
+echo "killing all java and starting cloudify"
+killall -9 java
+nohup ${CLOUDIFY_FOLDER}/bin/cloudify.sh "bootstrap-localcloud"
+
 
 cat nohup.out
 exit 0

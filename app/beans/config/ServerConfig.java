@@ -23,6 +23,9 @@ import java.util.Map;
 import java.util.Set;
 
 import cloudify.widget.api.clouds.CloudProvider;
+import cloudify.widget.api.clouds.MachineOptions;
+import cloudify.widget.softlayer.SoftlayerConnectDetails;
+import cloudify.widget.softlayer.SoftlayerMachineOptions;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.ReflectionUtils;
 
@@ -143,20 +146,33 @@ public class ServerConfig {
     }
 
     public static class BootstrapConfiguration{
-        public String serverNamePrefix="cloudify_pool_server";
-        public String zoneName="az-1.region-a.geo-l";
-        public String keyPair="cloudify";
-        public String securityGroup="default";
-        public String flavorId="102";
-        public String imageId="1358";
-        public SshConfiguration ssh = new SshConfiguration();
-        public String apiKey="<HP cloud Password>";
-        public String username="<tenant>:<user>";
-        public File script;
-        public String tag = null;
+
+        public SoftlayerBootstrapConfiguration softlayer = new SoftlayerBootstrapConfiguration();
+
+
+        // common configuration
+        public File script; // script to run on bootstrap
+        public String tag = null; // the tag to use
         @Config(ignoreNullValues = true)
-        public long sleepBeforeBootstrapMillis = Utils.parseTimeToMillis("20s");
-        public ApiCredentials api = new ApiCredentials();
+        public long sleepBeforeBootstrapMillis = Utils.parseTimeToMillis("20s"); // sleep before bootstrap
+        @Config(ignoreNullValues = true)
+        public int createServerRetries = 3; // retries to create server
+        @Config(ignoreNullValues = true)
+        public int bootstrapRetries = 3; // retries to bootstrap
+
+
+        public SoftlayerBootstrapConfiguration getSoftlayer(){
+            return softlayer;
+        }
+    }
+
+    public static class SoftlayerBootstrapConfiguration{
+       public SoftlayerConnectDetails connectDetails = new SoftlayerConnectDetails();
+        public MachineOptions machineOptions = new SoftlayerMachineOptions();
+
+        public SoftlayerConnectDetails getConnectDetails() {
+            return connectDetails;
+        }
     }
 
     public static class ApiCredentials{
@@ -203,5 +219,10 @@ public class ServerConfig {
     public static class DefaultAdmin{
         public String username = "admin@cloudifysource.org";
         public String password = "admin1324";
+    }
+
+
+    public BootstrapConfiguration getBootstrap(){
+        return bootstrap;
     }
 }

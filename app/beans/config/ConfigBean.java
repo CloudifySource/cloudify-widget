@@ -75,8 +75,10 @@ public class ConfigBean {
     public Conf getConfiguration()
     {
         try{
+            logger.info("serializing configuration");
             Conf root = new Conf();
             injectConfiguration( root, Play.application().configuration() );
+
             return root;
         }catch(RuntimeException e){
             logger.error("unable to get configuration",e);
@@ -160,6 +162,8 @@ public class ConfigBean {
     {
         Set<Field> allFields = ReflectionUtils.getAllFields( obj.getClass(), Predicates.alwaysTrue() );
         for ( Field field : allFields ) {
+            logger.info("injecting configuration for : " + field.getDeclaringClass().getName() + "#" + field.getName() );
+
             String configKey = field.getName();
             Config configAnn = null;
             if ( field.isAnnotationPresent( Config.class ) ) {

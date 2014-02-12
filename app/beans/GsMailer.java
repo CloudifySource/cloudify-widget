@@ -319,7 +319,7 @@ public class GsMailer implements Plugin {
         public void send( GsMailConfiguration mailDetails );
     }
 
-    public static class GsMailerImpl implements IMailer{
+    public static class     GsMailerImpl implements IMailer{
 
         SmtpConf smtpConf;
 

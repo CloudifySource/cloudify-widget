@@ -29,8 +29,9 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
 
     function _hasAdvanced(){
         var aData = _getAdvanced();
-        for ( var i in aData.params ){
-            if ( aData.hasOwnProperty(i) && !aData[i] ){
+        var params = aData.params;
+        for ( var i in params ){
+            if ( params.hasOwnProperty(i) && !params[i] ){
                 return false;
             }
         }
@@ -100,6 +101,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
     $scope.play = function(){
         resetWidgetStatus();
         $scope.widgetStatus.state = play;
+        debugger;
         widgetService.play(  $scope.params.apiKey,  _hasAdvanced() ? _getAdvanced() : null )
             .success(function( result ){
                 console.log(['play result', result]);

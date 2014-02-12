@@ -16,7 +16,8 @@
     <bean id="initialData" class="mocks.MockInitialData"/>
     <bean id="eventMonitor" class="mocks.EventMonitorMock"/>
 
-    <bean id="cloudServerApi" class="mocks.cloud.CloudServerApiMock"/>
+    <!--<bean id="cloudServerApi" class="cloudify.widget.softlayer.SoftlayerCloudServerApi"/>-->
+    <!--<bean id="cloudServerApi" class="mocks.cloud.CloudServerApiMock"/>-->
     <context:annotation-config />
     <context:component-scan base-package="mocks" />
 

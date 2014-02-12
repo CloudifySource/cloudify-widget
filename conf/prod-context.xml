@@ -23,9 +23,11 @@
 	<bean id="deployExecutor" scope="prototype" class="beans.ProcExecutorImpl"/>
 
     <bean id="destroyServersTask" class="beans.tasks.DestroyServersTaskImpl"/>
+    <bean id="confBean" class="beans.config.ConfigBean"/>
+    <bean id="conf" factory-method="getConfiguration" factory-bean="confBean"/>
 
     <bean id="serverBootstrapper" class="beans.ServerBootstrapperImpl" init-method="init">
-        <property name="machineTag" value="#{conf.server.bootstrap.tag}"/>
+        <property name="bootstrapConf" value="#{conf.server.bootstrap}"/>
     </bean>
 
     <bean id="hmac" class="beans.HmacImpl"/>
@@ -41,8 +43,7 @@
     <bean id="serverPool" class="beans.ServerPoolImpl"/>
     <bean id="widgetServer" class="beans.WidgetServerImpl"/>
 
-    <bean id="confBean" class="beans.config.ConfigBean"/>
-    <bean id="conf" factory-method="getConfiguration" factory-bean="confBean"/>
+
 
     <bean id="applicationContext" class="server.ApplicationContext"/>
 
@@ -54,7 +55,19 @@
 
 
 
+
     <beans profile="softlayer">
+
+        <bean id="serverApi" class="cloudify.widget.softlayer.SoftlayerCloudServerApi" init-method="connect">
+            <property name="connectDetails" value="#{conf.server.bootstrap.softlayer.connectDetails}"/>
+        </bean>
+        <bean id="machineOptions" class="cloudify.widget.softlayer.SoftlayerMachineOptions">
+            <property name="machinesCount"  value="1"/>
+            <property name="hardwareId" value="1640,2238,13899"/>
+            <property name="locationId" value="37473"/>
+            <property name="osFamily" value="CENTOS"/>
+            <property name="tag" value="#{conf.server.bootstrap.tag}"/>
+        </bean>
 
     </beans>
 

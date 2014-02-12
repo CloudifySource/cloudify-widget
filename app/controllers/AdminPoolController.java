@@ -4,7 +4,6 @@ import static utils.RestUtils.resultAsJson;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import models.ServerNode;
 import models.Summary;
@@ -16,21 +15,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-import play.libs.Akka;
 import play.libs.Json;
 import play.mvc.Result;
 import play.mvc.WebSocket;
 import play.mvc.With;
 import server.ApplicationContext;
 import server.ServerBootstrapper;
-import server.ServerPool;
 import server.WidgetServer;
 import utils.CollectionUtils;
 import beans.BootstrapValidationResult;
 import beans.NoOpCallback;
 import beans.ServerNodesPoolStats;
-import beans.config.Conf;
-import beans.config.ServerConfig;
 import controllers.compositions.AdminUserCheck;
 
 /**

@@ -31,7 +31,6 @@ import play.db.ebean.Model;
 import play.libs.Json;
 import utils.CollectionUtils;
 import utils.StringUtils;
-import utils.Utils;
 
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Junction;
@@ -57,7 +56,7 @@ extends Model
 
 	@Id
 	@XStreamOmitField
-	private Long id;
+	private Long id = null;
 
 	@XStreamAsAttribute
 	private String serverId;

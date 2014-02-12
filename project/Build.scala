@@ -28,13 +28,12 @@ object ApplicationBuild extends Build {
       "commons-validator" % "commons-validator" % "1.4.0",
       "mysql" % "mysql-connector-java" % "5.1.18"  ,
       "commons-lang" % "commons-lang" % "2.3",
-      "com.typesafe" %% "play-plugins-mailer" % "2.0.4",
       "com.mixpanel" % "mixpanel-java" % "1.0.1",
       "org.openid4java" % "openid4java" % "0.9.7",
       "org.jasypt" % "jasypt" % "1.9.0",
-      "org.apache.jclouds.driver" % "jclouds-sshj" % "1.6.2-incubating"  ,
-      "org.apache.jclouds.api"%"openstack-nova"%"1.6.2-incubating",
-      "org.apache.jclouds.provider"%"hpcloud-compute"%"1.6.2-incubating",
+      "org.apache.commons" % "commons-email" % "1.2",
+
+
 
       "cloudify.widget" % "api" % "1.0.0",
       "cloudify.widget" % "softlayer" % "1.0.0",

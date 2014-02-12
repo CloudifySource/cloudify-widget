@@ -259,6 +259,7 @@ public class Global extends GlobalSettings
 	}
 
     private ClassPathXmlApplicationContext loadSpringContext( Application app ){
+        try{
         GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
         ctx.getEnvironment().setActiveProfiles("standalone");
         ctx.load("*Context.xml");
@@ -279,5 +280,9 @@ public class Global extends GlobalSettings
         applicationContext.setConfigLocation(contextPath);
         applicationContext.refresh();
         return applicationContext;
+        }catch(RuntimeException e){
+            logger.error("unable to load context",e);
+            throw e;
+        }
     }
 }

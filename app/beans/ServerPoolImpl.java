@@ -243,10 +243,10 @@ public class ServerPoolImpl implements ServerPool
             public void run() {
                 if ( !serverBootstrapper.reboot(serverNode) ){
                     logger.info("could not rebuild machine [{}]. I will destroy it and create another one", serverNode );
-                    destroy(serverNode);
+                    serverBootstrapper.destroyServer(serverNode);
                 }else{
                     logger.info("machine [{}] rebuilt successfully", serverNode );
-                    destroy(serverNode);
+                    serverBootstrapper.destroyServer(serverNode);
                     serverBootstrapper.createServers( 1 );
                 }
 

@@ -107,12 +107,12 @@ function executeCommand( firstFile, data, commandArgs ){
 
 	myCmd.stdout.on("data", function (stdoutData) {
 		//console.log( '~~~~~~~myCmd.pid=' +  myCmd.pid );
-		//console.log("~~~~~~stdoutData" + stdoutData); 
+		console.log("~~~~~~stdoutData   [" + myCmd.pid + "]     " + stdoutData);
 		fileLogStream1.write(stdoutData);
 	});
 	
 	myCmd.stderr.on('data', function (stderrData) {
-		//console.log('~~~~stderrData:' + stderrData);
+		console.log('~~~~stderrData:' + stderrData);
 		fileLogStream2.write(stderrData);
 	});
 	
