@@ -1,13 +1,13 @@
 #!/bin/bash
 
 set -e
-if [ -z "$PLAY_HOME" ]; then
-    echo "need to set PLAY_HOME"
+if [ -z "$WIDGET_HOME" ]; then
+    echo "need to set WIDGET_HOME"
     exit 1
 fi
 
 if [ -z "$MODULES_HOME" ]; then
-    echo "MODULES_HOME is undefined. assuming it is at next to PLAY_HOME"
+    echo "MODULES_HOME is undefined. assuming it is at next to WIDGET_HOME"
     MODULES_HOME=`pwd`
     MODULES_HOME=`dirname $MODULES_HOME`/cloudify-widget-modules
     echo "settings modules to $MODULES_HOME"
@@ -32,8 +32,8 @@ set +e
 #the "dev" folder is ignored by GIT, so fear not to commit it by mistake.
 #if you want to debug, simply run "play_run.bat debug".
 
-echo "deleting cloudify.widget artifacts from $PLAY_HOME/repository/cache/cloudify.widget/"
-rm -Rf $PLAY_HOME/repository/cache/cloudify.widget/
+echo "deleting cloudify.widget artifacts from $WIDGET_HOME/repository/cache/cloudify.widget/"
+rm -Rf $WIDGET_HOME/repository/cache/cloudify.widget/
 
 
 play $* -Dconfig.file=conf/dev/me.conf run
