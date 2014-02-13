@@ -45,7 +45,7 @@ set +e
 #the "dev" folder is ignored by GIT, so fear not to commit it by mistake.
 #if you want to debug, simply run "play_run.bat debug".
 
-echo "deleting cloudify.widget artifacts from $WIDGET_HOME/repository/cache/cloudify.widget/"
+echo "deleting cloudify.widget artifacts from $PLAY_HOME/repository/cache/cloudify.widget/"
 rm -Rf $PLAY_HOME/repository/cache/cloudify.widget/
 
 
