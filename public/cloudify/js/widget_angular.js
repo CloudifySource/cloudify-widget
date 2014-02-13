@@ -283,7 +283,8 @@ widgetModule.service('advancedData', function (encryptDecrypt) {
     }
 });
 
-widgetModule.service('widgetService', function( $http, mixpanelService ){
+widgetModule.service('widgetService', function( $http, mixpanelService, paramsService ){
+    var origin_page_url = paramsService.params.origin_page_url;
     this.getStatus = function( instanceId , apiKey ){
         return $http.get( "/widget/"+ instanceId + "/status?apiKey=" + apiKey).then( function( data ){
             $.postMessage( JSON.stringify({name:"widget_status", data:data.data}), origin_page_url , parent );
