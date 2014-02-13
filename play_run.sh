@@ -22,7 +22,7 @@ fi
 if [ -f $MODULES_HOME/pom.xml ]; then
     CURRENT_DIR=`pwd`
     cd $MODULES_HOME/bin
-    maven-install-custom.sh
+    ./maven-install-custom.sh
     cd $CURRENT_DIR
     mvn install -f $MODULES_HOME/pom.xml
 else
