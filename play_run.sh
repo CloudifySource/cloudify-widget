@@ -1,12 +1,12 @@
 #!/bin/bash
 
 set -e
-if [ -z "$WIDGET_HOME" ]; then
+if [ "$WIDGET_HOME" = "" ]; then
     echo "need to set WIDGET_HOME"
     exit 1
 fi
 
-if [ -z "$MODULES_HOME" ]; then
+if [ "$MODULES_HOME" = "" ]; then
     echo "MODULES_HOME is undefined. assuming it is at next to WIDGET_HOME"
     MODULES_HOME=`pwd`
     MODULES_HOME=`dirname $MODULES_HOME`/cloudify-widget-modules
