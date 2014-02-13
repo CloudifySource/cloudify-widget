@@ -21,7 +21,7 @@ fi
 
 if [ -f $MODULES_HOME/pom.xml ]; then
 
-
+    $MODULES_HOME/bin/maven-install-custom.sh
     mvn install -f $MODULES_HOME/pom.xml
 else
     echo "pom.xml was not found under $MODULES_HOME"
