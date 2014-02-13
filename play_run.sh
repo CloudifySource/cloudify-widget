@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [ -f /etc/sysconfig/widget]; then
+    . /etc/sysconfig/widget
+fi
+
 set -e
 if [ "$WIDGET_HOME" = "" ]; then
     echo "need to set WIDGET_HOME"
