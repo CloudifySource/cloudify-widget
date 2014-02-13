@@ -20,8 +20,10 @@ fi
 
 
 if [ -f $MODULES_HOME/pom.xml ]; then
-
-    $MODULES_HOME/bin/maven-install-custom.sh
+    CURRENT_DIR=`pwd`
+    cd $MODULES_HOME/bin
+    maven-install-custom.sh
+    cd $CURRENT_DIR
     mvn install -f $MODULES_HOME/pom.xml
 else
     echo "pom.xml was not found under $MODULES_HOME"
