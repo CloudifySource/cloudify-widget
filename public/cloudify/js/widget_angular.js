@@ -287,10 +287,13 @@ widgetModule.service('advancedData', function (encryptDecrypt) {
 
 widgetModule.service('widgetService', function( $http, mixpanelService ){
     this.getStatus = function( instanceId , apiKey ){
-        return $http.get( "/widget/"+ instanceId + "/status?apiKey=" + apiKey );
+        return $http.get( "/widget/"+ instanceId + "/status?apiKey=" + apiKey).then( function( data ){
+            $.postMessage( JSON.stringify({name:"widget_status", data:data.data}), origin_page_url , parent );
+        });
     };
 
     this.play = function( apiKey, advancedData ){
+        $.postMessage( JSON.stringify({name:"play_widget"}), origin_page_url , parent );
         if ( !advancedData ){
             return $http.post( '/widget/start?apiKey=' + encodeURI(apiKey) );
         }else{

@@ -1,0 +1,1 @@
+crontab ${WIDGET_HOME}/conf/cron/cron.conf

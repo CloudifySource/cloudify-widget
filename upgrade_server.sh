@@ -19,72 +19,7 @@ chmod 755 $WIDGET_HOME/bin/*.sh
 
 # http://repository.cloudifysource.org/org/cloudifysource/2.7.0-5985-M3/gigaspaces-cloudify-2.7.0-M3-b5985.zip
 
-echo "CLOUDIFY_UPGRADE="$CLOUDIFY_UPGRADE
-
-if [ "$CLOUDIFY_UPGRADE" != "MANUAL" ]; then
-
-CLOUDIFY_VERSION=2.7.0
-BUILD_NUMBER=5985
-MILESTONE=m3
-BUILD_TYPE=SNAPSHOT
-
-MILESTONE_UPPERCASE=`echo $MILESTONE | tr '[:lower:]' '[:upper:]'`
-BUILD_VERSION=${CLOUDIFY_VERSION}-${BUILD_NUMBER}-${MILESTONE_UPPERCASE}
-CLOUDIFY_MILESTONE=${CLOUDIFY_VERSION}-${BUILD_NUMBER}-${MILESTONE}
-CLOUDIFY_BUILD=${CLOUDIFY_VERSION}-${MILESTONE}-b${BUILD_NUMBER}
-echo "upgrading cloudify to version $CLOUDIFY_VERSION $CLOUDIFY_BUILD"
-CLOUDIFY_FOLDER=gigaspaces-cloudify-${CLOUDIFY_VERSION}-${MILESTONE}
-CLOUDIFY_ZIP_NAME=${CLOUDIFY_FOLDER}-b${BUILD_NUMBER}
-CLOUDIFY_FILE=${CLOUDIFY_ZIP_NAME}.zip
-echo searching if file [${CLOUDIFY_FILE}] already exists
-if [ -f /root/$CLOUDIFY_FILE ]; then
-    echo "cloudify already installed, nothing to go"
-else
-    echo "executing wget on [http://repository.cloudifysource.org/org/cloudifysource/${BUILD_VERSION}/${CLOUDIFY_FILE}]"
-    wget "http://repository.cloudifysource.org/org/cloudifysource/${BUILD_VERSION}/${CLOUDIFY_FILE}" -O /root/$CLOUDIFY_FILE
-    if [ $? -ne 0 ]; then
-        echo "wget failed. deleting the file"
-        rm -f  /root/$CLOUDIFY_FILE
-    else
-        unzip /root/$CLOUDIFY_FILE -d /root/
-        ln -Tfs /root/${CLOUDIFY_FOLDER} cloudify-folder
-    fi
-fi
-else
-  echo "Cloudify upgrade can be performed only manually"
-fi
-
-echo "overriding webui-context.xml in cloudify installation"
-\cp -f conf/cloudify/webui-context.xml cloudify-folder/config/cloudify-webui-context-override.xml
-
-echo "injecting variables to cloudify.conf, and generating cloudify-prod.conf - extend this file in production instead of cloudify.conf"
-cat conf/cloudify.conf | sed 's,__CLOUDIFY_SECURITY_GROUP__,'"$CLOUDIFY_SECURITY_GROUP"','  > conf/cloudify-prod.conf
-
-
-
-TMP_SITE_CONF=conf/nginx/output.nginx
-SITE_CONF_TARGET=/etc/nginx/sites-available/$SITE_DOMAIN
-NGINX_CONF_SRC=conf/nginx/nginx.conf
-NGINX_CONF_TARGET=/etc/nginx/nginx.conf
-echo "copying nginx configurations"
-
-cmp  -s ${NGINX_CONF_SRC} ${NGINX_CONF_TARGET}
-if [ $? -ne 0 ]; then
-    \cp -f ${NGINX_CONF_SRC} ${NGINX_CONF_TARGET}
-    service nginx restart
-else
-     echo "nginx configuration did not change, not copying"
-fi
-
-cat conf/nginx/site.nginx  | sed 's/__domain_name__/'"$SITE_DOMAIN"'/' | sed 's/__staging_name__/'"$SITE_STAGING_DOMAIN"'/' > ${TMP_SITE_CONF}
-cmp  -s ${TMP_SITE_CONF}  ${SITE_CONF_TARGET}
-if [ $? -eq 1 ]; then
-    \cp -f ${TMP_SITE_CONF} ${SITE_CONF_TARGET}
-    echo "restarting nginx"
-    service nginx restart
-else
-    echo "nginx configuration did not change, not restarting"
-fi
+source ${WIDGET_HOME}/setup/utils/install_cloudify.sh
 
 \rm -f ${TMP_SITE_CONF}
 

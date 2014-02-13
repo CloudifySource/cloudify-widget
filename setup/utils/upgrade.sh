@@ -19,56 +19,16 @@ chmod 755 $WIDGET_HOME/bin/*.sh
 
 # http://repository.cloudifysource.org/org/cloudifysource/2.7.0-5985-M3/gigaspaces-cloudify-2.7.0-M3-b5985.zip
 
-install_cloudify.sh
+source ${WIDGET_HOME}/setup/utils/install_cloudify.sh
 
+source ${WIDGET_HOME}/setup/utils/update_nginx_configuration.sh
 
-TMP_SITE_CONF=conf/nginx/output.nginx
-SITE_CONF_TARGET=/etc/nginx/sites-available/$SITE_DOMAIN
-NGINX_CONF_SRC=conf/nginx/nginx.conf
-NGINX_CONF_TARGET=/etc/nginx/nginx.conf
-echo "copying nginx configurations"
+source ${WIDGET_HOME}/setup/utils/update_error_pages.sh
 
-cmp  -s ${NGINX_CONF_SRC} ${NGINX_CONF_TARGET}
-if [ $? -ne 0 ]; then
-    \cp -f ${NGINX_CONF_SRC} ${NGINX_CONF_TARGET}
-    service nginx restart
-else
-     echo "nginx configuration did not change, not copying"
-fi
+source ${WIDGET_HOME}/setup/utils/update_db_schema.sh
 
-cat conf/nginx/site.nginx  | sed 's/__domain_name__/'"$SITE_DOMAIN"'/' | sed 's/__staging_name__/'"$SITE_STAGING_DOMAIN"'/' > ${TMP_SITE_CONF}
-cmp  -s ${TMP_SITE_CONF}  ${SITE_CONF_TARGET}
-if [ $? -eq 1 ]; then
-    \cp -f ${TMP_SITE_CONF} ${SITE_CONF_TARGET}
-    echo "restarting nginx"
-    service nginx restart
-else
-    echo "nginx configuration did not change, not restarting"
-fi
+source ${WIDGET_HOME}/setup/utils/update_service_initd.sh
 
-\rm -f ${TMP_SITE_CONF}
-
-# assume with are in "cloudify-widget" folder
-echo "copying error pages"
-# copy content from public error_pages to that path
-\cp -Rvf public/error_pages /var/www/cloudifyWidget/public
-
-echo "upgrading DB schema"
-#find which is the latest version of DB
-# ll all the files, remove "create" script, remove extension, sort in descending order and output first line.
-db_version=`ls conf/evolutions/default -1 | grep -v create |  sed -e 's/\.[a-zA-Z]*$//' | sort -r -n | head -1`
-bin/migrate_db.sh $db_version
-
-echo "upgrading init.d script"
-\cp -f conf/initd/widget /etc/init.d/widget
-chmod 755 /etc/init.d/widget
-
-
-echo "upgrading hp-cloud templates"
-\cp -f conf/cloudify/hp-cloud.groovy cloudify-folder/clouds/hp/hp-cloud.groovy
-\cp -f conf/cloudify/hp-cloud.properties cloudify-folder/clouds/hp/hp-cloud.properties
-\cp -f conf/cloudify/softlayer-cloud.groovy cloudify-folder/clouds/softlayer/softlayer-cloud.groovy
-\cp -f conf/cloudify/softlayer-cloud.properties cloudify-folder/clouds/softlayer/softlayer-cloud.properties
 
 echo "upgrading monit configurations"
 cat conf/monit/conf.monit | sed 's,__monit_from__,'"$MONIT_FROM"',' | sed 's,__monit_to__,'"$MONIT_SET_ALERT"',' > /etc/monit.conf
