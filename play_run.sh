@@ -5,6 +5,12 @@ if [ -f /etc/sysconfig/widget ]; then
 fi
 
 set -e
+if [ "$PLAY_HOME" = ""]; then
+   echo "assuming play home is at /usr/lib/play"
+   PLAY_HOME=/usr/lib/play
+else
+   echo "play home is at $PLAY_HOME"
+fi
 if [ "$WIDGET_HOME" = "" ]; then
     echo "need to set WIDGET_HOME"
     exit 1
@@ -39,7 +45,7 @@ set +e
 #if you want to debug, simply run "play_run.bat debug".
 
 echo "deleting cloudify.widget artifacts from $WIDGET_HOME/repository/cache/cloudify.widget/"
-rm -Rf $WIDGET_HOME/repository/cache/cloudify.widget/
+rm -Rf $PLAY_HOME/repository/cache/cloudify.widget/
 
 
 play $* -Dconfig.file=conf/dev/me.conf run
