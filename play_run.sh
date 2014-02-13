@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -f /etc/sysconfig/widget]; then
+if [ -f /etc/sysconfig/widget ]; then
     . /etc/sysconfig/widget
 fi
 
