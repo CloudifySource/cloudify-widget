@@ -17,6 +17,7 @@ package server;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import cloudify.widget.cli.ICloudBootstrapDetails;
 import mocks.EventMonitorMock;
 
 import org.slf4j.Logger;
@@ -243,6 +244,9 @@ public class ApplicationContext
         this.destroyServersTask = destroyServersTask;
     }
 
+    public ICloudBootstrapDetails getCloudBootstrapDetails( ){
+        return (ICloudBootstrapDetails) getBean("bootstrapDetails");
+    }
 
     public void setApplicationContext(org.springframework.context.ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;

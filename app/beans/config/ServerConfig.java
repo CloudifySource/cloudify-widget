@@ -143,6 +143,10 @@ public class ServerConfig {
                 throw new RuntimeException("unable to populate execution map", e);
             }
         }
+
+        public String getCloudifyHome() {
+            return cloudifyHome;
+        }
     }
 
     public static class BootstrapConfiguration{
@@ -225,4 +229,6 @@ public class ServerConfig {
     public BootstrapConfiguration getBootstrap(){
         return bootstrap;
     }
+
+    public ScriptEnvironmentConf getEnvironment() { return environment; }
 }

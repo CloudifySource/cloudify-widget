@@ -14,21 +14,29 @@
  */
 package beans;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
 import beans.cloudify.CloudifyRestClient;
 import beans.config.ServerConfig;
+import beans.scripts.ScriptExecutor;
 import cloudify.widget.api.clouds.*;
+import cloudify.widget.cli.ICloudBootstrapDetails;
+import cloudify.widget.cli.ICloudifyCliHandler;
 import models.ServerNode;
 
+import org.apache.commons.exec.CommandLine;
 import org.apache.commons.io.FileUtils;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import play.libs.Json;
+import server.ApplicationContext;
 import server.ServerBootstrapper;
-import server.exceptions.BootstrapException;
 import server.exceptions.ServerException;
 import utils.CollectionUtils;
 import utils.Utils;
@@ -69,6 +77,12 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     @Inject
     private CloudifyRestClient cloudifyRestClient;
 
+    @Inject
+    private ICloudifyCliHandler cliHandler;
+
+    @Inject
+    private ScriptExecutor scriptExecutor;
+
     /**
      * The machine tag is a unique identifier to all machines related to this widget instance.
      * It can manifest in many ways on the cloud - tag in hp-cloud, machine name in softlayer etc..
@@ -76,6 +90,8 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
      */
 
     private ServerConfig.BootstrapConfiguration bootstrapConf;
+
+    private ServerConfig.CloudBootstrapConfiguration cloudBootstrapConf;
 
     @Override
     public List<ServerNode> createServers(int numOfServers) {
@@ -225,8 +241,35 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     }
 
     @Override
-    public ServerNode bootstrapCloud(ServerNode serverNode) throws BootstrapException {
-        logger.info("bootstrapping cloud with details [{}]", serverNode);
+    public ServerNode bootstrapCloud(ServerNode serverNode) {
+        File newCloudFolder = null;
+        try{
+            logger.info("bootstrapping cloud with details [{}]", serverNode);
+            String advancedParams = serverNode.getAdvancedParams();
+
+            ICloudBootstrapDetails bootstrapDetails = ApplicationContext.get().getCloudBootstrapDetails();
+
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode parse = Json.parse(advancedParams);
+            mapper.readerForUpdating(bootstrapDetails).readValue(parse.get("params"));
+            newCloudFolder = cliHandler.createNewCloud( bootstrapDetails );
+
+                        //Command line for bootstrapping remote cloud.
+            CommandLine cmdLine =
+            		new CommandLine( cloudBootstrapConf.remoteBootstrap.getAbsoluteFile() );
+            cmdLine.addArgument( newCloudFolder.getName() );
+
+            scriptExecutor.runBootstrapScript( cmdLine, serverNode, null, newCloudFolder, false );
+//
+        }catch(Exception e){
+            logger.error("unable to bootstrap");
+            return null;
+        }  finally {
+    		if (newCloudFolder != null && cloudBootstrapConf.removeCloudFolder ) {
+    			FileUtils.deleteQuietly(newCloudFolder);
+    		}
+    		serverNode.setStopped(true);
+    	}
         return null;
     }
 
@@ -899,4 +942,12 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     public void setBootstrapConf(ServerConfig.BootstrapConfiguration bootstrapConf) {
         this.bootstrapConf = bootstrapConf;
     }
+
+    public ServerConfig.CloudBootstrapConfiguration getCloudBootstrapConf() { return cloudBootstrapConf; }
+
+    public void setCloudBootstrapConf(ServerConfig.CloudBootstrapConfiguration cloudBootstrapConf) { this.cloudBootstrapConf = cloudBootstrapConf; }
+
+    public ScriptExecutor getScriptExecutor() { return scriptExecutor; }
+
+    public void setScriptExecutor(ScriptExecutor scriptExecutor) { this.scriptExecutor = scriptExecutor; }
 }

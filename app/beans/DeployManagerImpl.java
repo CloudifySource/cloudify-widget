@@ -153,9 +153,11 @@ public class DeployManagerImpl implements DeployManager
 
         try {
         	String recipeURL = widget.getRecipeURL();
-            if ( recipeURL == null ){
+            if ( StringUtils.isEmpty(recipeURL) ){
                 logger.info("recipe url is null. nothing to execute");
-                return null;
+                server.createEvent( "recipe already installed", ServerNodeEvent.Type.DONE).save();
+                return widget.addWidgetInstance( server, null );
+
             }
         	logger.info(" Widget [{}] has recipe url [{}]", widget.getRecipeName(), recipeURL );
             unzippedDir = Utils.downloadAndUnzip( recipeURL, widget.getApiKey());

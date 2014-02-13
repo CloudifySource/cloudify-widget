@@ -20,7 +20,6 @@ import java.util.List;
 
 import beans.BootstrapValidationResult;
 import models.ServerNode;
-import server.exceptions.BootstrapException;
 
 /**
  * The main abstraction to bootstrap servers on a cloud.
@@ -59,8 +58,12 @@ public interface ServerBootstrapper
     public BootstrapValidationResult validateBootstrap( ServerNode serverNode );
 
     public void close();
-    
-    public ServerNode bootstrapCloud( ServerNode serverNode ) throws BootstrapException;
+
+    /**
+     *
+     * @param serverNode return serverNode if bootstrap was a success, otherwise return null.
+     */
+    public ServerNode bootstrapCloud( ServerNode serverNode );
 
     public List<ServerNode> recoverUnmonitoredMachines();
 

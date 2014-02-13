@@ -1,6 +1,6 @@
 # get all sysconf variables we have for play
 
-. /etc/sysconfig/play
+. /etc/sysconfig/widget
 
 UPGRADE_TO=$1
 

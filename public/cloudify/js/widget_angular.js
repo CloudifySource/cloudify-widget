@@ -21,7 +21,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
 
     $scope.advancedParams = {};
     $scope.advancedParams[hpcloud] = {'type':'hpcloud-compute','params':{'project':null, 'key':null, 'secretKey':null}};
-    $scope.advancedParams[softlayer] = {'type':'softlayer', 'params' : {'password':null, 'userId':null, 'apiKey':null} };
+    $scope.advancedParams[softlayer] = {'type':'softlayer', 'params' : {'userId':null, 'apiKey':null} };
 
     $scope.poweredByUrl = {};
     $scope.poweredByUrl[hpcloud] = "http://hpcloud.com";
@@ -152,7 +152,8 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
     };
 
     $scope.getTimeLeft = function(){
-        if ( !$scope.widgetStauts || !$scope.widgetStatus.timeleftMillis ){
+        debugger;
+        if ( !$scope.widgetStatus || !$scope.widgetStatus.timeleftMillis ){
             return "";
         }
         var timeLeft = $scope.widgetStatus.timeleftMillis;

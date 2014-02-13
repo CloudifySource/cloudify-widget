@@ -70,8 +70,9 @@ public class Widget
     @Constraints.Required
     private String title;
 	private String youtubeVideoUrl;
-    @Constraints.Required
-	private String recipeURL;
+
+    // optional
+	private String recipeURL = null;
 	private Boolean allowAnonymous;
     @Constraints.Required
 	private String apiKey;
@@ -326,9 +327,12 @@ public class Widget
 	
 	public WidgetInstance addWidgetInstance( ServerNode serverNode, File recipeDir )
 	{
-        Recipe.Type recipeType = new Recipe(recipeDir).getRecipeType();
+
         WidgetInstance wInstance = new WidgetInstance();
-        wInstance.setRecipeType( recipeType );
+        if (recipeDir != null ){
+            Recipe.Type recipeType = new Recipe(recipeDir).getRecipeType();
+            wInstance.setRecipeType( recipeType );
+        }
         wInstance.setServerNode( serverNode );
         wInstance.setInstallName( toInstallName() );
 		if (instances == null){
@@ -342,6 +346,10 @@ public class Widget
 
 		return wInstance;
 	}
+
+    public boolean hasRecipe(){
+        return !StringUtils.isEmptyOrSpaces(recipeURL);
+    }
 
     public String toInstallName(){
 

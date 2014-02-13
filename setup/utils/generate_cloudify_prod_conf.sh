@@ -1,0 +1,2 @@
+echo "injecting variables to cloudify.conf, and generating cloudify-prod.conf - extend this file in production instead of cloudify.conf"
+cat ${WIDGET_HOME}/conf/cloudify.conf | sed 's,__CLOUDIFY_SECURITY_GROUP__,'"$CLOUDIFY_SECURITY_GROUP"','  > ${WIDGET_HOME}/conf/cloudify-prod.conf
