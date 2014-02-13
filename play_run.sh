@@ -12,8 +12,9 @@ else
    echo "play home is at $PLAY_HOME"
 fi
 if [ "$WIDGET_HOME" = "" ]; then
-    echo "need to set WIDGET_HOME"
-    exit 1
+    echo "assuming current directory is widget home"
+    WIDGET_HOME=`pwd`
+    echo "widget home is $WIDGET_HOME"
 fi
 
 if [ "$MODULES_HOME" = "" ]; then
