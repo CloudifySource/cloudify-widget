@@ -5,7 +5,7 @@ if [ -f /etc/sysconfig/widget ]; then
 fi
 
 set -e
-if [ "$PLAY_HOME" = ""]; then
+if [ "$PLAY_HOME" = "" ]; then
    echo "assuming play home is at /usr/lib/play"
    PLAY_HOME=/usr/lib/play
 else
