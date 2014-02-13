@@ -82,6 +82,12 @@ echo "killing all java and starting cloudify"
 killall -9 java
 nohup ${CLOUDIFY_FOLDER}/bin/cloudify.sh "bootstrap-localcloud"
 
+echo "installing recipe"
+wget http://s3.amazonaws.com/cloudify-widget/2.7/mongodb.zip
+unzip mongodb.zip
+cd mongodb
+${CLOUDIFY_FOLDER}/bin/cloudify.sh "connect http://localhost:8100; install-service ."
 
+cd ..
 cat nohup.out
 exit 0
