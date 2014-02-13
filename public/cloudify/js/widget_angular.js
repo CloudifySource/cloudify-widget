@@ -101,7 +101,6 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
     $scope.play = function(){
         resetWidgetStatus();
         $scope.widgetStatus.state = play;
-        debugger;
         widgetService.play(  $scope.params.apiKey,  _hasAdvanced() ? _getAdvanced() : null )
             .success(function( result ){
                 console.log(['play result', result]);
@@ -152,7 +151,6 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
     };
 
     $scope.getTimeLeft = function(){
-        debugger;
         if ( !$scope.widgetStatus || !$scope.widgetStatus.timeleftMillis ){
             return "";
         }
