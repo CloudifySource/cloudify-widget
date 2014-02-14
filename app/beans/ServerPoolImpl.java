@@ -15,6 +15,7 @@
 package beans;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -158,8 +159,18 @@ public class ServerPoolImpl implements ServerPool
 
         // failed bootstraps.
         Collection<ServerNode> failedBootstraps =CollectionUtils.select( servers,  failedBootstrapsPredicate );
+        Collection<Long> failedIds = new HashSet<Long>();
+        for (ServerNode sn : failedBootstraps   ) {
+            failedIds.add( sn.getId() );
+        }
+
+        if ( CollectionUtils.size( failedIds) != CollectionUtils.size(failedBootstraps)){
+            logger.error("ERROR : duplicate failedbootstrap machines! need to fix query");
+        }
+
+        logger.info("deleting {} failed bootstraps : {}", CollectionUtils.size( failedIds ) ,failedIds);
         if (!CollectionUtils.isEmpty(failedBootstraps)) {
-            logger.info("deleting {} failed bootstraps : {}", CollectionUtils.size( failedBootstraps) ,failedBootstraps);
+
             try{
                 Ebean.delete(failedBootstraps);
             }catch(RuntimeException e){
