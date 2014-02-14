@@ -76,12 +76,12 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
     function pollStatus( myTimeout){
 
         if ( $scope.widgetStatus.state !== stop ){ // keep polling until widget stops ==> mainly for timeleft..
-            widgetService.getStatus( $scope.widgetStatus.instanceId, $scope.params.apiKey ).success( function( result ){
+            widgetService.getStatus( $scope.widgetStatus.instanceId, $scope.params.apiKey ).then( function( result ){
                 if ( !result ){
                     return ;
                 }
                 handleStatus( result.status, myTimeout );
-            }).error(function(result){
+            },function(result){
                     console.log(['status error',result]);
                 });
         }else{
@@ -102,12 +102,12 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
         resetWidgetStatus();
         $scope.widgetStatus.state = play;
         widgetService.play(  $scope.params.apiKey,  _hasAdvanced() ? _getAdvanced() : null )
-            .success(function( result ){
+            .then(function( result ){
                 console.log(['play result', result]);
                 $scope.widgetStatus = result.status;
 
                 pollStatus(1);
-        }).error( function( result ){
+        }, function( result ){
                 console.log(['play error', result]);
                 resetWidgetStatus("unknown error");
             });
@@ -288,6 +288,7 @@ widgetModule.service('widgetService', function( $http, mixpanelService, paramsSe
     this.getStatus = function( instanceId , apiKey ){
         return $http.get( "/widget/"+ instanceId + "/status?apiKey=" + apiKey).then( function( data ){
             $.postMessage( JSON.stringify({name:"widget_status", data:data.data}), origin_page_url , parent );
+            return data;
         });
     };
 
