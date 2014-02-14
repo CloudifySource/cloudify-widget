@@ -128,14 +128,14 @@ public class ServerPoolImpl implements ServerPool
         logger.info( "Started to initialize ServerPool, cold-init={}", conf.server.pool.coldInit );
 		// get all available running servers
         List<ServerNode> servers = ServerNode.all();
-
+        logger.info("investigating [{}] servers", CollectionUtils.size(servers));
         Collection<ServerNode> busyServer = CollectionUtils.select( servers, busyServerPredicate );
         logger.info("I found {} busy servers", CollectionUtils.size(busyServer));
 
 
         Collection<ServerNode> availableServer = CollectionUtils.select( servers, nonBusyServerPredicate );
         availableServer = cleanPool( availableServer );
-        logger.info(" I have {} available server, I need a minimum of {} and maximum of {}", new Object[]{ CollectionUtils.size(availableServer), conf.server.pool.minNode, conf.server.pool.maxNodes} );
+        logger.info(" I have {} available servers, I need a minimum of {} and maximum of {}", new Object[]{ CollectionUtils.size(availableServer), conf.server.pool.minNode, conf.server.pool.maxNodes} );
 		// create new servers if need
 		if ( CollectionUtils.size( availableServer )  < conf.server.pool.minNode )
 		{
@@ -159,13 +159,14 @@ public class ServerPoolImpl implements ServerPool
 
         // failed bootstraps.
         Collection<ServerNode> failedBootstraps =CollectionUtils.select( servers,  failedBootstrapsPredicate );
+        logger.info("found [{}] failed bootstraps", failedBootstraps);
         Collection<Long> failedIds = new HashSet<Long>();
         for (ServerNode sn : failedBootstraps   ) {
             failedIds.add( sn.getId() );
         }
 
         if ( CollectionUtils.size( failedIds) != CollectionUtils.size(failedBootstraps)){
-            logger.error("ERROR : duplicate failedbootstrap machines! need to fix query");
+            logger.error("ERROR : duplicate failedbootstrap machines! need to fix query. [{}] unique, [{}] total", CollectionUtils.size(failedBootstraps), CollectionUtils.size(failedIds));
         }
 
         logger.info("deleting {} failed bootstraps : {}", CollectionUtils.size( failedIds ) ,failedIds);
