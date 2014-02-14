@@ -160,7 +160,19 @@ public class ServerPoolImpl implements ServerPool
         Collection<ServerNode> failedBootstraps =CollectionUtils.select( servers,  failedBootstrapsPredicate );
         if (!CollectionUtils.isEmpty(failedBootstraps)) {
             logger.info("deleting {} failed bootstraps : {}", CollectionUtils.size( failedBootstraps) ,failedBootstraps);
-            Ebean.delete(failedBootstraps);
+            try{
+                Ebean.delete(failedBootstraps);
+            }catch(RuntimeException e){
+                logger.info("unable to delete all server nodes with failed bootstraps. iterating");
+                for (ServerNode failedBootstrap : failedBootstraps) {
+                    try{
+                        failedBootstrap.refresh();
+                        failedBootstrap.delete();
+                    }catch(RuntimeException e1){
+                        logger.info("unable to delete server [{}]", failedBootstrap.getId());
+                    }
+                }
+            }
         }
     }
 

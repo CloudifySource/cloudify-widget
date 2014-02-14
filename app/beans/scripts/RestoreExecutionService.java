@@ -123,7 +123,7 @@ public class RestoreExecutionService implements ScriptExecutorsConstants {
         String serverNodeId = String.valueOf(serverNode.getId());
         boolean bootstrappingFinished = ScriptFilesUtilities.isBootstrappingFinished(serverNodeId, serverNodeId);
         if (!bootstrappingFinished) {
-            logger.info("bootstrap did not finish on nodeId [{}]", serverNode.getId());
+            logger.info("execution did not finish on nodeId [{}]", serverNode.getId());
 
             //run waiting for bootstrap finishing in different thread
             Akka.system().scheduler().scheduleOnce(
