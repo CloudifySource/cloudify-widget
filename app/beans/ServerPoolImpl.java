@@ -158,7 +158,7 @@ public class ServerPoolImpl implements ServerPool
         }
 
         // failed bootstraps.
-        Collection<ServerNode> failedBootstraps =CollectionUtils.select( servers,  failedBootstrapsPredicate );
+        Collection<ServerNode> failedBootstraps = new HashSet<ServerNode>(CollectionUtils.select( servers,  failedBootstrapsPredicate ));
         logger.info("found [{}] failed bootstraps", CollectionUtils.size(failedBootstraps));
         Collection<Long> failedIds = new HashSet<Long>();
         for (ServerNode sn : failedBootstraps   ) {
@@ -181,7 +181,7 @@ public class ServerPoolImpl implements ServerPool
                         failedBootstrap.refresh();
                         failedBootstrap.delete();
                     }catch(RuntimeException e1){
-                        logger.info("unable to delete server [{}]", failedBootstrap.getId());
+                        logger.info("unable to delete server [{}]", failedBootstrap.getId(),e1);
                     }
                 }
             }
