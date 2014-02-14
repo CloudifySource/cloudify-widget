@@ -105,7 +105,7 @@ public class ServerPoolImpl implements ServerPool
                     logger.info( "found a bad bootstrap on server [{}]. The test result showed the following [{}]. I should destroy this server..", serverNode, bootstrapValidationResult );
                     destroy( serverNode );
             }else{
-                logger.info( "Found a working management server [{}], adding to clean pool", serverNode );
+                logger.info( "Found a working management server [{}]:[{}], adding to clean pool", serverNode.getNodeId(), serverNode.getId() );
                 cleanPool.add( serverNode );
             }
         }
@@ -159,14 +159,14 @@ public class ServerPoolImpl implements ServerPool
 
         // failed bootstraps.
         Collection<ServerNode> failedBootstraps =CollectionUtils.select( servers,  failedBootstrapsPredicate );
-        logger.info("found [{}] failed bootstraps", failedBootstraps);
+        logger.info("found [{}] failed bootstraps", CollectionUtils.size(failedBootstraps));
         Collection<Long> failedIds = new HashSet<Long>();
         for (ServerNode sn : failedBootstraps   ) {
             failedIds.add( sn.getId() );
         }
 
         if ( CollectionUtils.size( failedIds) != CollectionUtils.size(failedBootstraps)){
-            logger.error("ERROR : duplicate failedbootstrap machines! need to fix query. [{}] unique, [{}] total", CollectionUtils.size(failedBootstraps), CollectionUtils.size(failedIds));
+            logger.error("ERROR : duplicate failed bootstrap machines! need to fix query. [{}] unique, [{}] total", CollectionUtils.size(failedIds), CollectionUtils.size(failedBootstraps));
         }
 
         logger.info("deleting {} failed bootstraps : {}", CollectionUtils.size( failedIds ) ,failedIds);
