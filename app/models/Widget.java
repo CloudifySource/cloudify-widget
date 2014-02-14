@@ -338,6 +338,7 @@ public class Widget
 		if (instances == null){
 			instances = new ArrayList<WidgetInstance>();
         }
+        refresh();
 		instances.add( wInstance );
 		save();
         // server node has the foreign key..
