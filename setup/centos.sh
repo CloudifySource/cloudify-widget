@@ -75,5 +75,5 @@ fi
 
 export UTILS_FOLDER=${WIDGET_HOME}/setup;
 
-source $UTILS_FOLDER/${TYPE}
+source $UTILS_FOLDER/centos_${TYPE}.sh
 
