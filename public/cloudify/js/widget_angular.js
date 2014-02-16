@@ -288,16 +288,16 @@ widgetModule.service('widgetService', function( $http, mixpanelService, paramsSe
     this.getStatus = function( instanceId , apiKey ){
         return $http.get( "/widget/"+ instanceId + "/status?apiKey=" + apiKey).then( function( data ){
             $.postMessage( JSON.stringify({name:"widget_status", data:data.data}), origin_page_url , parent );
-            return data;
+            return data.data;
         });
     };
 
     this.play = function( apiKey, advancedData ){
         $.postMessage( JSON.stringify({name:"play_widget"}), origin_page_url , parent );
         if ( !advancedData ){
-            return $http.post( '/widget/start?apiKey=' + encodeURI(apiKey) );
+            return $http.post( '/widget/start?apiKey=' + encodeURI(apiKey)).then(function(result){ return result.data; });
         }else{
-            return $http.post( '/widget/start?apiKey=' + encodeURI(apiKey),advancedData );
+            return $http.post( '/widget/start?apiKey=' + encodeURI(apiKey),advancedData).then(function(result){ return result.data});
         }
 
     };
