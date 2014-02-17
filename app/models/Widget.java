@@ -366,6 +366,10 @@ public class Widget
         return recipeName;
     }
 
+    public boolean getShowAdvanced(){
+        return showAdvanced != null ? showAdvanced : true;
+    }
+
     @Deprecated // todo : DO NOT USE THIS.. this is strictly for "WidgetServerImpl".
                //  todo : we should implement a different mechanism there, but for now there is no time.
     public static Widget getWidget( String apiKey )
