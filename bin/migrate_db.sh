@@ -1,6 +1,8 @@
 # get all sysconf variables we have for play
 
-source ../setup/utils/load_sysconfig.sh
+CURRENT_DIR=`pwd`
+echo "current dir is $CURRENT_DIR"
+source $CURRENT_DIR/../setup/utils/load_sysconfig.sh
 
 UPGRADE_TO=$1
 
