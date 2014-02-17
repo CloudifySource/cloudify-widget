@@ -8,7 +8,8 @@ ${WIDGET_HOME}/setup/utils/checkout_project.sh $MODULES_GIT_LOCATION $MODULES_GI
 CURRENT_DIR=`pwd`
 cd ${MODULES_HOME}/bin
 ./maven-install-custom.sh
-
+cd ..
+mvn install
 
 cd $CURRENT_DIR
 

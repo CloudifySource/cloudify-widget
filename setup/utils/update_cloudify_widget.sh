@@ -31,7 +31,7 @@ echo "has updates is $HAS_UPDATES"
 if [ "$HAS_UPDATES" != "0" ]; then
     perform_git_pull
     echo "building modules"
-    mvn install
+    mvn clean install
     echo "deleting cloudify.widget artifacts from $PLAY_HOME/repository/cache/cloudify.widget/"
     rm -Rf $PLAY_HOME/repository/cache/cloudify.widget/
 else
