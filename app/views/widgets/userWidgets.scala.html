@@ -164,6 +164,7 @@
                         <div style="border-bottom:1px solid #EEE; height:0">&nbsp;</div>
                         <div>
                             <input type="hidden" id="widgetId" name="widgetId" value=""/>
+                            @field("requireLogin", "Show Advanced", required = false, value = "actions.editWidget.requireLogin", fType = "checkbox")
                             @field("requireLogin", "Require Login", required = false, value = "actions.editWidget.requireLogin", fType = "checkbox")
                             @field("loginVerificationUrl", "Verification URL", required = false, value = "actions.editWidget.loginVerificationUrl")
                             @field("webServiceKey", "Web Service Private Key", required = false, value = "actions.editWidget.webServiceKey")

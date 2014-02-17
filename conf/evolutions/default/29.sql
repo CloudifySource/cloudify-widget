@@ -1,0 +1,1 @@
+alter table widget add column show_advanced tinyint(1) default 0;

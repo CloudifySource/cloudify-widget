@@ -10,6 +10,10 @@ SITE_STAGING_DOMAIN=mystagingdomain$SITE_DOMAIN
 MONIT_FROM=noreply@$COMPANY_DOMAIN
 MONIT_SET_ALERT=widget@$COMPANY_DOMAIN
 CLOUDIFY_SECURITY_GROUP=widgetSecurityGroup
+MODULES_GIT_LOCATION=https://github.com/guy-mograbi-at-gigaspaces/cloudify-widget-modules.git
+MODULES_GIT_BRANCH=master
+MODULES_HOME=/usr/lib/cloudify-widget-modules
+PLAY_HOME=/usr/lib/play-2.0.4
 #TYPE=ibm|hp
 #CLOUDIFY_UPGRADE=MANUAL
 

@@ -1,3 +1,6 @@
+
+# http://repository.cloudifysource.org/org/cloudifysource/2.7.0-5985-M3/gigaspaces-cloudify-2.7.0-M3-b5985.zip
+
 echo "CLOUDIFY_UPGRADE="$CLOUDIFY_UPGRADE
 rm -f /tmp/cloudify.zip
 

@@ -4,7 +4,7 @@ if [ -f /usr/bin/play ]; then
 else
     wget 'http://download.playframework.org/releases/play-2.0.4.zip'  -O /tmp/play.zip
     unzip /tmp/play.zip -d /usr/lib
-    ln -Tfs /usr/lib/play-2.0.4 /usr/lib/play
+    ln -Tfs ${PLAY_HOME} /usr/lib/play
     rm -f /tmp/play.zip
 fi
 echo "setting a link to play"

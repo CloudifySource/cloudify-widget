@@ -81,6 +81,9 @@ public class Widget
 	private Integer launches = 0;
 	private Boolean enabled;
 
+
+    private Boolean showAdvanced = true;
+
     @JsonProperty(value="consolename")
 	private String consoleName;
 

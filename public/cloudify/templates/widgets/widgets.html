@@ -149,7 +149,8 @@
             <h3 id="widget_{{selectedWidget.id}}_get_embed_label">Embed Code</h3>
         </div>
         <div class="modal-body">
-            <textarea autofocus readonly class="code">@views.html.widgets.dashboard.embedCode( "{{selectedWidget.apiKey}}", "{{selectedWidget.title}}","{{selectedWidget.youtubeVideoUrl}}","{{selectedWidget.host}}" ).toString()</textarea></div>
+            <textarea autofocus readonly class="code">@views.html.widgets.dashboard.embedCode( "{{selectedWidget.apiKey}}", "{{selectedWidget.title}}","{{selectedWidget.youtubeVideoUrl}}","{{selectedWidget.host}}","{{selectedWidget.showAdvanced}}"  ).toString()</textarea></div>
+
     </div>
 
 

@@ -12,7 +12,6 @@ execute install_mysql.sh
 
 execute install_nginx.sh
 
-
 execute install_ruby.sh
 
 execute install_cloudify.sh
@@ -21,4 +20,8 @@ execute install_play.sh
 
 execute install_maven.sh
 
-execute install_
+execute install_node.sh
+
+execute install_monit.sh
+
+execute setup_nginx_configuration.sh
