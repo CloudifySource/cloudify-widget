@@ -14,5 +14,6 @@ MODULES_GIT_BRANCH=master
 MODULES_HOME=/usr/lib/cloudify-widget-modules
 CLOUDIFY_URL=https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/org/cloudifysource/2.7.0-5996-RELEASE/gigaspaces-cloudify-2.7.0-ga-b5996.zip
 PLAY_HOME=/usr/lib/play-2.0.4
+ME_CONF_URL=
 #TYPE=ibm|hp
 
