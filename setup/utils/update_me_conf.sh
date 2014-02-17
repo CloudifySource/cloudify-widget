@@ -6,5 +6,5 @@ if [ -z $ME_CONF_URL ] || [ "$ME_CONF_URL" = "" ]; then
 else
     echo "downloading me.conf from [$ME_CONF_URL]"
     mkdir -p ${WIDGET_HOME}/conf/dev
-    wget $ME_CONF_URL -O ${WIDGET_HOME}/conf/dev/me.conf
+    wget "$ME_CONF_URL" -O ${WIDGET_HOME}/conf/dev/me.conf
 fi
