@@ -1,4 +1,11 @@
 # install nginx
+
+CURRENT_DIRECTORY=`pwd`
+
+cd "$(dirname "$0")"
+
+source load_sysconfig.sh
+
 echo "installing nginx"
 cp ${WIDGET_HOME}/conf/nginx/install.conf /etc/yum.repos.d/nginx.repo
 yum -y install nginx
@@ -12,3 +19,6 @@ touch /etc/nginx/sites-available/$SITE_DOMAIN
 ln -s  /etc/nginx/sites-available/$SITE_DOMAIN /etc/nginx/sites-enabled/$SITE_DOMAIN
 
 service nginx restart
+
+
+cd $CURRENT_DIRECTORY
