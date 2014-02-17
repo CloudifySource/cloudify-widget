@@ -4,7 +4,7 @@
 echo "CLOUDIFY_UPGRADE="$CLOUDIFY_UPGRADE
 rm -f /tmp/cloudify.zip
 
-if [ "$CLOUDIFY_UPGRADE" != "MANUAL" ]; then
+if [ "$CLOUDIFY_UPGRADE" != "MANUAL" ] || [ ! -f ${WIDGET_HOME}/cloudify-folder ]; then
 
     CLOUDIFY_URL=https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/org/cloudifysource/2.7.0-5996-RELEASE/gigaspaces-cloudify-2.7.0-ga-b5996.zip
 
