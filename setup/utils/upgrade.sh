@@ -27,7 +27,6 @@ execute update_db_schema
 
 execute update_service_initd
 
-
 execute update_monit
 
 

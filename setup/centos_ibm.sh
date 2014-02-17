@@ -24,4 +24,4 @@ execute install_node.sh
 
 execute install_monit.sh
 
-execute setup_nginx_configuration.sh
+execute upgrade.sh
