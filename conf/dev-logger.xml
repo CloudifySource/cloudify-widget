@@ -1,0 +1,93 @@
+<configuration>
+    <!-- THIS IS A CONFIGURATION FILE FOR THE DEVELOPMENT ENVIRONMENT -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type
+     ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%-20d{dd MMM yyyy HH:mm:ss.SSS} [%-40thread] %-5level %-40logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <appender name="CLI_OUTPUT" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <!-- in the absence of the class attribute, it is assumed that the
+             desired discriminator type is
+             ch.qos.logback.classic.sift.MDCBasedDiscriminator -->
+        <discriminator>
+            <key>servernodeid</key>
+            <defaultValue>unknown</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${userid}" class="ch.qos.logback.core.FileAppender">
+                <file>logs/cliOutput-nodeid-${servernodeid}.log</file>
+                <append>false</append>
+                <layout class="ch.qos.logback.classic.PatternLayout">
+                    <pattern>%d [%thread] %level %mdc %logger{35} - %msg%n</pattern>
+                </layout>
+            </appender>
+        </sift>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logFile.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>logs/logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+            <!-- keep 1 days' worth of history -->
+            <maxHistory>5</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS}  %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
+
+        <subject>ERROR : %logger{20} - %m</subject>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{HH:mm:ss.SSS}  %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </layout>
+        <cyclicBufferTracker class="ch.qos.logback.core.spi.CyclicBufferTrackerImpl">
+            <!-- send just one log entry per email -->
+            <bufferSize>10</bufferSize>
+        </cyclicBufferTracker>
+    </appender>
+
+
+    <!--<logger name="beans.tasks.DestroyServersTaskImpl" level="debug" additivity="false">-->
+        <!--<appender-ref ref="STDOUT"/>-->
+    <!--</logger>-->
+
+    <logger name="cliOutput" level="info" additivity="false">
+        <appender-ref ref="CLI_OUTPUT"/>
+    </logger>
+
+    <logger name="application" level="info" additivity="false">
+        <appender-ref ref="EMAIL"/>
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <logger name="play" level="INFO" additivity="false">
+        <appender-ref ref="EMAIL"/>
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <root level="info" additivity="false">
+        <appender-ref ref="EMAIL"/>
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <logger name="org.springframework" level="error">
+    </logger>
+
+
+    <logger name="net.schmizz.sshj.connection.channel.direct.SessionChannel" additivity="false" level="ERROR">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+</configuration>
