@@ -2,7 +2,11 @@
 
 CURRENT_DIR=`pwd`
 echo "current dir is $CURRENT_DIR"
-source $CURRENT_DIR/../setup/utils/load_sysconfig.sh
+
+echo "changing workdir"
+cd "$(dirname "$0")"
+
+source ../setup/utils/load_sysconfig.sh
 
 UPGRADE_TO=$1
 
@@ -55,3 +59,5 @@ else
 fi
 
 echo "done migrating"
+
+cd $CURRENT_DIR
