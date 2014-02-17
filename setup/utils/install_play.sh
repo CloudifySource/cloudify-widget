@@ -1,6 +1,6 @@
 echo "downloading play"
 
-
+source load_sysconfig.sh
 
 if [ -f /usr/bin/play ]; then
     echo "play already exists - nothing to do"
