@@ -7,8 +7,8 @@
 
 . /etc/init.d/functions
 
-if [ -f /etc/sysconfig/play ]; then
-    . /etc/sysconfig/play
+if [ -f /etc/sysconfig/cloudifyWidget ]; then
+    . /etc/sysconfig/cloudifyWidget
 fi
 
 prog=cloudify-widget
