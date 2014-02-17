@@ -17,13 +17,21 @@ echo "going to  [$WIDGET_HOME] to perform git pull"
 cd ${WIDGET_HOME}
 perform_git_pull
 
+
+
+
 echo "going to  [$MODULES_HOME] to perform git pull"
 cd ${MODULES_HOME}
-perform_git_pull
-echo "building modules"
-mvn install
-echo "deleting cloudify.widget artifacts from $PLAY_HOME/repository/cache/cloudify.widget/"
-rm -Rf $PLAY_HOME/repository/cache/cloudify.widget/
+HAS_UPDATES=`git remote update; git pull --dry-run | grep -q -v 'Already up-to-date.' | wc -l`
+if [ $HAS_UPDATES -gt 0 ]; then
+    perform_git_pull
+    echo "building modules"
+    mvn install
+    echo "deleting cloudify.widget artifacts from $PLAY_HOME/repository/cache/cloudify.widget/"
+    rm -Rf $PLAY_HOME/repository/cache/cloudify.widget/
+else
+    echo "modules - already-up-to-date"
+fi
 
 
 cd $CURRENT_DIRECTORY
