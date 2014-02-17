@@ -19,7 +19,8 @@ echo "going to  [$WIDGET_HOME] to perform git pull"
 cd ${WIDGET_HOME}
 perform_git_pull
 
-
+echo "make log directories"
+mkdir -p /var/log/cloudifyWidget/cli
 
 
 echo "going to  [$MODULES_HOME] to perform git pull"

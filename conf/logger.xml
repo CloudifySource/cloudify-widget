@@ -19,7 +19,7 @@
         </discriminator>
         <sift>
             <appender name="FILE-${userid}" class="ch.qos.logback.core.FileAppender">
-                <file>logs/cliOutput-nodeid-${servernodeid}.log</file>
+                <file>/var/log/cloudifyWidget/cli/cliOutput-nodeid-${servernodeid}.log</file>
                 <append>false</append>
                 <layout class="ch.qos.logback.classic.PatternLayout">
                     <pattern>%d [%thread] %level %mdc %logger{35} - %msg%n</pattern>
@@ -32,7 +32,7 @@
         <file>logFile.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- daily rollover -->
-            <fileNamePattern>logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>/var/log/cloudifyWidget/logFile.%d{yyyy-MM-dd}.log</fileNamePattern>
 
             <!-- keep 1 days' worth of history -->
             <maxHistory>5</maxHistory>
