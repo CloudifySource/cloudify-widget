@@ -34,19 +34,19 @@ if [ "$CLOUDIFY_UPGRADE" != "MANUAL" ]; then
     \cp -f ${WIDGET_HOME}/conf/cloudify/webui-context.xml ${WIDGET_HOME}/cloudify-folder/config/cloudify-webui-context-override.xml
 
     echo "injecting variables to cloudify.conf, and generating cloudify-prod.conf - extend this file in production instead of cloudify.conf"
-    cat conf/cloudify.conf | sed 's,__CLOUDIFY_SECURITY_GROUP__,'"$CLOUDIFY_SECURITY_GROUP"','  > conf/cloudify-prod.conf
+    cat ${WIDGET_HOME}/conf/cloudify.conf | sed 's,__CLOUDIFY_SECURITY_GROUP__,'"$CLOUDIFY_SECURITY_GROUP"','  > ${WIDGET_HOME}/conf/cloudify-prod.conf
 
 
 fi
 
 echo "upgrading hp-cloud templates"
-\cp -f conf/cloudify/hp-cloud.groovy cloudify-folder/clouds/hp/hp-cloud.groovy
-\cp -f conf/cloudify/hp-cloud.properties cloudify-folder/clouds/hp/hp-cloud.properties
-\cp -f conf/cloudify/prebootstrap cloudify-folder/clouds/hp/uploads/pre-bootstrap.sh
+\cp -f ${WIDGET_HOME}/conf/cloudify/hp-cloud.groovy ${WIDGET_HOME}/cloudify-folder/clouds/hp/hp-cloud.groovy
+\cp -f ${WIDGET_HOME}/conf/cloudify/hp-cloud.properties ${WIDGET_HOME}/cloudify-folder/clouds/hp/hp-cloud.properties
+\cp -f ${WIDGET_HOME}/conf/cloudify/prebootstrap ${WIDGET_HOME}/cloudify-folder/clouds/hp/uploads/pre-bootstrap.sh
 
-\cp -f conf/cloudify/softlayer-cloud.groovy cloudify-folder/clouds/softlayer/softlayer-cloud.groovy
-\cp -f conf/cloudify/softlayer-cloud.properties cloudify-folder/clouds/softlayer/softlayer-cloud.properties
-\cp -f conf/cloudify/prebootstrap cloudify-folder/clouds/softlayer/uploads/pre-bootstrap.sh
+\cp -f ${WIDGET_HOME}/conf/cloudify/softlayer-cloud.groovy ${WIDGET_HOME}/cloudify-folder/clouds/softlayer/softlayer-cloud.groovy
+\cp -f ${WIDGET_HOME}/conf/cloudify/softlayer-cloud.properties ${WIDGET_HOME}/cloudify-folder/clouds/softlayer/softlayer-cloud.properties
+\cp -f ${WIDGET_HOME}/conf/cloudify/prebootstrap ${WIDGET_HOME}/cloudify-folder/clouds/softlayer/uploads/pre-bootstrap.sh
 
 
 
