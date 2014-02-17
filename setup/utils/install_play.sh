@@ -2,6 +2,12 @@ echo "downloading play"
 
 source load_sysconfig.sh
 
+if [ -z "$PLAY_HOME" ]; then
+    echo "need to set PLAY_HOME"
+    exit 1
+fi
+
+
 if [ -f /usr/bin/play ]; then
     echo "play already exists - nothing to do"
 else
