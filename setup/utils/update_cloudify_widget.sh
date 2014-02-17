@@ -1,3 +1,5 @@
+source load_sysconfig.sh
+
 perform_git_pull(){
     git pull
     if [ "$?" -ne "0" ]; then       # we need to consider using hard reset here instead of specifying there's a problem: git reset --hard
