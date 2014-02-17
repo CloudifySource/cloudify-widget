@@ -1,5 +1,5 @@
 # note: sysconfig script does not need an update. it is edited on production and never committed to CVS.
-. /etc/sysconfig/play
+. /etc/sysconfig/widget
 
 
 execute(){
