@@ -1,0 +1,2 @@
+# copy this script under clouds/cloudname/uploads/pre-bootstrap.sh to let the bootstrap run the script
+yum -y groupinstall "Development Tools"

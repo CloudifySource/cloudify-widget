@@ -66,8 +66,12 @@ else
     fi
 
 
-    echo Unzip cloudify installation
+    echo "Unzip cloudify installation"
     unzip ~/cloudify.zip > /dev/null
+
+
+    echo "run prebootstrap script"
+    ##prebootstrapScript##
 
     wget "https://raw.github.com/CloudifySource/cloudify-widget/master/conf/cloudify/webui-context.xml"   -O ${CLOUDIFY_FOLDER}/config/cloudify-webui-context-override.xml
     echo Starting Cloudify bootstrap-localcloud `hostname -I`
@@ -82,12 +86,25 @@ echo "killing all java and starting cloudify"
 killall -9 java
 nohup ${CLOUDIFY_FOLDER}/bin/cloudify.sh "bootstrap-localcloud"
 
-echo "installing recipe"
-wget http://s3.amazonaws.com/cloudify-widget/2.7/mongodb.zip
-unzip mongodb.zip
-cd mongodb
-${CLOUDIFY_FOLDER}/bin/cloudify.sh "connect http://localhost:8100; install-service ."
+RECIPE_URL="##recipeUrl##"
+RECIPE_RELATIVE_PATH="##recipeRelativePath##"
 
-cd ..
+echo "RECIPE_URL is ($RECIPE_URL)"
+echo "RECIPE_RELATIVE_PATH is ($RECIPE_RELATIVE_PATH)"
+
+
+if [ ! -z "$RECIPE_URL" ] &&  [ ! -z "$RECIPE_RELATIVE_PATH" ] && [ "$RECIPE_URL" != "" ] [ "$RECIPE_RELATIVE_PATH" != "" ];then
+
+    echo "installing recipe from $RECIPE_URL"
+    wget -O recipe.zip "##recipeUrl##"
+    unzip recipe.zip
+    CURRENT_DIR=`pwd`
+    cd ##recipeRelativePath##
+    ${CLOUDIFY_FOLDER}/bin/cloudify.sh "connect http://localhost:8100; install-service ."
+    cd ${CURRENT_DIR}
+else
+    echo "no recipe url and/or no recipe relative path.. not installing recipe"
+fi
+
 cat nohup.out
 exit 0

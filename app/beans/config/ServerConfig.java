@@ -156,6 +156,10 @@ public class ServerConfig {
 
         // common configuration
         public File script; // script to run on bootstrap
+        public String recipeUrl;
+        public String recipeRelativePath;
+        public File prebootstrapScript = Utils.getFileByRelativePath("/conf/prebootstrap");
+
         public String tag = null; // the tag to use
         @Config(ignoreNullValues = true)
         public long sleepBeforeBootstrapMillis = Utils.parseTimeToMillis("20s"); // sleep before bootstrap

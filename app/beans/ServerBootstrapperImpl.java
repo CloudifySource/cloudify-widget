@@ -296,10 +296,24 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
 		try
 		{
+
+            String prebootstrapScript = "";
+
+            try{
+             prebootstrapScript = FileUtils.readFileToString( bootstrapConf.prebootstrapScript );
+            }catch(Exception e){
+                logger.error("error reading prebootstrapScript [{}]", bootstrapConf.prebootstrapScript );
+                throw new RuntimeException("unable to find prebootstrapScript",e );
+            }
+
 			logger.info("Starting bootstrapping for server:{} " , server );
             logger.info("reading script from file [{}]", bootstrapConf.script);
 			String script = FileUtils.readFileToString(bootstrapConf.script);
-            script = script.replace("##publicip##", server.getPublicIP()).replace("##privateip##", server.getPrivateIP());
+            script = script.replace("##publicip##", server.getPublicIP())
+                    .replace("##privateip##", server.getPrivateIP())
+                    .replace("##recipeUrl##", bootstrapConf.recipeUrl)
+                    .replace("##recipeRelativePath##", bootstrapConf.recipeRelativePath)
+                    .replace("##prebootstrapScript##", prebootstrapScript);
 
 			CloudExecResponse response = cloudServerApi.runScriptOnMachine( script, server.getPublicIP(), null );
 

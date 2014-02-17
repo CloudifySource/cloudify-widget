@@ -26,7 +26,7 @@ if [ "$CLOUDIFY_UPGRADE" != "MANUAL" ]; then
         ln -Tfs /usr/lib/cloudify/$GIGASPACES_FOLDER ${WIDGET_HOME}/cloudify-folder
 
         echo "saving url to file"
-        echo $CLOUDIFY_URL > /usr/lib/cloudify/url_version
+        echo $CLOUDIFY_URL > ${WIDGET_HOME}/cloudify-folder/url_version
         rm -f /tmp/cloudify.zip
     fi
 
@@ -42,7 +42,11 @@ fi
 echo "upgrading hp-cloud templates"
 \cp -f conf/cloudify/hp-cloud.groovy cloudify-folder/clouds/hp/hp-cloud.groovy
 \cp -f conf/cloudify/hp-cloud.properties cloudify-folder/clouds/hp/hp-cloud.properties
+\cp -f conf/cloudify/prebootstrap cloudify-folder/clouds/hp/uploads/pre-bootstrap.sh
+
 \cp -f conf/cloudify/softlayer-cloud.groovy cloudify-folder/clouds/softlayer/softlayer-cloud.groovy
 \cp -f conf/cloudify/softlayer-cloud.properties cloudify-folder/clouds/softlayer/softlayer-cloud.properties
+\cp -f conf/cloudify/prebootstrap cloudify-folder/clouds/softlayer/uploads/pre-bootstrap.sh
+
 
 
