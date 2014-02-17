@@ -11,7 +11,7 @@ execute install_java.sh
 
 execute install_maven.sh
 
-execute install_cloudify_widget_modules
+execute install_cloudify_widget_modules.sh
 
 execute install_mysql.sh
 
