@@ -1,3 +1,4 @@
+# rerunable script used for installing/updating cloudify
 
 source load_sysconfig.sh
 

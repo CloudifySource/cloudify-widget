@@ -38,5 +38,6 @@ else
     echo "modules - already-up-to-date"
 fi
 
-
+echo "creating nohup link"
+ln -Tfs /var/log/cloudifyWidget/nohup.out  ${WIDGET_HOME}/nohup.out
 cd $CURRENT_DIRECTORY
