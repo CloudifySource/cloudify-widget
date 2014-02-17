@@ -13,6 +13,7 @@ perform_git_pull(){
 echo "pulling source from git repository"
 CURRENT_DIRECTORY=`pwd`
 
+echo "going to  [$WIDGET_HOME] to perform git pull"
 cd ${WIDGET_HOME}
 perform_git_pull
 
