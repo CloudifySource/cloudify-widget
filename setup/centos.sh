@@ -19,9 +19,11 @@ if [ ! -f ${SYSCONF_FILE} ]; then
     echo "missing ${SYSCONF_FILE}"
     exit 1
   fi
+else
+    cp $SYSCONF_FILE $SYSCONF_DEST
 fi
 
-cp $SYSCONF_FILE $SYSCONF_DEST
+
 
 . $SYSCONF_DEST
 
