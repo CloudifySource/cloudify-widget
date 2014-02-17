@@ -1,5 +1,10 @@
 echo "downloading play"
 
+CURRENT_DIRECTORY=`pwd`
+
+cd "$(dirname "$0")"
+
+
 source load_sysconfig.sh
 
 if [ -z "$PLAY_HOME" ]; then
@@ -20,3 +25,6 @@ else
 fi
 echo "setting a link to play"
 ln -Tfs /usr/lib/play/play /usr/bin/play
+
+
+cd $CURRENT_DIRECTORY
