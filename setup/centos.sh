@@ -40,6 +40,7 @@ echo "installing git"
 yum  -y install git
 
 if [ ! -f "$WIDGET_HOME" ];then
+    echo "making $WIDGET_HOME"
     mkdir -p $WIDGET_HOME
 
     echo "cloning cloudify-widget"
@@ -64,7 +65,7 @@ if [ ! -f "$WIDGET_HOME" ];then
     git clone $GIT_LOCATION $WIDGET_HOME
 
     if [ -z $GIT_BRANCH  ] || [ $GIT_BRANCH"xxx" = "xxx" ]; then
-            echo "no branch specified"
+        echo "no branch specified"
     else
         echo "checking out branch ${GIT_BRANCH}"
         cd $WIDGET_HOME
@@ -75,7 +76,7 @@ if [ ! -f "$WIDGET_HOME" ];then
     echo $GIT_LOCATION > ${WIDGET_HOME}/.widgetGitLocation
 
 else
-    echo "$WIDGET_HOME" already exists. assuming cloned"
+    echo "[$WIDGET_HOME] already exists. assuming cloned"
 
 fi
 
