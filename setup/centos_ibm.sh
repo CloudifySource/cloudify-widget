@@ -1,6 +1,7 @@
 
 execute(){
     echo "executing $1"
+
     ${WIDGET_HOME}/setup/utils/$1
 }
 
@@ -26,4 +27,5 @@ execute install_monit.sh
 
 execute create_schema.sh
 
+cd ${WIDGET_HOME}/setup/utils
 execute upgrade.sh

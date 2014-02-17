@@ -39,17 +39,17 @@ echo "installing widget for $TYPE"
 echo "installing git"
 yum  -y install git
 
-mkdir -p $WIDGET_HOME
+if [ ! -f "$WIDGET_HOME" ];then
+    mkdir -p $WIDGET_HOME
 
-echo "cloning cloudify-widget"
+    echo "cloning cloudify-widget"
 
-if [ -z $GIT_LOCATION ] || [ $GIT_LOCATION"xxx" = "xxx" ]; then
-    echo "please define a github repository to checkout from"
-    exit 1;
-fi
-echo "using git location : ${GIT_LOCATION}"
+    if [ -z $GIT_LOCATION ] || [ $GIT_LOCATION"xxx" = "xxx" ]; then
+        echo "please define a github repository to checkout from"
+        exit 1;
+    fi
+    echo "using git location : ${GIT_LOCATION}"
 
-if [ ! -f $WIDGET_HOME ]; then
 
     if [ -f $WIDGET_HOME/.widgetGitLocation ]; then
         LAST_GIT_LOCATION=`cat $WIDGET_HOME/.widgetGitLocation`
@@ -75,12 +75,12 @@ if [ ! -f $WIDGET_HOME ]; then
     echo $GIT_LOCATION > ${WIDGET_HOME}/.widgetGitLocation
 
 else
-    echo "already checked out"
+    echo "$WIDGET_HOME" already exists. assuming cloned"
+
 fi
 
 
-
-export UTILS_FOLDER=${WIDGET_HOME}/setup;
-
-source $UTILS_FOLDER/centos_${TYPE}.sh
+UTILS_FOLDER=${WIDGET_HOME}/setup;
+cd $UTILS_FOLDER
+source centos_${TYPE}.sh
 
