@@ -24,4 +24,6 @@ execute install_node.sh
 
 execute install_monit.sh
 
+execute create_schema.sh
+
 execute upgrade.sh
