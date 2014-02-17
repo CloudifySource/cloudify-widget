@@ -24,7 +24,8 @@ perform_git_pull
 
 echo "going to  [$MODULES_HOME] to perform git pull"
 cd ${MODULES_HOME}
-HAS_UPDATES=`git remote update; git pull --dry-run | grep -q -v 'Already up-to-date.' | wc -l`
+git remote update;
+HAS_UPDATES=`git pull --dry-run | grep -q -v 'Already up-to-date.' | wc -l`
 echo "has updates is $HAS_UPDATES"
 if [ "$HAS_UPDATES" != "0" ]; then
     perform_git_pull
