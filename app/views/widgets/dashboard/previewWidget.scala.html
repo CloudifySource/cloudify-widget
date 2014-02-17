@@ -2,7 +2,7 @@
 @import tags._
 
 @context.set("body"){
-@embedCode.render( widget.getApiKey(), widget.getTitle(), widget.getYoutubeVideoUrl(), host, widget.getShowAdvanced() )
+@embedCode.render( widget.getApiKey(), widget.getTitle(), widget.getYoutubeVideoUrl(), host, widget.getShowAdvancedAsString() )
 }
 
 @dashboardTemplate()
