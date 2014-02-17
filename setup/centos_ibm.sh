@@ -9,6 +9,10 @@ echo "clone cloudify-modules"
 
 execute install_java.sh
 
+execute install_maven.sh
+
+execute install_cloudify_widget_modules
+
 execute install_mysql.sh
 
 execute install_nginx.sh
@@ -19,7 +23,7 @@ execute install_cloudify.sh
 
 execute install_play.sh
 
-execute install_maven.sh
+
 
 execute install_node.sh
 
