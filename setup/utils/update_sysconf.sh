@@ -1,4 +1,4 @@
-
+echo "I will update sysconf"
 source load_sysconfig.sh
 
 if [ -z $SYSCONF_URL ] || [ "$SYSCONF_URL" = "" ]; then

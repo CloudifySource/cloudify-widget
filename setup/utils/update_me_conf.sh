@@ -1,4 +1,4 @@
-
+echo "i will update me.conf"
 source load_sysconfig.sh
 
 if [ -z $ME_CONF_URL ] || [ "$ME_CONF_URL" = "" ]; then

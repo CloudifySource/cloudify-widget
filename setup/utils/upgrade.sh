@@ -7,6 +7,10 @@ execute(){
     source ${WIDGET_HOME}/setup/utils/$1.sh
 }
 
+execute update_me_conf
+
+execute update_sysconf
+
 execute update_cloudify_widget
 
 
