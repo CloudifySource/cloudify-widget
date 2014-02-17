@@ -33,11 +33,11 @@ echo "overriding webui-context.xml in cloudify installation"
 echo "upgrading hp-cloud templates"
 \cp -f ${WIDGET_HOME}/conf/cloudify/hp-cloud.groovy ${WIDGET_HOME}/cloudify-folder/clouds/hp/hp-cloud.groovy
 \cp -f ${WIDGET_HOME}/conf/cloudify/hp-cloud.properties ${WIDGET_HOME}/cloudify-folder/clouds/hp/hp-cloud.properties
-\cp -f ${WIDGET_HOME}/conf/cloudify/prebootstrap ${WIDGET_HOME}/cloudify-folder/clouds/hp/uploads/pre-bootstrap.sh
+\cp -f ${WIDGET_HOME}/conf/cloudify/prebootstrap ${WIDGET_HOME}/cloudify-folder/clouds/hp/upload/pre-bootstrap.sh
 
 \cp -f ${WIDGET_HOME}/conf/cloudify/softlayer-cloud.groovy ${WIDGET_HOME}/cloudify-folder/clouds/softlayer/softlayer-cloud.groovy
 \cp -f ${WIDGET_HOME}/conf/cloudify/softlayer-cloud.properties ${WIDGET_HOME}/cloudify-folder/clouds/softlayer/softlayer-cloud.properties
-\cp -f ${WIDGET_HOME}/conf/cloudify/prebootstrap ${WIDGET_HOME}/cloudify-folder/clouds/softlayer/uploads/pre-bootstrap.sh
+\cp -f ${WIDGET_HOME}/conf/cloudify/prebootstrap ${WIDGET_HOME}/cloudify-folder/clouds/softlayer/upload/pre-bootstrap.sh
 
 
 
