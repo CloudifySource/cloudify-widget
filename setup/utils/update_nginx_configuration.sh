@@ -1,4 +1,9 @@
 
+CURRENT_DIRECTORY=`pwd`
+
+cd "$(dirname "$0")"
+
+
 source load_sysconfig.sh
 
 TMP_SITE_CONF=${WIDGET_HOME}/conf/nginx/output.nginx
@@ -26,3 +31,6 @@ else
 fi
 
 \rm -f ${TMP_SITE_CONF}
+
+
+cd $CURRENT_DIRECTORY

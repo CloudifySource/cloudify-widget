@@ -7,6 +7,7 @@ CURRENT_DIRECTORY=`pwd`
 cd "$(dirname "$0")"
 
 source load_sysconfig.sh
+
 db_version=`ls ${WIDGET_HOME}/conf/evolutions/default -1 | grep -v create |  sed -e 's/\.[a-zA-Z]*$//' | sort -r -n | head -1`
 bash ${WIDGET_HOME}/bin/migrate_db.sh $db_version
 

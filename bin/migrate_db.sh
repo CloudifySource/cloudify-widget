@@ -9,6 +9,8 @@ echo "workdir is now `pwd`"
 
 source ../setup/utils/load_sysconfig.sh
 
+echo "using $DB_USER/$DB_PASSWORD for db upgrade"
+
 UPGRADE_TO=$1
 
 if [ "$UPGRADE_TO" = "create" ];then
