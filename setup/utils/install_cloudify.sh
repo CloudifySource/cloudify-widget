@@ -7,7 +7,7 @@ rm -f /tmp/cloudify.zip
 
 $CLOUDIFY_CURRENT_URL=`cat ${WIDGET_HOME}/cloudify-folder/url_version`
 
-echo "comparing $CLOUDIFY_URL to $CLOUDIFY_CURRENT_URL"
+echo "comparing [$CLOUDIFY_URL] to [$CLOUDIFY_CURRENT_URL]"
 if [ "$CLOUDIFY_URL" = "$CLOUDIFY_CURRENT_URL" ]; then
     echo "same cloudify version, nothing to install"
 else
