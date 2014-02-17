@@ -1,4 +1,11 @@
 #install mysql
+
+CURRENT_DIRECTORY=`pwd`
+
+cd "$(dirname "$0")"
+
+source load_sysconfig.sh
+
 echo "installing mysql"
 yum -y install mysql-server mysql php-mysql
 chkconfig --levels 235 mysqld on
@@ -12,3 +19,6 @@ mysql -u $DB_ADMIN -p$DB_ADMIN_PASSWORD -e "DROP USER ''@'localhost';"
 mysql -u $DB_ADMIN -e "DROP USER ''@'localhost';"
 mysql -u $DB_ADMIN -p$DB_ADMIN_PASSWORD  -e  "DROP USER ''@'localhost.localdomain';"
 mysql -u $DB_ADMIN -e "DROP USER ''@'localhost.localdomain';"
+
+
+cd $CURRENT_DIRECTORY
