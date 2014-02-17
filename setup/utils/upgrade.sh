@@ -9,8 +9,6 @@ execute(){
 
 execute update_cloudify_widget
 
-execute update_cloudify_widget_modules
-
 
 # I know we can commit the files with the correct mode, cannot rely on this in production.
 echo "changing mode for sh files"
