@@ -105,7 +105,7 @@
         <i class="close" ng-click="showEmbed=false"></i>
         <h3>Embed Code</h3>
         <p>Copy the code below to embed the widget on your website.</p>
-        <textarea class="autoselect" readonly="readonly">@embedCode.render( widget.getApiKey(), widget.getTitle(), widget.getYoutubeVideoUrl(), request.host(), if widget.getShowAdvanced() "true" else "false") ).body</textarea>
+        <textarea class="autoselect" readonly="readonly">@embedCode.render( widget.getApiKey(), widget.getTitle(), widget.getYoutubeVideoUrl(), request.host(), widget.getShowAdvancedAsString()) ).body</textarea>
     </div>
 
     @*<div id="walkthrough" style="display:none">&nbsp; <a href="javascript:void(0)">Click to close</a> </div>*@
