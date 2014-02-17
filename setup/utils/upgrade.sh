@@ -28,5 +28,7 @@ execute update_service_initd
 
 execute update_monit
 
+execute update_logrotate_conf
+
 
 
