@@ -1,8 +1,6 @@
 #!/bin/bash
 
-if [ -f /etc/sysconfig/widget ]; then
-    . /etc/sysconfig/widget
-fi
+source load_sysconfig.sh
 
 set -e
 if [ "$PLAY_HOME" = "" ]; then

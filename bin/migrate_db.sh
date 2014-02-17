@@ -1,6 +1,6 @@
 # get all sysconf variables we have for play
 
-. /etc/sysconfig/widget
+source ../setup/utils/load_sysconfig.sh
 
 UPGRADE_TO=$1
 

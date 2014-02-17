@@ -1,7 +1,5 @@
 
-if [ -f /etc/sysconfig/widget ];then
-    source /etc/sysconfig/widget
-fi
+source load_sysconfig.sh
 
 TMP_SITE_CONF=${WIDGET_HOME}/conf/nginx/output.nginx
 SITE_CONF_TARGET=/etc/nginx/sites-available/$SITE_DOMAIN
