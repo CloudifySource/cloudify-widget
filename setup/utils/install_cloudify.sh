@@ -1,5 +1,9 @@
 # rerunable script used for installing/updating cloudify
 
+CURRENT_DIRECTORY=`pwd`
+
+cd "$(dirname "$0")"
+
 source load_sysconfig.sh
 
 rm -f /tmp/cloudify.zip
@@ -39,5 +43,6 @@ echo "upgrading hp-cloud templates"
 \cp -f ${WIDGET_HOME}/conf/cloudify/softlayer-cloud.properties ${WIDGET_HOME}/cloudify-folder/clouds/softlayer/softlayer-cloud.properties
 \cp -f ${WIDGET_HOME}/conf/cloudify/prebootstrap ${WIDGET_HOME}/cloudify-folder/clouds/softlayer/upload/pre-bootstrap.sh
 
+cd $CURRENT_DIRECTORY
 
 
