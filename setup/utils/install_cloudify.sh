@@ -1,7 +1,6 @@
 
 source load_sysconfig.sh
 
-echo "CLOUDIFY_UPGRADE="$CLOUDIFY_UPGRADE
 rm -f /tmp/cloudify.zip
 
 
