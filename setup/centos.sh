@@ -9,16 +9,21 @@ export SETUP_WORKDIR=`pwd`
 echo "My workdir is $SETUP_WORKDIR"
 
 SYSCONF_FILE=widgetSysconfig
+SYSCONF_DEST=/etc/sysconfig/cloudifyWidget
 
 echo "checking if sysconfig file exists"
 if [ ! -f ${SYSCONF_FILE} ]; then
+   if [ -f $SYSCONF_DEST ]; then
+    echo "sysconf file already in place."
+   else
     echo "missing ${SYSCONF_FILE}"
     exit 1
+  fi
 fi
 
-cp $SYSCONF_FILE /etc/sysconfig/cloudifyWidget
+cp $SYSCONF_FILE $SYSCONF_DEST
 
-. /etc/sysconfig/cloudifyWidget
+. $SYSCONF_DEST
 
 if [ -z "$1" ]; then
     echo "usage centos.sh [ibm|hp]"
