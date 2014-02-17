@@ -1,4 +1,4 @@
-include "cloudify-prod.conf"
+include "cloudify.conf"
 
 "application.secret" = "generate a sha1 and paste it here"
 
