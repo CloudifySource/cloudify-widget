@@ -5,6 +5,7 @@ echo "current dir is $CURRENT_DIR"
 
 echo "changing workdir"
 cd "$(dirname "$0")"
+echo "workdir is not `pwd`"
 
 source ../setup/utils/load_sysconfig.sh
 
