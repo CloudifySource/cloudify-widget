@@ -15,7 +15,7 @@ else
     echo "wgetting cloudify from $CLOUDIFY_URL"
     wget --no-check-certificate $CLOUDIFY_URL -O /tmp/cloudify.zip
 
-    unzip /tmp/cloudify.zip -d /usr/lib/cloudify
+    unzip -q /tmp/cloudify.zip -d /usr/lib/cloudify
     echo "recreating the link"
 
     GIGASPACES_FOLDER=`ls /usr/lib/cloudify/ | grep giga`
