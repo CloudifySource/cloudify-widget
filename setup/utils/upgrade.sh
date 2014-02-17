@@ -1,3 +1,7 @@
+# note: sysconfig script does not need an update. it is edited on production and never committed to CVS.
+. /etc/sysconfig/play
+
+
 execute(){
     echo "executing $1"
     source ${WIDGET_HOME}/setup/utils/$1.sh
@@ -6,9 +10,6 @@ execute(){
 execute update_cloudify_widget
 
 execute update_cloudify_widget_modules
-
-# note: this script does not need an update. it is edited on production and never committed to CVS.
-. /etc/sysconfig/play
 
 
 # I know we can commit the files with the correct mode, cannot rely on this in production.
