@@ -199,6 +199,7 @@ WidgetApp.controller('WidgetController',
                     // todo : test if we should override entire widget
                     widget.id = savedWidget.id;
                     widget.apiKey = savedWidget.apiKey;
+                    widget.version = savedWidget.version;
                     $scope.widgets.push( savedWidget );
                 }
                 if ( isDone ){

@@ -82,7 +82,7 @@ public class Widget
 	private Boolean enabled;
 
 
-    private Boolean showAdvanced = true;
+    private Boolean showAdvanced;
 
     @JsonProperty(value="consolename")
 	private String consoleName;
@@ -101,7 +101,7 @@ public class Widget
 
     @JsonProperty( value="rootpath")
     private String recipeRootPath;
-    private Boolean requireLogin = false; // should this widget support login?
+    private Boolean requireLogin; // should this widget support login?
     private String loginVerificationUrl = null; // url to verify user IDs.
     private String webServiceKey=null; // secret key we add on the web service calls.
 
@@ -112,6 +112,9 @@ public class Widget
 
     @Lob
     private String description;
+
+    @Version
+    private long version = 0;
 
     // for remote bootstrap, use this service name to construct the console link.
     //
@@ -684,10 +687,6 @@ public class Widget
         return instances.size();
     }
 
-    public void setRequiresLogin( boolean requires ){
-        requireLogin = requires;
-    }
-
     public boolean isRequiresLogin() {
         return requireLogin == Boolean.TRUE; // solves NPE
     }
@@ -803,4 +802,10 @@ public class Widget
             }
         }
     }
+
+    public void setShowAdvanced(Boolean showAdvanced) {
+        this.showAdvanced = showAdvanced;
+    }
+
+
 }

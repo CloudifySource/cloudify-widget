@@ -389,6 +389,7 @@ public class WidgetAdmin extends Controller
                 user.addNewWidget( w );
             }
 
+            w.update();
             w.save(  );
             w.refresh( );
 

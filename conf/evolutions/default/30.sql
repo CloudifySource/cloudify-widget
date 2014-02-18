@@ -1,0 +1,1 @@
+alter table widget add column  version bigint not null;
