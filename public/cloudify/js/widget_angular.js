@@ -191,6 +191,16 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
     $scope.params = paramsService.params;
     $scope.cloudType = myConf.cloudProvider;
 
+
+    $scope.isShowAdvanced = function () {
+        console.log(["showadvanced param is ", $scope.params.showAdvanced, $scope.params.showAdvanced == "true"]);
+        try {
+            return $scope.params.showAdvanced == "true";
+        } catch (e) {
+            return true;
+        }
+    };
+
     var apiKey = $scope.params.apiKey;
     var shareUrl= encodeURI("http://launch.cloudifysource.org/d");
 

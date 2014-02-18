@@ -53,7 +53,7 @@
         }
     </div>
 
-<div class="advanced_section" ng-class="{'collapsed':!!showAdvanced}">
+<div class="advanced_section" ng-class="{'collapsed':!!showAdvanced, 'hidden' : !isShowAdvanced() }">
     <div class="remember_creds">
         <div class="remember_me_title">Remember me?</div>
         <div class="remember_option"><button class="yes" ng-click="rememberAdvanced(); showRemember=false">Yes</button></div>

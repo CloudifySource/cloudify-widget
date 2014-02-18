@@ -1,7 +1,7 @@
 function cloudifyWidgetInitialization(){
     function cloudifyWidgetOnLoadHandler(){
         var element = document.getElementById("cloudify-widget");
-        var show_advanced = element.getAttribute("data-show-advanced");
+        var show_advanced = element.getAttribute("data-show-advanced") || "true"; // backward compatibility
         var api_key = element.getAttribute("data-api-key");
         var host = element.getAttribute("data-host") || "launch.cloudifysource.org";  // backward compatibility
         var title = element.getAttribute("data-title");
