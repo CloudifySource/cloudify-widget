@@ -74,6 +74,8 @@ if [ ! -f "$WIDGET_HOME" ];then
     fi
 
     echo $GIT_LOCATION > ${WIDGET_HOME}/.widgetGitLocation
+    mkdir -p ${WIDGET_HOME}/logs
+    touch ${WIDGET_HOME}/logs/README
 
 else
     echo "[$WIDGET_HOME] already exists. assuming cloned"

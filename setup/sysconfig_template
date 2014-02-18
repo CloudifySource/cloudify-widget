@@ -16,5 +16,6 @@ CLOUDIFY_URL=https://s3-eu-west-1.amazonaws.com/gigaspaces-repository-eu/org/clo
 PLAY_HOME=/usr/lib/play-2.0.4
 ME_CONF_URL=
 SYSCONF_URL=
+CRON_EMAIL=admin@example.com
 #TYPE=ibm|hp
 
