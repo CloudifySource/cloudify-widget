@@ -13,7 +13,6 @@ execute update_sysconf
 
 execute update_cloudify_widget
 
-
 # I know we can commit the files with the correct mode, cannot rely on this in production.
 echo "changing mode for sh files"
 chmod 755 $WIDGET_HOME/*.sh
@@ -33,6 +32,8 @@ execute update_service_initd
 execute update_monit
 
 execute update_logrotate_conf
+
+execute update_crontab
 
 
 
