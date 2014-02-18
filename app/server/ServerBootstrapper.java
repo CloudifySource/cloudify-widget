@@ -67,6 +67,14 @@ public interface ServerBootstrapper
 
     public List<ServerNode> recoverUnmonitoredMachines();
 
+    /**
+     * should return an injected bootstrap script.
+     * @param publicIp
+     * @param privateIp
+     * @return
+     */
+    public String getInjectedBootstrapScript(String publicIp, String privateIp);
+
 
 
     /**

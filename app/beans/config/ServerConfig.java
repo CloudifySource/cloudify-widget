@@ -157,8 +157,9 @@ public class ServerConfig {
         // common configuration
         public File script; // script to run on bootstrap
         public String recipeUrl;
+        public String cloudifyUrl;
         public String recipeRelativePath;
-        public File prebootstrapScript = Utils.getFileByRelativePath("/conf/prebootstrap");
+        public File prebootstrapScript = Utils.getFileByRelativePath("/conf/cloudify/prebootstrap");
 
         public String tag = null; // the tag to use
         @Config(ignoreNullValues = true)

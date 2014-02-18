@@ -297,23 +297,8 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		try
 		{
 
-            String prebootstrapScript = "";
-
-            try{
-             prebootstrapScript = FileUtils.readFileToString( bootstrapConf.prebootstrapScript );
-            }catch(Exception e){
-                logger.error("error reading prebootstrapScript [{}]", bootstrapConf.prebootstrapScript );
-                throw new RuntimeException("unable to find prebootstrapScript",e );
-            }
-
-			logger.info("Starting bootstrapping for server:{} " , server );
-            logger.info("reading script from file [{}]", bootstrapConf.script);
-			String script = FileUtils.readFileToString(bootstrapConf.script);
-            script = script.replace("##publicip##", server.getPublicIP())
-                    .replace("##privateip##", server.getPrivateIP())
-                    .replace("##recipeUrl##", bootstrapConf.recipeUrl)
-                    .replace("##recipeRelativePath##", bootstrapConf.recipeRelativePath)
-                    .replace("##prebootstrapScript##", prebootstrapScript);
+            logger.info("Starting bootstrapping for server:{} " , server );
+            String script = getInjectedBootstrapScript( server.getPublicIP(), server.getPrivateIP());
 
 			CloudExecResponse response = cloudServerApi.runScriptOnMachine( script, server.getPublicIP(), null );
 
@@ -333,6 +318,33 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			throw new ServerException("Failed to bootstrap cloudify machine: " + server.toDebugString(), ex);
 		}
 	}
+
+    @Override
+    public String getInjectedBootstrapScript(String publicIp, String privateIp) {
+        try {
+            String prebootstrapScript = "";
+
+            try {
+                prebootstrapScript = FileUtils.readFileToString(bootstrapConf.prebootstrapScript);
+            } catch (Exception e) {
+                logger.error("error reading prebootstrapScript [{}]", bootstrapConf.prebootstrapScript);
+                throw new RuntimeException("unable to find prebootstrapScript", e);
+            }
+
+
+            logger.info("reading script from file [{}]", bootstrapConf.script);
+            String script = FileUtils.readFileToString(bootstrapConf.script);
+            script = script.replace("##publicip##", publicIp)
+                    .replace("##privateip##", privateIp)
+                    .replace("##recipeUrl##", bootstrapConf.recipeUrl)
+                    .replace("##cloudifyUrl##", bootstrapConf.cloudifyUrl)
+                    .replace("##recipeRelativePath##", bootstrapConf.recipeRelativePath)
+                    .replace("##prebootstrapScript##", prebootstrapScript);
+            return script;
+        } catch (Exception e) {
+            throw new RuntimeException("unable to inject bootstrap script",e);
+        }
+    }
 
 
     @Override

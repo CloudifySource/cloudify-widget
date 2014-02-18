@@ -88,6 +88,8 @@ GET     /admin/pool/summary             controllers.AdminPoolController.summary(
 #GET     /user/pool/manage/list         controllers.UserPoolController.getAllServers
 #GET     /user/pool/summary             controllers.UserPoolController.summary
 
+GET     /getInjectedScript              controllers.Application.getInjectScript( publicIp:String?="1.1.1.1", privateIp:String?="2.2.2.2" )
+
 GET     /embed/img/:apiKey              controllers.WidgetAdmin.embedImage( apiKey: String)                  
 
 # Map static resources from the /public folder to the /assets URL path
@@ -96,6 +98,7 @@ GET     /public/*file  		     	    controllers.Assets.at(path="/public/cloudify"
 GET     /assets/*file             	    controllers.Assets.at(path="/public", file)
 GET     /d                              controllers.DemosController.getDemoPageForUser(email="default_demo@gigaspaces.com")
 GET     /*file        		     	    controllers.Assets.at(path="/public/cloudify", file)
+
 
 
 

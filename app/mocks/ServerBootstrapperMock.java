@@ -63,6 +63,11 @@ public class ServerBootstrapperMock implements ServerBootstrapper
         return null;
     }
 
+    @Override
+    public String getInjectedBootstrapScript(String publicIp, String privateIp) {
+        return "mock does not do injections :(";
+    }
+
 
     @Override
     public BootstrapValidationResult validateBootstrap( ServerNode serverNode )

@@ -95,10 +95,10 @@ public class Application extends Controller
      *
      *  - installs the widget recipe
      * @param apiKey - user api key
-     * @param project - the HP project API data
-     * @param key - the HP key API data
-     * @param secretKey - the HP secret key API data
-     * @param userId - in case required login authentication is used
+//     * @param project - the HP project API data
+//     * @param key - the HP key API data
+//     * @param secretKey - the HP secret key API data
+//     * @param userId - in case required login authentication is used
      * @return - result
      */
 	public static Result start( String apiKey/*, String project, String key, String secretKey*/, String userId )
@@ -187,6 +187,15 @@ public class Application extends Controller
             return exceptionToStatus( ex );
 		}
 	}
+
+    public static Result getInjectScript( String publicIp, String privateIp ){
+        if ( Play.isDev() ){
+            String injectedScript = ApplicationContext.get().getServerBootstrapper().getInjectedBootstrapScript( publicIp, privateIp );
+            return ok(injectedScript);
+        }else{
+            return internalServerError("only available in dev mode");
+        }
+    }
 
     private static Long getPlayTimeout(){
         Long timeLeft = (Long) Cache.get(Controller.request().remoteAddress());
