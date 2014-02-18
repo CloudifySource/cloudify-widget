@@ -85,6 +85,7 @@ else
     # -nic-address `hostname -I`"
 fi
 
+CLOUDIFY_FOLDER=`cat $CLOUDIFY_HOMEDIR_CONF`
 echo "killing all java and starting cloudify"
 killall -9 java
 # nohup ${CLOUDIFY_FOLDER}/bin/cloudify.sh "bootstrap-localcloud"
