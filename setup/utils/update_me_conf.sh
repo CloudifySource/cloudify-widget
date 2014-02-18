@@ -4,7 +4,6 @@ CURRENT_DIRECTORY=`pwd`
 
 cd "$(dirname "$0")"
 
-
 source load_sysconfig.sh
 
 echo "ME_CONF_URL is [$ME_CONF_URL]"
