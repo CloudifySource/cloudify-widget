@@ -13,7 +13,9 @@ fi
 
 `cat ${WIDGET_HOME}/conf/cron/cron.conf >> /tmp/cronconf`
 
-crontab ${WIDGET_HOME}/conf/cron/cron.conf
+crontab /tmp/cronconf
+
+rm -f /tmp/cronconf
 
 
 cd $CURRENT_DIRECTORY
