@@ -110,7 +110,7 @@ if [ ! -z "$RECIPE_URL" ] &&  [ ! -z "$RECIPE_RELATIVE_PATH" ] && [ "$RECIPE_URL
     echo "going into $RECIPE_RELATIVE_PATH to install"
     cd "$RECIPE_RELATIVE_PATH"
     echo "I am at `pwd` and I am invoking install command on localhost"
-    ${CLOUDIFY_FOLDER}/bin/cloudify.sh "connect http://localhost:8100; install-service --verbose -timeout 200 ."
+    ${CLOUDIFY_FOLDER}/bin/cloudify.sh "connect http://localhost:8100; install-service  -disableSelfHealing --verbose -timeout 200 ."
     cd ${CURRENT_DIR}
 else
     echo "no recipe url and/or no recipe relative path.. not installing recipe"
