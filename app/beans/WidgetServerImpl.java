@@ -185,7 +185,7 @@ public class WidgetServerImpl implements WidgetServer
                 switch ( event.getEventType() ) {
 
                     case DONE:
-                        logger.info( "detected that widget instance installation done by event" );
+                        logger.debug( "detected that widget instance installation done by event" );
                         doneFromEvent = true;
                         break;
                     case ERROR:
