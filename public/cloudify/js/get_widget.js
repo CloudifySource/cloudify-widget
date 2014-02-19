@@ -28,6 +28,7 @@ function cloudifyWidgetInitialization(){
 
         // todo : make protocol insensitive once we support HTTPS.
         iframe.setAttribute("src", "http://" + host + "/widget/widget?" + params.join("&"));
+        iframe.setAttribute("scrolling","no");
         iframe.setAttribute("width", "600px");
         iframe.setAttribute("height", "463px");
         iframe.setAttribute("frameborder", "no");
