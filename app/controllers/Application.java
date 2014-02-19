@@ -161,30 +161,48 @@ public class Application extends Controller
             final Widget finalWidget = widget;
             final String remoteAddress = request().remoteAddress();
             logger.info("scheduling deployment");
-            Akka.system().scheduler().scheduleOnce(
-                    Duration.create(0, TimeUnit.SECONDS),
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            logger.info("deployment thread started");
-                            if (finalServerNode.isRemote()) {
-                                logger.info("bootstrapping remote cloud");
-                                try{
-                                    if ( ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode) == null ){
-                                        logger.info( "bootstrap cloud returned NULL. stopping progress." );
+
+            // TODO : this is a quick fix for the thread exhaustion problem. We need to figure out the best course of action here
+            // TODO : we assume that recipes without URL are fast and so simply creating a thread will not cost us much.
+            // TODO : however the design should be ignorant to the recipeURL nullability and still scale.
+            if ( StringUtils.isEmptyOrSpaces(widget.getRecipeURL()) ){
+                logger.info("no recipe url. will start a simple thread");
+                new Thread( new Runnable() {
+                    @Override
+                    public void run() {
+                        logger.info("installing widget on cloud");
+                        setPlayTimeout( remoteAddress );
+                        ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress );
+                    }
+                });
+            }else{
+                logger.info("recipe url exists. will schedule Akka");
+                Akka.system().scheduler().scheduleOnce(
+                        Duration.create(0, TimeUnit.SECONDS),
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                logger.info("deployment thread started");
+                                if (finalServerNode.isRemote()) {
+                                    logger.info("bootstrapping remote cloud");
+                                    try{
+                                        if ( ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode) == null ){
+                                            logger.info( "bootstrap cloud returned NULL. stopping progress." );
+                                            return;
+                                        }
+                                    }catch(Exception e){
+                                        logger.error("unable to bootstrap machine",e);
                                         return;
                                     }
-                                }catch(Exception e){
-                                    logger.error("unable to bootstrap machine",e);
-                                    return;
                                 }
-                            }
 
-                            logger.info("installing widget on cloud");
-                            setPlayTimeout( remoteAddress );
-                            ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress );
-                        }
-                    });
+                                logger.info("installing widget on cloud");
+                                setPlayTimeout( remoteAddress );
+                                ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress );
+                            }
+                        });
+            }
+
 
             return statusToResult( new Widget.Status().setInstanceId(serverNode.getId().toString()).setRemote(serverNode.isRemote()) );
 		}catch(ServerException ex)
