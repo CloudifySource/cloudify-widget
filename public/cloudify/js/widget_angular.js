@@ -21,7 +21,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
 
     $scope.advancedParams = {};
     $scope.advancedParams[hpcloud] = {'type':'hpcloud-compute','params':{'project':null, 'key':null, 'secretKey':null}};
-    $scope.advancedParams[softlayer] = {'type':'softlayer', 'params' : {'userId':null, 'apiKey':null} };
+    $scope.advancedParams[softlayer] = {'type':'softlayer', 'params' : {'username':null, 'apiKey':null} };
 
     $scope.poweredByUrl = {};
     $scope.poweredByUrl[hpcloud] = "http://hpcloud.com";
