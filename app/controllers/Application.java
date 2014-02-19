@@ -163,18 +163,13 @@ public class Application extends Controller
             logger.info("scheduling deployment");
 
             // TODO : this is a quick fix for the thread exhaustion problem. We need to figure out the best course of action here
-            // TODO : we assume that recipes without URL are fast and so simply creating a thread will not cost us much.
+            // TODO : we assume that recipes without URL are fast and so simply don't need a thread for it..
             // TODO : however the design should be ignorant to the recipeURL nullability and still scale.
             if ( StringUtils.isEmptyOrSpaces(widget.getRecipeURL()) ){
-                logger.info("no recipe url. will start a simple thread");
-                new Thread( new Runnable() {
-                    @Override
-                    public void run() {
-                        logger.info("installing widget on cloud");
-                        setPlayTimeout( remoteAddress );
-                        ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress );
-                    }
-                });
+                logger.info("no recipe url. this should be quick. no need for thread");
+                logger.info("installing widget on cloud");
+                setPlayTimeout(remoteAddress);
+                ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress);
             }else{
                 logger.info("recipe url exists. will schedule Akka");
                 Akka.system().scheduler().scheduleOnce(
@@ -185,20 +180,20 @@ public class Application extends Controller
                                 logger.info("deployment thread started");
                                 if (finalServerNode.isRemote()) {
                                     logger.info("bootstrapping remote cloud");
-                                    try{
-                                        if ( ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode) == null ){
-                                            logger.info( "bootstrap cloud returned NULL. stopping progress." );
+                                    try {
+                                        if (ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode) == null) {
+                                            logger.info("bootstrap cloud returned NULL. stopping progress.");
                                             return;
                                         }
-                                    }catch(Exception e){
-                                        logger.error("unable to bootstrap machine",e);
+                                    } catch (Exception e) {
+                                        logger.error("unable to bootstrap machine", e);
                                         return;
                                     }
                                 }
 
                                 logger.info("installing widget on cloud");
-                                setPlayTimeout( remoteAddress );
-                                ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress );
+                                setPlayTimeout(remoteAddress);
+                                ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress);
                             }
                         });
             }
