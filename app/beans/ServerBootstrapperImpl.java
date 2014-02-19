@@ -262,7 +262,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             scriptExecutor.runBootstrapScript( cmdLine, serverNode, null, newCloudFolder, false );
 //
         }catch(Exception e){
-            logger.error("unable to bootstrap");
+            logger.error("unable to bootstrap",e);
             return null;
         }  finally {
     		if (newCloudFolder != null && cloudBootstrapConf.removeCloudFolder ) {
