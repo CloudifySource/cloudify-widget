@@ -141,6 +141,7 @@ public class Application extends Controller
                 serverNode.save();
             }else{
                 serverNode = ApplicationContext.get().getServerPool().get();
+                logger.info("application will check if server node is null. if null, there are no available servers");
                 if (serverNode == null) {
                     // if the user clicked another play in the last 30 seconds, we allow ourselves to tell them to wait..
                     Long timeLeft = getPlayTimeout();
@@ -151,17 +152,21 @@ public class Application extends Controller
                     ApplicationContext.get().getMailSender().sendPoolIsEmptyMail( ApplicationContext.get().getServerPool().getStats().toString() );
                     throw new ServerException(Messages.get("no.available.servers"));
                 }
+                logger.info("it seems server node is not null. deployment continues as planned");
             }
+
 
             // run the "bootstrap" and "deploy" in another thread.
             final ServerNode finalServerNode = serverNode;
             final Widget finalWidget = widget;
             final String remoteAddress = request().remoteAddress();
+            logger.info("scheduling deployment");
             Akka.system().scheduler().scheduleOnce(
                     Duration.create(0, TimeUnit.SECONDS),
                     new Runnable() {
                         @Override
                         public void run() {
+                            logger.info("deployment thread started");
                             if (finalServerNode.isRemote()) {
                                 logger.info("bootstrapping remote cloud");
                                 try{
