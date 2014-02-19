@@ -74,8 +74,8 @@ body{
 }
 
 iframe {
-  width: $widget_width;
-  height: 473px;
+  width: $widget_width + 10px;
+  height: 483px;
   border: none;
   overflow: hidden;
   padding: 0;
