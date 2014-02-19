@@ -28,6 +28,7 @@
 
     <bean id="serverBootstrapper" class="beans.ServerBootstrapperImpl" init-method="init">
         <property name="bootstrapConf" value="#{conf.server.bootstrap}"/>
+        <property name="cloudBootstrapConf"  value="#{conf.server.cloudBootstrap}"/>
     </bean>
 
     <bean id="hmac" class="beans.HmacImpl"/>
