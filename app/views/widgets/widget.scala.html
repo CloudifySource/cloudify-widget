@@ -33,7 +33,7 @@
     <span id="title">{{params.title}}</span>
 
         <a herf="javascript:void(0)" id="start_btn" class="button" ng-show="showPlay()" ng-click="play()"></a>
-        <a herf="javascript:void(0)" id="stop_btn" class="button" ng-show="showStop()" ng-click="stop()"></a>
+        <a herf="javascript:void(0)" id="stop_btn" class="button" ng-show="showStop()" ng-click="stop()" ng-class="{'executing':!widgetStatus.instanceIsAvailable}"></a>
     <ul id="log">
         <li ng-show="pendingOutput()">Acquiring machine. This might take a few seconds, please wait...</li>
         <li ng-show="!widgetStatus.message && !isCompleted()" ng-repeat="o in widgetStatus.output" ng-bind-html-unsafe="o"></li>
