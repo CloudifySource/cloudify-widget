@@ -53,6 +53,13 @@
         }
     </div>
 
+
+<div class="advanced_section"  ng-class="{'hidden':!!showAdvanced() || !widgetStatus.instanceIsAvailable }">
+    <!-- temporary solution. we need to understand the best way to embed messages here -->
+    <div style="margin:10px auto 0 auto"><b>Username</b>: bluadmin<br><b>Password</b>: 0b9f757f32d98899</div>
+</div>
+
+</div>
 <div class="advanced_section" ng-class="{'collapsed':!!showAdvanced, 'hidden' : !isShowAdvanced() }">
     <div class="remember_creds">
         <div class="remember_me_title">Remember me?</div>
