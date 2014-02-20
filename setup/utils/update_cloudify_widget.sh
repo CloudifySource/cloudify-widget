@@ -40,6 +40,7 @@ if [ "$HAS_UPDATES" != "0" ]; then
 
     echo "deleting cloudify.widget artifacts from $PLAY_HOME/repository/cache/cloudify.widget/"
     rm -Rf $PLAY_HOME/repository/cache/cloudify.widget/
+    rm -Rf $PLAY_HOME/repository/cache/org.apache.jclouds.provider/
 else
     echo "modules - already-up-to-date"
 fi
