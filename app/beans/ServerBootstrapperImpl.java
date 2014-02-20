@@ -260,6 +260,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             cmdLine.addArgument( newCloudFolder.getName() );
 
             scriptExecutor.runBootstrapScript( cmdLine, serverNode, null, newCloudFolder, false );
+            return serverNode;
 //
         }catch(Exception e){
             logger.error("unable to bootstrap",e);
@@ -270,7 +271,6 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     		}
     		serverNode.setStopped(true);
     	}
-        return null;
     }
 
     @Override

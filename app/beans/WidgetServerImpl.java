@@ -212,10 +212,8 @@ public class WidgetServerImpl implements WidgetServer
 
         output.addAll(Utils.formatOutput(cachedOutput, server.getPrivateIP() + "]", filterOutputLines, filterOutputStrings));
 
-        if( logger.isDebugEnabled() ){
-        	logger.debug( ">> output=" + Arrays.toString( output.toArray( new String[ output.size() ] ) ) );
-        }
-        
+      	logger.debug( ">> output= [{}]" , Arrays.toString( output.toArray( new String[ output.size() ] ) ) );
+
         WidgetInstance widgetInstance = WidgetInstance.findByServerNode(server);
         if( logger.isDebugEnabled() ){
         	logger.debug("checking if installation finished for {} on the following output {}" , widgetInstance, output );
