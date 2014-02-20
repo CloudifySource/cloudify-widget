@@ -202,12 +202,15 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
     };
 
     var apiKey = $scope.params.apiKey;
-    var shareUrl= encodeURI("http://launch.cloudifysource.org/d");
+    var shareUrl= encodeURI("http://bluforcloud.com");
 
     var msg =  encodeURI("Launch on the cloud in a single click using the Cloudify widget");
     var twitterMsg = encodeURIComponent( $scope.params.title + " on any cloud with a single click with #cloudifysource");
 
-    $("#facebook_share_link").attr("href", "http://www.facebook.com/sharer/sharer.php?u=" + shareUrl);
+    $("#facebook_share_link").attr("href", "http://www.facebook.com/sharer/sharer.php?u=" + shareUrl).click(function(){
+        window.open('http://www.facebook.com/sharer/sharer.php?u=' + shareUrl, 'facebook_share', 'height=320, width=640, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, directories=no, status=no');
+        return false;
+    });
     $("#google_plus_share_link").attr("href", "https://plus.google.com/share?url=" + shareUrl);
     $("#twitter_share_link").attr("href", "https://twitter.com/share?url=" + encodeURIComponent($scope.params.origin_page_url) + "&text=" + twitterMsg);
 
