@@ -32,6 +32,12 @@ if [ "$HAS_UPDATES" != "0" ]; then
     perform_git_pull
     echo "building modules"
     mvn clean install
+
+    echo "updating custom softlayer jar"
+    cd bin
+    ./maven-install-custom.sh
+    cd ..
+
     echo "deleting cloudify.widget artifacts from $PLAY_HOME/repository/cache/cloudify.widget/"
     rm -Rf $PLAY_HOME/repository/cache/cloudify.widget/
 else
