@@ -202,17 +202,21 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
     };
 
     var apiKey = $scope.params.apiKey;
-    var shareUrl= encodeURI("http://bluforcloud.com");
+    var shareUrl= encodeURI("http://bluforcloud.com/plans/play");
 
     var msg =  encodeURI("Launch on the cloud in a single click using the Cloudify widget");
-    var twitterMsg = encodeURIComponent( $scope.params.title + " on any cloud with a single click with #cloudifysource");
+    var twitterMsg = encodeURIComponent( "I just installed #bluforcloud with a single click on http://bluforcloud.com/plans/play");
 
     $("#facebook_share_link").attr("href", "http://www.facebook.com/sharer/sharer.php?u=" + shareUrl).click(function(){
         window.open('http://www.facebook.com/sharer/sharer.php?u=' + shareUrl, 'facebook_share', 'height=320, width=640, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, directories=no, status=no');
         return false;
     });
-    $("#google_plus_share_link").attr("href", "https://plus.google.com/share?url=" + shareUrl);
-    $("#twitter_share_link").attr("href", "https://twitter.com/share?url=" + encodeURIComponent($scope.params.origin_page_url) + "&text=" + twitterMsg);
+    $("#google_plus_share_link").attr("href", "https://plus.google.com/share?url=" + shareUrl).click(function(){
+        window.open("https://plus.google.com/share?url=" + shareUrl, 'height=320, width=640, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, directories=no, status=no');
+    });
+    $("#twitter_share_link").attr("href", "https://twitter.com/share?url=" + encodeURIComponent($scope.params.origin_page_url) + "&text=" + twitterMsg).click(function(){
+        window.open("https://twitter.com/share?url=" + encodeURIComponent($scope.params.origin_page_url) + "&text=" + twitterMsg, 'height=320, width=640, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, directories=no, status=no');
+    });
 
 
 });
