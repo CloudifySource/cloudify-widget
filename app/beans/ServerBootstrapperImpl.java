@@ -178,7 +178,11 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                     bootstrapSuccess = true;
                 } else {
                     logger.info("machine [{}] did not bootstrap successfully [{}] retrying", serverNode, bootstrapValidationResult);
-                    cloudServerApi.rebuild( serverNode.getNodeId() );
+                    try{
+                        cloudServerApi.rebuild( serverNode.getNodeId() );
+                    }catch(Exception e){
+                        // exceptions may occur if cloud does not support this operation, so
+                    }
                 }
             } catch (RuntimeException e) {
                 lastBootstrapException = e;
@@ -203,7 +207,11 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             return;
         }
         logger.info("destroying server [{}]", serverNode);
-        deleteServer(serverNode.getNodeId());
+        try{
+            deleteServer(serverNode.getNodeId());
+        }catch(Exception e){
+            logger.info("unable to delete. perhaps this node will remain on the cloud. need to remove manually.");
+        }
         if ( serverNode.getId() != null ){
             logger.info("deleting serverNode");
             serverNode.refresh();
@@ -349,10 +357,15 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
     @Override
     public boolean reboot(ServerNode serverNode) {
-        logger.info("rebooting [{}]", serverNode);
-        cloudServerApi.rebuild(serverNode.getNodeId());
-        bootstrapMachine(serverNode);
-        return true;
+        try{
+            logger.info("rebooting [{}]", serverNode);
+            cloudServerApi.rebuild(serverNode.getNodeId());
+            bootstrapMachine(serverNode);
+            return true;
+        }catch(Exception e){
+            // exceptions can happen if cloud does not support this operation. so we regard exceptions as acceptable.
+            return false;
+        }
     }
 
     public void init(){

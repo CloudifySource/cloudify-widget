@@ -212,6 +212,8 @@ public class ServerPoolImpl implements ServerPool
 	{
         logger.info( "getting a server node" );
 
+        printStats();
+
         List<ServerNode> freeServers = ServerNode.findByCriteria(new ServerNode.QueryConf().setMaxRows(10).criteria().setBusy(false).setRemote(false).done());
         ServerNode selectedServer = null;
         if ( !CollectionUtils.isEmpty( freeServers )){
@@ -230,6 +232,23 @@ public class ServerPoolImpl implements ServerPool
 
 		return selectedServer;
 	}
+
+    public void printStats(){
+        new Thread( new PrintStats(this)).start();
+    }
+
+    public static class PrintStats implements Runnable{
+        ServerPoolImpl poolImpl;
+
+        public PrintStats(ServerPoolImpl poolImpl) {
+            this.poolImpl = poolImpl;
+        }
+
+        @Override
+        public void run() {
+            logger.info("pool stats [{}]",poolImpl.getStats());
+        }
+    }
 
     /**
      * <p>
@@ -259,21 +278,19 @@ public class ServerPoolImpl implements ServerPool
         return false;
     }
 
-    // this will destroy one machine and create another.
+
+    // this will destroy one machine and if necessary will create another.
     public void rebuild( final ServerNode serverNode ){
         logger.info("rebuilding machine [{}]", serverNode);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if ( !serverBootstrapper.reboot(serverNode) ){
-                    logger.info("could not rebuild machine [{}]. I will destroy it and create another one", serverNode );
-                    serverBootstrapper.destroyServer(serverNode);
-                }else{
-                    logger.info("machine [{}] rebuilt successfully", serverNode );
-                    serverBootstrapper.destroyServer(serverNode);
-                    serverBootstrapper.createServers( 1 );
+                logger.info("destroying machine [{}]", serverNode);
+                serverBootstrapper.destroyServer(serverNode);
+                if ( !isPoolSaturated() ){ // we have enough machines. just kill it
+                    logger.info("pool is not saturated. we will create another machine");
+                    serverBootstrapper.createServers(1);
                 }
-
             }
         }).start();
 
@@ -299,7 +316,7 @@ public class ServerPoolImpl implements ServerPool
     }
 
     private boolean isPoolSaturated(){
-        return ServerNode.count() >= conf.server.pool.maxNodes;
+        return getStats().nonBusyServers >= conf.server.pool.maxNodes;
     }
 
     @Override
