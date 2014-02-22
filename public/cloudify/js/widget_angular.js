@@ -309,7 +309,10 @@ widgetModule.service('widgetService', function( $http, mixpanelService, paramsSe
         });
     };
 
+
     this.play = function( apiKey, advancedData ){
+
+        mixpanelService.startWidget( !advancedData );
         $.postMessage( JSON.stringify({name:"play_widget"}), origin_page_url , parent );
         if ( !advancedData ){
             return $http.post( '/widget/start?apiKey=' + encodeURI(apiKey)).then(function(result){ return result.data; });
@@ -342,9 +345,35 @@ widgetModule.service('widgetService', function( $http, mixpanelService, paramsSe
 
 widgetModule.service('mixpanelService', function( paramsService){
     var params = paramsService.params;
+
+    if ( !window.mixpanel ){
+        window.mixpanel = { track : function(){ console.log(["mixpanel mock: tracking",arguments])} };
+    }
+
       this.stopWidget = function(){
             mixpanel.track("Stop Widget",{'page name' : params.title, 'url' : params.origin_page_url });
       };
+
+    this.startWidget = function( isAnonymous ){
+        mixpanel.track("Play Widget",{'page name' : params.title , 'url' : params.origin_page_url, "anonymous" : isAnonymous });
+    };
+
+    this.trackClick = function( linkTitle ){
+        mixpanel.track("Click", {'page name':params.title, 'url' : params.origin_page_url, 'link' : linkTitle  })
+    };
+
+});
+
+
+widgetModule.directive('track', function( mixpanelService ){
+    return {
+        restrict:'C',
+        link:function(scope,element){
+            element.click(function(){
+                mixpanelService.trackClick( element.text() );
+            })
+        }
+    }
 });
 
 

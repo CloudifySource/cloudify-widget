@@ -44,8 +44,8 @@
         <li class="important" ng-show="isCompleted()">Test drive successfully completed! <br/><a class='download_link successfully_completed_msg' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a></li>
     </ul>
     <ul id="links">
-      <li><span ng-show="!widgetStatus.cloudifyUiIsAvailable">Manage Your App</span><a href="http://{{widgetStatus.publicIp}}:8099" target="_blank" ng-show="!!widgetStatus.cloudifyUiIsAvailable">Manage Your App</a></li>
-      <li ng-show="!!widgetStatus.instanceIsAvailable"><a href="{{widgetStatus.consoleLink.url}}" target="_blank">{{widgetStatus.consoleLink.title}}</a></li>
+      <li><span ng-show="!widgetStatus.cloudifyUiIsAvailable">Manage Your App</span><a href="http://{{widgetStatus.publicIp}}:8099" target="_blank" ng-show="!!widgetStatus.cloudifyUiIsAvailable" class="track">Manage Your App</a></li>
+      <li ng-show="!!widgetStatus.instanceIsAvailable"><a href="{{widgetStatus.consoleLink.url}}" class="track" target="_blank">{{widgetStatus.consoleLink.title}}</a></li>
     </ul>
     <span id="time_left" ng-show="!!widgetStatus.timeleftMillis">Trial time left: <span id="time_left_counter">{{getTimeLeft()}}</span></span>
     <div id="video_container">
