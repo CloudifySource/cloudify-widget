@@ -322,6 +322,9 @@ public class ServerPoolImpl implements ServerPool
     @Override
     public void addNewServerToPool( final Runnable callback ) {
         logger.info("adding new server to the pool");
+        if ( isPoolSaturated() ){
+            logger.error("pool is saturated and someone asked for more machines", new RuntimeException());
+        }
         Akka.system().scheduler().scheduleOnce(Duration.Zero(),
                 new Runnable() {
                     public void run() {
@@ -331,8 +334,6 @@ public class ServerPoolImpl implements ServerPool
                                 for (ServerNode srv : servers) {
                                  srv.save();
                                 }
-                            }else{
-                                logger.info("pool is saturated and someone asked for a new machine", new RuntimeException());
                             }
                         } catch (Exception e) {
                             logger.error("ServerPool failed to create a new server node", e);
