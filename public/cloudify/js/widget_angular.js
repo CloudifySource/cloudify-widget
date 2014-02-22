@@ -146,6 +146,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
     };
 
     $scope.stop = function(){
+        mixpanelService.stopWidget();
         $scope.widgetStatus.state = stop;
         resetWidgetStatus();
     };
@@ -326,7 +327,7 @@ widgetModule.service('widgetService', function( $http, mixpanelService, paramsSe
         if (!confirm("Are you sure you want to stop the instance?")) {
             return;
         }
-        mixpanelService.stopWidget();
+
         $.postMessage( JSON.stringify({name:"stop_widget"}), origin_page_url , parent );
         widgetState.showPlayButton();
         if ( widgetState.instanceId()) {
