@@ -22,6 +22,7 @@ $(function () {
             console.log(["parent got the message", e]);
             try {
                 var msg = JSON.parse(e.data);
+                console.log(msg.name);
                 if ( typeof(callbacks[msg.name]) == "function" ){
                     callbacks[msg.name](e);
                 }

@@ -17,7 +17,7 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
         $scope.completedWT = false;
         var completedOverlayShown = false;
         $.receiveMessage(function (e) {
-                console.log(["demo got the message", e]);
+//                console.log(["demo got the message", e]);
 
                 var data = JSON.parse(e.data);
                 console.dir(data);

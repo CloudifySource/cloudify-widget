@@ -195,7 +195,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
 
 
     $scope.isShowAdvanced = function () {
-        console.log(["showadvanced param is ", $scope.params.showAdvanced, $scope.params.showAdvanced == "true"]);
+//        console.log(["showadvanced param is ", $scope.params.showAdvanced, $scope.params.showAdvanced == "true"]);
         try {
             return $scope.params.showAdvanced == "true";
         } catch (e) {
