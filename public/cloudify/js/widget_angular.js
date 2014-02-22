@@ -366,11 +366,13 @@ widgetModule.service('mixpanelService', function( paramsService){
 });
 
 
-widgetModule.directive('track', function( mixpanelService ){
+widgetModule.directive('track', function( mixpanelService, paramsService ){
+    var params = paramsService.params;
     return {
         restrict:'C',
         link:function(scope,element){
             element.click(function(){
+                $.postMessage( JSON.stringify({name:"widget_link_click", data:{"linkTitle" : element.text()}}), params.origin_page_url , parent );
                 mixpanelService.trackClick( element.text() );
             })
         }
