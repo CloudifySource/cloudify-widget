@@ -45,7 +45,7 @@
     </ul>
     <ul id="links">
       <li ng-show="!!widgetStatus.instanceIsAvailable"><a href="{{widgetStatus.consoleLink.url}}" class="track" target="_blank">{{widgetStatus.consoleLink.title}}</a></li>
-      <li><span ng-show="!widgetStatus.cloudifyUiIsAvailable">Cloudify</span><a href="http://{{widgetStatus.publicIp}}:8099" target="_blank" ng-show="!!widgetStatus.cloudifyUiIsAvailable" class="track">Manage Your App</a></li>
+      <li><span ng-show="!widgetStatus.cloudifyUiIsAvailable">Cloudify</span><a href="http://{{widgetStatus.publicIp}}:8099" target="_blank" ng-show="!!widgetStatus.cloudifyUiIsAvailable" class="track">Cloudify</a></li>
     </ul>
     <span id="time_left" ng-show="!!widgetStatus.timeleftMillis">Trial time left: <span id="time_left_counter">{{getTimeLeft()}}</span></span>
     <div id="video_container">
