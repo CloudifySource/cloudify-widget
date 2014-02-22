@@ -326,9 +326,13 @@ public class ServerPoolImpl implements ServerPool
                 new Runnable() {
                     public void run() {
                         try {
-                            List<ServerNode> servers = serverBootstrapper.createServers(1);
-                            for (ServerNode srv : servers) {
-                                srv.save();
+                            if ( !isPoolSaturated() ){
+                                List<ServerNode> servers = serverBootstrapper.createServers(1);
+                                for (ServerNode srv : servers) {
+                                 srv.save();
+                                }
+                            }else{
+                                logger.info("pool is saturated and someone asked for a new machine", new RuntimeException());
                             }
                         } catch (Exception e) {
                             logger.error("ServerPool failed to create a new server node", e);
