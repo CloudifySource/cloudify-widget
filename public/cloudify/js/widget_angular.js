@@ -147,7 +147,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
 
     $scope.stop = function(){
         mixpanelService.stopWidget();
-        $.postMessage( JSON.stringify({name:"stop_widget"}), $scope.params.origin_page_url , parent );
+        $.postMessage( JSON.stringify({name:"widget_stop"}), $scope.params.origin_page_url , parent );
         $scope.widgetStatus.state = stop;
         resetWidgetStatus();
     };
@@ -315,7 +315,7 @@ widgetModule.service('widgetService', function( $http, mixpanelService, paramsSe
     this.play = function( apiKey, advancedData ){
 
         mixpanelService.startWidget( !advancedData );
-        $.postMessage( JSON.stringify({name:"play_widget"}), origin_page_url , parent );
+        $.postMessage( JSON.stringify({name:"widget_play"}), origin_page_url , parent );
         if ( !advancedData ){
             return $http.post( '/widget/start?apiKey=' + encodeURI(apiKey)).then(function(result){ return result.data; });
         }else{
