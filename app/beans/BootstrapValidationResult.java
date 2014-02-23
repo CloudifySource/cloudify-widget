@@ -33,7 +33,7 @@ public class BootstrapValidationResult {
     private boolean getResult( String expectedVersion )
     {
         lastComparedVersion = expectedVersion;
-        return checkTrue( machineReachable, managementAvailable, expectedVersion == null || expectedVersion.equals( managementVersion ) );
+        return checkTrue( machineReachable, applicationAvailable, managementAvailable, expectedVersion == null || expectedVersion.equals( managementVersion ) );
     }
 
     private String getDefaultCompareVersion (){

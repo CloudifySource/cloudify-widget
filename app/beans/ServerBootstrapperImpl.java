@@ -244,6 +244,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                     }
                 }catch(Exception e){
                     logger.error("unable to determine if application is available or not",e);
+                    result.applicationAvailable = false;
                 }
                 result.managementAvailable = true;
             }catch( Exception e ){
