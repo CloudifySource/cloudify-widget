@@ -209,13 +209,14 @@ public class WidgetAdmin extends Controller
         return ok( widgets.render() );
     }
     public static Result getSigninPage( String message ){
-        if ( !ApplicationContext.get().conf().features.signup.on ){
-            return internalServerError("Instance does not support feature");
-        }
+
         return ok( signin.render( message ));
     }
 
     public static Result getSignupPage(){
+        if ( !ApplicationContext.get().conf().features.signup.on ){
+            return internalServerError("Instance does not support feature");
+        }
         return ok( signup.render() );
     }
     public static Result getResetPasswordPage(){
