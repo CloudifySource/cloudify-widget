@@ -35,10 +35,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import play.libs.Json;
+import play.libs.WS;
 import server.ApplicationContext;
 import server.ServerBootstrapper;
 import server.exceptions.ServerException;
 import utils.CollectionUtils;
+import utils.StringUtils;
 import utils.Utils;
 
 import javax.inject.Inject;
@@ -234,6 +236,15 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         if ( result.machineReachable == Boolean.TRUE ){
             try{
                 result.managementVersion = cloudifyRestClient.getVersion( serverNode.getPublicIP() ).getVersion();
+                try{
+                    if ( !StringUtils.isEmpty(bootstrapConf.bootstrapApplicationUrl) ){
+                        WS.Response response = WS.url( String.format(bootstrapConf.bootstrapApplicationUrl, serverNode.getPublicIP() )).get().get();
+                        result.applicationAvailable = response.getStatus() == 200;
+                        logger.info("decided application is not available at : " +  serverNode.getPublicIP() );
+                    }
+                }catch(Exception e){
+                    logger.error("unable to determine if application is available or not");
+                }
                 result.managementAvailable = true;
             }catch( Exception e ){
                 logger.debug( "got exception while checking management version",e );

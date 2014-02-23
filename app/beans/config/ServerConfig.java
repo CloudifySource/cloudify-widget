@@ -168,6 +168,7 @@ public class ServerConfig {
         public int createServerRetries = 3; // retries to create server
         @Config(ignoreNullValues = true)
         public int bootstrapRetries = 3; // retries to bootstrap
+        public String bootstrapApplicationUrl = null;
 
 
         public SoftlayerBootstrapConfiguration getSoftlayer(){

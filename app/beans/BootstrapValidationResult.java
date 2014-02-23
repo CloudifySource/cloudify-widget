@@ -28,6 +28,7 @@ public class BootstrapValidationResult {
     public Boolean managementAvailable = null;
     public String lastComparedVersion = null;
     public Exception machineReachableException = null;
+    public boolean applicationAvailable = true;
 
     private boolean getResult( String expectedVersion )
     {
@@ -85,6 +86,7 @@ public class BootstrapValidationResult {
                 "machineReachable=" + machineReachable +
                 ", managementAvailable=" + managementAvailable +
                 ", managementVersion=" + managementVersion +
+                ", applicationAvailable=" + applicationAvailable +
                 ", conf version=" + getDefaultCompareVersion() +
                 ", last compared version = " + lastComparedVersion +
                 ", machineReachableException=" + excString( machineReachableException ) +
