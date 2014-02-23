@@ -243,7 +243,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                         logger.info("decided application is  available [{}] while responseStatus was [{}]", result.applicationAvailable,  serverNode.getPublicIP() );
                     }
                 }catch(Exception e){
-                    logger.error("unable to determine if application is available or not");
+                    logger.error("unable to determine if application is available or not",e);
                 }
                 result.managementAvailable = true;
             }catch( Exception e ){
