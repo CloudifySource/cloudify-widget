@@ -216,8 +216,12 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         }
         if ( serverNode.getId() != null ){
             logger.info("deleting serverNode");
-            serverNode.refresh();
-            serverNode.delete();
+            try{
+                serverNode.refresh();
+                serverNode.delete();
+            }catch(Exception e){
+                logger.warn("unable to delete node [{}]", e.getMessage());
+            }
         }
     }
 
