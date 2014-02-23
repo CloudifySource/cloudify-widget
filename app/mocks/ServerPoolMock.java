@@ -65,4 +65,9 @@ public class ServerPoolMock implements ServerPool
         callback.run();
 
     }
+
+    @Override
+    public void runHealthCheck() {
+        logger.info("running health check. mock is always healthy");
+    }
 }

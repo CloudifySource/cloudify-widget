@@ -3,12 +3,13 @@
 recipe.not.valid.1=The recipe archive is not valid. Failed to find: {0} or {1}
 recipe.not.valid.2=The recipe archive is not valid. Found 2 files with {0} and {1}
 server.was.terminated=The server was terminated.
-no.available.servers=No servers are available to process your request, please retry later.
+no.available.servers=we are so freaking hot that we ran out of instances
 widget.disabled.by.administrator=This widget has been disabled and cannot be used to launch recipes.
 please.wait.x.sec=Please wait for {0} seconds...
 invalid.hpcs.credentials=Invalid credentials
 cloudify.already.exists=Cloudify already exists on your cloud
-test.drive.successfully.complete=Test drive successfully completed! <br/><a class='download_link successfully_completed_msg' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.
+test.drive.successfully.complete=<p>Now that your trial is over, check out the <a href='http://bluforcloud.com/plans/solo/' class='download_link successfully_completed_msg track' target='_blank'>Solo plan</a> to run BLU Acceleration on your own Softlayer or AWS Cloud.</p>
+#test.drive.successfully.complete=Test drive successfully completed! <br/><a class='download_link successfully_completed_msg' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a>.
 
 info.password.policy=Minimum of 8 characters. \n At least 1 upper-case, \n 1 lower-case \n and 1 digit.
 

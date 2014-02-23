@@ -27,6 +27,7 @@ public class ServerNodesPoolStats {
     public int nonBusyServers = -1;
     public int minLimit = -1;
     public int maxLimit = -1;
+    public int undergoingBootstrap = -1;
 
 
     public boolean isBelowLimit(){
@@ -42,6 +43,7 @@ public class ServerNodesPoolStats {
                 ", busyServers=" + busyServers +
                 ", nonBusyServers=" + nonBusyServers +
                 ", minLimit=" + minLimit +
+                ", undergoing bootstrap=" + undergoingBootstrap +
                 ", maxLimit=" + maxLimit +
                 '}';
     }

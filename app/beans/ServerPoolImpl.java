@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import akka.util.Duration;
 import beans.config.Conf;
@@ -53,6 +54,10 @@ public class ServerPoolImpl implements ServerPool
     private static Logger logger = LoggerFactory.getLogger( ServerPoolImpl.class );
     @Inject
     private ServerBootstrapper serverBootstrapper;
+
+    // counts the machines that are undergoing "create" process.
+    // we need to count them as well when we want to know if pool is missing resources or not.
+    private AtomicInteger undergoingBootstrapCount = new AtomicInteger(0);
 
 
     @Inject
@@ -112,7 +117,17 @@ public class ServerPoolImpl implements ServerPool
         return cleanPool;
     }
 
-	@Override
+    @Override
+    public void runHealthCheck() {
+        if ( !isPoolWillBeSaturated() ){
+            logger.info("healthcheck :: creating more instance [{}]", getStats() );
+            addNewServerToPool(1); // lets create just one.
+        } else {
+            logger.info("healthcheck :: not creating more instances [{}]", getStats() );
+        }
+    }
+
+    @Override
     public void init()
 	{
 
@@ -203,6 +218,7 @@ public class ServerPoolImpl implements ServerPool
         stats.nonBusyServers = CollectionUtils.size( CollectionUtils.select( all, nonBusyServerPredicate ) );
         stats.minLimit = conf.server.pool.minNode;
         stats.maxLimit = conf.server.pool.maxNodes;
+        stats.undergoingBootstrap = undergoingBootstrapCount.get();
         return stats;
     }
 	
@@ -287,14 +303,23 @@ public class ServerPoolImpl implements ServerPool
             public void run() {
                 logger.info("destroying machine [{}]", serverNode);
                 serverBootstrapper.destroyServer(serverNode);
-                if ( !isPoolSaturated() ){ // we have enough machines. just kill it
-                    logger.info("pool is not saturated. we will create another machine");
-                    serverBootstrapper.createServers(1);
-                }
+                addNewServerToPool(1);
+//                if ( !isPoolWillBeSaturated() ){ // we have enough machines. just kill it
+//                    logger.info("pool is not saturated. we will create another machine");
+//                    serverBootstrapper.createServers(1);
+//                }
             }
         }).start();
 
     }
+
+    // this function also counts the machine undergoing creation.
+    // it tells if after those machines' bootstrap the pool will be saturated.
+    public boolean isPoolWillBeSaturated(){
+        return getStats().nonBusyServers + undergoingBootstrapCount.get() >= conf.server.pool.maxNodes;
+    }
+
+
 
     public void destroy( ServerNode serverNode )
 	{
@@ -322,18 +347,28 @@ public class ServerPoolImpl implements ServerPool
     @Override
     public void addNewServerToPool( final Runnable callback ) {
         logger.info("adding new server to the pool");
-        if ( isPoolSaturated() ){
-            logger.error("pool is saturated and someone asked for more machines", new RuntimeException());
-        }
+//        if ( isPoolSaturated() ){
+//            logger.error("pool is saturated and someone asked for more machines", new RuntimeException());
+//        }
         Akka.system().scheduler().scheduleOnce(Duration.Zero(),
                 new Runnable() {
                     public void run() {
                         try {
-                            if ( !isPoolSaturated() ){
-                                List<ServerNode> servers = serverBootstrapper.createServers(1);
+                            if ( !isPoolWillBeSaturated() ){
+                                int createNewServerCount = 1;
+
+                                undergoingBootstrapCount.addAndGet(createNewServerCount);
+                                logger.info("creating new :: undergoing bootstrap count [{}]", getStats() );
+
+                                List<ServerNode> servers = serverBootstrapper.createServers(createNewServerCount);
                                 for (ServerNode srv : servers) {
-                                 srv.save();
+                                    srv.save();
+                                    undergoingBootstrapCount.decrementAndGet();
+                                    logger.info("after create :: undergoing bootstrap count [{}]", getStats());
                                 }
+                            }
+                            else {
+                                logger.info("not creating :: non busy [{}] ; .", getStats().nonBusyServers, undergoingBootstrapCount.get() ,conf.server.pool.maxNodes);
                             }
                         } catch (Exception e) {
                             logger.error("ServerPool failed to create a new server node", e);

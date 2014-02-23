@@ -7,11 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import play.libs.Akka;
 import server.ServerPool;
-import utils.CollectionUtils;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created with IntelliJ IDEA.
@@ -35,54 +33,23 @@ public class DestroyServersTaskImpl implements DestroyServersTask {
     public void run() {
         logger.debug("running DestroyServersTaskImpl");
         List<ServerNode> all = ServerNode.findByCriteria( new ServerNode.QueryConf().criteria().setRemote(false).done() );
-        CheckPoolStatusCallback checkPoolStatusCallback = new CheckPoolStatusCallback(serverPool);
-        if (CollectionUtils.isEmpty( all )){ // in case there are no servers in the pool, lets activate the "pool health" algorithm
-           checkPoolStatusCallback.run();
-        } else {
-            for (ServerNode serverNode : all) {
-                logger.debug("checking to see if server [{}] expired", serverNode.toDebugString());
-                if (serverNode.isExpired()) {
-                    DestroySingleServerTask task = new DestroySingleServerTask().setServerNode(serverNode).setServerPool(serverPool);
-                    Akka.system().scheduler().scheduleOnce(Duration.create(0, TimeUnit.MILLISECONDS), task);
-                    checkPoolStatusCallback.serversExpected ++;
-                } else {
-                    logger.debug("not expired, timeleft is : " + serverNode.getTimeLeft());
-                }
-            }
-            for ( int i =0 ; i < checkPoolStatusCallback.serversExpected; i ++){
-                serverPool.addNewServerToPool( checkPoolStatusCallback );
+        for (ServerNode serverNode : all) {
+            logger.debug("checking to see if server [{}] expired", serverNode.toDebugString());
+            if (serverNode.isExpired()) {
+                DestroySingleServerTask task = new DestroySingleServerTask().setServerNode(serverNode).setServerPool(serverPool);
+                Akka.system().scheduler().scheduleOnce(Duration.create(0, TimeUnit.MILLISECONDS), task);
+            } else {
+                logger.debug("not expired, timeleft is : " + serverNode.getTimeLeft());
             }
         }
+
+        serverPool.runHealthCheck();
     }
 
     public void setServerPool(ServerPool serverPool) {
         this.serverPool = serverPool;
     }
 
-
-    public static class CheckPoolStatusCallback implements Runnable{
-        private ServerPool serverPool;
-
-        public int serversExpected = 0;
-        public AtomicInteger serversFinished = new AtomicInteger();
-
-        public CheckPoolStatusCallback(ServerPool serverPool) {
-            this.serverPool = serverPool;
-        }
-
-        @Override
-        public void run() {
-            if ( serversExpected != serversFinished.incrementAndGet() ){
-                return;
-            }
-            if ( serverPool.getStats().isBelowLimit() ){
-                logger.info("after destroying a server node, I told the pool to add another. " +
-                        "When it finished, it called me. " +
-                        "I checked and the pool is below limit. " +
-                        "I am reinitializing it");
-            }
-        }
-    }
 
     public static class DestroySingleServerTask implements Runnable{
         private ServerNode serverNode;

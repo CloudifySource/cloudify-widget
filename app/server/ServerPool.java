@@ -38,4 +38,8 @@ public interface ServerPool
     public Collection<ServerNode> getPool();
 
     void addNewServerToPool( Runnable callback );
+
+    // pool should check if it is full or not and act appropriately.
+
+    public void runHealthCheck();
 }
