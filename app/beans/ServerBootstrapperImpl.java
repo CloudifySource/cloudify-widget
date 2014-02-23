@@ -240,7 +240,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                     if ( !StringUtils.isEmpty(bootstrapConf.bootstrapApplicationUrl) ){
                         WS.Response response = WS.url( String.format(bootstrapConf.bootstrapApplicationUrl, serverNode.getPublicIP() )).get().get();
                         result.applicationAvailable = response.getStatus() == 200;
-                        logger.info("decided application is  available [{}] while responseStatus was [{}]", result.applicationAvailable,  serverNode.getPublicIP() );
+                        logger.info("decided application is  available [{}] while responseStatus was [{}] on ip [{}]", result.applicationAvailable,  response.getStatus(), serverNode.getPublicIP() );
                     }
                 }catch(Exception e){
                     logger.error("unable to determine if application is available or not",e);
