@@ -116,6 +116,11 @@ public class WidgetAdmin extends Controller
 	 */
 	public static Result signUp( String email, String passwordConfirmation, String password, String firstname, String lastname )
 	{
+
+        if ( !ApplicationContext.get().conf().features.signup.on ){
+            return internalServerError("Instance does not support signup");
+        }
+
         try {
             Constraints.EmailValidator ev =  new Constraints.EmailValidator();
             if ( StringUtils.isEmpty( email ) || !ev.isValid( email ) ){
