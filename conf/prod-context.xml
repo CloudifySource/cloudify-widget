@@ -66,11 +66,11 @@
 
 
         <bean id="machineOptions" class="cloudify.widget.softlayer.SoftlayerMachineOptions">
-                <property name="tag" value="#{conf.server.bootstrap.softlayer.machineOptions.tag}"/>
-                <property name="hardwareId" value="#{conf.server.bootstrap.softlayer.machineOptions.hardwareId}"/>
-                <property name="locationId" value="#{conf.server.bootstrap.softlayer.machineOptions.locationId}"/>
-                <property name="machinesCount" value="#{conf.server.bootstrap.softlayer.machineOptions.machinesCount}"/>
-                <property name="osFamily" value="#{conf.server.bootstrap.softlayer.machineOptions.osFamily}"/>
+                <property name="tag" value="#{conf.server.bootstrap.softlayer.machineOptions.getTag()}"/>
+                <property name="hardwareId" value="#{conf.server.bootstrap.softlayer.machineOptions.getHardwareId()}"/>
+                <property name="locationId" value="#{conf.server.bootstrap.softlayer.machineOptions.getLocationId()}"/>
+                <property name="machinesCount" value="#{conf.server.bootstrap.softlayer.machineOptions.getMachinesCount()}"/>
+                <property name="osFamily" value="#{conf.server.bootstrap.softlayer.machineOptions.getOsFamily()}"/>
         </bean>
 
         <bean id="bootstrapDetails" class="cloudify.widget.cli.softlayer.SoftlayerCloudBootstrapDetails"/>
