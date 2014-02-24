@@ -3,8 +3,8 @@
 recipe.not.valid.1=The recipe archive is not valid. Failed to find: {0} or {1}
 recipe.not.valid.2=The recipe archive is not valid. Found 2 files with {0} and {1}
 server.was.terminated=The server was terminated.
-no.available.servers=we are so freaking hot that we ran out of instances
-widget.disabled.by.administrator=This widget has been disabled and cannot be used to launch recipes.
+no.available.servers=We are so hot that we ran out of instances. Please try again later.
+widget.disabled.by.administrator=We are so hot that we ran out of instances. Please try again later.
 please.wait.x.sec=Please wait for {0} seconds...
 invalid.hpcs.credentials=Invalid credentials
 cloudify.already.exists=Cloudify already exists on your cloud

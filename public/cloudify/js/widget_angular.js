@@ -109,7 +109,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
                 pollStatus(1);
         }, function( result ){
                 console.log(['play error', result]);
-                resetWidgetStatus("unknown error");
+                resetWidgetStatus("We are so hot that we ran out of instances. Please try again later.");
             });
 //        success: function (data, textStatus, jqXHR) {
 //            var state = data.status.state.toLowerCase();

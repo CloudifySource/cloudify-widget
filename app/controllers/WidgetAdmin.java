@@ -74,7 +74,7 @@ public class WidgetAdmin extends Controller
             return badRequest("apiKey required");
         }
         Widget widgetItem = Widget.getWidget(apiKey);
-        if ( widgetItem == null || !widgetItem.isEnabled()){
+        if ( widgetItem == null ){//|| !widgetItem.isEnabled()){
             return ok();
         }
         return ok(widget.render(ApplicationContext.get().conf().mixpanelApiKey, widgetItem));
