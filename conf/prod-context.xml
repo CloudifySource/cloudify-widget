@@ -65,12 +65,20 @@
 
 
 
+        <!--<bean id="machineOptions" class="cloudify.widget.softlayer.SoftlayerMachineOptions">-->
+                <!--<property name="tag" value="#{conf.server.bootstrap.softlayer.machineOptions.getTag()}"/>-->
+                <!--<property name="hardwareId" value="#{conf.server.bootstrap.softlayer.machineOptions.getHardwareId()}"/>-->
+                <!--<property name="locationId" value="#{conf.server.bootstrap.softlayer.machineOptions.getLocationId()}"/>-->
+                <!--<property name="machinesCount" value="#{conf.server.bootstrap.softlayer.machineOptions.getMachinesCount()}"/>-->
+                <!--<property name="osFamily" value="#{conf.server.bootstrap.softlayer.machineOptions.getOsFamily()}"/>-->
+        <!--</bean>-->
+
         <bean id="machineOptions" class="cloudify.widget.softlayer.SoftlayerMachineOptions">
-                <property name="tag" value="#{conf.server.bootstrap.softlayer.machineOptions.getTag()}"/>
-                <property name="hardwareId" value="#{conf.server.bootstrap.softlayer.machineOptions.getHardwareId()}"/>
-                <property name="locationId" value="#{conf.server.bootstrap.softlayer.machineOptions.getLocationId()}"/>
-                <property name="machinesCount" value="#{conf.server.bootstrap.softlayer.machineOptions.getMachinesCount()}"/>
-                <property name="osFamily" value="#{conf.server.bootstrap.softlayer.machineOptions.getOsFamily()}"/>
+            <property name="machinesCount"  value="1"/>
+            <property name="hardwareId" value="1643,21275,13887"/><!-- 16 x 2.0 GHz Cores, 32 GB RAM, 100 GB Hard Disk SAN -->
+            <property name="locationId" value="37473"/>
+            <property name="osFamily" value="CENTOS"/>
+            <property name="tag" value="#{conf.server.bootstrap.tag}"/>
         </bean>
 
         <bean id="bootstrapDetails" class="cloudify.widget.cli.softlayer.SoftlayerCloudBootstrapDetails"/>
