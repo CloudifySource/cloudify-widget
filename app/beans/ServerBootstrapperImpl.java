@@ -301,7 +301,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     public List<ServerNode> recoverUnmonitoredMachines() {
         logger.info("recovering lost machines");
                 List<ServerNode> result = new ArrayList<ServerNode>(  );
-        Collection<CloudServer> allMachinesWithTag = cloudServerApi.getAllMachinesWithTag( bootstrapConf.tag );
+        Collection<CloudServer> allMachinesWithTag = cloudServerApi.getAllMachinesWithTag( this.bootstrapMachineOptions.getMask() );
         logger.info( "found [{}] total machines with matching tags. filtering lost", CollectionUtils.size(allMachinesWithTag)  );
         if ( !CollectionUtils.isEmpty( allMachinesWithTag )){
             for ( CloudServer server : allMachinesWithTag ) {

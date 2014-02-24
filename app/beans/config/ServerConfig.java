@@ -178,11 +178,14 @@ public class ServerConfig {
 
     public static class SoftlayerBootstrapConfiguration{
        public SoftlayerConnectDetails connectDetails = new SoftlayerConnectDetails();
-        public MachineOptions machineOptions = new SoftlayerMachineOptions();
+        public SoftlayerMachineOptions machineOptions = new SoftlayerMachineOptions();
 
         public SoftlayerConnectDetails getConnectDetails() {
             return connectDetails;
         }
+        public SoftlayerMachineOptions getMachineOptions() { return machineOptions; }
+
+
     }
 
     public static class ApiCredentials{

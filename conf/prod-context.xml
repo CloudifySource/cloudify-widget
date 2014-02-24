@@ -62,12 +62,15 @@
         <bean id="serverApi" class="cloudify.widget.softlayer.SoftlayerCloudServerApi" init-method="connect">
             <property name="connectDetails" value="#{conf.server.bootstrap.softlayer.connectDetails}"/>
         </bean>
+
+
+
         <bean id="machineOptions" class="cloudify.widget.softlayer.SoftlayerMachineOptions">
-            <property name="machinesCount"  value="1"/>
-            <property name="hardwareId" value="1643,21275,13887"/><!-- 16 x 2.0 GHz Cores, 32 GB RAM, 100 GB Hard Disk SAN -->
-            <property name="locationId" value="37473"/>
-            <property name="osFamily" value="CENTOS"/>
-            <property name="tag" value="#{conf.server.bootstrap.tag}"/>
+                <property name="tag" value="#{conf.server.bootstrap.softlayer.machineOptions.tag}"/>
+                <property name="hardwareId" value="#{conf.server.bootstrap.softlayer.machineOptions.hardwareId}"/>
+                <property name="locationId" value="#{conf.server.bootstrap.softlayer.machineOptions.locationId}"/>
+                <property name="machinesCount" value="#{conf.server.bootstrap.softlayer.machineOptions.machinesCount}"/>
+                <property name="osFamily" value="#{conf.server.bootstrap.softlayer.machineOptions.osFamily}"/>
         </bean>
 
         <bean id="bootstrapDetails" class="cloudify.widget.cli.softlayer.SoftlayerCloudBootstrapDetails"/>
