@@ -79,7 +79,7 @@ else
     echo "run prebootstrap script"
     ##prebootstrapScript##
 
-    wget "https://raw.github.com/CloudifySource/cloudify-widget/master/conf/cloudify/webui-context.xml"   -O ${CLOUDIFY_FOLDER}/config/cloudify-webui-context-override.xml
+    wget --no-check-certificate "https://raw.github.com/CloudifySource/cloudify-widget/master/conf/cloudify/webui-context.xml"   -O ${CLOUDIFY_FOLDER}/config/cloudify-webui-context-override.xml
     echo Starting Cloudify bootstrap-localcloud `hostname -I`
 
     # -nic-address `hostname -I`"
