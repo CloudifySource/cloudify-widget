@@ -29,14 +29,19 @@ git remote update;
 HAS_UPDATES=`git pull --dry-run | grep 'Already up-to-date.' | wc -l`
 echo "has updates is $HAS_UPDATES"
 if [ "$HAS_UPDATES" != "0" ]; then
+
     perform_git_pull
-    echo "building modules"
-    mvn clean install
 
     echo "updating custom softlayer jar"
     cd bin
     ./maven-install-custom.sh
     cd ..
+
+
+    echo "building modules"
+    mvn clean install
+
+
 
     echo "deleting cloudify.widget artifacts from $PLAY_HOME/repository/cache/cloudify.widget/"
     rm -Rf $PLAY_HOME/repository/cache/cloudify.widget/
