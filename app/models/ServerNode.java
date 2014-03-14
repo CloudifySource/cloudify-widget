@@ -377,7 +377,13 @@ extends Model
 		return remote;
 	}
 
-	public void setRemote(boolean remote) {
+    @Override
+    public void delete() {
+        logger.error("deleting server node ", new RuntimeException());
+        super.delete();
+    }
+
+    public void setRemote(boolean remote) {
 		this.remote = remote;
 	}
 
@@ -416,7 +422,7 @@ extends Model
 
     // guy - todo - formalize this for reuse.
     public static class QueryConf {
-        public int maxRows;
+        public int maxRows = -1;
         public List<Criteria> criterias = new LinkedList<Criteria>();
 
         public QueryConf setMaxRows(int maxRows) {

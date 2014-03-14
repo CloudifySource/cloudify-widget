@@ -90,7 +90,7 @@ public class RestoreExecutionService implements ScriptExecutorsConstants {
     private static void restoreBootstrappingServerNodes() {
 
         List<ServerNode> serverNodesBootstrapping = ServerNode.findByCriteria(
-                new ServerNode.QueryConf().setMaxRows(-1).
+                new ServerNode.QueryConf().
                         criteria().
                         setRemote(true).
                         setWidgetIsNull(false).

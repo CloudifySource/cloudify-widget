@@ -156,7 +156,7 @@ public class Global extends GlobalSettings
             logger.error("unable to send changelog email",e);
         }
         
-        if( conf.settings.initialData.isRecoverExecutions ){
+        if( conf.settings.isRecoverExecutions ){
         	try{
         		restoreExecutions();
         	}

@@ -73,6 +73,8 @@ public class Conf {
 
         public InitialData initialData = new InitialData();
 
+        public boolean isRecoverExecutions = true;
+
         @Config(ignoreNullValues = true)
         public long stopTimeout = Utils.parseTimeToMillis( "30s" );
 
@@ -102,7 +104,7 @@ public class Conf {
         @Config( ignoreNullValues = true )
         public boolean override = false; // true iff we want to write over existing objects
         
-        public boolean isRecoverExecutions = true;
+
     }
 
     public static class FeaturesConfigItem {
