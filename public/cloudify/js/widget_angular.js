@@ -176,7 +176,13 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
 
         resetWidgetStatus();
         $scope.widgetStatus.state = play;
-        widgetService.play(  $scope.params.apiKey,  _hasAdvanced() ? _getAdvanced() : null )
+
+        var requestData = {};
+        if ( !!_hasAdvanced() ){
+            requestData["advancedData"] = _getAdvanced();
+        }
+
+        widgetService.play(  $scope.params.apiKey,  requestData )
             .then(function( result ){
                 console.log(['play result', result]);
                 $scope.widgetStatus = result.status;
