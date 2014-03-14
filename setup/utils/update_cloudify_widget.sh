@@ -26,9 +26,9 @@ mkdir -p /var/log/cloudifyWidget/cli
 echo "going to  [$MODULES_HOME] to perform git pull"
 cd ${MODULES_HOME}
 git remote update;
-HAS_UPDATES=`git  pull | grep -q -v 'Already up-to-date' | wc -l`
+HAS_UPDATES=`git  pull | grep 'Already up-to-date' | wc -l`
 echo "has updates is $HAS_UPDATES"
-if [ "$HAS_UPDATES" != "0" ]; then
+if [ "$HAS_UPDATES" != "1" ]; then
 
     echo "updating custom softlayer jar"
     cd bin
