@@ -17,6 +17,7 @@ package server;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import cloudify.widget.api.clouds.IWidgetLoginHandler;
 import cloudify.widget.cli.ICloudBootstrapDetails;
 import mocks.EventMonitorMock;
 
@@ -34,6 +35,9 @@ import beans.pool.PoolEventListener;
 import beans.pool.PoolEventManager;
 import beans.tasks.DestroyServersTask;
 import bootstrap.InitialData;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * A static class that helps to get an instance of different modules and keeps loose decoupling.
@@ -106,6 +110,10 @@ public class ApplicationContext
     @Deprecated // do not use - use "conf()" instead . do not deleted.
     public Conf getConf(){
         return conf();
+    }
+
+    public Collection<IWidgetLoginHandler> getLoginHandlers(){
+        return applicationContext.getBeansOfType( IWidgetLoginHandler.class ).values();
     }
 
     private  static <T> T getBean( String bean ){

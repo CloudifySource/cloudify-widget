@@ -22,6 +22,7 @@ import server.exceptions.ServerException;
 import utils.CollectionUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +35,7 @@ import java.util.List;
 public class Recipe {
 
     private File recipeRootDirectory;
+    private File recipeGroovyFile;
 
     public Recipe(File recipeFile) {
         this.recipeRootDirectory = recipeFile;
@@ -92,6 +94,21 @@ public class Recipe {
         }
 
         File filename = CollectionUtils.first(files);
+        recipeGroovyFile = filename;
         return filename == null ? null : Type.getRecipeTypeByFileName(filename.getName());
     }
+
+    public File getPropertiesFile(){
+        File propertiesFile = new File(recipeGroovyFile.getAbsolutePath().replace(".groovy", ".properties"));
+        if ( !propertiesFile.exists() ){
+            try {
+                propertiesFile.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException("unable to create properties file",e);
+            }
+        }
+        return propertiesFile;
+    }
+
+
 }

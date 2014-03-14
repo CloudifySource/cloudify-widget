@@ -101,6 +101,9 @@ extends Model
     @Lob
     public String advancedParams = null;
 
+    @Lob
+    public String recipeProperties = null;
+
     @JsonIgnore
     @OneToMany(mappedBy="serverNode", cascade = CascadeType.REMOVE)
     public List<ServerNodeEvent> events = new LinkedList<ServerNodeEvent>();
@@ -151,11 +154,17 @@ extends Model
     public String getAdvancedParams(){
     	return advancedParams;
     }
+
+    public String getRecipeProperties(){
+        return recipeProperties;
+    }
     
 	public void setAdvancedParams(String text) {
 		// TODO Auto-generated method stub
 		advancedParams = text;
 	}
+
+    public void setRecipeProperties( String text ){ recipeProperties = text; }
 	
 	public CloudProvider getCloudProvider(){
 		String typeStr = Json.parse( advancedParams ).get( "type" ).asText();

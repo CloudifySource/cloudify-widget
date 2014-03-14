@@ -3,7 +3,7 @@
 var widgetConfig = function($routeProvider){ $routeProvider.when( '/', { controller: 'DemoController', templateUrl: 'widgetTemplate' } ) };
 var WidgetApp = angular.module( 'DemoApp', ['ngCookies'] ).config( widgetConfig );
 
-WidgetApp.controller('DemoController', function($scope, $location, $routeParams, $http, $cookieStore, $timeout ){
+WidgetApp.controller('DemoController', function($scope, $location, $log, $routeParams, $http, $cookieStore, $timeout ){
     $scope["widgets"] = $http.get(jsRoutes.controllers.DemosController.listWidgetForDemoUser( $scope["userId"] ).url ).then(function(data){
         var searchWidgetId = $cookieStore.get("widgetId");
         var cachedWidget = $( data.data ).filter(function(index,value){ return value.id == searchWidgetId })[0];
@@ -72,6 +72,12 @@ WidgetApp.controller('DemoController', function($scope, $location, $routeParams,
         $cookieStore.put("dismissWT", true);
         $scope.$hideWT();
     };
+
+    $scope.isSelected = function(widget){
+        return $scope.selectedWidget.apiKey == widget.apiKey;
+    };
+
+    $scope.dismissWalkthrough();
 
     $scope.shouldShowWalkthrough = function(){
         var dismissWTCookieValue = $cookieStore.get("dismissWT");

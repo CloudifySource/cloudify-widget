@@ -25,7 +25,7 @@
 
     <script type="text/ng-template" id="widgetTemplate">
     <div class="nav-links btn-group-vertical" data-toggle="buttons-radio">
-        <div class="btn demo-link" ng-class="{'selected': selectedWidget.id == widget.id}" ng-click="menuClick(widget)" data-api-key="{{widget.apiKey}}" ng-repeat="widget in widgets | orderBy:demoSort">
+        <div class="btn demo-link" ng-class="{'selected': !!isSelected(widget)}" ng-click="menuClick(widget)" data-api-key="{{widget.apiKey}}" ng-repeat="widget in widgets | orderBy:demoSort">
             <div class="product-icon" style="background-image:url('/widget/icon?apiKey={{widget.apiKey}}')"> </div>
             <div class="product-name"> {{widget.productName}} </div>
         </div>

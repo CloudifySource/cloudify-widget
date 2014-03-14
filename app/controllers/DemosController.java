@@ -15,6 +15,7 @@
 
 package controllers;
 
+import models.PublicWidget;
 import models.User;
 
 import models.Widget;
@@ -24,6 +25,9 @@ import play.mvc.Result;
 import server.ApplicationContext;
 import views.html.widgets.demos.userDemoIndex;
 import views.html.widgets.demos.userDemoIndexEmbeddable;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * User: guym
@@ -48,7 +52,14 @@ public class DemosController extends Controller {
     }
 
     public static Result listWidgetForDemoUser( Long userId ){
-        return ok(Json.toJson(new Widget.WidgetQueryConfig().criteria().setEnabled(true).setUser(User.findById(userId)).done().find().findList()));
+        List<Widget> list = new Widget.WidgetQueryConfig().criteria().setEnabled(true).setUser(User.findById(userId)).done().find().findList();
+        List<PublicWidget> publicDetails = new LinkedList<PublicWidget>();
+
+        for (Widget widget : list) {
+            publicDetails.add(new PublicWidget(widget));
+        }
+
+        return ok(Json.toJson(publicDetails));
     }
 
     public static Result getDemoPageForWidget( Long userId, String apiKey ){

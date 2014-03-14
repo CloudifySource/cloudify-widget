@@ -1,19 +1,88 @@
 var widgetModule = angular.module('widget', ['ngCookies']);
 
+widgetModule.service('widgetReceiveMessageService', function( $log, paramsService ){
+
+    var handlers = {};
+
+    function addMessageHandler(  ){
+
+        var originPageUrl = paramsService.params.origin_page_url;
+        function receiveMessage(event)
+        {
+            if (event.origin !== originPageUrl ){
+                $log.info('got event with origin ' + event.origin + ' which does not match param ' + originPageUrl );
+                return;
+            }else{
+                try{
+                    var recievedObj = event.data;
+                    if ( recievedObj.hasOwnProperty('name')){
+                        var name = recievedObj.name;
+                        if ( handlers.hasOwnProperty( name )){
+                            handlers[name](recievedObj);
+                        }else{
+                            $log.error('got an event with unknown name. I do not have a handler ' + name);
+                        }
+                    }else{
+                        $log.error('received message without name ', event.data);
+                    }
+                }catch(e){
+                    $log.error(e);
+                }
+            }
+
+            // ...
+        }
+        window.addEventListener('message', receiveMessage, false);
 
 
 
+    }
 
-widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService, mixpanelService, paramsService, dbService) {
+    this.addHandler = function(type, fn ){
+        if ( handlers.hasOwnProperty(type)){
+            $log.error('to handlers for type ' + type + ' I will disregard the second one');
+        }
+        handlers[type] = fn;
+    }
 
+
+});
+
+
+
+widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window, widgetService, mixpanelService, paramsService, dbService) {
+
+    $window.$windowScope = $scope;
 
     var hpcloud = 'HP';
     var softlayer = 'SOFTLAYER';
     var play = 'RUNNING';
     var stop = 'STOPPED';
 
+    var popupWindow = null;
 
+    $scope.loginDone = function( loginDetails ){
+        if ( popupWindow !== null ){
+            popupWindow.close();
+        }
+
+        $scope.loginDetails = loginDetails;
+        $scope.play();
+    };
+
+    $scope.params = paramsService.params;
     $scope.widgetStatus = {};
+    var widgetApiKey = $scope.params.apiKey;
+    widgetService.getWidgetByApiKey(widgetApiKey).then(
+        function success( result ){
+            $log.info('widget with apiKey ' + widgetApiKey + ' loaded successfully');
+            $scope.widget = result.data;
+            $log.info($scope.widget);
+        },
+        function error( result ){
+            $log.error('unable to load widget ' + widgetApiKey );
+        }
+    );
 
     function _getAdvanced(){
         return $scope.advancedParams[$scope.cloudType];
@@ -99,6 +168,12 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
     };
 
     $scope.play = function(){
+
+        if ( !!$scope.widget.loginsString && !$scope.loginDetails ){
+            popupWindow = window.open("/widget/login/google","myWindow","width=400,height=500");    // Opens a new window
+            return;
+        }
+
         resetWidgetStatus();
         $scope.widgetStatus.state = play;
         widgetService.play(  $scope.params.apiKey,  _hasAdvanced() ? _getAdvanced() : null )
@@ -190,7 +265,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, widgetService,
 
     console.log(["saved status", savedStatus]);
     // place params on scope
-    $scope.params = paramsService.params;
+
     $scope.cloudType = myConf.cloudProvider;
 
 
@@ -322,6 +397,10 @@ widgetModule.service('widgetService', function( $http, mixpanelService, paramsSe
             return $http.post( '/widget/start?apiKey=' + encodeURI(apiKey),advancedData).then(function(result){ return result.data});
         }
 
+    };
+
+    this.getWidgetByApiKey = function(apiKey){
+        return $http.get('/widget/' + apiKey + '/public');
     };
 
     this.stop = function(){

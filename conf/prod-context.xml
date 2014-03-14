@@ -59,6 +59,11 @@
 
     <beans profile="softlayer">
 
+        <bean id="mailChimpLoginHandler" class="cloudify.widget.common.MailChimpWidgetLoginHandler">
+            <property name="apiKey" value="#{conf.mailChimpDetails.apiKey}"/>
+            <property name="listId" value="#{conf.mailChimpDetails.listId}"/>
+        </bean>
+        
         <bean id="serverApi" class="cloudify.widget.softlayer.SoftlayerCloudServerApi" init-method="connect">
             <property name="connectDetails" value="#{conf.server.bootstrap.softlayer.connectDetails}"/>
         </bean>
@@ -91,6 +96,8 @@
 
 
     </beans>
+    
+    
 
     <beans profile="stub">
         <bean id="cloudServerApi" class="mocks.cloud.CloudServerApiMock"/>

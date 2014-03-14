@@ -133,9 +133,26 @@ public class Application extends Controller
 
             // credentials validation is made when we attempt to create a PEM file. if credentials are wrong, it will fail.
             RequestBody requestBody = request().body();
+            JsonNode advancedData = null;
+            JsonNode recipeProperties = null;
+
             if ( requestBody != null && requestBody.asJson() != null && !StringUtils.isEmptyOrSpaces( requestBody.asJson().toString() ) ){
+                JsonNode jsonNode = requestBody.asJson();
+                String ADVANCED_DATA_JSON_KEY = "advancedData";
+                if ( jsonNode.has(ADVANCED_DATA_JSON_KEY) && !StringUtils.isEmptyOrSpaces( jsonNode.get(ADVANCED_DATA_JSON_KEY).toString())){
+                    advancedData = jsonNode.get(ADVANCED_DATA_JSON_KEY);
+                }
+
+                String RECIPE_PROPERTIES_JSON_KEY = "recipeProperties";
+                if ( jsonNode.has(RECIPE_PROPERTIES_JSON_KEY) && !StringUtils.isEmptyOrSpaces( jsonNode.get(RECIPE_PROPERTIES_JSON_KEY).toString())){
+
+                    recipeProperties = jsonNode.get(RECIPE_PROPERTIES_JSON_KEY);
+                }
+            }
+
+            if ( advancedData != null ){
                 serverNode = new ServerNode();
-                serverNode.setAdvancedParams( requestBody.asJson().toString() );
+                serverNode.setAdvancedParams( advancedData.toString() );
                 serverNode.setRemote(true);
                 serverNode.setWidget(widget);
                 serverNode.save();
@@ -155,8 +172,13 @@ public class Application extends Controller
                 logger.info("it seems server node is not null. deployment continues as planned");
             }
 
+            if ( recipeProperties != null ){
+                serverNode.setRecipeProperties( recipeProperties.toString() );
+                serverNode.save();
+            }
 
             // run the "bootstrap" and "deploy" in another thread.
+
             final ServerNode finalServerNode = serverNode;
             final Widget finalWidget = widget;
             final String remoteAddress = request().remoteAddress();

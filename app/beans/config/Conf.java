@@ -46,6 +46,10 @@ public class Conf {
 
     public FeaturesConfig features = new FeaturesConfig();
 
+    public MailChimpDetails mailChimpDetails = new MailChimpDetails();
+
+
+
     public SettingsConfig settings = new SettingsConfig();
 
     @Config(ignoreNullValues = true)
@@ -165,5 +169,30 @@ public class Conf {
 
     public ServerConfig getServer(){
         return server;
+    }
+
+    public MailChimpDetails getMailChimpDetails() {
+        return mailChimpDetails;
+    }
+
+    public static class MailChimpDetails{
+        public String apiKey = null;
+        public String listId = null;
+
+        public String getApiKey() {
+            return apiKey;
+        }
+
+        public void setApiKey(String apiKey) {
+            this.apiKey = apiKey;
+        }
+
+        public String getListId() {
+            return listId;
+        }
+
+        public void setListId(String listId) {
+            this.listId = listId;
+        }
     }
 }

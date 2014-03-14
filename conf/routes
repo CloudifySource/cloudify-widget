@@ -70,7 +70,11 @@ GET     /widget/previewWidget           controllers.WidgetAdmin.previewWidget( a
 GET     /widget/icon                    controllers.WidgetAdmin.icon( apiKey: String)
 GET     /server/headers               	controllers.WidgetAdmin.headers
 GET     /widget/widget                  controllers.WidgetAdmin.getWidget( apiKey:String )
+GET     /widget/:apiKey/public        controllers.WidgetAdmin.getPublicWidgetDetails( apiKey : String )
 GET     /widget/single/:apiKey          controllers.WidgetAdmin.getWidgetSinglePage( apiKey:String )
+GET     /widget/login/google/callback  controllers.WidgetGoogleLoginController.googleLoginCallback
+GET     /widget/login/google           controllers.WidgetGoogleLoginController.loginWithGoogle
+
 
 POST     /admin/pool/manage/add                          controllers.AdminPoolController.addNode( authToken:String )
 POST     /admin/pool/manage/:nodeId/remove               controllers.AdminPoolController.removeNode( authToken:String, nodeId:String )

@@ -15,6 +15,9 @@
 package beans;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 import javax.inject.Inject;
 
@@ -24,13 +27,16 @@ import models.Widget;
 import models.WidgetInstance;
 
 import org.apache.commons.exec.CommandLine;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import play.libs.Json;
 import server.DeployManager;
+import utils.StringUtils;
 import utils.Utils;
 import beans.api.ExecutorFactory;
 import beans.cloudify.CloudifyRestClient;
@@ -133,7 +139,7 @@ public class DeployManagerImpl implements DeployManager
             Recipe.Type recipeType = widgetInstance.getRecipeType();
             if ( recipeType == Recipe.Type.SERVICE ) {
                 return cloudifyRestClient.getPublicIp( server.getPublicIP(), "default", widget.toInstallName() ).cloudPublicIp;
-            } else if ( !StringUtils.isEmpty( widget.getConsoleUrlService() ) ) { // this is an application and we need to get ip for specific service
+            } else if ( !StringUtils.isEmptyOrSpaces(widget.getConsoleUrlService()) ) { // this is an application and we need to get ip for specific service
                 return cloudifyRestClient.getPublicIp( server.getPublicIP(), widget.toInstallName(), widget.getConsoleUrlService() ).cloudPublicIp;
             }
         } catch ( Exception e ) {
@@ -149,6 +155,7 @@ public class DeployManagerImpl implements DeployManager
 	{
         File unzippedDir = null;
         File recipeDir = null;
+        Recipe recipe = null;
         Recipe.Type recipeType = null;
 
         try {
@@ -167,7 +174,8 @@ public class DeployManagerImpl implements DeployManager
             }
             logger.info("Deploying an instance for recipe at : [{}] ", recipeDir);
 
-            recipeType = new Recipe(recipeDir).getRecipeType();
+            recipe = new Recipe(recipeDir);
+            recipeType = recipe.getRecipeType();
         } catch (RuntimeException e) {
             server.createEvent(e.getMessage(), ServerNodeEvent.Type.ERROR).save();
             throw e;
@@ -186,6 +194,23 @@ public class DeployManagerImpl implements DeployManager
 
             return widgetInstance;
         }else{
+            if ( !StringUtils.isEmptyOrSpaces(server.getRecipeProperties()) ){
+                logger.info("user passed properties for the recipe. writing them to a file");
+                File propertiesFile = recipe.getPropertiesFile();
+                Collection<String> newLines = new LinkedList<String>();
+                JsonNode recipePropertiesJson = Json.parse( server.getRecipeProperties() );
+                Iterator<String> fieldNames = recipePropertiesJson.getFieldNames();
+                while (fieldNames.hasNext()) {
+                    String fieldName = fieldNames.next();
+                    newLines.add( fieldName + "="+ StringUtils.wrapWithQuotes(recipePropertiesJson.get(fieldName).getTextValue()));
+                }
+                try{
+                    FileUtils.writeLines(propertiesFile, newLines, true);
+                }catch(Exception e){
+                    throw new RuntimeException("unable to write lines to properties file",e);
+                }
+
+            }
             logger.info( "Deploying: [ServerIP={}] [recipe={}] [type={}]", new Object[]{server.getPublicIP(), recipeDir, recipeType.name()} );
             String recipePath = FilenameUtils.separatorsToSystem( recipeDir.getPath() );
 

@@ -81,6 +81,8 @@ public class Widget
 	private Integer launches = 0;
 	private Boolean enabled;
 
+    public String loginsString;
+
 
     private Boolean showAdvanced;
 
@@ -807,5 +809,11 @@ public class Widget
         this.showAdvanced = showAdvanced;
     }
 
+    public String getLoginsString() {
+        return loginsString;
+    }
 
+    public void setLoginsString( String logins ){
+        loginsString = logins;
+    }
 }

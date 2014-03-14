@@ -641,4 +641,12 @@ public class WidgetAdmin extends Controller
         return ok( angularjs_widget.render() );
     }
 
+
+    public static Result getPublicWidgetDetails( String apiKey ){
+        Widget w = Widget.getWidget(apiKey);
+        return ok(Json.toJson(new PublicWidget(w)));
+    }
+
+
+
 }
