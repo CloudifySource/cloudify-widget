@@ -73,11 +73,14 @@ body{
   position:absolute;
 }
 
+
+
 iframe {
-  width: $widget_width + 10px;
-  height: 483px;
+  width: $widget_width + 13px;
+  height: 800px;
   border: none;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
   padding: 0;
   margin: 0;
 }

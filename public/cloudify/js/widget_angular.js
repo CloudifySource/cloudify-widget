@@ -9,34 +9,36 @@ widgetModule.service('widgetReceiveMessageService', function( $log, paramsServic
         var originPageUrl = paramsService.params.origin_page_url;
         function receiveMessage(event)
         {
-            if (event.origin !== originPageUrl ){
-                $log.info('got event with origin ' + event.origin + ' which does not match param ' + originPageUrl );
-                return;
-            }else{
-                try{
-                    var recievedObj = event.data;
-                    if ( recievedObj.hasOwnProperty('name')){
-                        var name = recievedObj.name;
-                        if ( handlers.hasOwnProperty( name )){
-                            handlers[name](recievedObj);
-                        }else{
-                            $log.error('got an event with unknown name. I do not have a handler ' + name);
-                        }
+            $log.info('widget got message');
+//            if (event.origin !== originPageUrl ){
+//                $log.info('got event with origin ' + event.origin + ' which does not match param ' + originPageUrl );
+//                return;
+//            }else{
+            try{
+                var recievedObj = event.data;
+                if ( recievedObj.hasOwnProperty('name')){
+                    var name = recievedObj.name;
+                    if ( handlers.hasOwnProperty( name )){
+                        handlers[name](recievedObj);
                     }else{
-                        $log.error('received message without name ', event.data);
+                        $log.error('got an event with unknown name. I do not have a handler ' + name);
                     }
-                }catch(e){
-                    $log.error(e);
+                }else{
+                    $log.error('received message without name ', event.data);
                 }
+            }catch(e){
+                $log.error(e);
             }
-
+//            }
+//
             // ...
         }
+        $log.info('adding message handler');
         window.addEventListener('message', receiveMessage, false);
-
-
-
     }
+    try{
+        addMessageHandler();
+    }catch(e){ $log.error(e);}
 
     this.addHandler = function(type, fn ){
         if ( handlers.hasOwnProperty(type)){
@@ -50,7 +52,13 @@ widgetModule.service('widgetReceiveMessageService', function( $log, paramsServic
 
 
 
-widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window, widgetService, mixpanelService, paramsService, dbService) {
+widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window, widgetService, mixpanelService, paramsService, dbService, widgetReceiveMessageService) {
+
+    var recipeProperties = null;
+    widgetReceiveMessageService.addHandler( 'widget_recipe_properties', function(event){
+        $log.info('got new properties for widget', event.data);
+        recipeProperties = event.data;
+    });
 
     $window.$windowScope = $scope;
 
@@ -151,8 +159,8 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
                 }
                 handleStatus( result.status, myTimeout );
             },function(result){
-                    console.log(['status error',result]);
-                });
+                console.log(['status error',result]);
+            });
         }else{
             console.log("removing widget status");
             dbService.remove();
@@ -188,7 +196,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
                 $scope.widgetStatus = result.status;
 
                 pollStatus(1);
-        }, function( result ){
+            }, function( result ){
                 console.log(['play error', result]);
                 resetWidgetStatus("We are so hot that we ran out of instances. Please try again later.");
             });
@@ -355,7 +363,7 @@ widgetModule.service('dbService', function( $cookieStore, paramsService ){
 
     this.saveWidgetStatus = function(status){
         if ( !status ){
-           $cookieStore.remove( getCookieName() );
+            $cookieStore.remove( getCookieName() );
         }else{
             $cookieStore.put( getCookieName() , status);
         }
@@ -437,9 +445,9 @@ widgetModule.service('mixpanelService', function( paramsService){
         window.mixpanel = { track : function(){ console.log(["mixpanel mock: tracking",arguments])} };
     }
 
-      this.stopWidget = function(){
-            mixpanel.track("Stop Widget",{'page name' : params.title, 'url' : params.origin_page_url });
-      };
+    this.stopWidget = function(){
+        mixpanel.track("Stop Widget",{'page name' : params.title, 'url' : params.origin_page_url });
+    };
 
     this.startWidget = function( isAnonymous ){
         mixpanel.track("Play Widget",{'page name' : params.title , 'url' : params.origin_page_url, "anonymous" : isAnonymous });

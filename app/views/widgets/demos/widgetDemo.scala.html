@@ -4,6 +4,8 @@
 <html>
 <head>
     <link href="/public/style/demo.css" rel="stylesheet">
+    <script src="/public/js/angularjs/angular.js"></script>
+    <script src="/public/js/demos/DemoApp.js"></script>
     <script src="/js/jquery.min.js"></script>
     <script type="text/javascript" src="/public/js/jquery.ba-postmessage.js"></script>
     @if(widget.isRequiresLogin){
@@ -13,5 +15,35 @@
 <body>
     @embedCode(widget.getApiKey, widget.getTitle, widget.getYoutubeVideoUrl, host, widget.getShowAdvancedAsString )
     <script src="/public/js/demos/widgetDemo.js"> </script><!-- general js file for demo purposes -->
+
+
+<div ng-app="DemoApp" ng-controller="DemoCtrl">
+    <h2> Recipe Properties </h2>
+    <div ng-show="needToApplyProperties()" style="color:red">Don't forget to apply properties</div>
+      <div ng-repeat="property in properties">
+          <input ng-model="property.key"> = <input ng-model="property.value"/>
+      </div>
+    <button ng-click="applyProperties()">Apply</button>
+    <button ng-click="addProperty()">Add</button>
+    <div ng-show="!!appliedProperties && appliedProperties.length > 0">
+    <h2> Applied Properties</h2>
+    <div class="applied-properties">
+        <table border="1" style="border-collapse: collapse;border:1px solid black; width:400px; margin:0 auto;">
+            <tr>
+                <td>Key</td>
+                <td>Value</td>
+            </tr>
+            <tr ng-repeat="property in appliedProperties">
+                <td>
+                    {{property.key}}
+                </td>
+                <td>
+                    {{property.value}}
+                </td>
+            </tr>
+        </table>
+    </div>
+    </div>
+</div>
 </body>
 </html>
