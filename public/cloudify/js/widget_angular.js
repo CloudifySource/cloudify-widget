@@ -190,6 +190,10 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
             requestData["advancedData"] = _getAdvanced();
         }
 
+        if ( !!recipeProperties ){
+            requestData['recipeProperties'] = recipeProperties;
+        }
+
         widgetService.play(  $scope.params.apiKey,  requestData )
             .then(function( result ){
                 console.log(['play result', result]);

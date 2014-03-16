@@ -14,7 +14,7 @@ angular.module('DemoApp').controller('DemoCtrl', function($scope, $log){
         $log.info('applying properties');
         $scope.appliedProperties = $scope.properties;
 
-        frames[0].postMessage( {'name' : 'widget_recipe_properties' , 'data' : [ { 'key' : 'someKey' , 'value' : 'someValue' } , { 'key' : 'property2Key', 'value' : 'property2Value'} ] } , frames[0].location.origin);
+        frames[0].postMessage( {'name' : 'widget_recipe_properties' , 'data' : $scope.appliedProperties } , frames[0].location.origin);
 
         $scope.properties = [];
     };
