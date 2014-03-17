@@ -92,7 +92,7 @@ public class ServerPoolImpl implements ServerPool
     private static Predicate failedBootstrapsPredicate = new Predicate() {
         @Override
         public boolean evaluate(Object o) {
-            return ((ServerNode)o).getNodeId() == null;
+            return ((ServerNode)o).getNodeId() == null && nonRemotePredicate.evaluate(o);
         }
     };
 
