@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import play.libs.Akka;
 import server.*;
 import utils.CollectionUtils;
+import utils.StringUtils;
 
 import javax.inject.Inject;
 import javax.persistence.OptimisticLockException;
@@ -68,7 +69,10 @@ public class ServerPoolImpl implements ServerPool
         @Override
         public boolean evaluate( Object o )
         {
-            return !((ServerNode)o).isRemote();
+            ServerNode node = (ServerNode) o;
+            boolean result = !node.isRemote() && StringUtils.isEmptyOrSpaces(node.getAdvancedParams());
+            logger.info("server [{}] is remote [{}] advanced params [{}] result [{}]", node.getId(), node.isRemote(), node.getAdvancedParams() , result );
+            return result;
         }
     };
     private static Predicate busyServerPredicate = new Predicate() {
