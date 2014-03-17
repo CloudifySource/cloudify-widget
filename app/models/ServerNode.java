@@ -379,8 +379,12 @@ extends Model
 
     @Override
     public void delete() {
-        logger.error("deleting server node ", new RuntimeException());
-        super.delete();
+        if( !remote ){
+            super.delete();
+        }else{
+            logger.error("deleting server node ", new RuntimeException());
+//            super.delete();
+        }
     }
 
     public void setRemote(boolean remote) {
