@@ -251,7 +251,7 @@ cloud {
                     // Mandatory. Amount of RAM available to machine.
                     machineMemoryMB 1600
                     // Mandatory. Hardware ID.
-                    hardwareId hardwareId
+                    hardwareId flexImageHardwareId
                     // Mandatory. All files from this LOCAL directory will be copied to the remote machine directory.
                     localDirectory "upload"
                     // Optional. Name of key file to use for authenticating to the remote machine. Remove this line if key files
@@ -265,7 +265,7 @@ cloud {
 
                     overrides ([
                             "jclouds.softlayer.package-id":46,
-                            "jclouds.softlayer.flex-image-global-identifier":"5ad7a379-5252-4c19-a02a-1a5882f4fcbf"
+                            "jclouds.softlayer.flex-image-global-identifier":flexImageGlobalIdentifier
                     ])
 
                     // when set to 'true', agent will automatically start after reboot.
