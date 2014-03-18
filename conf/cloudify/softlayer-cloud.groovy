@@ -185,13 +185,13 @@ cloud {
                 // Mandatory. Template Name.
                 MEDIUM_RH : computeTemplate {
                     // Mandatory. Image ID.
-                    imageId readHatLinuxImageId
+                    imageId redHatLinuxImageId
                     // Mandatory. Files from the local directory will be copied to this directory on the remote machine.
                     remoteDirectory "/tmp/gs-files"
                     // Mandatory. Amount of RAM available to machine.
                     machineMemoryMB 1600
                     // Mandatory. Hardware ID.
-                    hardwareId readHatHardwareId
+                    hardwareId redHatHardwareId
                     // Mandatory. All files from this LOCAL directory will be copied to the remote machine directory.
                     localDirectory "upload"
                     // Optional. Name of key file to use for authenticating to the remote machine. Remove this line if key files
