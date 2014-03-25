@@ -1,6 +1,7 @@
 package controllers;
 
 import cloudify.widget.api.clouds.IWidgetLoginDetails;
+import cloudify.widget.common.MailChimpWidgetLoginHandler;
 import org.openid4java.consumer.ConsumerManager;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.message.AuthRequest;
@@ -83,6 +84,8 @@ public class WidgetGoogleLoginController extends AbstractLoginController {
             public Attributes addEmail() {
                 try {
                     fetchRequest.addAttribute("email", "http://schema.openid.net/contact/email", true);
+                    fetchRequest.addAttribute("firstname", "http://schema.openid.net/namePerson/first", true);
+                    fetchRequest.addAttribute("lastname", "http://schema.openid.net/namePerson/last", true);
                 } catch (MessageException e) {
                     throw new RuntimeException("unable to add email as attribute");
                 }
@@ -105,11 +108,16 @@ public class WidgetGoogleLoginController extends AbstractLoginController {
             DynamicForm df = new DynamicForm().bindFromRequest();
             String openId = ((String) df.get("openid.identity")).split("\\?id=")[1];
             String email = df.get("openid.ext1.value.email");
+            String firstname = df.get("openid.ax.type.firstname");
+            String lastname = df.get("openid.ext1.value.email");
+
             logger.info("user successfully logged in with [{},{}]", openId, email);
 
 
             GoogleLoginDetails loginDetails = new GoogleLoginDetails();
             loginDetails.setEmail(email);
+            loginDetails.setFirstName(firstname);
+            loginDetails.setLastName(lastname);
             handleLogin( loginDetails );
 
 
@@ -121,8 +129,10 @@ public class WidgetGoogleLoginController extends AbstractLoginController {
     }
 
 
-    public static class GoogleLoginDetails implements IWidgetLoginDetails {
+    public static class GoogleLoginDetails implements MailChimpWidgetLoginHandler.MailChimpLoginDetails {
         public String email;
+        public String firstName;
+        public String lastName;
 
         @Override
         public String getEmail() {
@@ -131,6 +141,22 @@ public class WidgetGoogleLoginController extends AbstractLoginController {
 
         public void setEmail(String email) {
             this.email = email;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public void setFirstName(String firstName) {
+            this.firstName = firstName;
+        }
+
+        public String getLastName() {
+            return lastName;
+        }
+
+        public void setLastName(String lastName) {
+            this.lastName = lastName;
         }
     }
 
