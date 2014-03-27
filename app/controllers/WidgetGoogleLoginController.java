@@ -108,8 +108,8 @@ public class WidgetGoogleLoginController extends AbstractLoginController {
             DynamicForm df = new DynamicForm().bindFromRequest();
             String openId = ((String) df.get("openid.identity")).split("\\?id=")[1];
             String email = df.get("openid.ext1.value.email");
-            String firstname = df.get("openid.ax.type.firstname");
-            String lastname = df.get("openid.ext1.value.email");
+            String firstname = df.get("openid.ext1.value.firstname");
+            String lastname = df.get("openid.ext1.value.lastname");
 
             logger.info("user successfully logged in with [{},{}]", openId, email);
 
