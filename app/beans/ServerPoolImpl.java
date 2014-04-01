@@ -71,7 +71,7 @@ public class ServerPoolImpl implements ServerPool
         {
             ServerNode node = (ServerNode) o;
             boolean result = !node.isRemote() && StringUtils.isEmptyOrSpaces(node.getAdvancedParams());
-            logger.info("server [{}] is remote [{}] advanced params [{}] result [{}]", node.getId(), node.isRemote(), node.getAdvancedParams() , result );
+            logger.debug("server [{}] is remote [{}] advanced params [{}] result [{}]", node.getId(), node.isRemote(), node.getAdvancedParams() , result );
             return result;
         }
     };
