@@ -75,7 +75,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
         }
 
         $scope.loginDetails = loginDetails;
-        $scope.play();
+        $timeout(function(){$scope.play()}, 0);
     };
 
     $scope.params = paramsService.params;
@@ -140,7 +140,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
 
     function handleStatus( status, myTimeout ){
 
-        console.log(['got status', status]);
+        $log.info(['got status', status]);
         dbService.saveWidgetStatus( status );
         $scope.ellipsis = ellipsis.substring(ellipsis.length - ellipsisIndex % ellipsis.length);
         ellipsisIndex = ellipsisIndex +1;
@@ -159,10 +159,10 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
                 }
                 handleStatus( result.status, myTimeout );
             },function(result){
-                console.log(['status error',result]);
+                $log.info(['status error',result]);
             });
         }else{
-            console.log("removing widget status");
+            $log.info("removing widget status");
             dbService.remove();
         }
     }
@@ -188,6 +188,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
             popupWindow = window.open("/widget/login/" + $scope.widget.loginsString ,"myWindow",popupWidths[$scope.widget.loginsString]);    // Opens a new window
             return;
         }
+        $log.info('starting the widget');
 
         resetWidgetStatus();
         $scope.widgetStatus.state = play;
@@ -203,12 +204,12 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
 
         widgetService.play(  $scope.params.apiKey,  requestData )
             .then(function( result ){
-                console.log(['play result', result]);
+                $log.info(['play result', result]);
                 $scope.widgetStatus = result.status;
 
                 pollStatus(1);
             }, function( result ){
-                console.log(['play error', result]);
+                $log.info(['play error', result]);
                 resetWidgetStatus("We are so hot that we ran out of instances. Please try again later.");
             });
 //        success: function (data, textStatus, jqXHR) {
@@ -273,7 +274,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
     };
 
     $scope.submitAdvancedData = function(){
-        console.log("submitting advanced");
+        $log.info("submitting advanced");
         $scope.play();
     };
 
@@ -288,14 +289,14 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
     }
 
 
-    console.log(["saved status", savedStatus]);
+    $log.info(["saved status", savedStatus]);
     // place params on scope
 
     $scope.cloudType = myConf.cloudProvider;
 
 
     $scope.isShowAdvanced = function () {
-//        console.log(["showadvanced param is ", $scope.params.showAdvanced, $scope.params.showAdvanced == "true"]);
+//        $log.info(["showadvanced param is ", $scope.params.showAdvanced, $scope.params.showAdvanced == "true"]);
         try {
             return $scope.params.showAdvanced == "true";
         } catch (e) {
@@ -336,13 +337,13 @@ widgetModule.service('encryptDecrypt', function ($http) {
 });
 
 
-widgetModule.service('paramsService', function(){
+widgetModule.service('paramsService', function( $log ){
     // read params from URL;
     function get_params() {
         var params = {};
         var hash;
         var hashes = window.location.search.substring(1).split('&');
-        console.log(["using search tearm", hashes ]);
+        $log.info(["using search tearm", hashes ]);
         for(var i = 0; i < hashes.length; i++)
         {
             hash = hashes[i].split('=');
@@ -350,7 +351,7 @@ widgetModule.service('paramsService', function(){
                 params[hash[0]] = decodeURIComponent(hash[1]);
             }
         }
-        console.log(["params are",params]);
+        $log.info(["params are",params]);
         return params;
     }
 
@@ -449,11 +450,11 @@ widgetModule.service('widgetService', function( $http, mixpanelService, paramsSe
 });
 
 
-widgetModule.service('mixpanelService', function( paramsService){
+widgetModule.service('mixpanelService', function( paramsService, $log){
     var params = paramsService.params;
 
     if ( !window.mixpanel ){
-        window.mixpanel = { track : function(){ console.log(["mixpanel mock: tracking",arguments])} };
+        window.mixpanel = { track : function(){ $log.info(["mixpanel mock: tracking",arguments])} };
     }
 
     this.stopWidget = function(){
