@@ -1,0 +1,108 @@
+<html ng-app="customLogin">
+<head>
+    <link href="/public/style/customLogin.css" rel="stylesheet">
+    <script src="/public/js/angularjs/angular.js"></script>
+</head>
+<body ng-controller="CustomLoginController">
+
+<div class="custom-login">
+    <div class="forms-section">
+        <div class="google-login">
+            <div class="option-title">Sign in with Google</div>
+            <a href="/widget/login/google">
+
+                <img src="/public/img/sign_in_with_google.png"/>
+            </a>
+        </div>
+        <div class="divider">
+            <div class="line"></div>
+            <div class="divider-text"> OR </div>
+            <div class="line"></div>
+        </div>
+        <div class="custom-form">
+            <div class="option-title">Fill in details</div>
+
+            <form ng-submit="submitForm()">
+                <div class="input-section">
+                    <span class="label">
+                        Name
+                    </span>
+                        <input ng-model="login.name" required>
+                </div>
+                <div class="input-section">
+                <span class="label">
+                    Last Name
+                </span>
+                        <input ng-model="login.lastName" required>
+                </div>
+
+
+                <div class="input-section">
+                <span class="label">
+                    Email
+                </span>
+                        <input ng-model="login.email" required >
+                </div>
+                <input type="submit" value="Submit"/>
+                <div class="error">
+                    {{error}}
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+</body>
+
+<script>
+    angular.module('customLogin', []);
+
+
+
+    function CustomLoginController( $scope, $http, $log ){
+        $log.info("loading controller");
+
+
+        function recoverLoginFromLocalStorage( ){
+            try {
+                if (typeof(Storage) !== "undefined") {
+                    if (localStorage.hasOwnProperty("customLogin"))
+                        $scope.login = JSON.parse(localStorage.customLogin);
+                    // Code for localStorage/sessionStorage.
+                    localStorage.setItem("lastname", "Smith");
+                }
+            }catch(e){ $log.error('unable to recover login details', e);}
+        }
+
+        function saveLoginDetails(){
+            if ( typeof(Storage) !== "undefined" ){
+                localStorage.customLogin = JSON.stringify($scope.login);
+            }
+        }
+
+
+        $scope.login = {};
+        recoverLoginFromLocalStorage();
+
+
+
+        $scope.submitForm = function( ){
+            $scope.error = null;
+            saveLoginDetails();
+            $log.info('submitting login', $scope.login);
+            $http.post('/widget/login/custom', $scope.login).then(function( result ){
+                $log.info('got result from backend', result.data);
+
+                window.opener.$windowScope.loginDone( $scope.login );
+
+            }, function( result ){
+                $log.info('got error from backend', $scope.error = result.data);
+            })
+        };
+
+
+
+    }
+</script>
+
+</html>

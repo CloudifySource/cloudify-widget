@@ -272,6 +272,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             String advancedParams = serverNode.getAdvancedParams();
 
             ICloudBootstrapDetails bootstrapDetails = ApplicationContext.get().getCloudBootstrapDetails();
+            bootstrapDetails.setCloudDriver( serverNode.getWidget().getCloudName() );
 
             ObjectMapper mapper = new ObjectMapper();
             JsonNode parse = Json.parse(advancedParams);

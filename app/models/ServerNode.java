@@ -104,6 +104,7 @@ extends Model
     @Lob
     public String recipeProperties = null;
 
+
     @JsonIgnore
     @OneToMany(mappedBy="serverNode", cascade = CascadeType.REMOVE)
     public List<ServerNodeEvent> events = new LinkedList<ServerNodeEvent>();

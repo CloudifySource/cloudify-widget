@@ -175,10 +175,17 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
         return $scope.widgetStatus.state == play && !$scope.widgetStatus.output;
     };
 
+
+    var popupWidths = {
+        'google' : "width=400,height=500",
+        'custom' : 'width=827px,height=376px'
+    };
+
     $scope.play = function(){
 
         if ( !!$scope.widget.loginsString && !$scope.loginDetails ){
-            popupWindow = window.open("/widget/login/google","myWindow","width=400,height=500");    // Opens a new window
+
+            popupWindow = window.open("/widget/login/" + $scope.widget.loginsString ,"myWindow",popupWidths[$scope.widget.loginsString]);    // Opens a new window
             return;
         }
 

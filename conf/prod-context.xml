@@ -86,11 +86,14 @@
             <property name="tag" value="#{conf.server.bootstrap.tag}"/>
         </bean>
 
-        <bean id="bootstrapDetails" class="cloudify.widget.cli.softlayer.SoftlayerCloudBootstrapDetails"/>
+        <bean id="bootstrapDetails" class="cloudify.widget.cli.softlayer.SoftlayerCloudBootstrapDetails">
+            <property name="cloudDriver" value="softlayer"/>
+        </bean>
+
         <bean id="cliHandler" class="cloudify.widget.cli.softlayer.SoftlayerCloudifyCliHandler">
             <property name="cloudPropertiesFilenameSuffix" value="-cloud.properties"/>
             <property name="cloudifyCloudsFolderRelativePath" value="clouds"/>
-            <property name="cloudifyCloudFoldername" value="softlayer"/>
+
             <property name="cloudifyHomeDir" value="#{conf.server.environment.cloudifyHome}"/>
         </bean>
 

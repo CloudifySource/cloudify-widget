@@ -124,10 +124,10 @@ public class ServerPoolImpl implements ServerPool
     @Override
     public void runHealthCheck() {
         if ( !isPoolWillBeSaturated() ){
-            logger.info("healthcheck :: creating more instance [{}]", getStats() );
+            logger.debug("healthcheck :: creating more instance [{}]", getStats() );
             addNewServerToPool(1); // lets create just one.
         } else {
-            logger.info("healthcheck :: not creating more instances [{}]", getStats() );
+            logger.debug("healthcheck :: not creating more instances [{}]", getStats() );
         }
     }
 

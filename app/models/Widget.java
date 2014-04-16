@@ -71,6 +71,8 @@ public class Widget
     private String title;
 	private String youtubeVideoUrl;
 
+    public String cloudName;
+
     // optional
 	private String recipeURL = null;
 	private Boolean allowAnonymous;
@@ -526,7 +528,15 @@ public class Widget
 		this.productName = productName;
 	}
 
-	public String getProviderURL()
+    public String getCloudName() {
+        return cloudName;
+    }
+
+    public void setCloudName(String cloudName) {
+        this.cloudName = cloudName;
+    }
+
+    public String getProviderURL()
 	{
 		return providerURL;
 	}
