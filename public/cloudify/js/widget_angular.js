@@ -177,15 +177,17 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
 
 
     var popupWidths = {
-        'google' : "width=400,height=500",
-        'custom' : 'width=827px,height=376px'
+        'google' : { 'width' : 400, 'height' : 500 },
+        'custom' : { 'width' : 827 , 'height' : 376 }
     };
 
     $scope.play = function(){
 
         if ( !!$scope.widget.loginsString && !$scope.loginDetails ){
-
-            popupWindow = window.open("/widget/login/" + $scope.widget.loginsString ,"myWindow",popupWidths[$scope.widget.loginsString]);    // Opens a new window
+            var size = popupWidths[$scope.widget.loginsString];
+            var left = (screen.width/2)-(size.width/2);
+            var top = (screen.height/2)-(size.height/2);
+            popupWindow = window.open( "/widget/login/" + $scope.widget.loginsString  , 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+ size.width +', height='+ size.height +', top='+top+', left='+left);
             return;
         }
         $log.info('starting the widget');
