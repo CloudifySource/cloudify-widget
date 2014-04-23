@@ -75,6 +75,7 @@ public class Global extends GlobalSettings
 		// print cloudify configuration
         logger.info("printing configuration");
         conf = ApplicationContext.get().conf();
+        logger.info("[{}]",ApplicationContext.get().getCloudBootstrapDetails());
         logger.info( Json.stringify( Json.toJson( conf ) ) );
 
         // initialize the server pool.
