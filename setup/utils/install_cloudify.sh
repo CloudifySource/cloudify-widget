@@ -36,7 +36,7 @@ echo "overriding webui-context.xml in cloudify installation"
 
 
 echo "upgrading clouds"
-\cp -f ${WIDGET_HOME}/conf/cloudify/clouds/* ${WIDGET_HOME}/cloudify-folder/clouds
+\cp -fR ${WIDGET_HOME}/conf/cloudify/clouds/* ${WIDGET_HOME}/cloudify-folder/clouds
 
 cd $CURRENT_DIRECTORY
 
