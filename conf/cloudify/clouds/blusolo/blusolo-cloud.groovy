@@ -266,7 +266,8 @@ cloud {
 
                     overrides ([
                             "jclouds.softlayer.package-id":46,
-                            "jclouds.softlayer.flex-image-global-identifier":flexImageGlobalIdentifier
+                            "jclouds.softlayer.flex-image-global-identifier":flexImageGlobalIdentifier,
+                            "jclouds.softlayer.server.active-transactions-started-delay":100000000000
                     ])
 
                     // when set to 'true', agent will automatically start after reboot.
