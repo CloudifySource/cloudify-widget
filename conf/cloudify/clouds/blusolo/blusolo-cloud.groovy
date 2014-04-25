@@ -1,4 +1,3 @@
-package cloudify.clouds.blusolo
 /*
  * ******************************************************************************
  *  * Copyright (c) 2012 GigaSpaces Technologies Ltd. All rights reserved
