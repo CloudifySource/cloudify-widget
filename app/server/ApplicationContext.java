@@ -112,9 +112,6 @@ public class ApplicationContext
         return conf();
     }
 
-    public Collection<IWidgetLoginHandler> getLoginHandlers(){
-        return applicationContext.getBeansOfType( IWidgetLoginHandler.class ).values();
-    }
 
     private  static <T> T getBean( String bean ){
         return (T) applicationContext.getBean( bean );

@@ -1,13 +1,14 @@
 package controllers;
 
 import cloudify.widget.common.MailChimpWidgetLoginHandler;
-import org.apache.commons.lang3.StringUtils;
+import models.Widget;
 import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.validation.Constraints;
 import play.mvc.Result;
 import server.HeaderMessage;
+import utils.StringUtils;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,13 +20,17 @@ public class WidgetCustomLoginController extends AbstractLoginController{
 
     private static Logger logger = LoggerFactory.getLogger(WidgetCustomLoginController.class);
 
-    public static Result customLogin(  ){
+    public static Result customLogin(   String widgetKey ){
+        if ( StringUtils.isEmptyOrSpaces(widgetKey) ){
+            return internalServerError("missing widgetId");
+        }
+        Widget widget = Widget.getWidget(widgetKey);
         logger.info("logged in custom");
         JsonNode jsonNode = request().body().asJson();
         logger.info("jsonNode is : " + jsonNode);
 
         try {
-            handleLogin(new CustomLoginDetails(jsonNode));
+            handleLogin( widget, new CustomLoginDetails(jsonNode));
         }catch(CustomLoginException e){
             return internalServerError(e.getMessage());
         }catch( Exception e ){

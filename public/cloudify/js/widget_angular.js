@@ -187,7 +187,8 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
             var size = popupWidths[$scope.widget.loginsString];
             var left = (screen.width/2)-(size.width/2);
             var top = (screen.height/2)-(size.height/2);
-            popupWindow = window.open( "/widget/login/" + $scope.widget.loginsString  , 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+ size.width +', height='+ size.height +', top='+top+', left='+left);
+
+            popupWindow = window.open( "/widget/login/" + $scope.widget.loginsString + "?widgetKey=" + $scope.widget.apiKey  , 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+ size.width +', height='+ size.height +', top='+top+', left='+left);
             return;
         }
         $log.info('starting the widget');

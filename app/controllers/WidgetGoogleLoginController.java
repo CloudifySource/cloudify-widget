@@ -1,7 +1,7 @@
 package controllers;
 
-import cloudify.widget.api.clouds.IWidgetLoginDetails;
 import cloudify.widget.common.MailChimpWidgetLoginHandler;
+import models.Widget;
 import org.openid4java.consumer.ConsumerManager;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.message.AuthRequest;
@@ -24,15 +24,15 @@ public class WidgetGoogleLoginController extends AbstractLoginController {
     private static Logger logger = LoggerFactory.getLogger(WidgetGoogleLoginController.class);
 
 
-    public static Result loginWithGoogle() {
+    public static Result loginWithGoogle( String widgetKey ) {
         logger.info("loggging into google with openId4Java");
-        return openId4JavaGoogleLogin();
+        return openId4JavaGoogleLogin( widgetKey );
 //       return getPlayLoginWithGoogle();
     }
 
 
-    private static Result openId4JavaGoogleLogin() {
-        String redirectUrl = new MyOpenId("https://www.google.com/accounts/o8/id", routes.WidgetGoogleLoginController.googleLoginCallback().absoluteURL(request())).attributes().addEmail().apply().getReirectUrl();
+    private static Result openId4JavaGoogleLogin( String widgetKey ) {
+        String redirectUrl = new MyOpenId("https://www.google.com/accounts/o8/id", routes.WidgetGoogleLoginController.googleLoginCallback(widgetKey).absoluteURL(request())).attributes().addEmail().apply().getReirectUrl();
         return redirect(redirectUrl);
 
     }
@@ -96,15 +96,18 @@ public class WidgetGoogleLoginController extends AbstractLoginController {
     }
 
 
-    public static Result googleLoginCallback() {
+    public static Result googleLoginCallback( String widgetKey ) {
 //     {openid.op_endpoint=https://www.google.com/accounts/o8/ud, openid.signed=op_endpoint,claimed_id,identity,return_to,response_nonce,assoc_handle,ns.ext1,ext1.mode,ext1.type.email,ext1.value.email, openid.ns.ext1=http://openid.net/srv/ax/1.0, openid.sig=D8v0yywzchLsxChBA4/cdWJ/8jQzGfTNcHWBOWpzk50=, openid.response_nonce=2013-03-19T06:16:50ZcZqbrl75NjFBiw, openid.claimed_id=https://www.google.com/accounts/o8/id?id=AItOawkok_bxLaOJ341SwKtr9GtIcEgftGxXGoE, openid.assoc_handle=1.AMlYA9XC0Fq0Zld9fEUiCXrEOboBBt6b3iNI0nvdpX1gOvhdUGFlMJvbwhmfaxOc098KzxjxR51DFg, openid.ext1.value.email=some.email@gmail.com, openid.ns=http://specs.openid.net/auth/2.0, openid.identity=https://www.google.com/accounts/o8/id?id=AItOawkok_bxLaOJ341SwKtr9GtIcEgftGxXGoE, openid.ext1.type.email=http://schema.openid.net/contact/email, openid.mode=id_res, openid.ext1.mode=fetch_response, openid.return_to=http://localhost:9000/demos/googleLoginCallback}
 
-        return getOpenid4jGoogleLoginCallback();
+        return getOpenid4jGoogleLoginCallback( widgetKey );
 //        return getPlayGoogleLoginCallback();
     }
 
-    private static Result getOpenid4jGoogleLoginCallback() {
+    private static Result getOpenid4jGoogleLoginCallback( String widgetKey ) {
         try {
+
+            Widget widget = Widget.getWidget( widgetKey );
+
             DynamicForm df = new DynamicForm().bindFromRequest();
             String openId = ((String) df.get("openid.identity")).split("\\?id=")[1];
             String email = df.get("openid.ext1.value.email");
@@ -118,7 +121,7 @@ public class WidgetGoogleLoginController extends AbstractLoginController {
             loginDetails.setEmail(email);
             loginDetails.setFirstName(firstname);
             loginDetails.setLastName(lastname);
-            handleLogin( loginDetails );
+            handleLogin( widget, loginDetails );
 
 
             return ok(google.render(openId, email));

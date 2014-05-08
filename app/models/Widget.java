@@ -20,6 +20,7 @@ import java.util.*;
 import javax.persistence.*;
 
 import beans.Recipe;
+import beans.config.Conf;
 import beans.config.ServerConfig;
 import com.avaje.ebean.Junction;
 import models.query.QueryConf;
@@ -84,6 +85,10 @@ public class Widget
 	private Boolean enabled;
 
     public String loginsString;
+
+    @ManyToOne
+    @JsonIgnore
+    public MailChimpDetails mailChimpDetails;
 
 
     private Boolean showAdvanced;
@@ -409,6 +414,11 @@ public class Widget
     public static Widget findByUserAndId( User user, Long widgetId )
     {
         return find.where( ).eq( "user", user ).eq( "id",widgetId ).findUnique();
+    }
+
+    public static Widget findById( Long widgetId )
+    {
+        return find.where( ).eq( "id",widgetId ).findUnique();
     }
     /** @return the widget by apiKey or null  */
     // guy - NOTE : we must always add "user" to the mix.. otherwise we never verify the user really owns the widget.
@@ -822,6 +832,8 @@ public class Widget
     public String getLoginsString() {
         return loginsString;
     }
+
+
 
     public void setLoginsString( String logins ){
         loginsString = logins;

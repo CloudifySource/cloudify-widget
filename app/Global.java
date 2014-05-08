@@ -149,6 +149,7 @@ public class Global extends GlobalSettings
             logger.error("unable to reconfigure logback");
         }
 
+        logger.error("testing");
 
         try{
             ApplicationContext.get().getMailSender().sendChangelog();
