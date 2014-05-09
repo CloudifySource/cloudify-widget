@@ -97,8 +97,13 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 			logger.error( e.toString(), e );
 		}
     }
-    
-	private static void addCommonProps( CommandLine cmdLine, Map<String,String> map, ServerNode serverNode ){
+
+    @Override
+    public void runTearDownCommand(CommandLine cmdLine) {
+
+    }
+
+    private static void addCommonProps( CommandLine cmdLine, Map<String,String> map, ServerNode serverNode ){
 	
     	Map<String, String> environment = 
 				ApplicationContext.get().conf().server.environment.getEnvironment();

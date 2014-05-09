@@ -42,6 +42,7 @@ public interface ExecutorFactory {
 	 */
 	ProcExecutor getDeployExecutor( ServerNode server );
 
+
     DefaultExecuteResultHandler getResultHandler( String name );
 	
 }

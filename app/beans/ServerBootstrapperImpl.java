@@ -265,21 +265,38 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     }
 
     @Override
-    public ServerNode bootstrapCloud(ServerNode serverNode) {
-        File newCloudFolder = null;
-        try{
-            logger.info("bootstrapping cloud with details [{}]", serverNode);
+    public File createCloudProvider( ServerNode serverNode  ){
+
+        try {
             String advancedParams = serverNode.getAdvancedParams();
 
+
             ICloudBootstrapDetails bootstrapDetails = ApplicationContext.get().getCloudBootstrapDetails();
-            if ( !StringUtils.isEmpty(serverNode.getWidget().getCloudName()) ){
-                bootstrapDetails.setCloudDriver( serverNode.getWidget().getCloudName() );
+            if (!StringUtils.isEmpty(serverNode.getWidget().getCloudName())) {
+                bootstrapDetails.setCloudDriver(serverNode.getWidget().getCloudName());
             }
 
             ObjectMapper mapper = new ObjectMapper();
             JsonNode parse = Json.parse(advancedParams);
             mapper.readerForUpdating(bootstrapDetails).readValue(parse.get("params"));
-            newCloudFolder = cliHandler.createNewCloud( bootstrapDetails );
+            File newCloudFolder = cliHandler.createNewCloud(bootstrapDetails);
+
+            File bootstrapPropertiesFile = cliHandler.getPropertiesFile(newCloudFolder, bootstrapDetails);
+            new CustomPropertiesWriter().writeProperties(serverNode, bootstrapPropertiesFile);
+            return newCloudFolder;
+        }catch( Exception e ){
+            logger.error("failed creating cloud provider",e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public ServerNode bootstrapCloud(ServerNode serverNode) {
+        File newCloudFolder = null;
+        try{
+            logger.info("bootstrapping cloud with details [{}]", serverNode);
+             newCloudFolder = createCloudProvider( serverNode );
+
 
                         //Command line for bootstrapping remote cloud.
             CommandLine cmdLine =

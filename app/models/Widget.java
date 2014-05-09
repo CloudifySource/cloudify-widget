@@ -86,6 +86,9 @@ public class Widget
 
     public String loginsString;
 
+    @JsonIgnore
+    public String managerPrefix;
+
     @ManyToOne
     @JsonIgnore
     public MailChimpDetails mailChimpDetails;

@@ -17,6 +17,7 @@ package server;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import cloudify.widget.api.clouds.CloudServerApi;
 import cloudify.widget.api.clouds.IWidgetLoginHandler;
 import cloudify.widget.cli.ICloudBootstrapDetails;
 import mocks.EventMonitorMock;
@@ -68,6 +69,7 @@ public class ApplicationContext
     @Inject private InitialData initialData;
     @Inject private PoolEventListener poolEventManager;
     @Inject private DestroyServersTask destroyServersTask;
+    @Inject private CloudServerApi cloudServerApi;
 
     @Inject private static org.springframework.context.ApplicationContext applicationContext;
 
@@ -257,7 +259,13 @@ public class ApplicationContext
         this.applicationContext = applicationContext;
     }
 
+    public CloudServerApi getCloudServerApi() {
+        return cloudServerApi;
+    }
 
+    public void setCloudServerApi(CloudServerApi cloudServerApi) {
+        this.cloudServerApi = cloudServerApi;
+    }
 }
 
 

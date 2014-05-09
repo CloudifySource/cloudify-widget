@@ -15,6 +15,7 @@
 
 package mocks;
 
+import java.io.File;
 import java.util.List;
 
 import models.ServerNode;
@@ -81,5 +82,11 @@ public class ServerBootstrapperMock implements ServerBootstrapper
     public boolean reboot(ServerNode serverNode) {
         logger.info("rebooting serverNode [{}]", serverNode );
         return true;
+    }
+
+    @Override
+    public File createCloudProvider(ServerNode serverNode) {
+        logger.info("creating cloud provider : " + serverNode );
+        return new File("mockBootstrapper");
     }
 }

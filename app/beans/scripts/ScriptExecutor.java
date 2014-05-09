@@ -28,5 +28,7 @@ public interface ScriptExecutor{
 	 */
     public void runInstallationManagementScript( CommandLine cmdLine, ServerNode server );
 
+    public void runTearDownCommand( CommandLine cmdLine );
+
     public String getOutput( ServerNode serverNode );    
 }

@@ -7,10 +7,7 @@ import javax.inject.Inject;
 
 import models.ServerNode;
 
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecuteResultHandler;
-import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.ExecuteResultHandler;
+import org.apache.commons.exec.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jclouds.compute.ComputeServiceContext;
@@ -124,8 +121,23 @@ public class BasicScriptExecutor implements ScriptExecutor{
 			serverNode.setStopped(true);
 		}
 	}
-	
-	/**
+
+    @Override
+    public void runTearDownCommand(CommandLine cmdLine ) {
+        try{
+            DefaultExecutor defaultExecutor = new DefaultExecutor();
+
+            defaultExecutor.execute( cmdLine );
+        }catch ( ExecuteException e ){
+            logger.error("Failed to execute process teardown. Exit Value : " + e.getExitValue() , e);
+            throw new ServerException( "Failed to execute process teardown. Exit value : " + e.getExitValue(), e);
+        }catch(IOException e){
+            logger.error("Failed to execute process teardown",e);
+            throw new ServerException("Failed to execute process teardown.",e);
+        }
+    }
+
+    /**
 	 * used for running install and uninstall of applications
 	 * @param cmdLine
 	 * @param server

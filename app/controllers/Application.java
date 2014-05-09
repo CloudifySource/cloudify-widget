@@ -16,10 +16,13 @@ package controllers;
 
 import static utils.RestUtils.OK_STATUS;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import cloudify.widget.api.clouds.CloudServer;
+import cloudify.widget.api.clouds.CloudServerApi;
 import models.ServerNode;
 import models.Widget;
 
@@ -235,6 +238,43 @@ public class Application extends Controller
         }else{
             return internalServerError("only available in dev mode");
         }
+    }
+
+    public static Result tearDownRemoteBootstrap( Widget widget ){
+        if ( StringUtils.isEmptyOrSpaces(widget.managerPrefix) ){
+            return internalServerError("This widget is not configured for remote teardown. please contact admin.");
+        }
+
+        logger.info("tearing down remote bootatrap");
+        CloudServerApi cloudServerApi = ApplicationContext.get().getCloudServerApi();
+
+        // credentials validation is made when we attempt to create a PEM file. if credentials are wrong, it will fail.
+        RequestBody requestBody = request().body();
+        JsonNode advancedData = null;
+        JsonNode recipeProperties = null;
+
+        if ( requestBody != null && requestBody.asJson() != null && !StringUtils.isEmptyOrSpaces( requestBody.asJson().toString() ) ){
+            JsonNode jsonNode = requestBody.asJson();
+            String ADVANCED_DATA_JSON_KEY = "advancedData";
+            if ( jsonNode.has(ADVANCED_DATA_JSON_KEY) && !StringUtils.isEmptyOrSpaces( jsonNode.get(ADVANCED_DATA_JSON_KEY).toString())){
+                advancedData = jsonNode.get(ADVANCED_DATA_JSON_KEY);
+            }
+        }
+
+        String managerIp = null;
+        cloudServerApi.connect();
+        Collection<CloudServer> allMachinesWithTag = cloudServerApi.getAllMachinesWithTag(null);
+        for (CloudServer cloudServer : allMachinesWithTag) {
+            if ( cloudServer.getName().startsWith(widget.managerPrefix)){
+                managerIp = cloudServer.getServerIp().publicIp;
+            }
+        }
+
+        if ( managerIp == null ){
+            return ok("{'message':'did not find a manager to tear down', 'code':100}");
+        }
+
+      return ok("TBD");
     }
 
     private static Long getPlayTimeout(){

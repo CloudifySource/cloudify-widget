@@ -15,6 +15,7 @@
 
 package server;
 
+import java.io.File;
 import java.util.List;
 
 
@@ -58,6 +59,8 @@ public interface ServerBootstrapper
     public BootstrapValidationResult validateBootstrap( ServerNode serverNode );
 
     public void close();
+
+    public File createCloudProvider( ServerNode serverNode  );
 
     /**
      *

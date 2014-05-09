@@ -187,27 +187,8 @@ public class DeployManagerImpl implements DeployManager {
 
             return widgetInstance;
         } else {
-            if (!StringUtils.isEmptyOrSpaces(server.getRecipeProperties())) {
-                logger.info("user passed properties for the recipe. writing them to a file");
-                File propertiesFile = recipe.getPropertiesFile();
-                Collection<String> newLines = new LinkedList<String>();
-                JsonNode recipePropertiesJson = Json.parse(server.getRecipeProperties());
-
-                int i = 0;
-                while (recipePropertiesJson.has(i)) {
-                    JsonNode iNode = recipePropertiesJson.get(i);
-                    newLines.add(iNode.get("key").getTextValue() + "=" + StringUtils.wrapWithQuotes(iNode.get("value").getTextValue()));
-                    i++;
-                }
-
-
-                try {
-                    FileUtils.writeLines(propertiesFile, newLines, true);
-                } catch (Exception e) {
-                    throw new RuntimeException("unable to write lines to properties file", e);
-                }
-
-            }
+           // write Properties to file ~!~ TODO:
+            new CustomPropertiesWriter().writeProperties( server, recipe.getPropertiesFile());
             logger.info("Deploying: [ServerIP={}] [recipe={}] [type={}]", new Object[]{server.getPublicIP(), recipeDir, recipeType.name()});
             String recipePath = FilenameUtils.separatorsToSystem(recipeDir.getPath());
 
