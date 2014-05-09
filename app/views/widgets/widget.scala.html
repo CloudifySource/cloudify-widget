@@ -63,7 +63,7 @@
 </div>
 
 </div>
-<div class="advanced_section" ng-class="{'collapsed':!!showAdvanced, 'hidden' : !isShowAdvanced() }">
+<div class="advanced_section" ng-class="{'collapsed':!!showAdvanced, 'hidden' : !isShowAdvanced() }" ng-show="!!isShowAdvanced()">
     <div class="remember_creds">
         <div class="remember_me_title">Remember me?</div>
         <div class="remember_option"><button class="yes" ng-click="rememberAdvanced(); showRemember=false">Yes</button></div>
@@ -75,6 +75,7 @@
     </div>
     <!-- need to set autocomplete=off explicitly in order to turn off the browser's built-in autocomplete -->
     <form class="advanced_form" autocomplete="off" ng-submit="submitAdvancedData()">
+        <div class="error" ng-show="advancedRequiredError">Must fill in details</div>
         <span ng-switch="cloudType" cloud-type={{cloudType}}>
             <span ng-switch-when="HP">
                 <input ng-model="advancedParams.HP.params.project" placeholder="Project" name="project"/>

@@ -183,6 +183,11 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
 
     $scope.play = function(){
 
+        if ( $scope.isShowAdvanced() && !_hasAdvanced() ){
+            $scope.advancedRequiredError = true;
+            return;
+        }
+        $scope.advancedRequiredError = false;
         if ( !!$scope.widget.loginsString && !$scope.loginDetails ){
             var size = popupWidths[$scope.widget.loginsString];
             var left = (screen.width/2)-(size.width/2);
@@ -301,7 +306,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
     $scope.isShowAdvanced = function () {
 //        $log.info(["showadvanced param is ", $scope.params.showAdvanced, $scope.params.showAdvanced == "true"]);
         try {
-            return $scope.params.showAdvanced == "true";
+            return !!$scope.widget.showAdvanced;
         } catch (e) {
             return true;
         }
