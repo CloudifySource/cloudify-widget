@@ -157,6 +157,10 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
     }
 
+    public void teardown( ServerNode serverNode ){
+
+    }
+
 
     private boolean bootstrap( ServerNode serverNode ){
 

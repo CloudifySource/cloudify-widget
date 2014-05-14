@@ -27,3 +27,5 @@ cloudify-folder
 automatic_changelog
 sass
 _scripts
+dev
+node_modules

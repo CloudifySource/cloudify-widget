@@ -89,4 +89,9 @@ public class ServerBootstrapperMock implements ServerBootstrapper
         logger.info("creating cloud provider : " + serverNode );
         return new File("mockBootstrapper");
     }
+
+    @Override
+    public void teardown(ServerNode serverNode) {
+        logger.info("tearing down");
+    }
 }

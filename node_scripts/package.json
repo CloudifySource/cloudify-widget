@@ -1,0 +1,20 @@
+{
+  "name": "node_scripts",
+  "version": "0.0.0",
+  "description": "",
+  "main": "src/scriptsExecutor.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "lodash": "~2.4.1",
+    "log4js": "~0.6.14",
+    "nodemailer": "~0.6.3",
+    "grunt": "~0.4.4",
+    "matchdep": "~0.3.0",
+    "fs-extra": "~0.8.1"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "~0.10.0"
+  }
+}

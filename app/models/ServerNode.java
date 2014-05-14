@@ -426,6 +426,10 @@ extends Model
         this.lead = lead;
     }
 
+    public static ServerNode findByWidgetAndInstanceId(Widget widget, String instanceId) {
+        return find.where().eq("widget",widget).eq("id", instanceId).findUnique();
+    }
+
     // guy - todo - formalize this for reuse.
     public static class QueryConf {
         public int maxRows = -1;
