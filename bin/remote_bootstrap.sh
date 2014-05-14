@@ -7,4 +7,4 @@ mkdir $CLOUDIFY_HOME/clouds/$CLOUD_NAME/upload/cloudify-overrides/config/
 \cp -f $CLOUDIFY_HOME/config/cloudify-webui-context-override.xml $CLOUDIFY_HOME/clouds/$CLOUD_NAME/upload/cloudify-overrides/config/
 
 cd $CLOUDIFY_HOME/bin
-./cloudify.sh "bootstrap-cloud -timeout 120 --verbose $CLOUD_NAME"
+./cloudify.sh "bootstrap-cloud -timeout 120000 --verbose $CLOUD_NAME"
