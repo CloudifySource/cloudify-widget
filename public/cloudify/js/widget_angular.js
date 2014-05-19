@@ -381,11 +381,17 @@ widgetModule.service('dbService', function( $cookieStore, paramsService ){
     };
 
 
+    function toCookieStatus( status ){
+        return { 'state' : status.state , 'instanceId' : status.instanceId };
+    }
+
+
     this.saveWidgetStatus = function(status){
         if ( !status ){
             $cookieStore.remove( getCookieName() );
         }else{
-            $cookieStore.put( getCookieName() , status);
+            $.cookie(getCookieName(), JSON.stringify(toCookieStatus(status)), {"path": "/", expires: 10000 });
+
         }
     };
 
