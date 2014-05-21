@@ -87,7 +87,7 @@
         </bean>
 
         <bean id="bootstrapDetails" class="cloudify.widget.cli.softlayer.SoftlayerCloudBootstrapDetails">
-            <property name="cloudDriver" value="softlayer"/>
+            <property name="cloudDriver" value="softlayer_cci"/>
         </bean>
 
         <bean id="cliHandler" class="cloudify.widget.cli.softlayer.SoftlayerCloudifyCliHandler">
