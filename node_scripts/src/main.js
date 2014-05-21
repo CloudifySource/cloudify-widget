@@ -12,7 +12,7 @@ logger.info('conf',JSON.stringify(conf));
 exports.initialize = function(){
     for ( var i in conf.directories ){
         var absPath = path.resolve(conf.directories[i]);
-        logger.info('making sure all directories exist',i, absPath );
+        logger.trace('making sure all directories exist',i, absPath );
         fs.mkdirsSync(absPath);
     }
 };
@@ -41,14 +41,14 @@ function modifyMandrillData( opts, values ){
 
 
 exports.doMain = function(){
-    logger.info('running main');
+    logger.trace('running main');
     var outputWriter = null;
     var opts  = null;
     async.waterfall([
 
         function( callback ) { exports.initialize(); callback(); },
         function( callback ){
-            logger.info('getting next task');
+            logger.trace('getting next task');
             services.taskReader.getNextTask( conf.directories.newDirectory , callback )
         },
         function createExecutionDir( _opts, callback ){

@@ -5,8 +5,8 @@ var meConf = path.resolve('conf/dev/me.json');
 var prodConf = path.resolve(__dirname, '../../conf/prod.json');
 var logger = require('log4js').getLogger('conf');
 
-logger.info('me conf is at ', meConf );
-logger.info('prod conf is at ', prodConf );
+logger.trace('me conf is at ', meConf );
+logger.trace('prod conf is at ', prodConf );
 
 
 var data = fs.readFileSync(prodConf, 'utf8');
