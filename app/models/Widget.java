@@ -100,6 +100,10 @@ public class Widget
 	private String consoleName;
 
 
+    @OneToOne( cascade = CascadeType.REMOVE )
+    public MandrillDetails mandrillDetails = null;
+
+
     // guy - this is a temporary work around until cloudify will sort
     // https://cloudifysource.atlassian.net/browse/CLOUDIFY-1258
     private String recipeName;

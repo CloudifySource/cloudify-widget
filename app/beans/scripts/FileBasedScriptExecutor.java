@@ -2,20 +2,20 @@ package beans.scripts;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import models.ServerNode;
 
+import models.WidgetInstanceUserDetails;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+
 import org.jclouds.compute.ComputeServiceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import server.ApplicationContext;
+import utils.StringUtils;
 
 public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsConstants{
 	
@@ -34,7 +34,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 	 * @param serverNode
 	 * @param jCloudsContext
 	 * @param cloudFolder
-	 * @param cloudBootstrapConfiguration
+//	 * @param cloudBootstrapConfiguration
 	 * @param isHandlePrivateKey
 	 */
 	@Override
@@ -53,10 +53,11 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 				", serverNode.id=" + serverNodeId  );
 		}
 		
-		Map<String,String> map = new HashMap<String, String>();
+		Map<String,Object> map = new HashMap<String, Object>();
 		map.put( IS_HANDLE_PRIVATE_KEY_PROPERTY, String.valueOf( isHandlePrivateKey ) );
 		map.put( CLOUD_FOLDER_PROPERTY, cloudFolder.getAbsolutePath() );
-		addCommonProps( cmdLine, map, serverNode );
+        map.put("action","bootstrap");
+		addCommonProps(cmdLine, map, serverNode);
 
 		try {
 			ScriptFilesUtilities.writeToJsonFile( serverNodeId, BOOTSTRAP, map );
@@ -72,7 +73,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 	/**
 	 * used for running install and uninstall of applications
 	 * @param cmdLine
-	 * @param server
+//	 * @param server
 	 */
     @Override
 	public void runInstallationManagementScript( CommandLine cmdLine, ServerNode serverNode ){
@@ -86,7 +87,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
     				", serverNode.getSecretKey=" + serverNode.getSecretKey() );
     	}
 		
-		Map<String,String> map = new HashMap<String, String>();
+		Map<String,Object> map = new HashMap<String, Object>();
 		addCommonProps( cmdLine, map, serverNode );
 		
 		try {
@@ -103,7 +104,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 
     }
 
-    private static void addCommonProps( CommandLine cmdLine, Map<String,String> map, ServerNode serverNode ){
+    private static void addCommonProps( CommandLine cmdLine, Map<String,Object> map, ServerNode serverNode ){
 	
     	Map<String, String> environment = 
 				ApplicationContext.get().conf().server.environment.getEnvironment();
@@ -112,9 +113,79 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		String[] arguments = cmdLine.getArguments();
 		
 		map.put( CMD_EXECUTABLE, executable );
-		map.put( CMD_ARGUMENTS, StringUtils.join( arguments, "," ) );
+		map.put( CMD_ARGUMENTS, StringUtils.join(arguments, ",") );
     	map.put( SERVER_NODE_ID_PROPERTY, String.valueOf( serverNode.getId() ) );
 		map.put( CLOUDIFY_HOME_PROPERTY, environment.get( CLOUDIFY_HOME ) );
+
+
+        // add application name and service for mail sending
+
+        if ( serverNode.sendEmail ) {
+
+            map.put("serviceName", serverNode.getWidget().getConsoleUrlService());
+            map.put("applicationName", serverNode.getWidget().getRecipeName());
+            map.put("sendEmail", serverNode.sendEmail);
+            map.put("managerIp", serverNode.getPublicIP());
+
+            Map<String,Object> mandrillDetails = new HashMap<String, Object>();
+            map.put("mandril", mandrillDetails);
+
+
+            mandrillDetails.put("apiKey", serverNode.getWidget().mandrillDetails.apiKey );
+            mandrillDetails.put("templateName", serverNode.getWidget().mandrillDetails.templateName );
+
+            List<MandrillDataItem> items = new LinkedList<MandrillDataItem>();
+            items.add(new MandrillDataItem("name", serverNode.widgetInstanceUserDetails.name + " " + serverNode.widgetInstanceUserDetails.lastName));
+            items.add(new MandrillDataItem("firstName", serverNode.widgetInstanceUserDetails.name ) );
+            items.add(new MandrillDataItem("lastName", serverNode.widgetInstanceUserDetails.lastName));
+            items.add(new MandrillDataItem("link", serverNode.getWidget().getConsoleURL()));
+            items.add(new MandrillDataItem("linkTitle", serverNode.getWidget().getConsoleName()));
+
+            mandrillDetails.put("data", items);
+
+            List<MandrilEmailAddressItem> emailItems = new LinkedList<MandrilEmailAddressItem>();
+
+            emailItems.add( new MandrilEmailAddressItem(serverNode.widgetInstanceUserDetails));
+            String csvBccEmails = serverNode.getWidget().mandrillDetails.csvBccEmails;
+            if ( !StringUtils.isEmptyOrSpaces(csvBccEmails) ){
+                for (String item : csvBccEmails.split(",")) {
+                    if ( !StringUtils.isEmptyOrSpaces(item)){
+                        emailItems.add(new MandrilEmailAddressItem(item, "bcc address", "bcc"));
+                    }
+                }
+            }
+
+
+            mandrillDetails.put("to",emailItems);
+        }
+    }
+
+    public static class MandrillDataItem{
+        public String name;
+        public String content;
+
+        public MandrillDataItem(String name, String content) {
+            this.name = name;
+            this.content = content;
+        }
+    }
+
+    public static class MandrilEmailAddressItem{
+        public String email;
+        public String name;
+        public String type;
+
+        public MandrilEmailAddressItem(String email, String name, String type) {
+            this.email = email;
+            this.name = name;
+            this.type = type;
+        }
+
+        public MandrilEmailAddressItem( WidgetInstanceUserDetails details) {
+            email = details.email;
+            name = details.name + " " + details.lastName;
+            type = "to";
+        }
     }
 
 	@Override

@@ -1,13 +1,13 @@
 package controllers;
 
 import cloudify.widget.api.clouds.IWidgetLoginDetails;
-import cloudify.widget.api.clouds.IWidgetLoginHandler;
 import cloudify.widget.common.MailChimpWidgetLoginHandler;
 import models.Widget;
+import models.WidgetInstanceUserDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.libs.Json;
 import play.mvc.Controller;
-import server.ApplicationContext;
 
 import java.util.Collection;
 
@@ -22,6 +22,18 @@ public abstract class AbstractLoginController extends Controller {
     private static Logger logger = LoggerFactory.getLogger(AbstractLoginController.class);
 
     public static void handleLogin( Widget widget, IWidgetLoginDetails loginDetails ){
+
+        if (loginDetails instanceof MailChimpWidgetLoginHandler.MailChimpLoginDetails) {
+            MailChimpWidgetLoginHandler.MailChimpLoginDetails details = (MailChimpWidgetLoginHandler.MailChimpLoginDetails) loginDetails;
+
+            WidgetInstanceUserDetails userDetails = new WidgetInstanceUserDetails();
+            userDetails.setLastName( details.getLastName() );
+            userDetails.setName( details.getFirstName() );
+            userDetails.setEmail( details.getEmail() );
+
+            response().setCookie("instanceUserDetails",Json.toJson(userDetails).toString(), Integer.MAX_VALUE);
+
+        }
 
 
         if ( widget.mailChimpDetails != null && widget.mailChimpDetails.isEnabled() ){

@@ -26,6 +26,7 @@ import cloudify.widget.api.clouds.CloudServerApi;
 import models.ServerNode;
 import models.Widget;
 
+import models.WidgetInstanceUserDetails;
 import org.apache.commons.lang.NumberUtils;
 import org.codehaus.jackson.JsonNode;
 import org.jasypt.util.text.BasicTextEncryptor;
@@ -41,6 +42,7 @@ import play.libs.F;
 import play.libs.Json;
 import play.libs.WS;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Http.RequestBody;
 import play.mvc.Result;
 import server.ApplicationContext;
@@ -180,6 +182,21 @@ public class Application extends Controller
                 serverNode.save();
             }
 
+            try {
+                logger.info("trying to save user details on server node");
+                Http.Cookie cookie = request().cookies().get(WidgetInstanceUserDetails.COOKIE_NAME);
+
+                if (cookie != null && !StringUtils.isEmptyOrSpaces(widget.loginsString) ) {
+                    logger.info("I got a cookie");
+                    String value = cookie.value();
+                    WidgetInstanceUserDetails widgetInstanceUserDetails = Json.fromJson(Json.parse(value), WidgetInstanceUserDetails.class);
+                    serverNode.widgetInstanceUserDetails = widgetInstanceUserDetails;
+                    serverNode.save();
+                }
+            }catch(Exception e){
+                logger.error("unable to save widget instance user details",e);
+            }
+
             // run the "bootstrap" and "deploy" in another thread.
 
             final ServerNode finalServerNode = serverNode;
@@ -278,7 +295,7 @@ public class Application extends Controller
                             }
                         }
 
-                        ApplicationContext.get().getServerBootstrapper().
+//                        ApplicationContext.get().getServerBootstrapper().
 
                         if (managerIp == null) {
                             logger.info("did not find a manager to tear down");

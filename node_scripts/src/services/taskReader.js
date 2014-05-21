@@ -36,8 +36,10 @@ exports.getNextTask = function( newDir, callback ) {
 
     var files = fs.readdirSync(newDir);
 
+
+
     var filesCount = files.length;
-    logger.info('files count:' + filesCount);
+
 
     if (filesCount > 0) {
         logger.info('All files:' + files);
@@ -50,9 +52,10 @@ exports.getNextTask = function( newDir, callback ) {
         }
 
         //handle first found folder, move it first to executing folder
-        var firstFile = files[ 0 ];
+        var firstFile = newDir + '/' + files[ 0 ];
         logger.info('handling file', firstFile);
         fs.readFile(firstFile, function (err, data) {
+            data = data.toString();
             if ( !!err ){
                 callback(err);
                 return;
@@ -63,12 +66,10 @@ exports.getNextTask = function( newDir, callback ) {
                     callback(err);
                     return;
                 }
-                callback(null, data);
+                callback(null, JSON.parse(data));
             });
 
-            console.log(data);
         });
-        callback(null, firstFile);
     }
 };
 

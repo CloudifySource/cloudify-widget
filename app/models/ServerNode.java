@@ -104,6 +104,10 @@ extends Model
     @Lob
     public String recipeProperties = null;
 
+    public boolean sendEmail = false;
+
+    @OneToOne( cascade = CascadeType.REMOVE)
+    public WidgetInstanceUserDetails widgetInstanceUserDetails = null;
 
     @JsonIgnore
     @OneToMany(mappedBy="serverNode", cascade = CascadeType.REMOVE)

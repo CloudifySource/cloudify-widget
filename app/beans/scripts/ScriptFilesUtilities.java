@@ -136,7 +136,7 @@ public class ScriptFilesUtilities implements ScriptExecutorsConstants{
 		}		
 	}
 	
-	public static void writeToJsonFile( String serverNodeId, String opName, Map<String, String> map ) throws IOException {
+	public static void writeToJsonFile( String serverNodeId, String opName, Map<String, Object> map ) throws IOException {
 
 		JsonNode json = Json.toJson( map );
 		
