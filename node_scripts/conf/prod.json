@@ -1,4 +1,7 @@
 {
+    "log" : {
+        "level" : "INFO"
+    },
     "directories" : {
         "newDirectory" : "../_scripts/new",
         "executingDirectory" : "../_scripts/executing"

@@ -6,7 +6,9 @@ var logger = require('log4js').getLogger('main');
 var conf = require('./services/conf');
 var services = require('./services');
 
-logger.info('conf',JSON.stringify(conf));
+logger.setLevel(conf.log.level);
+logger.trace('conf',JSON.stringify(conf));
+
 
 
 exports.initialize = function(){
