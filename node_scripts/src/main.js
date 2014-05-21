@@ -55,6 +55,7 @@ exports.doMain = function(){
             opts = _opts;
             logger.info('creating execution dir');
             outputWriter = new services.taskOutputWriter.Writer( conf.directories.executingDirectory, opts.serverNodeId, opts.action );
+            outputWriter.createDir();
             callback();
         },
         function writeConfObj(  callback  ){
@@ -84,9 +85,9 @@ exports.doMain = function(){
                         });
                     }
 
-                    if ( exitCode === 0 ){
+//                    if ( exitCode === 0 ){
                         callback();
-                    }
+//                    }
                 },
                 'onErr' : function( err ){
                     logger.error(err);
@@ -166,7 +167,7 @@ exports.doMain = function(){
 
 
             logger.info('post execution handler');
-            if ( opts.sendEmail === true ){
+            if ( opts.sendEmail === true && opts.actions === 'install'){
                 logger.info('resolving ip');
                  services.cloudifyRestClient.getServiceIp( opts.managerIp, opts.applicationName, opts.serviceName, sendEmail );
             }
@@ -180,10 +181,6 @@ exports.doMain = function(){
 
             logger.info('email sent successfully');
         }
-
-
-
-
 
     ], function( err ){
         if ( !!err ){

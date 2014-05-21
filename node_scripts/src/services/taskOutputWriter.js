@@ -17,6 +17,7 @@ function OutputWriter( baseDir, name, action ){
 
     var dirName = path.join(baseDir,name);
     var logFile = path.resolve(path.join(dirName, action + '.log'));
+    var outputFile = path.resolve(path.join(dirName, 'output.log'));
     var configurationFile = path.join(dirName, action + '.json');
     var statusFile = path.join(dirName, action + '.status');
     logger.info('log file is', logFile );
@@ -29,7 +30,13 @@ function OutputWriter( baseDir, name, action ){
     };
     this.getLogAppender = function(){
 
+        // writing to 2 files. the action.log file and a general output.log file where the server can read output from.
+
         fs.writeFileSync( logFile, '', 'utf8');
+
+        if ( !fs.existsSync( outputFile )){
+            fs.writeFileSync( outputFile, '', 'utf8');
+        }
 
         return {
             'write' : function( data ){
@@ -37,6 +44,7 @@ function OutputWriter( baseDir, name, action ){
                     data = data.toString();
                 }
                 fs.appendFileSync( logFile , data , 'utf8');
+                fs.appendFileSync( outputFile , data , 'utf8');
             }
         }
 

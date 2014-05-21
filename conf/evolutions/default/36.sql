@@ -1,4 +1,4 @@
-alter table server_node add column send_email  tinyint(1) default 0;
+alter table widget add column send_email  tinyint(1) default 0;
 alter table server_node add column widget_instance_user_details_id bigint;
 
 create table widget_instance_user_details (

@@ -31,7 +31,7 @@ public abstract class AbstractLoginController extends Controller {
             userDetails.setName( details.getFirstName() );
             userDetails.setEmail( details.getEmail() );
 
-            response().setCookie("instanceUserDetails",Json.toJson(userDetails).toString(), Integer.MAX_VALUE);
+            session().put(WidgetInstanceUserDetails.COOKIE_NAME,Json.toJson(userDetails).toString());
 
         }
 

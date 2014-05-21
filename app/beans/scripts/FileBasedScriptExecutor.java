@@ -120,11 +120,11 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 
         // add application name and service for mail sending
 
-        if ( serverNode.sendEmail ) {
+        if ( serverNode.getWidget().sendEmail ) {
 
             map.put("serviceName", serverNode.getWidget().getConsoleUrlService());
             map.put("applicationName", serverNode.getWidget().getRecipeName());
-            map.put("sendEmail", serverNode.sendEmail);
+            map.put("sendEmail", serverNode.getWidget().sendEmail);
             map.put("managerIp", serverNode.getPublicIP());
 
             Map<String,Object> mandrillDetails = new HashMap<String, Object>();

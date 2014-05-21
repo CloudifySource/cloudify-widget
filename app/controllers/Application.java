@@ -184,12 +184,12 @@ public class Application extends Controller
 
             try {
                 logger.info("trying to save user details on server node");
-                Http.Cookie cookie = request().cookies().get(WidgetInstanceUserDetails.COOKIE_NAME);
+                String widgetInstanceUserDetailsStr = session().get(WidgetInstanceUserDetails.COOKIE_NAME);
 
-                if (cookie != null && !StringUtils.isEmptyOrSpaces(widget.loginsString) ) {
+                if ( !StringUtils.isEmptyOrSpaces(widgetInstanceUserDetailsStr) && !StringUtils.isEmptyOrSpaces(widget.loginsString) ) {
                     logger.info("I got a cookie");
-                    String value = cookie.value();
-                    WidgetInstanceUserDetails widgetInstanceUserDetails = Json.fromJson(Json.parse(value), WidgetInstanceUserDetails.class);
+                    WidgetInstanceUserDetails widgetInstanceUserDetails = Json.fromJson(Json.parse( widgetInstanceUserDetailsStr ), WidgetInstanceUserDetails.class);
+                    widgetInstanceUserDetails.save();
                     serverNode.widgetInstanceUserDetails = widgetInstanceUserDetails;
                     serverNode.save();
                 }

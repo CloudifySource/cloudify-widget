@@ -74,6 +74,8 @@ public class Widget
 
     public String cloudName;
 
+    public boolean sendEmail;
+
     // optional
 	private String recipeURL = null;
 	private Boolean allowAnonymous;
