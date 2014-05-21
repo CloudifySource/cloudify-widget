@@ -105,6 +105,9 @@ extends Model
     public String recipeProperties = null;
 
 
+    @OneToOne( cascade = CascadeType.REMOVE)
+    public WidgetInstanceUserDetails widgetInstanceUserDetails = null;
+
     @JsonIgnore
     @OneToMany(mappedBy="serverNode", cascade = CascadeType.REMOVE)
     public List<ServerNodeEvent> events = new LinkedList<ServerNodeEvent>();
@@ -424,6 +427,10 @@ extends Model
 
     public void setLead(Lead lead) {
         this.lead = lead;
+    }
+
+    public static ServerNode findByWidgetAndInstanceId(Widget widget, String instanceId) {
+        return find.where().eq("widget",widget).eq("id", instanceId).findUnique();
     }
 
     // guy - todo - formalize this for reuse.

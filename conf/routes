@@ -22,7 +22,7 @@ GET 	 /backend/getConf           	controllers.Application.getConf( name : String
 
 # Widget
 POST     /widget/start		     	    controllers.Application.start( apiKey: String, userId:String?="" )
-POST     /widget/:instanceId/stop	    controllers.Application.stop( apiKey: String, instanceId: String)
+POST     /widget/:instanceId/stop	    controllers.Application.stopPoolInstance( apiKey: String, instanceId: String)
 GET      /widget/:instanceId/status     controllers.Application.getWidgetStatus( apiKey: String, instanceId: String )
 GET      /widget/:instanceId/pem        controllers.Application.downloadPemFile( instanceId:String )
 GET     /encrypt                        controllers.Application.encrypt( data:String )

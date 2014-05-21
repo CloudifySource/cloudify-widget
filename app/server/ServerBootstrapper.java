@@ -87,4 +87,7 @@ public interface ServerBootstrapper
     boolean reboot(ServerNode serverNode);
 
 
+    public void teardown( ServerNode serverNode );
+
+
 }

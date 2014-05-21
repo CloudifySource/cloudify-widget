@@ -14,7 +14,7 @@ public interface ScriptExecutorsConstants {
 	
 	String CLOUDIFY_HOME = "CLOUDIFY_HOME";
 	
-	String SCRIPTS_FOLDER_PATH = "." + File.separator + "_scripts";
+	String SCRIPTS_FOLDER_PATH = "." + File.separator + "node_scripts" + File.separator + "_scripts";
 	String NEW_SCRIPTS_FOLDER_PATH = SCRIPTS_FOLDER_PATH + File.separator + "new" + File.separator;
 	String EXECUTING_SCRIPTS_FOLDER_PATH = SCRIPTS_FOLDER_PATH + File.separator + "executing" + File.separator;
 	//String EXECUTED_SCRIPTS_FOLDER_PATH = SCRIPTS_FOLDER_PATH + File.separator + "executed" + File.separator;

@@ -31,7 +31,7 @@ stop() {
 }
 
 executeScript(){
-    cd $WIDGET_HOME/conf
+    cd $WIDGET_HOME/node_scripts/src
     node scriptsExecutor.js >> $WIDGET_HOME/logs/scriptsExecutor.log 2>&1
 }
 

@@ -74,6 +74,8 @@ public class Widget
 
     public String cloudName;
 
+    public boolean sendEmail;
+
     // optional
 	private String recipeURL = null;
 	private Boolean allowAnonymous;
@@ -98,6 +100,10 @@ public class Widget
 
     @JsonProperty(value="consolename")
 	private String consoleName;
+
+
+    @OneToOne( cascade = CascadeType.REMOVE )
+    public MandrillDetails mandrillDetails = null;
 
 
     // guy - this is a temporary work around until cloudify will sort

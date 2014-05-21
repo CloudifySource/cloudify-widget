@@ -26,6 +26,7 @@ import cloudify.widget.api.clouds.CloudServerApi;
 import models.ServerNode;
 import models.Widget;
 
+import models.WidgetInstanceUserDetails;
 import org.apache.commons.lang.NumberUtils;
 import org.codehaus.jackson.JsonNode;
 import org.jasypt.util.text.BasicTextEncryptor;
@@ -41,6 +42,7 @@ import play.libs.F;
 import play.libs.Json;
 import play.libs.WS;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Http.RequestBody;
 import play.mvc.Result;
 import server.ApplicationContext;
@@ -180,6 +182,21 @@ public class Application extends Controller
                 serverNode.save();
             }
 
+            try {
+                logger.info("trying to save user details on server node");
+                String widgetInstanceUserDetailsStr = session().get(WidgetInstanceUserDetails.COOKIE_NAME);
+
+                if ( !StringUtils.isEmptyOrSpaces(widgetInstanceUserDetailsStr) && !StringUtils.isEmptyOrSpaces(widget.loginsString) ) {
+                    logger.info("I got a cookie");
+                    WidgetInstanceUserDetails widgetInstanceUserDetails = Json.fromJson(Json.parse( widgetInstanceUserDetailsStr ), WidgetInstanceUserDetails.class);
+                    widgetInstanceUserDetails.save();
+                    serverNode.widgetInstanceUserDetails = widgetInstanceUserDetails;
+                    serverNode.save();
+                }
+            }catch(Exception e){
+                logger.error("unable to save widget instance user details",e);
+            }
+
             // run the "bootstrap" and "deploy" in another thread.
 
             final ServerNode finalServerNode = serverNode;
@@ -240,41 +257,56 @@ public class Application extends Controller
         }
     }
 
-    public static Result tearDownRemoteBootstrap( Widget widget ){
-        if ( StringUtils.isEmptyOrSpaces(widget.managerPrefix) ){
-            return internalServerError("This widget is not configured for remote teardown. please contact admin.");
-        }
+    public static Result tearDownRemoteBootstrap( final String widgetApiKey ){
 
-        logger.info("tearing down remote bootatrap");
-        CloudServerApi cloudServerApi = ApplicationContext.get().getCloudServerApi();
+        Akka.system().scheduler().scheduleOnce( Duration.create( 0, TimeUnit.SECONDS ),
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        Widget widget = Widget.getWidget(widgetApiKey);
 
-        // credentials validation is made when we attempt to create a PEM file. if credentials are wrong, it will fail.
-        RequestBody requestBody = request().body();
-        JsonNode advancedData = null;
-        JsonNode recipeProperties = null;
+                        if (StringUtils.isEmptyOrSpaces(widget.managerPrefix)) {
+                            logger.error("This widget is not configured for remote teardown. please contact admin.");
+                            return;
+                        }
 
-        if ( requestBody != null && requestBody.asJson() != null && !StringUtils.isEmptyOrSpaces( requestBody.asJson().toString() ) ){
-            JsonNode jsonNode = requestBody.asJson();
-            String ADVANCED_DATA_JSON_KEY = "advancedData";
-            if ( jsonNode.has(ADVANCED_DATA_JSON_KEY) && !StringUtils.isEmptyOrSpaces( jsonNode.get(ADVANCED_DATA_JSON_KEY).toString())){
-                advancedData = jsonNode.get(ADVANCED_DATA_JSON_KEY);
-            }
-        }
+                        logger.info("tearing down remote bootatrap");
+                        CloudServerApi cloudServerApi = ApplicationContext.get().getCloudServerApi();
 
-        String managerIp = null;
-        cloudServerApi.connect();
-        Collection<CloudServer> allMachinesWithTag = cloudServerApi.getAllMachinesWithTag(null);
-        for (CloudServer cloudServer : allMachinesWithTag) {
-            if ( cloudServer.getName().startsWith(widget.managerPrefix)){
-                managerIp = cloudServer.getServerIp().publicIp;
-            }
-        }
+                        // credentials validation is made when we attempt to create a PEM file. if credentials are wrong, it will fail.
+                        RequestBody requestBody = request().body();
+                        JsonNode advancedData = null;
+                        JsonNode recipeProperties = null;
 
-        if ( managerIp == null ){
-            return ok("{'message':'did not find a manager to tear down', 'code':100}");
-        }
+                        if (requestBody != null && requestBody.asJson() != null && !StringUtils.isEmptyOrSpaces(requestBody.asJson().toString())) {
+                            JsonNode jsonNode = requestBody.asJson();
+                            String ADVANCED_DATA_JSON_KEY = "advancedData";
+                            if (jsonNode.has(ADVANCED_DATA_JSON_KEY) && !StringUtils.isEmptyOrSpaces(jsonNode.get(ADVANCED_DATA_JSON_KEY).toString())) {
+                                advancedData = jsonNode.get(ADVANCED_DATA_JSON_KEY);
+                            }
+                        }
 
-      return ok("TBD");
+                        String managerIp = null;
+                        cloudServerApi.connect();
+                        Collection<CloudServer> allMachinesWithTag = cloudServerApi.getAllMachinesWithTag(null);
+                        for (CloudServer cloudServer : allMachinesWithTag) {
+                            if (cloudServer.getName().startsWith(widget.managerPrefix)) {
+                                managerIp = cloudServer.getServerIp().publicIp;
+                            }
+                        }
+
+//                        ApplicationContext.get().getServerBootstrapper().
+
+                        if (managerIp == null) {
+                            logger.info("did not find a manager to tear down");
+
+                        }
+
+                    }
+                }
+        );
+            return ok("TBD");
+
     }
 
     private static Long getPlayTimeout(){
@@ -328,9 +360,8 @@ public class Application extends Controller
     }
 
 
-    public static Result stop( final String apiKey, final String instanceId )
+    public static Result stopPoolInstance( final String apiKey, final String instanceId )
     {
-        final String remoteAddress = request().remoteAddress();
         Akka.system().scheduler().scheduleOnce( Duration.create( 0, TimeUnit.SECONDS ),
                 new Runnable() {
                     @Override
@@ -345,9 +376,15 @@ public class Application extends Controller
 //                        }
 
                         if ( instanceId != null ) {
-                            ServerNode serverNode = ServerNode.find.byId( Long.parseLong( instanceId ) );
-                            ApplicationContext.get().getWidgetServer().uninstall( serverNode );
-                            Utils.deleteCachedOutput( serverNode );
+                            logger.info("stopping server node for widget [{}] and instanceId [{}]", widget, instanceId );
+                            ServerNode serverNode = ServerNode.findByWidgetAndInstanceId(widget, instanceId);
+                            if ( serverNode != null ) {
+                                ApplicationContext.get().getServerBootstrapper().destroyServer( serverNode );
+                            }else{
+                                logger.info("serverNode for widget [{}] and instanceId [{}] does not exit", widget, instanceId );
+                            }
+//                            ApplicationContext.get().getWidgetServer().uninstall( serverNode );
+//                            Utils.deleteCachedOutput( serverNode );
                         }
                     }
                 } );
