@@ -193,7 +193,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		
 		long nodeId = serverNode.getId();
 		String outputFileName = EXECUTING_SCRIPTS_FOLDER_PATH +  
-					nodeId + File.separator + OUTPUT_FILE_NAME_PREFIX + nodeId + ".log";
+					nodeId + File.separator + "output.log";
 		
 		if( logger.isDebugEnabled() ){
 			logger.debug( "> outputFileName=" + outputFileName );
