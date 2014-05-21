@@ -1,23 +1,4 @@
-
 {
-    "mailSettings" : {
-        "type" : "SMTP",
-        "options" : {
-            "host" : "__host__",
-            "port" : "__port__" ,
-            "auth" : {
-                "user" : "__user__",
-                "pass" : "__pass__"
-            }
-        },
-        "emails" : {
-            "logs" : {
-                "from" : "__from__",
-                "to" : "__to__",
-                "subject" : "logs"
-            }
-        }
-    },
     "directories" : {
         "newDirectory" : "../_scripts/new",
         "executingDirectory" : "../_scripts/executing"
