@@ -259,6 +259,7 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
         $.postMessage( JSON.stringify({name:"widget_stop"}), $scope.params.origin_page_url , parent );
         $scope.widgetStatus.state = stop;
         resetWidgetStatus();
+        dbService.saveWidgetStatus(null); //removes the cookie.
     };
 
     $scope.getTimeLeft = function(){
