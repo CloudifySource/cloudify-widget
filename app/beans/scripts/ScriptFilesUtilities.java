@@ -192,9 +192,7 @@ public class ScriptFilesUtilities implements ScriptExecutorsConstants{
 		}
 		
 		String fileContent = FileUtils.readFileToString( resultJsonFile );
-		if( logger.isDebugEnabled() ){
-			logger.debug( "---getJson(), fileContent=" + fileContent  );
-		}
+	    logger.info( " --- file exists --- getJson(), fileContent=" + fileContent  );
 		retValue = Json.parse( fileContent );
 		
 		return retValue;

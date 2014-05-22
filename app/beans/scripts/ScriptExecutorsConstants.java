@@ -28,5 +28,5 @@ public interface ScriptExecutorsConstants {
 	
 	//String BOOTSTRAPPING_STATUS_FILE_NAME = "bootstrapping_status.json";
 	String ERROR_MESSAGE_PROPERTY = "exception";
-	String EXIT_STATUS_PROPERTY = "exitStatus";
+	String EXIT_STATUS_PROPERTY = "exitCode";
 }
