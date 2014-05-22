@@ -282,18 +282,12 @@ public class ScriptFilesUtilities implements ScriptExecutorsConstants{
 		boolean retValue = false;
 
 		try {
-			if( logger.isDebugEnabled() ){
-				logger.debug( "---START isBootstrappingFinished()" );
-			}
+     		logger.info( "---START isBootstrappingFinished()" );
 			JsonNode parsedJson = getStatusJson( subFolderName, BOOTSTRAP, serverNodeId );
-			if( logger.isDebugEnabled() ){
-				logger.debug( "---isBootstrappingFinished(), parsedJson=" + parsedJson );
-			}
+    		logger.info( "---isBootstrappingFinished(), parsedJson=" + parsedJson );
 			if( parsedJson != null ){
 				JsonNode statusJsonNode = parsedJson.get( EXIT_STATUS_PROPERTY );
-				if( logger.isDebugEnabled() ){
-					logger.debug( "---isBootstrappingFinished(), statusJsonNode=" + statusJsonNode );
-				}
+    			logger.info( "---isBootstrappingFinished(), statusJsonNode=" + statusJsonNode );
 				if( statusJsonNode != null ){
 					logger.info( "Bootstrap exit code:" + statusJsonNode.getIntValue() );
 					retValue = true;
