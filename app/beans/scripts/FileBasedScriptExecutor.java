@@ -117,6 +117,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		map.put( CMD_ARGUMENTS, StringUtils.join(arguments, ",") );
     	map.put( SERVER_NODE_ID_PROPERTY, String.valueOf( serverNode.getId() ) );
 		map.put( CLOUDIFY_HOME_PROPERTY, environment.get( CLOUDIFY_HOME ) );
+        map.put("managerIp", serverNode.getPublicIP());
 
 
         // add application name and service for mail sending
@@ -126,7 +127,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
             map.put("serviceName", serverNode.getWidget().getConsoleUrlService());
             map.put("applicationName", serverNode.getWidget().getRecipeName());
             map.put("sendEmail", serverNode.getWidget().sendEmail);
-            map.put("managerIp", serverNode.getPublicIP());
+
 
             Map<String,Object> mandrillDetails = new HashMap<String, Object>();
             map.put("mandril", mandrillDetails);

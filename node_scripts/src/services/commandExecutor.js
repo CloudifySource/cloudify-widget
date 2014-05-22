@@ -1,4 +1,5 @@
 var logger = require('log4js').getLogger('commandExecutor');
+var path = require('path');
 var spawn = require('child_process').spawn;
 
 
@@ -32,10 +33,15 @@ exports.execute = function( opts , handlers ){
 
     var executable = opts.executable;
     var argumentsArray = opts.arguments.split(",");
+
+    if ( opts.action === 'install'){ // guy, fix, manager IP is missing
+        argumentsArray.unshift(opts.managerIp);
+    }
+
     var cloudifyHome = opts.cloudifyHome;
 
 
-    logger.info( 'executable=' , executable );
+    logger.info( 'executable=' , path.resolve(executable) );
     logger.info( 'splitted arguments=' , argumentsArray );
     logger.info( 'cloudifyHome=' , cloudifyHome );
 
