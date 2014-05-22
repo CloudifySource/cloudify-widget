@@ -169,9 +169,11 @@ exports.doMain = function(){
 
 
             logger.info('post execution handler');
-            if ( opts.sendEmail === true && opts.actions === 'install'){
+            if ( opts.sendEmail === true && opts.action === 'install'){
                 logger.info('resolving ip');
                  services.cloudifyRestClient.getServiceIp( opts.managerIp, opts.applicationName, opts.serviceName, sendEmail );
+            } else{
+                logger.info('did not send email since sendEmail or action did not apply', opts.sendEmail, opts.action );
             }
         },
 
