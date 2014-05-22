@@ -89,6 +89,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 		
 		Map<String,Object> map = new HashMap<String, Object>();
 		addCommonProps( cmdLine, map, serverNode );
+        map.put("action","install");
 		
 		try {
 			ScriptFilesUtilities.writeToJsonFile( serverNodeId, INSTALL, map );
