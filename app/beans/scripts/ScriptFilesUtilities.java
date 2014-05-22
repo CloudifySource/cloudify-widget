@@ -205,7 +205,7 @@ public class ScriptFilesUtilities implements ScriptExecutorsConstants{
 		JsonNode retValue = null;
 	
 		String path = createOperationStatusJsonFileName( 
-							EXECUTING_SCRIPTS_FOLDER_PATH + subFolderName, serverNodeId, opName ); 
+							EXECUTING_SCRIPTS_FOLDER_PATH + serverNodeId, serverNodeId, opName );
 		File resultJsonFile = FileUtils.getFile( path );
 		if( logger.isDebugEnabled() ){
 			logger.debug( "---getStatusJson(), statusJsonNodeFile=" + path + ", exists:" + resultJsonFile.exists() );
@@ -231,7 +231,7 @@ public class ScriptFilesUtilities implements ScriptExecutorsConstants{
 			
 	public static String createOperationStatusJsonFileName( 
 								String parentFolderPath, String serverNodeId, String operationName ){			
-		return parentFolderPath + File.separator + serverNodeId + SERVER_NODE_ID_DELIMETER + operationName + STATUS_SUFFIX;
+		return parentFolderPath + File.separator +"bootstrap.status";
 	}	
 	
 	/*
@@ -325,6 +325,8 @@ public class ScriptFilesUtilities implements ScriptExecutorsConstants{
 		
 		return retValue;
 	}
+
+
 	
 	private static int getBootstrappingExitStatus( String subFolderName, String serverNodeId ) {
 
@@ -351,7 +353,7 @@ public class ScriptFilesUtilities implements ScriptExecutorsConstants{
 		
 		long nodeId = serverNode.getId();
 		String outputFileName = EXECUTING_SCRIPTS_FOLDER_PATH +  
-					nodeId + File.separator + OUTPUT_FILE_NAME_PREFIX + nodeId + ".log";
+					nodeId + File.separator + "output.log";
 		
 		if( logger.isDebugEnabled() ){
 			logger.debug( "> outputFileName=" + outputFileName );
