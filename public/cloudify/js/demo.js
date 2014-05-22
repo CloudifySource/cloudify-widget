@@ -22,7 +22,7 @@ WidgetApp.controller('DemoController', function($scope, $location, $log, $routeP
                 var data = JSON.parse(e.data);
                 console.dir(data);
                 // installation finished
-                if (data.status.instanceIsAvailable) {
+                if (!!data && !!data.status && !!data.status.instanceIsAvailable) {
                     // if not already shown, display customized overlay
                     if (!completedOverlayShown) {
                         $scope.completedWT = true;
