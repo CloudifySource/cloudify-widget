@@ -25,7 +25,7 @@
 
 cloud {
 	// Mandatory. The name of the cloud, as it will appear in the Cloudify UI.
-	name = "softlayer"
+	name = displyName
 
 	/********
 	 * General configuration information about the cloud driver implementation.
@@ -34,9 +34,9 @@ cloud {
 		// Optional. The cloud implementation class. Defaults to the build in jclouds-based provisioning driver.
 		className "org.cloudifysource.esc.driver.provisioning.jclouds.softlayer.SoftlayerProvisioningDriver"
 		// Optional. The template name for the management machines. Defaults to the first template in the templates section below.
-		managementMachineTemplate "SMALL_LINUX"
+		managementMachineTemplate "MASTER_NODE"
 		// Optional. Indicates whether internal cluster communications should use the machine private IP. Defaults to true.
-		connectToPrivateIp true
+		connectToPrivateIp false
 
         components {
 
@@ -44,6 +44,8 @@ cloud {
 
                 startMachineTimeoutInSeconds 36000
                 stopMachineTimeoutInSeconds 36000
+                minMemory "64m"
+                maxMemory "4096m"
             }
 
         }
@@ -71,10 +73,10 @@ cloud {
 		// different HTTP server instead.
 		// IMPORTANT: the default linux bootstrap script appends '.tar.gz' to the url whereas the default windows script appends '.zip'.
 		// Therefore, if setting a custom URL, make sure to leave out the suffix.
-        // cloudifyUrl "http://repository.cloudifysource.org/org/cloudifysource/2.7.1-6202-M2/gigaspaces-cloudify-2.7.1-m2-b6202.zip"
+        cloudifyUrl "http://repository.cloudifysource.org/softlayer/gigaspaces-cloudify-2.7.1-m6-b6205-130bmcci"
 
 		// Mandatory. The prefix for new machines started for servies.
-        machineNamePrefix "cloudify-agent-"
+        machineNamePrefix AGENT_PREFIX
 		// Optional. Defaults to true. Specifies whether cloudify should try to deploy services on the management machine.
 		// Do not change this unless you know EXACTLY what you are doing.
 
@@ -86,7 +88,7 @@ cloud {
 		sshLoggingLevel "WARNING"
 
 		// Mandatory. Name of the new machine/s started as cloudify management machines. Names are case-insensitive.
-		managementGroup "cloudify-manager"
+		managementGroup MANAGER_PREFIX
 		// Mandatory. Number of management machines to start on bootstrap-cloud. In production, should be 2. Can be 1 for dev.
 		numberOfManagementMachines 1
 
@@ -118,15 +120,15 @@ cloud {
 		 */
 		templates ([
 					// Mandatory. Template Name.
-					SMALL_LINUX : computeTemplate{
+					MASTER_NODE : computeTemplate {
 						// Mandatory. Image ID.
-						imageId linuxImageId
+						imageId masterLinuxImageId
 						// Mandatory. Files from the local directory will be copied to this directory on the remote machine.
 						remoteDirectory "/tmp/gs-files"
 						// Mandatory. Amount of RAM available to machine.
-						machineMemoryMB 1600
+						machineMemoryMB 10000
 						// Mandatory. Hardware ID.
-						hardwareId hardwareId
+						hardwareId masterHardwareId
 						// Mandatory. All files from this LOCAL directory will be copied to the remote machine directory.
 						localDirectory "upload"
 						// Optional. Name of key file to use for authenticating to the remote machine. Remove this line if key files
@@ -135,8 +137,28 @@ cloud {
 						username "root"
 
                         options ([
-                                "domainName":"cloudify.org"
+                                "domainName":orgDomain
                         ])
+						
+						
+						
+						overrides ([
+							// additional disks, 7 in total.
+							"jclouds.softlayer.external-disks-ids":masterOtherHardDisksIDs,
+							"jclouds.softlayer.package-id":masterPackage, // Use Bare Metal Servers Package or not (44 is BM)
+							"jclouds.softlayer.hardware.disk-controller" : masterDiskControllerID ,  // RAID 1 OR non-RAID1 
+							"jclouds.so-timeout" : 600000 ,
+							"jclouds.connection-timeout" : 600000,
+							"jclouds.request-timeout":600000,
+							//"jclouds.max-retries":5,
+							"jclouds.max-retries":1,
+							//"jclouds.retries-delay-start":300000
+						])
+						
+						env ([
+							"ESM_JAVA_OPTIONS" : "-Dorg.openspaces.grid.start-agent-timeout-seconds=72000000"
+						])
+
 						
 						// when set to 'true', agent will automatically start after reboot.
 						autoRestartAgent true
@@ -148,105 +170,58 @@ cloud {
 						// initializationCommand "echo Cloudify agent is about to start"
 	
 					},
-                    // Mandatory. Template Name.
-                    SMALL_LINUX_BMI : computeTemplate{
-                        // Mandatory. Image ID.
-                        imageId bmiLinuxImageId
-                        // Mandatory. Files from the local directory will be copied to this directory on the remote machine.
-                        remoteDirectory "/tmp/gs-files"
-                        // Mandatory. Amount of RAM available to machine.
-                        machineMemoryMB 1600
-                        // Mandatory. Hardware ID.
-                        hardwareId bmiHardwareId
-                        // Mandatory. All files from this LOCAL directory will be copied to the remote machine directory.
-                        localDirectory "upload"
-                        // Optional. Name of key file to use for authenticating to the remote machine. Remove this line if key files
-                        // are not used.
-                        locationId locationId
-                        username "root"
-
-                        // when set to 'true', agent will automatically start after reboot.
-                        autoRestartAgent true
+					// Mandatory. Template Name.
+					DATA_NODE : computeTemplate {
+						// Mandatory. Image ID.
+						imageId dataLinuxImageId
+						// Mandatory. Files from the local directory will be copied to this directory on the remote machine.
+						remoteDirectory "/tmp/gs-files"
+						// Mandatory. Amount of RAM available to machine.
+						machineMemoryMB 10000
+						// Mandatory. Hardware ID.
+						hardwareId dataHardwareId
+						// Mandatory. All files from this LOCAL directory will be copied to the remote machine directory.
+						localDirectory "upload"
+						// Optional. Name of key file to use for authenticating to the remote machine. Remove this line if key files
+						// are not used.						
+						locationId locationId
+						username "root"
 
                         options ([
-                                "domainName":"cloudify.org"
+                                "domainName":orgDomain
                         ])
+						
+						
+						
+						overrides ([
+							// additional disks, 7 in total.
+							"jclouds.softlayer.external-disks-ids":dataOtherHardDisksIDs,
+							"jclouds.softlayer.package-id":dataPackage, // Use Bare Metal Servers Package or not (44 is BM)	
+							"jclouds.softlayer.hardware.disk-controller" : dataDiskControllerID ,  // RAID 1 OR non-RAID1
+							"jclouds.so-timeout" : 600000 ,
+							"jclouds.connection-timeout" : 600000,
+							"jclouds.request-timeout":600000,
+							//"jclouds.max-retries":5,
+							"jclouds.max-retries":1,
+							//"jclouds.retries-delay-start":300000
+						])
+						
+						env ([
+							"ESM_JAVA_OPTIONS" : "-Dorg.openspaces.grid.start-agent-timeout-seconds=72000000"
+						])
 
-                        custom ([
-                                "org.cloudifysource.softlayer.bmi":true
-                        ])
+						
+						// when set to 'true', agent will automatically start after reboot.
+						autoRestartAgent true
 
                         // enable sudo.
-                        privileged true
-
-                        // optional. A native command line to be executed before the cloudify agent is started.
-                        // initializationCommand "echo Cloudify agent is about to start"
-
-                    },
-					
-                    MEDIUM_RH : computeTemplate{
-                       // Mandatory. Image ID.
-                       imageId readHatLinuxImageId
-                       // Mandatory. Files from the local directory will be copied to this directory on the remote machine.
-                       remoteDirectory "/tmp/gs-files"
-                       // Mandatory. Amount of RAM available to machine.
-                       machineMemoryMB 1600
-                       // Mandatory. Hardware ID.
-                       hardwareId readHatHardwareId
-                       // Mandatory. All files from this LOCAL directory will be copied to the remote machine directory.
-                       localDirectory "upload"
-                       // Optional. Name of key file to use for authenticating to the remote machine. Remove this line if key files
-                       // are not used.						
-                       locationId locationId
-                       username "root"
-					   
-                       options ([
-                              "domainName":"cloudify.org"
-                       ])
-
-                       // when set to 'true', agent will automatically start after reboot.
-                       autoRestartAgent true
-
-                       // enable sudo.
-                      privileged true
-
-                      // optional. A native command line to be executed before the cloudify agent is started.
-                      // initializationCommand "echo Cloudify agent is about to start"
+						privileged true
 	
-                   }, 					
-					
-                   MEDIUM_UBUNTU : computeTemplate{
-                       // Mandatory. Image ID.
-                       imageId mediumUbuntuLinuxImageId
-                       // Mandatory. Files from the local directory will be copied to this directory on the remote machine.
-                       remoteDirectory "/tmp/gs-files"
-                       // Mandatory. Amount of RAM available to machine.
-                       machineMemoryMB 1600
-                       // Mandatory. Hardware ID.
-                       hardwareId mediumUbuntuHardwareId
-                       // Mandatory. All files from this LOCAL directory will be copied to the remote machine directory.
-                       localDirectory "upload"
-                       // Optional. Name of key file to use for authenticating to the remote machine. Remove this line if key files
-                       // are not used.						
-                       locationId locationId
-                       username "root"
-
-                       options ([
-                              "domainName":"cloudify.org"
-                       ])
-
-                       // when set to 'true', agent will automatically start after reboot.
-                       autoRestartAgent true
-
-                       // enable sudo.
-                       privileged true
-
-                       // optional. A native command line to be executed before the cloudify agent is started.
-                       // initializationCommand "echo Cloudify agent is about to start"
-
-                   }
-
-				])
+						// optional. A native command line to be executed before the cloudify agent is started.
+						// initializationCommand "echo Cloudify agent is about to start"
+	
+					}                     
+        ])
 	
 	}
 
