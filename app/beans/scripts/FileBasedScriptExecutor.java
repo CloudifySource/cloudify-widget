@@ -130,7 +130,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 
 
                 Map<String, Object> mandrillDetails = new HashMap<String, Object>();
-                map.put("mandril", mandrillDetails);
+                map.put("mandrill", mandrillDetails);
 
 
                 mandrillDetails.put("apiKey", serverNode.getWidget().mandrillDetails.apiKey);
