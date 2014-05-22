@@ -283,9 +283,9 @@ public class ScriptFilesUtilities implements ScriptExecutorsConstants{
 
 
 			if( parsedJson != null ){
-                logger.debug( "---isBootstrappingFinished(), parsedJson=" + parsedJson );
+                logger.info( "---isBootstrappingFinished(), parsedJson=" + parsedJson );
 				JsonNode statusJsonNode = parsedJson.get( EXIT_STATUS_PROPERTY );
-    			logger.debug( "---isBootstrappingFinished(), statusJsonNode=" + statusJsonNode );
+    			logger.info( "---isBootstrappingFinished(), statusJsonNode=" + statusJsonNode );
 				if( statusJsonNode != null ){
 					logger.info( "Bootstrap exit code:" + statusJsonNode.getIntValue() );
 					retValue = true;
