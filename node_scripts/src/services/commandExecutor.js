@@ -34,10 +34,6 @@ exports.execute = function( opts , handlers ){
     var executable = opts.executable;
     var argumentsArray = opts.arguments.split(",");
 
-    if ( opts.action === 'install'){ // guy, fix, manager IP is missing
-        argumentsArray.unshift(opts.managerIp);
-    }
-
     var cloudifyHome = opts.cloudifyHome;
 
 
