@@ -23,12 +23,15 @@ import java.util.concurrent.TimeUnit;
 
 import cloudify.widget.api.clouds.CloudServer;
 import cloudify.widget.api.clouds.CloudServerApi;
+import cloudify.widget.softlayer.SoftlayerCloudServerApi;
+import cloudify.widget.softlayer.SoftlayerConnectDetails;
 import models.ServerNode;
 import models.Widget;
 
 import models.WidgetInstanceUserDetails;
 import org.apache.commons.lang.NumberUtils;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +51,7 @@ import play.mvc.Result;
 import server.ApplicationContext;
 import server.HeaderMessage;
 import server.exceptions.ServerException;
+import utils.CollectionUtils;
 import utils.StringUtils;
 import utils.Utils;
 import akka.util.Duration;
@@ -221,6 +225,21 @@ public class Application extends Controller
                             public void run() {
                                 logger.info("deployment thread started");
                                 if (finalServerNode.isRemote()) {
+
+                                    logger.info("trying to find existing management");
+                                    try {
+                                        String ip = getExistingManagement(finalWidget, finalServerNode.advancedParams);
+                                        if ( !StringUtils.isEmptyOrSpaces(ip )) {
+                                            logger.info("found management on ip [{}]", ip);
+                                            finalServerNode.setPublicIP(ip);
+                                            finalServerNode.save();
+                                        }else{
+                                            logger.info("did not find management");
+                                        }
+                                    }catch(Exception e){
+                                        logger.info("got exception. will try to bootstrap cloud",e);
+                                    }
+
                                     logger.info("bootstrapping remote cloud");
                                     try {
                                         if (ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode) == null) {
@@ -256,6 +275,54 @@ public class Application extends Controller
             return internalServerError("only available in dev mode");
         }
     }
+
+    // find existing management and returns IP
+    public static String getExistingManagement( Widget widget, String advancedData ){
+
+        try {
+            if (StringUtils.isEmptyOrSpaces(widget.managerPrefix)) {
+                logger.error("This widget is not configured for reuse or remote teardown. please contact admin.");
+                return null;
+            }
+
+            logger.info("searching for existing management");
+            CloudServerApi cloudServerApi = new SoftlayerCloudServerApi();
+            ObjectMapper objectMapper = new ObjectMapper();
+            AdvancedParams advancedParams = objectMapper.readValue(advancedData, AdvancedParams.class);
+
+            SoftlayerConnectDetails connectDetails = new SoftlayerConnectDetails();
+            connectDetails.setKey( advancedParams.params.get("apiKey"));
+            connectDetails.setUsername( advancedParams.params.get("username"));
+            connectDetails.setNetworkId("274");
+            connectDetails.isApiKey = true;
+            cloudServerApi.connect( connectDetails );
+
+
+            Collection<CloudServer> allMachinesWithTag = cloudServerApi.getAllMachinesWithTag("");
+            logger.info("found machines [{}]", CollectionUtils.size(allMachinesWithTag));
+
+            for (CloudServer cloudServer : allMachinesWithTag) {
+                logger.info("checking [{}] vs. [{}]", cloudServer.getName(), widget.managerPrefix );
+                if (cloudServer.getName().startsWith(widget.managerPrefix)) {
+                    return cloudServer.getServerIp().publicIp;
+                }
+            }
+
+//
+        }catch(Exception e){
+            logger.error("unable to find existing management",e);
+            return null;
+        }
+
+        return null;
+    }
+
+
+    public static class AdvancedParams{
+        public String type;
+        public Map<String,String> params;
+    }
+
 
     public static Result tearDownRemoteBootstrap( final String widgetApiKey ){
 

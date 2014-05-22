@@ -260,6 +260,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                 result.managementAvailable = false;
             }
         }
+
         return result;
     }
 

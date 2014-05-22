@@ -255,11 +255,12 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
     };
 
     $scope.stop = function(){
+        dbService.remove(); // remove the cookie
         mixpanelService.stopWidget();
         $.postMessage( JSON.stringify({name:"widget_stop"}), $scope.params.origin_page_url , parent );
         $scope.widgetStatus.state = stop;
         resetWidgetStatus();
-        dbService.saveWidgetStatus(null); //removes the cookie.
+
     };
 
     $scope.getTimeLeft = function(){
@@ -389,7 +390,7 @@ widgetModule.service('dbService', function( $cookieStore, paramsService ){
 
     this.saveWidgetStatus = function(status){
         if ( !status ){
-            $cookieStore.remove( getCookieName() );
+            $.cookie(getCookieName(), null, {"path": "/"});
         }else{
             $.cookie(getCookieName(), JSON.stringify(toCookieStatus(status)), {"path": "/", expires: 10000 });
 

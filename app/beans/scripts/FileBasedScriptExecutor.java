@@ -122,43 +122,47 @@ public class FileBasedScriptExecutor implements ScriptExecutor, ScriptExecutorsC
 
         // add application name and service for mail sending
 
-        if ( serverNode.getWidget().sendEmail ) {
-
-            map.put("serviceName", serverNode.getWidget().getConsoleUrlService());
-            map.put("applicationName", serverNode.getWidget().getRecipeName());
-            map.put("sendEmail", serverNode.getWidget().sendEmail);
-
-
-            Map<String,Object> mandrillDetails = new HashMap<String, Object>();
-            map.put("mandril", mandrillDetails);
+        if ( serverNode.getWidget().sendEmail && !StringUtils.isEmptyOrSpaces(serverNode.getWidget().loginsString) ) {
+            logger.info("adding properties for sending email");
+            try {
+                map.put("serviceName", serverNode.getWidget().getConsoleUrlService());
+                map.put("applicationName", serverNode.getWidget().getRecipeName());
 
 
-            mandrillDetails.put("apiKey", serverNode.getWidget().mandrillDetails.apiKey );
-            mandrillDetails.put("templateName", serverNode.getWidget().mandrillDetails.templateName );
+                Map<String, Object> mandrillDetails = new HashMap<String, Object>();
+                map.put("mandril", mandrillDetails);
 
-            List<MandrillDataItem> items = new LinkedList<MandrillDataItem>();
-            items.add(new MandrillDataItem("name", serverNode.widgetInstanceUserDetails.name + " " + serverNode.widgetInstanceUserDetails.lastName));
-            items.add(new MandrillDataItem("firstName", serverNode.widgetInstanceUserDetails.name ) );
-            items.add(new MandrillDataItem("lastName", serverNode.widgetInstanceUserDetails.lastName));
-            items.add(new MandrillDataItem("link", serverNode.getWidget().getConsoleURL()));
-            items.add(new MandrillDataItem("linkTitle", serverNode.getWidget().getConsoleName()));
 
-            mandrillDetails.put("data", items);
+                mandrillDetails.put("apiKey", serverNode.getWidget().mandrillDetails.apiKey);
+                mandrillDetails.put("templateName", serverNode.getWidget().mandrillDetails.templateName);
 
-            List<MandrilEmailAddressItem> emailItems = new LinkedList<MandrilEmailAddressItem>();
+                List<MandrillDataItem> items = new LinkedList<MandrillDataItem>();
+                items.add(new MandrillDataItem("name", serverNode.widgetInstanceUserDetails.name + " " + serverNode.widgetInstanceUserDetails.lastName));
+                items.add(new MandrillDataItem("firstName", serverNode.widgetInstanceUserDetails.name));
+                items.add(new MandrillDataItem("lastName", serverNode.widgetInstanceUserDetails.lastName));
+                items.add(new MandrillDataItem("link", serverNode.getWidget().getConsoleURL()));
+                items.add(new MandrillDataItem("linkTitle", serverNode.getWidget().getConsoleName()));
 
-            emailItems.add( new MandrilEmailAddressItem(serverNode.widgetInstanceUserDetails));
-            String csvBccEmails = serverNode.getWidget().mandrillDetails.csvBccEmails;
-            if ( !StringUtils.isEmptyOrSpaces(csvBccEmails) ){
-                for (String item : csvBccEmails.split(",")) {
-                    if ( !StringUtils.isEmptyOrSpaces(item)){
-                        emailItems.add(new MandrilEmailAddressItem(item, "bcc address", "bcc"));
+                mandrillDetails.put("data", items);
+
+                List<MandrilEmailAddressItem> emailItems = new LinkedList<MandrilEmailAddressItem>();
+
+                emailItems.add(new MandrilEmailAddressItem(serverNode.widgetInstanceUserDetails));
+                String csvBccEmails = serverNode.getWidget().mandrillDetails.csvBccEmails;
+                if (!StringUtils.isEmptyOrSpaces(csvBccEmails)) {
+                    for (String item : csvBccEmails.split(",")) {
+                        if (!StringUtils.isEmptyOrSpaces(item)) {
+                            emailItems.add(new MandrilEmailAddressItem(item, "bcc address", "bcc"));
+                        }
                     }
                 }
+
+
+                mandrillDetails.put("to", emailItems);
+                map.put("sendEmail", serverNode.getWidget().sendEmail);
+            }catch(Exception e){
+                logger.info("error while trying to set properties for sending email");
             }
-
-
-            mandrillDetails.put("to",emailItems);
         }
     }
 
