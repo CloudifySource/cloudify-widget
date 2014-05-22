@@ -240,15 +240,19 @@ public class Application extends Controller
                                         logger.info("got exception. will try to bootstrap cloud",e);
                                     }
 
-                                    logger.info("bootstrapping remote cloud");
-                                    try {
-                                        if (ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode) == null) {
-                                            logger.info("bootstrap cloud returned NULL. stopping progress.");
+                                    if ( StringUtils.isEmptyOrSpaces( finalServerNode.getPublicIP() )) {
+                                        logger.info("bootstrapping remote cloud");
+                                        try {
+                                            if (ApplicationContext.get().getServerBootstrapper().bootstrapCloud(finalServerNode) == null) {
+                                                logger.info("bootstrap cloud returned NULL. stopping progress.");
+                                                return;
+                                            }
+                                        } catch (Exception e) {
+                                            logger.error("unable to bootstrap machine", e);
                                             return;
                                         }
-                                    } catch (Exception e) {
-                                        logger.error("unable to bootstrap machine", e);
-                                        return;
+                                    }else{
+                                        logger.info("skipping bootstrap");
                                     }
                                 }
 
@@ -292,7 +296,7 @@ public class Application extends Controller
 
             SoftlayerConnectDetails connectDetails = new SoftlayerConnectDetails();
             connectDetails.setKey( advancedParams.params.get("apiKey"));
-            connectDetails.setUsername( advancedParams.params.get("username"));
+            connectDetails.setUsername(advancedParams.params.get("username"));
             connectDetails.setNetworkId("274");
             connectDetails.isApiKey = true;
             cloudServerApi.connect( connectDetails );
