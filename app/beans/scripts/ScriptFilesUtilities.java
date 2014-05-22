@@ -23,7 +23,7 @@ import beans.config.ServerConfig.CloudBootstrapConfiguration;
 
 public class ScriptFilesUtilities implements ScriptExecutorsConstants{
 	
-	private final static long SLEEP_TIMEOUT = 3 *1000;
+	private final static long SLEEP_TIMEOUT = 6*10000;
 	
 	private static Logger logger = LoggerFactory.getLogger( ScriptFilesUtilities.class );
 
@@ -207,10 +207,8 @@ public class ScriptFilesUtilities implements ScriptExecutorsConstants{
 		String path = createOperationStatusJsonFileName( 
 							EXECUTING_SCRIPTS_FOLDER_PATH + serverNodeId, serverNodeId, opName );
 		File resultJsonFile = FileUtils.getFile( path );
-		if( logger.isDebugEnabled() ){
-			logger.debug( "---getStatusJson(), statusJsonNodeFile=" + path + ", exists:" + resultJsonFile.exists() );
-		}
-		
+    	logger.info( "---getStatusJson(), statusJsonNodeFile=" + path + ", exists:" + resultJsonFile.exists() );
+
 		if( !resultJsonFile.exists() ){
 			return null;
 		}
