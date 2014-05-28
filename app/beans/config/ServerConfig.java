@@ -158,6 +158,10 @@ public class ServerConfig {
         public File script; // script to run on bootstrap
         public String recipeUrl;
         public String cloudifyUrl;
+        public String urlSecretKey = "";
+        public String urlAccessKey = "";
+        public String recipeDownloadMethod = "wget";
+        public String installNode = "false";
         public String recipeRelativePath;
         public File prebootstrapScript = Utils.getFileByRelativePath("/conf/cloudify/prebootstrap");
 

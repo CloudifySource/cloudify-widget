@@ -387,6 +387,11 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                     .replace("##privateip##", privateIp)
                     .replace("##recipeUrl##", bootstrapConf.recipeUrl)
                     .replace("##cloudifyUrl##", bootstrapConf.cloudifyUrl)
+                    .replace("##urlAccessKey##", bootstrapConf.urlAccessKey)
+                    .replace("##urlSecretKey##", bootstrapConf.urlSecretKey)
+                    .replace("##installNode##", bootstrapConf.installNode)
+                    .replace("##recipeDownloadMethod##", bootstrapConf.recipeDownloadMethod)
+
                     .replace("##recipeRelativePath##", bootstrapConf.recipeRelativePath)
                     .replace("##prebootstrapScript##", prebootstrapScript);
             return script;
