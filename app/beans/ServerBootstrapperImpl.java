@@ -157,6 +157,8 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
     }
 
+
+    // teardown to remote machine
     public void teardown( ServerNode serverNode ){
 
     }
@@ -218,6 +220,15 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         }catch(Exception e){
             logger.info("unable to delete. perhaps this node will remain on the cloud. need to remove manually.");
         }
+
+        try{
+            logger.info("reading script from file [{}]", bootstrapConf.teardownScript);
+            String script = FileUtils.readFileToString(bootstrapConf.teardownScript);
+            CloudExecResponse response = cloudServerApi.runScriptOnMachine( script, serverNode.getPublicIP(), null );
+        }catch(Exception e){
+            logger.info("unable to teardown.",e);
+        }
+
         if ( serverNode.getId() != null ){
             logger.info("deleting serverNode");
             try{
@@ -232,6 +243,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     @Override
     public void deleteServer(String nodeId) {
         logger.info("destroying server [{}]", nodeId);
+
         cloudServerApi.delete(nodeId);
     }
 
