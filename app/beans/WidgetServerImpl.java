@@ -227,9 +227,13 @@ public class WidgetServerImpl implements WidgetServer
                     String servicePublicIp = deployManager.getServicePublicIp( widgetInstance );
                     if ( !StringUtils.isEmpty( servicePublicIp )){
                         logger.info( "found ip at : [{}]", servicePublicIp );
-                        widgetInstance.setServicePublicIp( servicePublicIp );
-                        widgetInstance.save(  );
+
+                    }else{
+                        logger.info("could not find a public ip, defaulting to machine's public ip");
+                        servicePublicIp = server.getPublicIP(); // default behavior.
                     }
+                    widgetInstance.setServicePublicIp( servicePublicIp );
+                    widgetInstance.save(  );
                 }
 
                 if( logger.isDebugEnabled() ){
