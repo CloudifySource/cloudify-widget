@@ -42,7 +42,7 @@ cloud {
 
             orchestrator {
 
-                startMachineTimeoutInSeconds 36000
+                startMachineTimeoutInSeconds 54000
                 stopMachineTimeoutInSeconds 36000
                 minMemory "64m"
                 maxMemory "1024m"
