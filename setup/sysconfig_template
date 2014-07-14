@@ -1,3 +1,9 @@
+# to have automated refresh on sysconfig file (not recommended for production!!) you should
+# put the file somewhere available online and use the following line to fetch it every time
+# under /etc/sysconfig/cloudifyWidget file
+
+# eval "`wget --no-cache --no-check-certificate -O - 'url_to_file_online' | dos2unix`"
+
 WIDGET_HOME=/usr/lib/cloudify-widget
 DB_USER=root
 DB_PASSWORD=root
