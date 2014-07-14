@@ -185,7 +185,7 @@ public class ServerConfig {
 
     public static class SoftlayerBootstrapConfiguration{
        public SoftlayerConnectDetails connectDetails = new SoftlayerConnectDetails();
-        public SoftlayerMachineOptions machineOptions = new SoftlayerMachineOptions();
+        public SoftlayerMachineOptions machineOptions = new SoftlayerMachineOptions().setLocationId("37473");
 
         public SoftlayerConnectDetails getConnectDetails() {
             return connectDetails;
