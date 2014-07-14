@@ -50,10 +50,17 @@
     </ul>
     <span id="time_left" ng-show="!!widgetStatus.timeleftMillis">Trial time left: <span id="time_left_counter">{{getTimeLeft()}}</span></span>
     <div id="video_container">
-
-        @if(widget.getYoutubeVideoKey() != null ){
+            @if(widget.isYoutube() ){
             <object width="270" height="160"><param name="movie" value="http://www.youtube.com/v/@widget.getYoutubeVideoKey()?version=3&amp;hl=en_US"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/@widget.getYoutubeVideoKey()?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="270" height="160" allowscriptaccess="always" wmode="transparent" allowfullscreen="true"></embed></object>
-        }
+            }
+
+
+            @if(widget.isYouku() ){
+                <iframe height="160" width="270" src="http://player.youku.com/embed/@widget.getYoukuVideoKey()" frameborder=0 allowfullscreen></iframe>
+            }
+
+
+
     </div>
 
 
@@ -86,6 +93,10 @@
                 <input ng-model="advancedParams.SOFTLAYER.params.username" placeholder="User ID" title="User ID" name="userId"/>
                 @*<input ng-model="advancedParams.SOFTLAYER.params.password" placeholder="Password" type="password"/>*@
                 <input ng-model="advancedParams.SOFTLAYER.params.apiKey" type="password" title="API Key" placeholder="API Key" name="apiKey"/>
+            </span>
+            <span ng-switch-when="EC2">
+                <input ng-model="advancedParams.EC2.params.key" placeholder="Key"/>
+                <input ng-model="advancedParams.EC2.params.secretKey" placeholder="Secret Key" type="password"/>
             </span>
         </span>
         <div class="form-footer-links">

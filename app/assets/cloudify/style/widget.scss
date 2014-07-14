@@ -238,12 +238,12 @@ body {
 
 
 #video_container{
-  object{
+  object, iframe{
     position: absolute;
     left: 20px;
     top: 252px;
   }
-  object,embed{
+  object,embed, iframe{
     height:160px;
     width:270px;
   }

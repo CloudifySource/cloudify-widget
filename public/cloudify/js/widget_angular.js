@@ -64,6 +64,8 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
 
     var hpcloud = 'HP';
     var softlayer = 'SOFTLAYER';
+    var ec2 = 'AWS_EC2';
+
     var play = 'RUNNING';
     var stop = 'STOPPED';
 
@@ -99,10 +101,12 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
     $scope.advancedParams = {};
     $scope.advancedParams[hpcloud] = {'type':'hpcloud-compute','params':{'project':null, 'key':null, 'secretKey':null}};
     $scope.advancedParams[softlayer] = {'type':'softlayer', 'params' : {'username':null, 'apiKey':null} };
+    $scope.advancedParams[ec2] = {'type':'aws_ec2', 'params' : {'key':null, 'secretKey':null} };
 
     $scope.poweredByUrl = {};
     $scope.poweredByUrl[hpcloud] = "http://hpcloud.com";
     $scope.poweredByUrl[softlayer] = "http://softlayer.com";
+    $scope.poweredByUrl[ec2] = "http://aws.amazon.com";
 
     function _hasAdvanced(){
         var aData = _getAdvanced();
@@ -302,7 +306,11 @@ widgetModule.controller('widgetCtrl', function ($scope, $timeout, $log, $window,
     $log.info(["saved status", savedStatus]);
     // place params on scope
 
-    $scope.cloudType = myConf.cloudProvider;
+    $scope.cloudType =myConf.cloudProvider;
+
+    $scope.$watch('widget', function( newValue ){
+        $scope.cloudType = ( $scope.widget && $scope.widget.cloudProvider ) || myConf.cloudProvider;
+    });
 
 
     $scope.isShowAdvanced = function () {

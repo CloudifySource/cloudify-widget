@@ -22,6 +22,7 @@ import javax.persistence.*;
 import beans.Recipe;
 import beans.config.Conf;
 import beans.config.ServerConfig;
+import cloudify.widget.api.clouds.CloudProvider;
 import com.avaje.ebean.Junction;
 import models.query.QueryConf;
 import org.apache.commons.collections.Predicate;
@@ -73,6 +74,8 @@ public class Widget
 	private String youtubeVideoUrl;
 
     public String cloudName;
+    @Enumerated(EnumType.STRING)
+    public CloudProvider cloudProvider = CloudProvider.SOFTLAYER;
 
     public boolean sendEmail;
 
@@ -584,6 +587,32 @@ public class Widget
 	{
 		this.title = title;
 	}
+
+
+    public boolean isYouku(){
+        return StringUtils.contains( youtubeVideoUrl, "youku" );
+    }
+
+    public boolean isYoutube(){
+          return  StringUtils.contains( youtubeVideoUrl, "/embed/" );
+    }
+
+//    http://v.youku.com/v_show/id_XNzM4NzQzMTIw.html?from=y1.3-idx-grid-1519-9909.86808-86807.3-1
+    public String getYoukuVideoKey(){
+        try{
+           if ( StringUtils.isEmpty(youtubeVideoUrl)){
+               return null;
+           }
+
+            if ( StringUtils.contains(youtubeVideoUrl, "youku")){
+                 return youtubeVideoUrl.split("/id_")[1].split(".html")[0];
+            }
+        }catch(Exception e){
+            logger.error("error while getting youku key");
+            return null;
+        }
+        return null;
+    }
 
     @JsonIgnore
     public String getYoutubeVideoKey(){

@@ -1,0 +1,1 @@
+alter table widget add column cloud_provider varchar(9);
