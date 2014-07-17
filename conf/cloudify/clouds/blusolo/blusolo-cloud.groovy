@@ -149,7 +149,7 @@ cloud {
 
                 },
                 // Mandatory. Template Name.
-                SMALL_LINUX_BMI : computeTemplate {
+                /* SMALL_LINUX_BMI : computeTemplate {
                     // Mandatory. Image ID.
                     imageId bmiLinuxImageId
                     // Mandatory. Files from the local directory will be copied to this directory on the remote machine.
@@ -181,7 +181,7 @@ cloud {
 
                     // optional. A native command line to be executed before the cloudify agent is started.
                     // initializationCommand "echo Cloudify agent is about to start"
-                },
+                },*/
                 // Mandatory. Template Name.
                 MEDIUM_RH : computeTemplate {
                     // Mandatory. Image ID.
