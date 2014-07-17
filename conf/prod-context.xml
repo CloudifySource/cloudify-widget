@@ -80,7 +80,7 @@
 
         <bean id="machineOptions" class="cloudify.widget.softlayer.SoftlayerMachineOptions">
             <property name="machinesCount"  value="1"/>
-            <property name="hardwareId" value="1643,21275,13887"/><!-- 16 x 2.0 GHz Cores, 32 GB RAM, 100 GB Hard Disk SAN -->
+            <property name="hardwareId" value="860,1155,3876,188,439"/><!-- 16 x 2.0 GHz Cores, 32 GB RAM, 100 GB Hard Disk SAN -->
             <property name="locationId" value="#{conf.server.bootstrap.softlayer.machineOptions.locationId}"/>
             <property name="osFamily" value="CENTOS"/>
             <property name="tag" value="#{conf.server.bootstrap.tag}"/>
