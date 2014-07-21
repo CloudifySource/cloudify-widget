@@ -624,7 +624,6 @@ public class Widget
             return youtubeVideoUrl.split( "/embed/" )[1];
 
         }else{
-            logger.error( "unable to get youtube key from [{}]", youtubeVideoUrl );
             return null;
         }
         }catch(Exception e){
