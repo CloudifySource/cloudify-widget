@@ -254,7 +254,14 @@ public class WidgetServerImpl implements WidgetServer
 
 
 
-        logWidgetInstanceError( server, result, "widgetInstance is taking too long. More than ", Long.toString(conf.cloudify.deployTimeoutError) , " millis \n");
+        try {
+            if (System.currentTimeMillis() - server.getBusySince() > conf.cloudify.deployTimeoutError ) {
+                logWidgetInstanceError(server, result, "widgetInstance is taking too long. More than ", Long.toString(conf.cloudify.deployTimeoutError), " millis \n");
+            }
+        }catch(Exception e){
+            logger.warn("unable to decide if widget is running for too long",e);
+        }
+
 
         return result;
     }
@@ -262,6 +269,7 @@ public class WidgetServerImpl implements WidgetServer
 
 
     private void logWidgetInstanceError( ServerNode serverNode, Widget.Status status, String ... prefix ){
+
         if ( !serverNodeIds.contains( serverNode.getId() )){
             serverNodeIds.add( serverNode.getId() );
             StringBuilder sb = new StringBuilder();
