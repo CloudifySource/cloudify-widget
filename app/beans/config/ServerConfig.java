@@ -163,6 +163,7 @@ public class ServerConfig {
         public String cloudifyUrl;
         public String urlSecretKey = "";
         public String urlAccessKey = "";
+        public String urlEndpoint = "s3.amazonaws.com";
         public String recipeDownloadMethod = "wget";
         public String installNode = "false";
         public String recipeRelativePath;

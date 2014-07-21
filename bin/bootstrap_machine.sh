@@ -143,6 +143,7 @@ download_recipe_s3(){
     S3_APIKEY="##urlAccessKey##"
     S3_SECRETKEY="##urlSecretKey##"
     RECIPE_URL="##recipeUrl##"
+    ENDPOINT="##urlEndpoint##"
 
     mkdir -p /tmp/s3_bash
     wget -O /tmp/s3_bash/s3_bash.zip "https://dl.dropboxusercontent.com/s/bh6zqgci6crp239/s3-bash-master.zip?dl=1&token_hash=AAFDPyOoNEn1JlSipoRXVGSg5INJ7QHfT95hO4WQ1tEnEA&expiry=1401176925"
@@ -152,10 +153,11 @@ download_recipe_s3(){
 
 
 
+
     echo -n "$S3_SECRETKEY" > secret
 
     mkdir -p /tmp/download_recipe
-    ./s3-get -k "$S3_APIKEY" -s secret "$RECIPE_URL" > /tmp/download_recipe/recipe.zip
+    ./s3-get -k "$S3_APIKEY" -s secret -e $ENDPOINT "$RECIPE_URL" > /tmp/download_recipe/recipe.zip
 
 
 

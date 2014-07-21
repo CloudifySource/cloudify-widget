@@ -401,6 +401,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                     .replace("##cloudifyUrl##", bootstrapConf.cloudifyUrl)
                     .replace("##urlAccessKey##", bootstrapConf.urlAccessKey)
                     .replace("##urlSecretKey##", bootstrapConf.urlSecretKey)
+                    .replace("##urlEndpoint##", bootstrapConf.urlEndpoint)
                     .replace("##installNode##", bootstrapConf.installNode)
                     .replace("##recipeDownloadMethod##", bootstrapConf.recipeDownloadMethod)
 
