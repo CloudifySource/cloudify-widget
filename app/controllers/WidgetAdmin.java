@@ -237,28 +237,9 @@ public class WidgetAdmin extends Controller
     }
 
     private static String isPasswordStrongEnough( String password, String email ){
-        if ( StringUtils.length( password ) < 8 ){
+        if ( StringUtils.length( password ) < 4 ){
             return "Password is too short";
         }
-        if ( !Pattern.matches( "(?=^.{8,}$)((?=.*\\d)|(?=.*\\W+))(?![.\\n])(?=.*[A-Z])(?=.*[a-z]).*$", password ) && !StringUtils.containsIgnoreCase( email, password ) ){
-            return "Password must match requirements";
-        }
-
-        Set<String> strSet = new HashSet<String>(  );
-        for ( String s : password.split( "" ) ) {
-            if ( StringUtils.length( s ) > 0){
-                strSet.add( s.toLowerCase( ) );
-            }
-        }
-
-        if ( CollectionUtils.size( strSet ) < 3 ){
-            return "Too many repeating letters";
-        }
-
-        if ( StringUtils.getLevenshteinDistance( password, email.split( "@" )[0] ) < 5 || StringUtils.getLevenshteinDistance( password, email.split( "@" )[1] ) < 5 ){
-            return "Password similar to email";
-        }
-
         return null;
     }
 
@@ -292,7 +273,13 @@ public class WidgetAdmin extends Controller
         }
         return true;
     }
-    public static Result postChangePassword( String authToken, String oldPassword, String newPassword, String confirmPassword ){
+    public static Result postChangePassword(){
+        JsonNode parse = request().body().asJson();
+        String authToken = parse.get("authToken").getTextValue();
+        String oldPassword = parse.get("oldPassword").getTextValue();
+        String newPassword = parse.get("newPassword").getTextValue();
+        String confirmPassword = parse.get("confirmPassword").getTextValue();
+
         User user = User.validateAuthToken( authToken );
         if ( !user.comparePassword( oldPassword )){
             new HeaderMessage().setError( "Wrong Password" ).apply( response().getHeaders() );

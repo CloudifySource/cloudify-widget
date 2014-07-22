@@ -4,12 +4,16 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
+    <bean id="cloudServerApi" class="mocks.cloud.CloudServerApiMock"/>
+    <bean id="machineOptions" class="cloudify.widget.softlayer.SoftlayerMachineOptions"/>
+    <bean id="cloudifyCliHandler" class="cloudify.widget.cli.softlayer.SoftlayerCloudifyCliHandler"/>
+    <bean id="serverBootstrapper" class="mocks.ServerBootstrapperMock"/>
+
     <import resource="classpath:prod-context.xml"/>
 
     <bean id="deployManager" class="mocks.DeployManagerMock" />
     <bean id="destroyServersTask" class="beans.tasks.DestroyServersTaskMock"/>
 
-    <bean id="serverBootstrapper" class="mocks.ServerBootstrapperMock"/>
     <bean id="serverPool" class="mocks.ServerPoolMock"/>
     <bean id="widgetServer" class="mocks.WidgetServerMock"/>
     <bean id="mailSender" class="mocks.MailSenderMock"/>
@@ -17,7 +21,7 @@
     <bean id="eventMonitor" class="mocks.EventMonitorMock"/>
 
     <!--<bean id="cloudServerApi" class="cloudify.widget.softlayer.SoftlayerCloudServerApi"/>-->
-    <!--<bean id="cloudServerApi" class="mocks.cloud.CloudServerApiMock"/>-->
+
     <context:annotation-config />
     <context:component-scan base-package="mocks" />
 

@@ -1,36 +1,9 @@
 @import tags._
 
 
-@field( id:String, title:String, required:Boolean, inputType:String="test", info:String=null  )={
-<div class="control-group">
-    <label class="control-label" for="@id">@title @if(required){<abbr class="required_mark">*</abbr>}</label>
-    <div class="controls">
-        <input type="@inputType" id="@id" name="@id" class="@if(required){required}">
-        @* Using replace \n to <br/>. This is not the recommend way, but could not implement it any other way :
-            https://groups.google.com/forum/?fromgroups=&nomobile=true#!topic/play-framework/HU2x9ce6mLs
-        *@
-        @if(info){ <i class='info-icon' data-html="true" title="@Html(info.replace("\\n", "<br/>"))"></i> }
-    </div>
-</div>
-}
-
-@context.set("body"){
-<div id="main" class="hero-unit container change-password">
-
-    <div class="global-message"></div>
-    <h2> Change Password </h2>
-
-    <form id="change_password" class="form-horizontal">
-        @field( "oldPassword", "Old Password", required = true, inputType="password")
-        @field( "newPassword", "New Password", required = true, inputType="password", info=Messages("info.password.policy"))
-        @field( "confirmPassword", "Confirm Password", required = true, inputType="password" )
-        <button class="btn btn-primary">Submit</button>
-    </form>
-
-
-
-</div>
+@context.set("head"){
+    <script src="/public/js/widgets/AccountApp.js"></script>
 }
 
 
-@dashboardTemplate()
+@dashboardTemplate("AccountApp")

@@ -1,8 +1,8 @@
 /**
- *
- * This file contains reusable modules across the application
- *
- **/
+*
+* This file contains reusable modules across the application
+*
+**/
 
 var WidgetModules = angular.module("WidgetModules",["gs.modules"]);
 WidgetModules.controller("PoolSummaryController",function( $scope, SessionService, WidgetModel ){
@@ -125,30 +125,30 @@ WidgetModules.service("WidgetCookies", function( $http, $q ){
 
 
 /**
- *
- * Guy - we are currently using promises here. We could take another approach - create an array and keep the reference
- * and then update the array - while keeping the same reference.
- *
- * something like
- *
- *           function( authToken, $scope ){
- *              $http().success(function(data){ $scope["widgets"] = data } )
- *          }
- *
- *
- * or
- *
- *         function (authToken){
- *              var result = {}
- *              $http().success(function(data){ result["widgets"] = data } }
- *              return result;
- *         }
- *
- *
- * The "result" here behaves like a scope that we can modify
- * This approach (updating references) might expose a nicer API.. at the meantime I am going with the flow and I use promises.
- *
- */
+*
+* Guy - we are currently using promises here. We could take another approach - create an array and keep the reference
+* and then update the array - while keeping the same reference.
+*
+* something like
+*
+*           function( authToken, $scope ){
+*              $http().success(function(data){ $scope["widgets"] = data } )
+*          }
+*
+*
+* or
+*
+*         function (authToken){
+*              var result = {}
+*              $http().success(function(data){ result["widgets"] = data } }
+*              return result;
+*         }
+*
+*
+* The "result" here behaves like a scope that we can modify
+* This approach (updating references) might expose a nicer API.. at the meantime I am going with the flow and I use promises.
+*
+*/
 
 
 WidgetModules.service('WidgetModel', function( $http ){
@@ -210,13 +210,13 @@ WidgetModules.service('WidgetModel', function( $http ){
 
 
 /**********************
- *
- *
- * Below this line we have modules that can be reused across Gigaspaces.
- * Due to lack of GS UI Infrastructure project right now, we place the code here.
- *
- *
- **********************/
+*
+*
+* Below this line we have modules that can be reused across Gigaspaces.
+* Due to lack of GS UI Infrastructure project right now, we place the code here.
+*
+*
+**********************/
 
 // i18n plugin
 angular.module("gs.modules", ["gs.modules.i18n","ui.utils.time"]);
