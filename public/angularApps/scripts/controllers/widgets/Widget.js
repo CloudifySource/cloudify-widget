@@ -225,7 +225,7 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         var timeLeft = $scope.widgetStatus.timeleftMillis;
         if ( !!timeLeft ){
             timeLeft = timeLeft / 1000;
-            return ( Math.floor( parseInt(timeLeft,10) /60  ) + 1 )+ ' minutes';
+            return ( Math.floor( parseInt(timeLeft,10) /60  ) + 1 );
         }
         return '';
     };
