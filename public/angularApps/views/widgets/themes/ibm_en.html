@@ -6,7 +6,7 @@
 <a herf="javascript:void(0)" id="stop_btn" class="button" ng-show="showStop()" ng-click="stop()" ng-class="{'executing':!widgetStatus.instanceIsAvailable}"></a>
 <ul id="log">
 
-    <li ng-show="pendingOutput()">Acquiring machine. This might take a few seconds, please wait...</li>
+    <li ng-show="pendingOutput()">{{'acquiringMachines' | i18n}}</li>
     <li ng-show="!widgetStatus.message && !isCompleted()" ng-repeat="o in widgetStatus.safeOutput" ng-bind-html="o"></li>
     <li ng-show="!widgetStatus.message && !widgetStatus.completed && !isCompleted() && !widgetStatus.reset">{{ellipsis}}</li>
     <li class="error" ng-show="!!widgetStatus.message">{{widgetStatus.message}}</li>

@@ -206,7 +206,7 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
                 pollStatus(1);
             }, function( result ){
                 $log.info(['play error', result]);
-                resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
+                resetWidgetStatus( $filter('i18n')('resetWidgetStatusMessage'));
             });
     };
 

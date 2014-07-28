@@ -176,7 +176,7 @@ public class Application extends Controller
                         throw new ServerException(Messages.get("please.wait.x.sec", (timeLeft - System.currentTimeMillis()) / 1000));
                     }
                     ApplicationContext.get().getMailSender().sendPoolIsEmptyMail( ApplicationContext.get().getServerPool().getStats().toString() );
-                    throw new ServerException(Messages.get("no.available.servers"));
+                    throw new ServerException("i18n:noAvailableServers");
                 }
                 logger.info("it seems server node is not null. deployment continues as planned");
             }
