@@ -103,15 +103,8 @@ GET     /getInjectedScript              controllers.Application.getInjectScript(
 GET     /embed/img/:apiKey              controllers.WidgetAdmin.embedImage( apiKey: String)                  
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /recipes/*file      	   		controllers.Assets.at(path="/public/recipes", file)
-GET     /public/*file  		     	    controllers.Assets.at(path="/public/cloudify", file)
-GET     /assets/*file             	    controllers.Assets.at(path="/public", file)
+GET     /public/*file  		     	    controllers.Assets.at(path="/public", file)
 GET     /d                              controllers.DemosController.getDemoPageForUser(email="default_demo@gigaspaces.com")
-GET     /*file        		     	    controllers.Assets.at(path="/public/cloudify", file)
-
-
-
-
-
+GET     /*file        		     	    controllers.Assets.at(path="/public", file)
 
 GET     /                               controllers.WidgetAdmin.index

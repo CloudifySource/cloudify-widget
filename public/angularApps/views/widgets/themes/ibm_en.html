@@ -18,12 +18,7 @@
     <li><span ng-show="!widgetStatus.cloudifyUiIsAvailable">Cloudify</span><a href="http://{{widgetStatus.publicIp}}:8099" target="_blank" ng-show="!!widgetStatus.cloudifyUiIsAvailable" class="track">Cloudify</a></li>
 </ul>
 <span id="time_left" ng-show="!!widgetStatus.timeleftMillis">Trial time left: <span id="time_left_counter">{{getTimeLeft()}} minutes</span></span>
-<div id="video_container" video-container>
-
-
-
-
-</div>
+<div id="video_container" video-container url="widget.youtubeVideoUrl"></div>
 
 
 <div class="advanced_section"  ng-class="{'hidden':!!showAdvanced() || !widgetStatus.instanceIsAvailable }">

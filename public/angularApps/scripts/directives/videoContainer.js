@@ -2,7 +2,7 @@
 
 
 // a directive that allows us to preview the icon.
-angular.module('WidgetApp').directive('embedCode', function () {
+angular.module('WidgetApp').directive('videoContainer', function ($sce) {
     return {
         restrict: 'A',
         transclude: true,
@@ -10,7 +10,7 @@ angular.module('WidgetApp').directive('embedCode', function () {
         scope: {
             'url': '='
         },
-        replace: true,
+        replace: false,
 //    <iframe src='http://localhost:9000/widget/291edd87-c17e-422c-9bdc-f5686b23a6ed/display' scrolling='no' width='600px' height='463px' frameborder='no'></iframe>
         templateUrl: 'views/directives/videoContainer.html',
 //        replace:true,
@@ -41,9 +41,15 @@ angular.module('WidgetApp').directive('embedCode', function () {
 
 
             scope.$watch('url', function () {
-                scope.youtubeKey = getYoukuVideoKey(scope.url);
-                scope.youkuKey = getYoutubeVideoKey(scope.url);
+
+                scope.youkuKey  = getYoukuVideoKey(scope.url);
+                scope.youtubeKey= getYoutubeVideoKey(scope.url);
+
+                scope.youkuUrl = $sce.trustAsResourceUrl('http://player.youku.com/embed/' + scope.youkuKey );
+                scope.youtubeUrl = $sce.trustAsResourceUrl('http://www.youtube.com/embed/' + scope.youtubeKey );
             });
+
+
 
         }
     };
