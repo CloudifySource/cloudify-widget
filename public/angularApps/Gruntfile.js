@@ -50,7 +50,8 @@ module.exports = function (grunt) {
     grunt.registerTask('build', function () {
         var tasks = [
             'jshint',
-            'sass'
+            'sass',
+            'cacheBust'
         ];
         grunt.task.run(tasks);
     });
