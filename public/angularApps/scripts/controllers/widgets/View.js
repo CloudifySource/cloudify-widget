@@ -10,7 +10,7 @@ angular.module('WidgetApp').controller('WidgetsViewCtrl', function($scope, Widge
             $scope.widget = result.data;
 
             $scope.widget.data = JSON.parse(result.data.data);
-            $scope.includePath = 'views/widgets/themes/' + ( $scope.widget.data.theme || WidgetThemes.getDefault().id) + '.html';
+            $scope.includePath = 'views/widgets/themes/' + ( ( $scope.widget.data && $scope.widget.data.theme ) || WidgetThemes.getDefault().id) + '.html';
             $log.info('includePath is', $scope.includePath);
             $controller('WidgetCtrl', {$scope: $scope}); //This works
         });
