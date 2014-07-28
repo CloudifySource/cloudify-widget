@@ -28,6 +28,20 @@ module.exports = function (grunt) {
 
                 }
             }
+        },
+        cacheBust: {
+            options: {
+                ignorePatterns: ['public/style'],
+                rename:false,
+                encoding: 'utf8',
+                algorithm: 'md5',
+                length: 16
+            },
+            assets: {
+                files: [{
+                    src: ['index.html']
+                }]
+            }
         }
 
     });

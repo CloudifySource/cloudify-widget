@@ -12,7 +12,8 @@
     "grunt": "~0.4.2",
     "grunt-contrib-jshint": "~0.6.0",
     "matchdep": "~0.1.2",
-    "grunt-contrib-sass": "~0.7.3"
+    "grunt-contrib-sass": "~0.7.3",
+    "grunt-cache-bust": "~0.4.1"
   },
   "engines": {
     "node": ">=0.8.0"
