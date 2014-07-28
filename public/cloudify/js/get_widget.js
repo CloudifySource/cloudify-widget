@@ -10,6 +10,10 @@ function cloudifyWidgetInitialization(){
         // todo : make protocol insensitive once we support HTTPS.
         // http://localhost:9000/public/angularApps/index.html#/widgets/4a7c12a1-3e1b-412d-b674-8329480f93fd/view?since=1406540993919
         iframe.setAttribute("src", "http://" + host + "/public/angularApps/index.html#/widgets/" + api_key + '/view?since=' + new Date().getTime());
+        iframe.setAttribute("width", "600px");
+        iframe.setAttribute("height", "463px");
+        iframe.setAttribute("scrolling", "no");
+        iframe.setAttribute("frameborder", "no");
     }
     window.addEventListener("load", cloudifyWidgetOnLoadHandler, false);
 }
