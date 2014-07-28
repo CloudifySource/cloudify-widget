@@ -89,7 +89,7 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
                 widget.apiKey = savedWidget.apiKey;
                 widget.version = savedWidget.version;
 
-                $scope.widgetData = JSON.parse(widget.data);
+                $scope.widgetData = JSON.parse(widget.data) || {} ;
             }
             if ( isDone ){
                 $location.path('/widgets/' + $scope.widget.id + '/preview');
