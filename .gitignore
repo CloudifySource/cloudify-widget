@@ -14,6 +14,7 @@ tmp
 .target/
 */.DS_Store
 .DS_Store
+.sass-cache
 conf/dev
 logFile.log
 /recipes

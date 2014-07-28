@@ -17,6 +17,16 @@ module.exports = function (grunt) {
                 'Gruntfile.js',
                 'scripts/**/*.js'
             ]
+        } ,
+        sass: {
+            dist: {
+                files: {
+                    '../style/angular/main.css': '../../app/assets/cloudify/style/angular/main.scss',
+                    '../style/demos.css': '../../app/assets/cloudify/style/demos.scss',
+                    '../style/userDemoIndex.css': '../../app/assets/cloudify/style/userDemoIndex.scss'
+
+                }
+            }
         }
 
     });

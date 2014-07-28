@@ -1,24 +1,20 @@
 {
-    "name": "old-cloudify-widget-ui",
-    "version": "1.0.0",
-    "private": true,
-    "bugs": {
-        "url": "http://cloudifysource.atlassian.net",
-        "email": "support@cloudifysource.org"
-    },
-
-    "description": "UI for Cloudify widget.",
-
-    "dependencies": {
-
-    },
-    "devDependencies": {
-        "grunt": "~0.4.2",
-        "grunt-contrib-jshint": "~0.6.0",
-        "matchdep": "~0.1.2"
-    },
-
-    "engines": {
-        "node": ">=0.8.0"
-    }
+  "name": "old-cloudify-widget-ui",
+  "version": "1.0.0",
+  "private": true,
+  "bugs": {
+    "url": "http://cloudifysource.atlassian.net",
+    "email": "support@cloudifysource.org"
+  },
+  "description": "UI for Cloudify widget.",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-jshint": "~0.6.0",
+    "matchdep": "~0.1.2",
+    "grunt-contrib-sass": "~0.7.3"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  }
 }
