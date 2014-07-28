@@ -76,7 +76,7 @@ public class WidgetAdmin extends Controller
         if ( widgetItem == null ){//|| !widgetItem.isEnabled()){
             return ok();
         }
-        return ok(widget.render(ApplicationContext.get().conf().mixpanelApiKey, widgetItem));
+        return redirect("/public/angularApps/index.html#/widgets/" + apiKey + "/view?since=" + System.currentTimeMillis());
     }
     
     public static Result getWidgetSinglePage( String apiKey ){
