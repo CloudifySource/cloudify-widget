@@ -281,13 +281,13 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
 
 
         catch (e) {
-            $log.info('failed to change language for widget')
+            $log.info('failed to change language for widget');
         }
     }
     setLanguage();
 
     $scope.$watch('widget', function( /*newValue*/ ){
-         setLanguage();
+        setLanguage();
 //        $scope.cloudType = ( $scope.widget && $scope.widget.data && $scope.widget.cloudProvider ) || myConf.cloudProvider;
     });
 

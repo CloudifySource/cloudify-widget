@@ -24,6 +24,5 @@ angular.module('WidgetApp').service('i18n', function ($http, $rootScope) {
     this.setLanguage = function( language ){
         option.lng = language;
         init();
-
-    }
+    };
 });
