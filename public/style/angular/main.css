@@ -286,6 +286,20 @@ td.action_col {
 .code {
   cursor: text !important; }
 
+@-webkit-keyframes rotate {
+  from {
+    -webkit-transform: rotate(0deg); }
+
+  to {
+    -webkit-transform: rotate(360deg); } }
+
+@-moz-keyframes rotate {
+  from {
+    -moz-transform: rotate(0deg); }
+
+  to {
+    -moz-transform: rotate(360deg); } }
+
 #widget-view {
   height: 463px;
   padding: 15px;
@@ -293,20 +307,6 @@ td.action_col {
   background: url("/img/widget_background.png") no-repeat;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   /* components */
-  @-webkit-keyframes rotate {
-    from {
-      -webkit-transform: rotate(0deg); }
-
-    to {
-      -webkit-transform: rotate(360deg); } }
-
-  @-moz-keyframes rotate {
-    from {
-      -moz-transform: rotate(0deg); }
-
-    to {
-      -moz-transform: rotate(360deg); } }
-
   /* selected text - must use separate rule for gecko as the whole rule will be dropped on non-supporting engines */ }
   #widget-view .hidden {
     position: absolute !important;
