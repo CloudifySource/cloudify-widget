@@ -15,16 +15,22 @@
 package utils;
 
 import models.ServerNode;
+import models.Widget;
 import org.apache.commons.io.FileUtils;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.Play;
 import play.cache.Cache;
+import play.data.validation.Validation;
 import play.i18n.Lang;
 import play.libs.Time;
 import play.mvc.Http;
 import server.exceptions.ServerException;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -359,5 +365,25 @@ public class Utils
 //        return res;
 //    }
 
+
+    public static Set<String> validate( Object obj ){
+        Validator validator = Validation.getValidator();
+        Set<ConstraintViolation<Object>> validate = validator.validate( obj );
+        Set<String> errors = new HashSet<String>();
+        for (ConstraintViolation<Object> widgetConstraintViolation : validate) {
+            errors.add(widgetConstraintViolation.getMessage());
+        }
+        return errors;
+    }
+
+
+    public static void update( JsonNode json, Object obj ){
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            mapper.readerForUpdating( obj ).treeToValue( json, obj.getClass() );
+        } catch (Exception e) {
+            throw new RuntimeException ( "unable to update model ",e);
+        }
+    }
 
 }

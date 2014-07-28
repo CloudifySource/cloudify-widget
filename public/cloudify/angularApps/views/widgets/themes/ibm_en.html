@@ -1,0 +1,93 @@
+
+<img src="/img/beta.png" class="beta-ribbon"/>
+        This is the english version
+<span id="title">{{widget.title}}</span>
+
+<a herf="javascript:void(0)" id="start_btn" class="button" ng-show="showPlay()" ng-click="play()"></a>
+<a herf="javascript:void(0)" id="stop_btn" class="button" ng-show="showStop()" ng-click="stop()" ng-class="{'executing':!widgetStatus.instanceIsAvailable}"></a>
+<ul id="log">
+
+    <li ng-show="pendingOutput()">Acquiring machine. This might take a few seconds, please wait...</li>
+    <li ng-show="!widgetStatus.message && !isCompleted()" ng-repeat="o in widgetStatus.safeOutput" ng-bind-html="o"></li>
+    <li ng-show="!widgetStatus.message && !widgetStatus.completed && !isCompleted() && !widgetStatus.reset">{{ellipsis}}</li>
+    <li class="error" ng-show="!!widgetStatus.message">{{widgetStatus.message}}</li>
+    <li class="important" ng-show="isCompleted()">Now that your trial is over, check out the <a href='http://bluforcloud.com/plans/solo/' class='download_link successfully_completed_msg track' target='_blank'>Solo plan</a> to run BLU Acceleration on your own Softlayer or AWS Cloud.        </li>
+    <!--<li class="important" ng-show="isCompleted()">Test drive successfully completed! <br/><a class='download_link successfully_completed_msg' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a></li>-->
+</ul>
+<ul id="links">
+    <li ng-show="!!widgetStatus.instanceIsAvailable"><a href="{{widgetStatus.consoleLink.url}}" class="track" target="_blank">{{widgetStatus.consoleLink.title}}</a></li>
+    <li><span ng-show="!widgetStatus.cloudifyUiIsAvailable">Cloudify</span><a href="http://{{widgetStatus.publicIp}}:8099" target="_blank" ng-show="!!widgetStatus.cloudifyUiIsAvailable" class="track">Cloudify</a></li>
+</ul>
+<span id="time_left" ng-show="!!widgetStatus.timeleftMillis">Trial time left: <span id="time_left_counter">{{getTimeLeft()}}</span></span>
+<div id="video_container" video-container>
+
+
+
+
+</div>
+
+
+<div class="advanced_section"  ng-class="{'hidden':!!showAdvanced() || !widgetStatus.instanceIsAvailable }">
+    <!-- temporary solution. we need to understand the best way to embed messages here -->
+    <div style="margin:10px auto 0 auto"><b>Username</b>: bluadmin<br><b>Password</b>: 0b9f757f32d98899</div>
+</div>
+
+</div>
+<div class="advanced_section" ng-class="{'collapsed':!!showAdvanced, 'hidden' : !isShowAdvanced() }" ng-show="!!isShowAdvanced()">
+    <div class="remember_creds">
+        <div class="remember_me_title">Remember me?</div>
+        <div class="remember_option"><button class="yes" ng-click="rememberAdvanced(); showRemember=false">Yes</button></div>
+        <div class="remember_option"><button class="no" ng-click="showRemember=false">No</button></div>
+    </div>
+    <div class="advanced_header">
+        <a href="javascript:void(0)" class="advanced_title" ng-click="showAdvanced=!showAdvanced">Advanced</a>
+        <a id="pemFileLink" class="download-link download-pem-link" href="javascript:void(0)"> PEM </a>
+    </div>
+    <!-- need to set autocomplete=off explicitly in order to turn off the browser's built-in autocomplete -->
+    <form class="advanced_form" autocomplete="off" ng-submit="submitAdvancedData()">
+        <div class="error" ng-show="advancedRequiredError">Must fill in details</div>
+        <span ng-switch="cloudType" cloud-type={{cloudType}}>
+            <span ng-switch-when="HP">
+                <input ng-model="advancedParams.HP.params.project" placeholder="Project" name="project"/>
+                <input ng-model="advancedParams.HP.params.key" placeholder="HPCS Key" name="key"/>
+                <input ng-model="advancedParams.HP.params.secretKey" placeholder="HPCS Secret Key" type="password" name="secretKey"/>
+            </span>
+            <span ng-switch-when="SOFTLAYER">
+                <input ng-model="advancedParams.SOFTLAYER.params.username" placeholder="User ID" title="User ID" name="userId"/>
+                <input ng-model="advancedParams.SOFTLAYER.params.apiKey" type="password" title="API Key" placeholder="API Key" name="apiKey"/>
+            </span>
+            <span ng-switch-when="EC2">
+                <input ng-model="advancedParams.EC2.params.key" placeholder="Key"/>
+                <input ng-model="advancedParams.EC2.params.secretKey" placeholder="Secret Key" type="password"/>
+            </span>
+        </span>
+        <div class="form-footer-links">
+            <a class="form-footer-links" href="http://youtu.be/lHtOBXpouyo" target="_blank">Help</a>
+            <a style="display:none" id="hp_console_link" class="form-footer-links" href="http://console.hpcloud.com" target="_blank">HP Console</a>
+        </div>
+        <input type="submit" class="hidden" value="submit"/>
+    </form>
+</div>
+
+<div id="footer">
+    Powered by: <a ng-href="{{poweredByUrl[cloudType]}}" target="_blank">
+    <span class="cloud-min-logo-icon brand_btns"></span>
+    <!--img class="brand_btns" src="/img/hp_cloud_icon.png"-->
+</a>
+    <a href="http://cloudifysource.org" target="_blank"><img class="brand_btns" src="/img/cloudify_icon.png"></a>
+    <a herf="javascript:void(0)" id="patent_pending">&nbsp;&nbsp;(Patent Pending)</a>
+    <div class="put_left">
+        <!-- TODO update image for embed button -->
+        <span id="embed_btn" ng-click="showEmbed=true"><img src="/img/share_widget.png"></span>
+        <a class="share_link" id="facebook_share_link" href="#"><img src="/img/share_facebook.png"></a>
+        <a class="share_link" id="google_plus_share_link" href="#"><img src="/img/share_google.png"></a>
+        <a class="share_link" id="twitter_share_link" href="#"><img src="/img/share_twitter.png"></a>
+    </div>
+</div>
+<div id="embed-code-box" ng-show="!!showEmbed">
+    <i class="close" ng-click="showEmbed=false"></i>
+    <h3>Embed Code</h3>
+    <p>Copy the code below to embed the widget on your website.</p>
+    <textarea class="autoselect" readonly="readonly"><div embed-code widget="widget"></div></textarea>
+</div>
+

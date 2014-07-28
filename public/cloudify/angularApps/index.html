@@ -1,0 +1,81 @@
+<!doctype html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+    <!-- build:css(.tmp,app) styles/main.css -->
+    <link href="/public/style/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/style/angular/main.css" rel="stylesheet">
+    <link href="/public/style/fontawesome/css/font-awesome.css" rel="stylesheet"/>
+
+
+
+
+    <!--[if lte IE 7]>
+    <link href="/public/style/fontawesome/css/font-awesome-ie7.min.css" rel="stylesheet"/>
+    <![endif]-->
+
+
+
+    <!-- endbuild -->
+</head>
+<body ng-app="WidgetApp">
+
+
+<!-- Add your site or application content here -->
+<div ng-view=""></div>
+
+
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/jquery-cookie/jquery.cookie.js"></script>
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/i18next/i18next.js"></script>
+<script src="bower_components/lodash/dist/lodash.js"></script>
+
+<!-- build:js scripts/modules.js -->
+
+<script src="bower_components/angular-cookies/angular-cookies.js"></script>
+<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
+<script src="bower_components/angular-route/angular-route.js"></script>
+<!-- endbuild -->
+
+<!-- build:js({.tmp,app}) scripts/scripts.js -->
+<script src="scripts/app.js"></script>
+<script src="scripts/controllers/widgets/Index.js"></script>
+<script src="scripts/controllers/widgets/Edit.js"></script>
+<script src="scripts/controllers/widgets/View.js"></script>
+<script src="scripts/controllers/widgets/Preview.js"></script>
+<script src="scripts/controllers/widgets/Widget.js"></script>
+
+<script src="scripts/services/WidgetsService.js"></script>
+<script src="scripts/services/i18n.js"></script>
+<script src="scripts/services/WidgetThemesService.js"></script>
+<script src="scripts/services/WidgetDbService.js"></script>
+<script src="scripts/services/MixpanelService.js"></script>
+<script src="scripts/services/CloudTypesService.js"></script>
+<script src="scripts/services/WidgetReceiveMessageService.js"></script>
+<script src="scripts/services/WidgetLocalesService.js"></script>
+
+
+<script src="scripts/directives/layout.js"></script>
+<script src="scripts/directives/img.js"></script>
+<script src="scripts/directives/formField.js"></script>
+<script src="scripts/directives/fileread.js"></script>
+<script src="scripts/directives/embedCode.js"></script>
+
+<script src="scripts/filters/i18n.js"></script>
+<!-- endbuild -->
+</body>
+</html>

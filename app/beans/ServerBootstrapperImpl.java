@@ -393,6 +393,11 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             }
 
 
+            if ( bootstrapConf.cloudifyUrl == null ){
+
+                throw new RuntimeException("Missing cloudify URL");
+
+            }
             logger.info("reading script from file [{}]", bootstrapConf.script);
             String script = FileUtils.readFileToString(bootstrapConf.script);
             script = script.replace("##publicip##", publicIp)

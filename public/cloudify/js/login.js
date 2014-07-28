@@ -41,7 +41,7 @@ $(function () {
                     $.cookie("admin", data.session["@admin"], { expires: 1, path:'/' });
                     $.cookie("authToken", data.session["@authToken"], { expires: 1 , path:'/'});
                     $.cookie("username", formData.email, { expires: 1 , path:'/'});
-                    window.location.href = "/user/widgets"; // /admin/widgets.html
+                    window.location.href = "/"; // /admin/widgets.html
                 }
          },
         error: function(data){
@@ -85,7 +85,7 @@ $(function () {
       } else {
         $.cookie("authToken", data.session["@authToken"], { expires: 1 , path:'/'});
         $.cookie("username", formData.email , { expires: 1, path:'/' });
-        window.location.href = "/user/widgets";
+        window.location.href = "/";
       }
     });
       return false;

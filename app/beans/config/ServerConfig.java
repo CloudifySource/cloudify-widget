@@ -159,7 +159,7 @@ public class ServerConfig {
         public File teardownScript = Utils.getFileByRelativePath("/bin/teardown_machine.sh"); // script to run teardown
         @Config(ignoreNullValues=true)
         public boolean runTeardown = true;
-        public String recipeUrl;
+        public String recipeUrl = "";
         public String cloudifyUrl;
         public String urlSecretKey = "";
         public String urlAccessKey = "";

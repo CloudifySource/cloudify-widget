@@ -54,7 +54,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Pattern;
 
 import static utils.RestUtils.*;
 
@@ -150,7 +149,7 @@ public class WidgetAdmin extends Controller
         // and we can redirect to widgets.html
         Http.Cookie authToken = request().cookies().get( "authToken" );
         if ( authToken != null && User.validateAuthToken( authToken.value(), true ) != null ) {
-            return redirect( routes.WidgetAdmin.newWidgetsPage() );
+            return redirect( "public/angularApps/index.html" );
         }
         else{
             return redirect( routes.WidgetAdmin.getSigninPage( null ) );
@@ -432,39 +431,7 @@ public class WidgetAdmin extends Controller
     }
 
 
-	public static Result createNewWidget( String widgetId, String authToken,  String productName, String productVersion,
-										  String title, String youtubeVideoUrl, String providerURL,
-										  String recipeURL, String consolename, String consoleurl, String rootpath, String recipeName, String consoleUrlService )
-	{
-        User user = User.validateAuthToken(authToken);
-        Widget widget = null;
-        if ( !NumberUtils.isNumber( widgetId ) ){
-		    widget = user.createNewWidget( productName, productVersion, title, youtubeVideoUrl, providerURL, recipeURL, consolename, consoleurl, rootpath );
-        }else{
-            Long widgetIdLong = Long.parseLong( widgetId );
-            widget = Widget.findByUserAndId( user, widgetIdLong );
-            if ( widget == null ){
-                new HeaderMessage().setError( "User is not allowed to edit this widget" ).apply( response().getHeaders() );
-                return badRequest(  );
-            }
-            widget.setProductName( productName );
-            widget.setProductVersion( productVersion );
-            widget.setTitle( title );
-            widget.setYoutubeVideoUrl( youtubeVideoUrl );
-            widget.setProviderURL( providerURL );
-            widget.setRecipeURL( recipeURL );
-            widget.setConsoleName( consolename );
-            widget.setConsoleURL( consoleurl );
-            widget.setRecipeRootPath( rootpath );
-            widget.setRecipeName( recipeName );
-            widget.setConsoleUrlService( consoleUrlService );
-            widget.save();
-        }
-
-        logger.info( "edited widget : " + widget.toString() );
-        return ok( Json.toJson(widget) );
-//		return resultAsJson(widget);
-	}
+//
 
 	
 	public static Result getAllWidgets( String authToken )
@@ -507,9 +474,21 @@ public class WidgetAdmin extends Controller
         return enableDisableWidget( authToken, apiKey, false );
 	}
 
+    public static Result disableWidgetById( Long widgetId )
+    {
+        String authToken = request().body().asJson().get("authToken").getTextValue();
+        return enableDisableWidget( authToken, widgetId, false );
+    }
+
     private static Result enableDisableWidget( String authToken, String apiKey, boolean enabled )
     {
         getWidgetSafely( authToken, apiKey ).setEnabled( enabled ).save();
+        return ok(OK_STATUS).as("application/json");
+    }
+
+    private static Result enableDisableWidget( String authToken, Long widgetId, boolean enabled )
+    {
+        getWidgetSafely( authToken, widgetId, true ).setEnabled( enabled ).save();
         return ok(OK_STATUS).as("application/json");
     }
 
@@ -517,6 +496,12 @@ public class WidgetAdmin extends Controller
     public static Result enableWidget( String authToken, String apiKey )
 	{
         return enableDisableWidget( authToken, apiKey, true );
+	}
+
+    public static Result enableWidgetById( Long widgetId )
+	{
+        String authToken = request().body().asJson().get("authToken").getTextValue();
+        return enableDisableWidget( authToken, widgetId, true );
 	}
 
     private static Widget getWidgetSafely( String authToken, Long widgetId, boolean allowAdmin ){
@@ -539,13 +524,25 @@ public class WidgetAdmin extends Controller
         }
     }
 
+
+    public static Result getWidgetById( String authToken, Long widgetId ){
+        return ok(Json.toJson(getWidgetSafely(authToken, widgetId, false)));
+    }
+
     public static Result getUserWidgetTemplate(){
         return ok( views.html.widgets.userWidgets.render() ); // we do this so we can get the embed code.. we cannot use angularJS as we might want to email it too..
     }
 
+
     public static Result deleteWidget( String authToken, String apiKey ){
         logger.info( "got a request to delete widget [{}]", apiKey );
         Widget widget = getWidgetSafely( authToken, apiKey );
+        widget.delete(  );
+        return ok( );
+    }
+    public static Result deleteWidgetById( Long widgetId ){
+        String authToken = request().body().asJson().get("authToken").getTextValue();
+        Widget widget = getWidgetSafely( authToken, widgetId, true );
         widget.delete(  );
         return ok( );
     }
@@ -635,5 +632,40 @@ public class WidgetAdmin extends Controller
     }
 
 
+
+
+//    public static Result createNewWidget( String widgetId, String authToken,  String productName, String productVersion,
+//										  String title, String youtubeVideoUrl, String providerURL,
+//										  String recipeURL, String consolename, String consoleurl, String rootpath, String recipeName, String consoleUrlService )
+//	{
+//        User user = User.validateAuthToken(authToken);
+//        Widget widget = null;
+//        if ( !NumberUtils.isNumber( widgetId ) ){
+//		    widget = user.createNewWidget( productName, productVersion, title, youtubeVideoUrl, providerURL, recipeURL, consolename, consoleurl, rootpath );
+//        }else{
+//            Long widgetIdLong = Long.parseLong( widgetId );
+//            widget = Widget.findByUserAndId( user, widgetIdLong );
+//            if ( widget == null ){
+//                new HeaderMessage().setError( "User is not allowed to edit this widget" ).apply( response().getHeaders() );
+//                return badRequest(  );
+//            }
+//            widget.setProductName( productName );
+//            widget.setProductVersion( productVersion );
+//            widget.setTitle( title );
+//            widget.setYoutubeVideoUrl( youtubeVideoUrl );
+//            widget.setProviderURL( providerURL );
+//            widget.setRecipeURL( recipeURL );
+//            widget.setConsoleName( consolename );
+//            widget.setConsoleURL( consoleurl );
+//            widget.setRecipeRootPath( rootpath );
+//            widget.setRecipeName( recipeName );
+//            widget.setConsoleUrlService( consoleUrlService );
+//            widget.save();
+//        }
+//
+//        logger.info( "edited widget : " + widget.toString() );
+//        return ok( Json.toJson(widget) );
+////		return resultAsJson(widget);
+//	}
 
 }

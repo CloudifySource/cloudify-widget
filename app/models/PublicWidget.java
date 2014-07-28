@@ -79,4 +79,6 @@ public class PublicWidget{
     public boolean getShowAdvanced() {
         return widget.getShowAdvanced();
     }
+
+    public String getData() { return widget.getData(); }
 }

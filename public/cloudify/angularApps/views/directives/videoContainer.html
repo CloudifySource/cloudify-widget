@@ -1,0 +1,8 @@
+<span ng-show="!!youtubeKey">
+    <object width="270" height="160"><param name="movie" value="http://www.youtube.com/v/{{youtubeKey}}?version=3&amp;hl=en_US"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/@widget.getYoutubeVideoKey()?version=3&amp;hl=en_US" type="application/x-shockwave-flash" width="270" height="160" allowscriptaccess="always" wmode="transparent" allowfullscreen="true"></embed></object>
+</span>
+
+
+<span ng-show="!!youkuKey">
+    <iframe height="160" width="270" src="http://player.youku.com/embed/{{youkuKey}}" frameborder=0 allowfullscreen></iframe>
+</span>

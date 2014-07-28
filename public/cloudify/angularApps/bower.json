@@ -1,0 +1,14 @@
+{
+  "name": "ibmBiginsightsUi",
+  "version": "0.0.0",
+  "dependencies": {
+    "angular": "~1.2.20",
+    "jquery": "~2.1.1",
+    "angular-sanitize": "~1.2.20",
+    "angular-route": "~1.2.20",
+    "angular-cookies": "~1.2.20",
+    "i18next": "~1.7.3",
+    "jquery-cookie": "~1.4.1",
+    "lodash": "~2.4.1"
+  }
+}

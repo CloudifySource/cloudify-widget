@@ -219,7 +219,6 @@ WidgetApp.controller('WidgetController',
 
         $scope.$watch('widgetIconFile', function(  newValue ){
             console.log(["handling new value",newValue]);
-            debugger;
             if ( !!$scope.actions ){
                 $scope.actions.editIcon = newValue;
             }

@@ -1,6 +1,6 @@
 @(mixpanelKey:String, widget:Widget)
 @import views.html.widgets.dashboard.embedCode
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <title>Widget</title>
@@ -32,7 +32,7 @@
   </head>
   <body @if(widget.isRequiresLogin()){data-requires-login="requires-login"} ng-app="widget" ng-controller="widgetCtrl" class="{{cloudType}}">
     <img src="/img/beta.png" class="beta-ribbon"/>
-    <span id="title">{{params.title}}</span>
+    <span id="title">{{widget.title}}</span>
 
         <a herf="javascript:void(0)" id="start_btn" class="button" ng-show="showPlay()" ng-click="play()"></a>
         <a herf="javascript:void(0)" id="stop_btn" class="button" ng-show="showStop()" ng-click="stop()" ng-class="{'executing':!widgetStatus.instanceIsAvailable}"></a>

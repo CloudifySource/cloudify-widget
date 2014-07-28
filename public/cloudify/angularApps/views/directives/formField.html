@@ -1,0 +1,9 @@
+<div class="control-group" ng-class="{'error': !!errorId }">
+
+    <label class="control-label" for="{{fieldId}}">{{title}}<abbr class="required_mark" ng-show="required">*</abbr></label>
+    <div class="controls">
+        <input ng-show="type !== 'textarea'" ng-model="value" type="{{type}}" id="{{fieldId}}" name="{{fieldId}}" ng-class="{'required' : !!required}" ng-disabled="disabled"/>
+        <textarea ng-show="type === 'textarea'" cols="50" rows="6" ng-model="value" id={{fieldId}} name="{{fieldId}}" ng-class="{'required' : !!required}" style="width:450px;"></textarea>
+        <i ng-show="!!tooltip" title="{{tooltip}}" class='info-icon'></i>
+    </div>
+</div>

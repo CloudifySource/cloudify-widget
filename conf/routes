@@ -60,11 +60,14 @@ POST     /widget/regenerate	   			controllers.WidgetAdmin.regenerateWidgetApiKey
 POST     /widget/:instanceId/shutdown	controllers.WidgetAdmin.shutdownInstance( authToken: String, instanceId: String )
 POST     /widget/disable				controllers.WidgetAdmin.disableWidget( authToken: String, apiKey: String )
 POST     /widget/enable 				controllers.WidgetAdmin.enableWidget( authToken: String, apiKey: String )
+POST     /widget/:widgetId/disable				controllers.WidgetAdmin.disableWidgetById( widgetId:Long)
+POST     /widget/:widgetId/enable 				controllers.WidgetAdmin.enableWidgetById( widgetId:Long)
 GET      /user/list	   					controllers.WidgetAdmin.getAllUsers( authToken: String )
-POST     /widget/new              	    controllers.WidgetAdmin.createNewWidget( widgetId:String ?= null, authToken: String, productName: String, productVersion: String, title: String, youtubeVideoUrl: String, providerURL: String, recipeURL: String, consolename: String, consoleurl: String, rootpath:String, recipeName:String, consoleUrlService:String )
+# POST     /widget/new              	    controllers.WidgetAdmin.createNewWidget( widgetId:String ?= null, authToken: String, productName: String, productVersion: String, title: String, youtubeVideoUrl: String, providerURL: String, recipeURL: String, consolename: String, consoleurl: String, rootpath:String, recipeName:String, consoleUrlService:String )
 POST     /widget/edit                   controllers.WidgetAdmin.postWidget
 GET      /widget/list 					controllers.WidgetAdmin.getAllWidgets( authToken: String )
 POST    /widget/delete                  controllers.WidgetAdmin.deleteWidget( authToken:String, apiKey:String )
+POST    /widget/:widgetId/delete                  controllers.WidgetAdmin.deleteWidgetById( widgetId:Long )
 
 GET     /widget/previewWidget           controllers.WidgetAdmin.previewWidget( apiKey:String )
 GET     /widget/icon                    controllers.WidgetAdmin.icon( apiKey: String)
@@ -76,6 +79,7 @@ GET     /widget/login/google/callback/:widgetKey   controllers.WidgetGoogleLogin
 GET     /widget/login/google                controllers.WidgetGoogleLoginController.loginWithGoogle( widgetKey: String )
 GET     /widget/login/custom            controllers.Assets.at(path="/public/cloudify/pages/logins",file="custom.html")
 POST    /widget/login/custom            controllers.WidgetCustomLoginController.customLogin( widgetKey: String )
+GET     /widget/:widgetId/get           controllers.WidgetAdmin.getWidgetById( authToken:String, widgetId: Long )
 
 
 POST     /admin/pool/manage/add                          controllers.AdminPoolController.addNode( authToken:String )

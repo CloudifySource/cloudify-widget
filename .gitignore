@@ -30,3 +30,5 @@ _scripts
 dev
 node_modules
 me.json
+
+public/cloudify/angularApps/node_modules

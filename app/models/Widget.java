@@ -18,6 +18,8 @@ import java.io.File;
 import java.util.*;
 
 import javax.persistence.*;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 
 import beans.Recipe;
 import beans.config.Conf;
@@ -26,6 +28,7 @@ import cloudify.widget.api.clouds.CloudProvider;
 import com.avaje.ebean.Junction;
 import models.query.QueryConf;
 import org.apache.commons.collections.Predicate;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
@@ -35,6 +38,7 @@ import org.codehaus.jackson.map.annotate.JsonRootName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.validation.Constraints;
+import play.data.validation.Validation;
 import play.db.ebean.Model;
 import play.i18n.Messages;
 import server.ApplicationContext;
@@ -126,6 +130,8 @@ public class Widget
     private String loginVerificationUrl = null; // url to verify user IDs.
     private String webServiceKey=null; // secret key we add on the web service calls.
 
+//    private String theme;
+
     private long lifeExpectancy = 0;
     @JsonIgnore
     @ManyToOne( optional = false )
@@ -133,6 +139,10 @@ public class Widget
 
     @Lob
     private String description;
+
+
+    @Lob // use this field when you have information we don't need in the backend, only the front-end.
+    private String data; // a schema less field to maintain more data about the widget
 
     @Version
     private long version = 0;
@@ -784,6 +794,14 @@ public class Widget
         return description;
     }
 
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
     @JsonIgnore
     public void setHasIcon( boolean hasIcon ){
 
@@ -870,9 +888,15 @@ public class Widget
         return loginsString;
     }
 
-
-
     public void setLoginsString( String logins ){
         loginsString = logins;
     }
+
+//    public String getTheme() {
+//        return theme;
+//    }
+//
+//    public void setTheme(String theme) {
+//        this.theme = theme;
+//    }
 }

@@ -1,0 +1,14 @@
+<div>
+    <a href="#/widgets/index">Homepage</a><br/>
+    <a href="#/widgets/{{widget.id}}/edit">Edit</a><br/>
+    <button class="btn btn-danger" ng-click="delete(widget)">Delete</button><br/>
+</div>
+<div>
+    <pre>{{widget|json}}</pre>
+</div>
+
+<h1>Embed Code</h1>
+<div embed-code widget="widget" as-code="true"></div>
+
+<h1>Preview</h1>
+<div embed-code widget="widget"></div>
