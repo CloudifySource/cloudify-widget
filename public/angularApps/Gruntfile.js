@@ -23,7 +23,8 @@ module.exports = function (grunt) {
                 files: {
                     '../style/angular/main.css': '../../app/assets/cloudify/style/angular/main.scss',
                     '../style/demos.css': '../../app/assets/cloudify/style/demos.scss',
-                    '../style/userDemoIndex.css': '../../app/assets/cloudify/style/userDemoIndex.scss'
+                    '../style/userDemoIndex.css': '../../app/assets/cloudify/style/userDemoIndex.scss',
+                    '../style/demo.css': '../../app/assets/cloudify/style/demo.scss'
 
                 }
             }
@@ -34,7 +35,8 @@ module.exports = function (grunt) {
 
     grunt.registerTask('build', function () {
         var tasks = [
-            'jshint'
+            'jshint',
+            'sass'
         ];
         grunt.task.run(tasks);
     });
