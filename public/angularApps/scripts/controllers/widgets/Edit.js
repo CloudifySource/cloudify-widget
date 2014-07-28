@@ -23,7 +23,7 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
 
     if ( !!$routeParams.widgetId ){
         WidgetsService.getWidget( $routeParams.widgetId).then(function(result){
-            $scope.widgetData = JSON.parse(result.data.data);
+            $scope.widgetData = JSON.parse(result.data.data) || {};
             $scope.widget = result.data;
 
         });
