@@ -28,6 +28,16 @@ server{
            alias /var/www/cloudifyWidget/public/error_pages;
     }
 
+    location /public/cloudify{
+        alias /usr/lib/cloudify-widget/public/cloudify;
+    }
+
+
+    location ^/public {
+        alias /usr/lib/cloudify-widget/public/cloudify;
+    }
+
+
     location / {
             set $down 0;
             if ( -f /var/www/cloudifyWidget/NO_AGENT ) {

@@ -4,7 +4,7 @@ project/target
 target
 tmp
 .history
-dist
+./dist
 .classpath
 .project
 .idea/

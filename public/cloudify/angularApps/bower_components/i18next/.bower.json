@@ -26,6 +26,5 @@
   },
   "_source": "git://github.com/jamuhl/i18next.git",
   "_target": "~1.7.3",
-  "_originalSource": "i18next",
-  "_direct": true
+  "_originalSource": "i18next"
 }
