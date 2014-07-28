@@ -72,6 +72,13 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
     }
 
 
+    function translateString( str ) {
+        if ( str.indexOf('i18n') === 0 ) {
+            return $filter('i18n')(str.substring('i18n:'.length));
+        }
+        return str;
+    }
+
     function outputToSafe(status) {
         try {
             if (!!status.output && status.output.length > 0) {
@@ -82,9 +89,7 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
                     var original = status.output[i];
 
                     try{
-                        if ( original.indexOf('i18n') === 0 ) {
-                            original = $filter('i18n')(original.substring('i18n:'.length));
-                        }
+                        original = translateString(original);
                     }catch(e){
                         $log.warn(e);
                     }
@@ -104,7 +109,7 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         };
 
         if ( !!msg ){
-            $scope.widgetStatus.message = msg;
+            $scope.widgetStatus.message = translateString(msg);
         }
         ellipsisIndex = 0;
     }
@@ -127,6 +132,9 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         WidgetDbService.saveWidgetStatus( status );
         $scope.ellipsis = ellipsis.substring(ellipsis.length - ellipsisIndex % ellipsis.length);
         ellipsisIndex = ellipsisIndex +1;
+        try {
+            status.message = translateString(status.message);
+        }catch(e){}
         $scope.widgetStatus = status;
         outputToSafe($scope.widgetStatus);
         $timeout(pollStatus, myTimeout || 3000) ;
@@ -200,6 +208,11 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
             .then(function( result ){
                 result = result.data;
                 $log.info(['play result', result]);
+                try {
+                    result.status.message = translateString(result.status.message);
+                }catch(e){
+
+                }
                 $scope.widgetStatus = result.status;
                 outputToSafe($scope.widgetStatus);
 
