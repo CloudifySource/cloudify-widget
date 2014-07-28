@@ -32,6 +32,7 @@ angular.module('WidgetApp').directive('embedCode', function ($window, $compile, 
                     var compiledHTML = $compile(contents)($scope);
                     $timeout(function () { // need this because compiling is on event queue so we register right after it.http://stackoverflow.com/a/18600499/1068746
                         var outerHTML = compiledHTML[0].outerHTML;
+                        outerHTML = $(outerHTML).removeAttr('class')[0].outerHTML;
                         var text = $('<textarea></textarea>', { 'html': outerHTML, 'rows' : 40, 'cols' : 40, width:'400px', 'height':'100px', 'disabled':'disabled'});
                         $element.append(text);
 
