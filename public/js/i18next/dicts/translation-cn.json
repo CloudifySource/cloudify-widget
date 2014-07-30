@@ -1,6 +1,6 @@
 {
     "installationCompletedSuccessfully" : "安装成功完成",
-    "resetWidgetStatusMessage" : "对不起，太多人试用了，目前试用版服务器 资源已经全分配了，请稍后再试",
-    "noAvailableServers" : "对不起，太多人试用了，目前试用版服务器 资源已经全分配了，请稍后再试",
+    "resetWidgetStatusMessage" : "由于用户太多，目前试用版服务器资源已 分配完，请稍后再试",
+    "noAvailableServers" : "由于用户太多，目前试用版服务器资源已 分配完，请稍后再试",
     "acquiringMachines" : "正在获取服务器， 可能需要一分钟左右的时间，请耐心等候。。。"
 }
