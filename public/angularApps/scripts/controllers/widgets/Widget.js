@@ -270,8 +270,6 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
     $log.info(['saved status', savedStatus]);
     // place params on scope
 
-
-
     function widgetData(){
         try{
             if ( !!$scope.widget && !!$scope.widget.data ){
@@ -283,7 +281,9 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         }catch(e){
             $log.error('unable to get widget data',e);
         }
-        return {}; // return empty object if we failed.
+        $scope.widget.data = {};
+        return $scope.widget.data;
+
     }
 
 
@@ -306,13 +306,28 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
 
 
         catch (e) {
-            $log.info('failed to change language for widget');
+            $log.info('failed to change language for widget',e);
         }
     }
+
+    function updateSocialShares(){
+        try{
+            if ( !!$scope.widget ){
+                if ( !$scope.widget.data.socialSources ){
+                    $scope.widget.data.socialSources = [];
+                }
+               WidgetsService.shareSources.updateSocialSources( $scope.widget.data.socialSources  );
+            }
+        }catch(e){
+            $log.info('failed to update social shares',e);
+        }
+    }
+
     setLanguage();
 
     $scope.$watch('widget', function( /*newValue*/ ){
         setLanguage();
+        updateSocialShares();
 //        $scope.cloudType = ( $scope.widget && $scope.widget.data && $scope.widget.cloudProvider ) || myConf.cloudProvider;
     });
 
