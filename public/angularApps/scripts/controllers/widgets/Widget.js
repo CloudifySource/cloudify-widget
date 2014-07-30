@@ -3,7 +3,7 @@
 angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, $log, $sce, $window, $routeParams, $filter, WidgetDbService, WidgetReceiveMessageService, WidgetsService, CloudTypesService, i18n, WidgetLocalesService ) {
 
     var apiKey = $routeParams.widgetKey;
-    var originPageUrl = document.referrer;
+
     var recipeProperties = null;
 
 
@@ -272,6 +272,20 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
 
 
 
+    function widgetData(){
+        try{
+            if ( !!$scope.widget && !!$scope.widget.data ){
+                if ( typeof($scope.widget.data) === 'string'){ // handle if data is string
+                    return JSON.parse($scope.widget.data);
+                }
+                return $scope.widget.data; // simply return is data is an object
+            }
+        }catch(e){
+            $log.error('unable to get widget data',e);
+        }
+        return {}; // return empty object if we failed.
+    }
+
 
     $scope.cloudType = CloudTypesService.getDefault().id;
     var language = WidgetLocalesService.getDefault().id;
@@ -281,10 +295,8 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         try {
             if (!!$scope.widget) { // if we have a widget on the scope ===> might be given from the outside
 
-                var parsedData = $scope.widget.data; // ==> try to search data on it.
-                if (!!parsedData && typeof($scope.widget.data) === 'string') {
-                    parsedData = JSON.parse($scope.widget.data);
-                } // ==> extract locale if exists
+                var parsedData = widgetData();
+                // ==> extract locale if exists
                 if (!!parsedData.locale) {
                     language = parsedData.locale;
                 }
@@ -315,21 +327,157 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
     };
 
 
-    var shareUrl= encodeURI('http://bluforcloud.com/plans/play');
+    function shareUrl() {
+        try {
+            var widgetShareUrl = widgetData().shareUrl;
+            if (!widgetShareUrl) {
+                widgetShareUrl = document.referrer; // default to referrer url.
+            }
+            return encodeURI(widgetShareUrl);
+        } catch (e) {
+            $log.info('unable to get shareUrl', e);
+        }
+        return '';
+    }
 
+    function twitterMsg(){
+        try{
+            return encodeURIComponent(widgetData().twitterMessage);
+        }catch(e){
+            $log.info('unable to get twitter msg');
+        }
+        return '';
+    }
+
+    function renrenMsg(){
+        try{
+            return encodeURIComponent(widgetData().renrenMessage);
+        }catch(e){
+            $log.info('unable to get twitter msg');
+        }
+        return '';
+    }
+
+    function tencenWeiboTitle(){
+        try{
+            return encodeURIComponent(widgetData().tencenWeiboTitle);
+        }catch(e){
+            $log.info('unable to get twitter msg');
+        }
+        return '';
+    }
+
+    function sinaWeiboTitle(){
+        try{
+            return encodeURIComponent(widgetData().sinaWeiboTitle);
+        }catch(e){
+            $log.info('unable to get twitter msg');
+        }
+        return '';
+    }
+
+    function tecentWeiboSite(){
+        try{
+            return encodeURIComponent(widgetData().tecentWeiboSite);
+        }catch(e){
+            $log.info('unable to get twitter msg');
+        }
+        return '';
+    }
+
+    function windowName(){
+        return '_blank';
+    }
+
+    function getParamsOfShareWindow(width, height) {
+        var popupParams =  ['toolbar=0,status=0,resizable=1,width=', width ,',height=' ,height , ',left=',(screen.width-width)/2,',top=',(screen.height-height)/2].join('');
+        $log.info('popup params', popupParams);
+        return popupParams;
+    }
 //    var msg =  encodeURI('Launch on the cloud in a single click using the Cloudify widget');
-    var twitterMsg = encodeURIComponent( 'I just installed #ibmblu with a single click');
 
-    $('#facebook_share_link').attr('href', 'http://www.facebook.com/sharer/sharer.php?u=' + shareUrl).click(function(){
-        window.open('http://www.facebook.com/sharer/sharer.php?u=' + shareUrl, 'facebook_share', 'height=320, width=640, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, directories=no, status=no');
-        return false;
-    });
-    $('#google_plus_share_link').attr('href', 'https://plus.google.com/share?url=' + shareUrl).click(function(){
-        window.open('https://plus.google.com/share?url=' + shareUrl, 'height=320, width=640, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, directories=no, status=no');
-    });
-    $('#twitter_share_link').attr('href', 'https://twitter.com/share?url=' + encodeURIComponent(originPageUrl) + '&text=' + twitterMsg).click(function(){
-        window.open('https://twitter.com/share?url=' + encodeURIComponent(originPageUrl) + '&text=' + twitterMsg, 'height=320, width=640, toolbar=no, menubar=no, scrollbars=no, resizable=no, location=no, directories=no, status=no');
-    });
 
+    // lets map each share source some widget relevant details
+    // such as icon, open operation etc..
+
+    // initialize the object with all shareSources
+    var sourcesIds = WidgetsService.shareSources.SourcesIds;
+    $scope.shareSources = [
+        {
+            'id' : sourcesIds.EMBED_CODE,
+            'open' : function(){
+                $scope.showEmbed = true;
+            },
+            'icon' : 'fa fa-share-alt-square'
+
+        },
+        {
+            'id' :  sourcesIds.FACEBOOK,
+            'open' : function(){
+                window.open('http://www.facebook.com/sharer/sharer.php?u=' + shareUrl(), windowName(), getParamsOfShareWindow(640, 320));
+            },
+            'icon' : 'fa fa-facebook-square'
+        },
+        {
+            'id': sourcesIds.GOOGLE_PLUS,
+            'open' : function(){
+                window.open('https://plus.google.com/share?url=' + shareUrl(), windowName(), getParamsOfShareWindow(640, 320));
+            },
+            'icon' : 'fa fa-google-plus-square'
+        },
+        {
+            'id' : sourcesIds.TWITTER,
+            'open' : function(){
+                window.open('https://twitter.com/share?url=' + shareUrl() + '&text=' + twitterMsg(), windowName(), getParamsOfShareWindow(640, 320));
+            },
+            'icon' : 'fa fa-twitter-square'
+        },
+        {
+            'id' : sourcesIds.LINKEDIN,
+            'open' : function(){
+                window.open('https://www.linkedin.com/cws/share?url=' + shareUrl(), windowName(), getParamsOfShareWindow(640, 320));
+            },
+            'icon' : 'fa fa-linkedin-square'
+        },
+        {
+            'id' :  sourcesIds.RENREN,
+            'open' : function(){
+                window.open('http://share.renren.com/share/buttonshare?link=' + shareUrl() + '&title=' + renrenMsg(), windowName(), getParamsOfShareWindow(626, 436));
+            },
+            'icon' : 'fa fa-renren'
+        },
+        {
+            'id' :  sourcesIds.WEIBO,
+            'open' : function(){
+                window.open('http://v.t.qq.com/share/share.php?title=' + tencenWeiboTitle() + '&url=' + shareUrl() + '&site=' + tecentWeiboSite(), windowName(), getParamsOfShareWindow(640, 320));
+            },
+            'icon' : 'fa fa-tencent-weibo'
+
+        },
+        {
+            'id' : sourcesIds.SINA,
+            'open' : function(){
+                window.open('http://v.t.sina.com.cn/share/share.php?url=' + shareUrl() + '&title=' + sinaWeiboTitle(), windowName(), getParamsOfShareWindow(640, 320));
+            },
+            'icon' : 'fa fa-qq'
+        }
+    ];
+
+    $scope.isShareSourceActive = function( shareSource ){
+        try{
+
+            var source = _.find(widgetData().socialSources, {'id' : shareSource.id});
+            if ( !source){
+                // by this point, the system and the widget configuration should be synced!
+                // follow calls to WidgetShareSourcesService#updateSocialSources to see where we sync them
+                $log.debug('share source is defined in system, but not on widget');
+                return false;
+            }
+            return !!source.active;
+        }catch(e){
+            $log.info('unable to decide if share source active',e);
+            return false;
+        }
+    };
 
 });

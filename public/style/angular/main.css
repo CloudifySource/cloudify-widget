@@ -318,8 +318,6 @@ td.action_col {
     overflow: hidden; }
   #widget-view .error {
     color: red; }
-  #widget-view .put_left {
-    float: right; }
   #widget-view .button {
     height: 112px;
     width: 112px;
@@ -671,3 +669,18 @@ td.action_col {
     margin-top: 20px;
     width: 255px;
     margin-left: 42px; }
+#widget-view .share_links {
+  float: right;
+  margin-right: 5px; }
+  #widget-view .share_links .share_link {
+    margin-right: 5px; }
+    #widget-view .share_links .share_link a {
+      color: #545454; }
+    #widget-view .share_links .share_link .fa {
+      color: #545454;
+      font-size: 26px;
+      line-height: 26px;
+      vertical-align: bottom; }
+
+#social-source-form-section input[type=checkbox] {
+  vertical-align: top; }

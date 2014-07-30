@@ -35,9 +35,6 @@
     color: red;
   }
 
-  .put_left {
-    float: right;
-  }
 
   /* components */
 
@@ -548,5 +545,26 @@
       }
     }
   }
+
+
+  .share_links {
+    float: right;
+    margin-right:5px;
+    .share_link{
+      margin-right:5px;
+      a{
+        color:#545454;
+      }
+      .fa{
+        color:#545454;
+        font-size:26px;
+        line-height:26px;
+        vertical-align: bottom;
+
+      }
+    }
+
+  }
+
 
 }

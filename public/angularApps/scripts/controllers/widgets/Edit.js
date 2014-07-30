@@ -21,9 +21,21 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
     $scope.widget = { };
     $scope.widgetData = {};
 
+
+    function updateWidgetData( widget ){
+
+        $scope.widgetData = ( !!widget.data && JSON.parse(widget.data) ) || {};
+        if ( !$scope.widgetData.socialSources ){
+            $scope.widgetData.socialSources = [];
+        }
+        WidgetsService.shareSources.updateSocialSources($scope.widgetData.socialSources);
+
+
+    }
+
     if ( !!$routeParams.widgetId ){
         WidgetsService.getWidget( $routeParams.widgetId).then(function(result){
-            $scope.widgetData = JSON.parse(result.data.data) || {};
+            updateWidgetData(result.data);
             $scope.widget = result.data;
 
         });
@@ -64,6 +76,15 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
         $scope.actions.editIcon = null;
     };
 
+    $scope.getSocialSourceLabel = function(source){
+        try {
+            return WidgetsService.shareSources.getById(source.id).label;
+        }catch(e){
+            $log.error('unable to get label for source',source,e);
+            return '';
+        }
+    };
+
     $scope.actions = { 'editWidget' : {}, 'editIcon':null };
     $scope.data = {};
 
@@ -89,7 +110,7 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
                 widget.apiKey = savedWidget.apiKey;
                 widget.version = savedWidget.version;
 
-                $scope.widgetData = JSON.parse(widget.data) || {} ;
+                updateWidgetData(widget.data);
             }
             if ( isDone ){
                 $location.path('/widgets/' + $scope.widget.id + '/preview');

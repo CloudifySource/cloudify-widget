@@ -1,7 +1,9 @@
 'use strict';
 
 
-angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $cookies, WidgetThemes, CloudTypesService, $window, MixpanelService, WidgetLocalesService  ){
+angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $cookies, WidgetThemes,
+                                                                CloudTypesService, $window, MixpanelService,
+                                                                WidgetLocalesService, WidgetShareSourcesService  ){
     var authToken = $.cookie('authToken');
     $log.info('authToken is ', authToken);
 
@@ -9,6 +11,7 @@ angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $co
     this.themes = WidgetThemes;
     this.cloudTypes = CloudTypesService;
     this.locales = WidgetLocalesService;
+    this.shareSources = WidgetShareSourcesService;
 
 
     this.getWidgets = function( ){
