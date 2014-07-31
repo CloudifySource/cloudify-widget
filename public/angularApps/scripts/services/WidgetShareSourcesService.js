@@ -68,17 +68,17 @@ angular.module('WidgetApp').service('WidgetShareSourcesService', function( $q ){
             'id' : sourcesIds.WEIBO,
             'label' : 'Weibo Tencent',
             'active': false
-        }//,
+        },
 //        {
 //            'id' : 'QZONE',
 //            'label' : 'Qzone',
 //            'active' : false
 //        },
-//        {
-//            'id' : sourcesIds.WECHAT, // guy no share button feature
-//            'label' : 'Wechat',
-//            'active': false
-//        }
+        {
+            'id' : sourcesIds.WECHAT, // guy no share button feature
+            'label' : 'Wechat',
+            'active': false
+        }
     ];
 
     this.getShareSources = function(){

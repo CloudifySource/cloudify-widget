@@ -400,6 +400,14 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         return '';
     }
 
+    function getWechatUrl(){
+        try{
+            return encodeURI(widgetData().wechatUrl);
+        }catch(e){
+            $log.info('unable to get wechat url',e);
+        }
+    }
+
     function windowName(){
         return '_blank';
     }
@@ -474,7 +482,14 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
             'open' : function(){
                 window.open('http://v.t.sina.com.cn/share/share.php?url=' + shareUrl() + '&title=' + sinaWeiboTitle(), windowName(), getParamsOfShareWindow(640, 320));
             },
-            'icon' : 'fa fa-qq'
+            'icon' : 'fa fa-weibo'
+        },
+        {
+            'id' : sourcesIds.WECHAT,
+            'open' : function(){
+                window.open(getWechatUrl(), windowName(), getParamsOfShareWindow(640,320));
+            },
+            'icon' : 'fa fa-wechat'
         }
     ];
 
