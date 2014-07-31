@@ -169,7 +169,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         long timeout = bootstrapConf.sleepBeforeBootstrapMillis;
         int bootstrapRetries = bootstrapConf.bootstrapRetries;
 
-        logger.info("Server created, wait {} seconds before starting to bootstrap machine: {}", timeout, serverNode.getPublicIP());
+        logger.info("Server created, wait {} milliseconds before starting to bootstrap machine: {}", timeout, serverNode.getPublicIP());
 
         Utils.threadSleep(timeout);
 
