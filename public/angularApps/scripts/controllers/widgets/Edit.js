@@ -17,6 +17,11 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
     });
 
 
+    WidgetsService.cloudProviders.list().then(function(result){
+        $scope.cloudProviders = result.data;
+    });
+
+
 
     $scope.widget = { };
     $scope.widgetData = {};

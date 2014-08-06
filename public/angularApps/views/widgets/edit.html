@@ -74,8 +74,26 @@
             </div>
         </div>
 
+        <!-- there is lack of correlation between cloud provider and cloud name conventions,
+
+            since the widget has 2 meaning for cloud provider.
+
+            One we use to know which credentials fields to expose in the front-end, which steps to do before bootstrap
+            (such as create private key in ec2) and such,
+
+            while cloud name, is the name of the folder under "clouds" in cloudify.
+
+
+         -->
+        <div class="control-group">
+            <label class="control-label" for="locale">Cloud Name<abbr class="required_mark" ng-show="required">*</abbr></label>
+            <div class="controls">
+                <select name="locale" id="cloudProvider" ng-model="widget.cloudName" ng-options="provider for provider in cloudProviders"></select>
+            </div>
+        </div>
+
         <div class="control-group" id="social-source-form-section">
-            <label class="control-label" for="locale">Share Sources<abbr class="required_mark" ng-show="required">*</abbr></label>
+            <label class="control-label" for="locale">Cloud Providers<abbr class="required_mark" ng-show="required">*</abbr></label>
             <div class="controls">
                 <span ng-repeat="socialSource in widgetData.socialSources track by socialSource.id">
                     <input name="shareSources" id="shareSources" ng-model="socialSource.active" type="checkbox" /> {{getSocialSourceLabel(socialSource)}}<br/>

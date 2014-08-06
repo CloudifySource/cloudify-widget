@@ -94,6 +94,9 @@ GET     /admin/pool/manage/events                       controllers.AdminPoolCon
 
 GET     /admin/pool/summary             controllers.AdminPoolController.summary( authToken :String)
 
+GET     /cloudProviders/list                 controllers.Application.getCloudProviders
+
+
 #GET     /user/pool/manage              controllers.UserPoolController.getServerNodePoolPage( authToken:String, project:String, key:String, secretKey:String)
 #GET     /user/pool/manage/list         controllers.UserPoolController.getAllServers
 #GET     /user/pool/summary             controllers.UserPoolController.summary

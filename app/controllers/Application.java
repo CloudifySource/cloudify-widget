@@ -16,9 +16,9 @@ package controllers;
 
 import static utils.RestUtils.OK_STATUS;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.io.FileFilter;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import cloudify.widget.api.clouds.CloudServer;
@@ -45,7 +45,6 @@ import play.libs.F;
 import play.libs.Json;
 import play.libs.WS;
 import play.mvc.Controller;
-import play.mvc.Http;
 import play.mvc.Http.RequestBody;
 import play.mvc.Result;
 import server.ApplicationContext;
@@ -53,7 +52,6 @@ import server.HeaderMessage;
 import server.exceptions.ServerException;
 import utils.CollectionUtils;
 import utils.StringUtils;
-import utils.Utils;
 import akka.util.Duration;
 import beans.config.Conf;
 
@@ -552,6 +550,33 @@ public class Application extends Controller
 
                 )
         );
+
+    }
+
+
+    public static Result getCloudProviders(  ){
+
+        String cloudifyHome = ApplicationContext.get().conf().server.environment.cloudifyHome;
+        File file = new File(cloudifyHome);
+
+        logger.info("will find cloud providers for home dir", file.getAbsolutePath());
+
+        File cloudsFolder = new File(file,"clouds");
+
+        File[] cloudProviders = cloudsFolder.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.isDirectory();
+            }
+        });
+
+        List<String> result = new LinkedList<String>();
+
+        for (File cloudProvider : cloudProviders) {
+            result.add(cloudProvider.getName());
+        }
+
+        return ok(Json.toJson(result));
 
     }
 }
