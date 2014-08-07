@@ -42,7 +42,7 @@ cloud {
 
             orchestrator {
 
-                startMachineTimeoutInSeconds 36000
+                startMachineTimeoutInSeconds 144000
                 stopMachineTimeoutInSeconds 36000
             }
 
@@ -266,7 +266,8 @@ cloud {
                     overrides ([
                             "jclouds.softlayer.package-id":46,
                             "jclouds.softlayer.flex-image-global-identifier":flexImageGlobalIdentifier,
-                            "jclouds.softlayer.server.active-transactions-started-delay":100000000000
+                            "jclouds.softlayer.server.active-transactions-started-delay":100000000000,
+	                    "jclouds.softlayer.virtualguest.active-transactions-ended-delay":14400000							
                     ])
 
                     // when set to 'true', agent will automatically start after reboot.
