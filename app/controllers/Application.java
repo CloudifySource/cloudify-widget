@@ -25,6 +25,7 @@ import cloudify.widget.api.clouds.CloudProvider;
 import cloudify.widget.api.clouds.CloudServer;
 import cloudify.widget.api.clouds.CloudServerApi;
 import models.ServerNode;
+import models.User;
 import models.Widget;
 
 import models.WidgetInstanceUserDetails;
@@ -263,6 +264,13 @@ public class Application extends Controller
         }else{
             return internalServerError("only available in dev mode");
         }
+    }
+
+    public static Result getPoolStatus( String authToken ){
+        if ( User.validateAuthToken( authToken ) == null ) {
+            return unauthorized();
+        }
+        return ok(Json.toJson(ApplicationContext.get().getServerPool().getStats()));
     }
 
     // find existing management and returns IP

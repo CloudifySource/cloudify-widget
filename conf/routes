@@ -28,6 +28,8 @@ GET      /widget/:instanceId/pem        controllers.Application.downloadPemFile(
 GET     /encrypt                        controllers.Application.encrypt( data:String )
 GET     /decrypt                        controllers.Application.decrypt( data:String )
 
+GET     /backend/application/pool/stats  controllers.Application.getPoolStatus( authToken :String )
+
 
 # User API
 POST   /api/user/:userId/lead                                       controllers.LeadsController.postLead( userId:String, authToken:String )

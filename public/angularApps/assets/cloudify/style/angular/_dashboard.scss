@@ -212,3 +212,48 @@ td.action_col {
   cursor: text !important;
 }
 
+
+
+
+#dashboard {
+
+  .pool-status-section-title{
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    padding:20px;
+  }
+
+  .pool-status-section{
+
+    display: table;
+
+    width:400px;
+    margin:0 auto;
+
+    text-align:center;
+    color:red;
+
+
+
+    .pool-status-overview{
+
+      display:table-row;
+
+      .pool-status-overview-item{
+        display:table-cell;
+
+        .pool-status-overview-item-value{
+           font-size:47px;
+           line-height:40px;
+           width:100px;
+        }
+
+        .pool-status-overview-item-label{
+          width:100px;
+        }
+      }
+    }
+  }
+
+}

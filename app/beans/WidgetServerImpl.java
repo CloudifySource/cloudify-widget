@@ -149,10 +149,9 @@ public class WidgetServerImpl implements WidgetServer
         if (server == null || ( timeLeft != null && timeLeft.longValue() == 0 ) ) {
             logger.info("no more time left. trial time is over, settings status to STOPPED");
             result.setState(Status.State.STOPPED);
-            output.add(Messages.get("test.drive.successfully.complete"));
+            output.add("i18n:testDriveSuccessfullyCompleted");
             return result;
         }else{
-            logger.info("there is still time on trial");
             result.setInstanceId( Long.toString(server.getId()) ); // will need this to register users on specific nodes.
         }
 

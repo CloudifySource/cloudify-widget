@@ -92,7 +92,8 @@ public class WidgetAdmin extends Controller
     public static Result icon( String apiKey ){
         WidgetIcon widgetItem = WidgetIcon.findByWidgetApiKey( apiKey );
         if ( widgetItem == null || ArrayUtils.isEmpty(widgetItem.getData()) ){
-            return notFound(  );
+            return ok().as( "image/png");
+//            return notFound(  );
         }
         return ok( widgetItem.getData() ).as( widgetItem.getContentType() );
     }

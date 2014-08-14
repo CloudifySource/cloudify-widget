@@ -1,9 +1,14 @@
 'use strict';
 
-angular.module('WidgetApp').controller('WidgetsIndexCtrl', function ($scope, WidgetsService, $log, $location) {
+angular.module('WidgetApp').controller('WidgetsIndexCtrl', function ($scope, WidgetsService, $log, $location, PoolService) {
     $log.info('loading controller');
 
     function load() {
+
+        PoolService.getStatus().then(function (result) {
+            $scope.poolStatus = result.data;
+        });
+
         WidgetsService.getWidgets().then(function (result) {
             $scope.widgets = result.data;
 
