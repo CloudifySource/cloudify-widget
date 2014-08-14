@@ -505,7 +505,7 @@ public class Application extends Controller
         String cloudifyHome = ApplicationContext.get().conf().server.environment.cloudifyHome;
         File file = new File(cloudifyHome);
 
-        logger.info("will find cloud providers for home dir", file.getAbsolutePath());
+        logger.info("will find cloud providers for home dir [{}] ", file.getAbsolutePath());
 
         File cloudsFolder = new File(file,"clouds");
 
