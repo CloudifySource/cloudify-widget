@@ -17,23 +17,21 @@ package server;
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import beans.scripts.IExecutionRestore;
+import cloudify.widget.allclouds.advancedparams.IServerApiFactory;
+import cloudify.widget.api.clouds.CloudProvider;
 import cloudify.widget.api.clouds.CloudServerApi;
-import cloudify.widget.api.clouds.IWidgetLoginHandler;
 import cloudify.widget.cli.ICloudBootstrapDetails;
-import mocks.EventMonitorMock;
+import cloudify.widget.cli.softlayer.SoftlayerCloudBootstrapDetails;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContextAware;
 import play.Play;
-import utils.CloudifyFactory;
 import beans.GsMailer;
 import beans.HmacImpl;
 import beans.config.Conf;
-import beans.pool.PoolEventListener;
-import beans.pool.PoolEventManager;
 import beans.tasks.DestroyServersTask;
 import bootstrap.InitialData;
 
@@ -64,12 +62,12 @@ public class ApplicationContext
     @Inject private ServerBootstrapper serverBootstrapper;
     @Inject private MailSender mailSender;
     @Inject private HmacImpl hmac;
-    @Inject private EventMonitor eventMonitor;
     @Inject private Conf conf;
     @Inject private InitialData initialData;
-    @Inject private PoolEventListener poolEventManager;
     @Inject private DestroyServersTask destroyServersTask;
     @Inject private CloudServerApi cloudServerApi;
+    @Inject private IExecutionRestore restoreExecutionService;
+    @Inject private IServerApiFactory serverApiFactory;
 
     @Inject private static org.springframework.context.ApplicationContext applicationContext;
 
@@ -181,19 +179,9 @@ public class ApplicationContext
         this.conf = conf;
     }
 
-    public EventMonitor getEventMonitor()
-    {
-        if ( eventMonitor == null ){
-            logger.info("eventMonitor is null for some reason");
-            return new EventMonitorMock();
-        }
-        return eventMonitor;
-    }
 
-    public void setEventMonitor( EventMonitor eventMonitor )
-    {
-        this.eventMonitor = eventMonitor;
-    }
+
+
 
     public InitialData getInitialData()
     {
@@ -206,42 +194,6 @@ public class ApplicationContext
         this.initialData = initialData;
     }
 
-//    public static NovaCloudCredentials getNovaCloudCredentials(){
-//        return getBean("novaCloudCredentials");  // prototype, we cannot inject it.
-//    }
-    
-    public static CloudifyFactory getCloudifyFactory(){
-        return getBean("cloudifyFactory");
-    }
-    
-    public void setPoolEventManager(PoolEventManager poolEventManager) {
-        this.poolEventManager = poolEventManager;
-    }
-    
-//    public static BootstrapCloudHandler getBootstrapCloudHandler( CloudProvider cloudProvider ){
-//
-//    	return ( BootstrapCloudHandler )getBean(cloudProvider.label + "BootstrapCloudHandler");
-//    }
-    
-/*    public static class SoftlayerHandler implements BootstrapCloudHandler{
-    	
-    	@Override
-    	public Machine createMachine( ServerNode serverNode ){
-    		SoftlayerAdvancedParams params = Json.fromJson( Json.parse(serverNode.getAdvancedParams()), SoftlaterAdvancedParams.class);
-    	}
-    	
-//    	 { "type": "softlayer", "params":{"userId":"", "apiKey":"", "anotherKey":""}}}
-//    	 @author evgenyf
-    	     	 
-    	public static class SoftlayerAdvancedParams{
-    		String userId;
-    		String apiKey;
-    	}
-    }*/
-
-    public PoolEventListener getPoolEventManager() {
-        return poolEventManager;
-    }
 
     public DestroyServersTask getDestroyServersTask() {
         return destroyServersTask;
@@ -251,16 +203,45 @@ public class ApplicationContext
         this.destroyServersTask = destroyServersTask;
     }
 
-    public ICloudBootstrapDetails getCloudBootstrapDetails( ){
-        return (ICloudBootstrapDetails) getBean("bootstrapDetails");
+    public ICloudBootstrapDetails getCloudBootstrapDetails( CloudProvider cloudProvider  ){
+        ICloudBootstrapDetails result = null;
+        switch( cloudProvider ){
+
+            case HP:
+                break;
+            case AWS_EC2:
+
+                break;
+            case SOFTLAYER:
+                result = new SoftlayerCloudBootstrapDetails();
+                break;
+            case NA:
+                break;
+        }
+        if ( result == null ){
+            throw new RuntimeException("cloud provider not supported by backend [" +  cloudProvider + "]");
+        }
+        return result;
     }
 
     public void setApplicationContext(org.springframework.context.ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
+    public IExecutionRestore getRestoreExecutionService(){
+        return restoreExecutionService;
+    }
+
     public CloudServerApi getCloudServerApi() {
         return cloudServerApi;
+    }
+
+    public IServerApiFactory getServerApiFactory() {
+        return serverApiFactory;
+    }
+
+    public void setServerApiFactory(IServerApiFactory serverApiFactory) {
+        this.serverApiFactory = serverApiFactory;
     }
 
     public void setCloudServerApi(CloudServerApi cloudServerApi) {

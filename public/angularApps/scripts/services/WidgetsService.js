@@ -3,7 +3,7 @@
 
 angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $cookies, WidgetThemes,
                                                                 CloudTypesService, $window, MixpanelService,
-                                                                CloudProvidersService,
+                                                                CloudService,
                                                                 WidgetLocalesService, WidgetShareSourcesService  ){
     var authToken = $.cookie('authToken');
     $log.info('authToken is ', authToken);
@@ -13,7 +13,7 @@ angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $co
     this.cloudTypes = CloudTypesService;
     this.locales = WidgetLocalesService;
     this.shareSources = WidgetShareSourcesService;
-    this.cloudProviders = CloudProvidersService;
+    this.cloud = CloudService;
 
 
     this.getWidgets = function( ){

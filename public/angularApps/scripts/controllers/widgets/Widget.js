@@ -316,7 +316,7 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
                 if ( !$scope.widget.data.socialSources ){
                     $scope.widget.data.socialSources = [];
                 }
-               WidgetsService.shareSources.updateSocialSources( $scope.widget.data.socialSources  );
+                WidgetsService.shareSources.updateSocialSources( $scope.widget.data.socialSources  );
             }
         }catch(e){
             $log.info('failed to update social shares',e);

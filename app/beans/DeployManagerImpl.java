@@ -15,26 +15,21 @@
 package beans;
 
 import java.io.File;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
 
 import javax.inject.Inject;
 
+import cloudify.widget.common.WidgetResourcesUtils;
 import models.ServerNode;
 import models.ServerNodeEvent;
 import models.Widget;
 import models.WidgetInstance;
 
 import org.apache.commons.exec.CommandLine;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.codehaus.jackson.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import play.libs.Json;
 import server.DeployManager;
 import utils.StringUtils;
 import utils.Utils;
@@ -160,10 +155,22 @@ public class DeployManagerImpl implements DeployManager {
 
             }
             logger.info(" Widget [{}] has recipe url [{}]", widget.getRecipeName(), recipeURL);
-            unzippedDir = Utils.downloadAndUnzip(recipeURL, widget.getApiKey());
-            recipeDir = unzippedDir;
+
+            WidgetResourcesUtils.ResourceManager recipeManager = new WidgetResourcesUtils.ResourceManager();
+            recipeManager.setUrl( recipeURL );
+            recipeManager.setUid( widget.getApiKey() );
+            recipeManager.setBaseDir( conf.resources.recipesBaseDir.getAbsolutePath() );
+
+            if ( ! recipeManager.isExtracted() ) {
+                recipeManager.download();
+                recipeManager.extract();
+            }
+            File tempRecipePath = new File( conf.resources.recipesBaseDir.getAbsolutePath() , "copy-" + System.currentTimeMillis() );
+            recipeManager.copy( tempRecipePath );
+
+            recipeDir = tempRecipePath;
             if (widget.getRecipeRootPath() != null) {
-                recipeDir = new File(unzippedDir, widget.getRecipeRootPath());
+                recipeDir = new File(recipeDir, widget.getRecipeRootPath());
             }
             logger.info("Deploying an instance for recipe at : [{}] ", recipeDir);
 

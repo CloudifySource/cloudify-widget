@@ -94,6 +94,7 @@ GET     /admin/pool/manage/events                       controllers.AdminPoolCon
 
 GET     /admin/pool/summary             controllers.AdminPoolController.summary( authToken :String)
 
+GET     /cloudNames/list                 controllers.Application.getCloudNames
 GET     /cloudProviders/list                 controllers.Application.getCloudProviders
 
 

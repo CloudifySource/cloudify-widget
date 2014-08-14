@@ -1,17 +1,11 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:p="http://www.springframework.org/schema/p"
-       xmlns:task="http://www.springframework.org/schema/task"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
            http://www.springframework.org/schema/context
-           http://www.springframework.org/schema/context/spring-context-3.1.xsd
-           http://www.springframework.org/schema/task
-           http://www.springframework.org/schema/task/spring-task.xsd">
+           http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-    <bean id="poolEventManager" class="beans.pool.PoolEventManagerMock"/>
-    <!--<bean id="poolEventManager" class="beans.pool.PoolEventManager"/>-->
 
     <bean id="deployManager" class="beans.DeployManagerImpl"/>
     <bean id="executorFactory" class="beans.ExecutorFactoryImpl"/>
@@ -36,19 +30,22 @@
     <bean id="mailSender" class="beans.MailSenderImpl"/>
     <bean id="initialData" class="bootstrap.JsonInitialData"/>
 
-    <bean id="eventMonitorImpl" class="beans.EventMonitorMixpanel" p:apiKey="#{conf.mixpanelApiKey}" init-method="init"/>
-    <bean id="eventMonitorMock" class="mocks.EventMonitorMock"/>
-    <bean id="beansFactory" class="beans.BeansFactory"/>
-    <bean id="eventMonitor" factory-bean="beansFactory" factory-method="getEventMonitor"/>
+
+
+    <bean id="resourceManagerFactory" class="utils.ResourceManagerFactory"/>
+    <bean id="restoreExecutionService" class="beans.scripts.ExecutionRestoreImpl"/>
 
     <bean id="serverPool" class="beans.ServerPoolImpl"/>
     <bean id="widgetServer" class="beans.WidgetServerImpl"/>
 
 
+    <bean id="serverApiFactory" class="cloudify.widget.allclouds.advancedparams.ServerApiFactoryImpl"/>
 
     <bean id="applicationContext" class="server.ApplicationContext"/>
 
-    <bean id="scriptExecutor" class="beans.scripts.FileBasedScriptExecutor"/>
+    <bean id="scriptExecutor" class="beans.scripts.FileBasedScriptExecutor">
+        <property name="conf"  ref="conf"/>
+    </bean>
 
     <!-- these two lines should be above the beans tags -->
     <context:annotation-config/>
@@ -86,41 +83,15 @@
             <property name="tag" value="#{conf.server.bootstrap.tag}"/>
         </bean>
 
-        <bean id="bootstrapDetails" class="cloudify.widget.cli.softlayer.SoftlayerCloudBootstrapDetails">
-            <property name="cloudDriver" value="softlayer_cci"/>
-        </bean>
+        <bean id="cliHandler" class="cloudify.widget.cli.softlayer.SoftlayerCloudifyCliHandler"/>
 
-        <bean id="cliHandler" class="cloudify.widget.cli.softlayer.SoftlayerCloudifyCliHandler">
-            <property name="cloudPropertiesFilenameSuffix" value="-cloud.properties"/>
-            <property name="cloudifyCloudsFolderRelativePath" value="clouds"/>
 
-            <property name="cloudifyHomeDir" value="#{conf.server.environment.cloudifyHome}"/>
-        </bean>
 
 
     </beans>
-    
-    
 
     <beans profile="stub">
         <bean id="cloudServerApi" class="mocks.cloud.CloudServerApiMock"/>
     </beans>
-
-
-    <beans profile="hpcloud">
-
-        <!--<bean id="novaCloudCredentials" class="cloudify.widget.hpcloud.NovaCloudCredentials" scope="prototype" init-method="init"/>-->
-
-        <!--<bean id="cloudifyFactory" class="utils.CloudifyFactory"/>-->
-
-
-        <!--<bean id="hpcloud-computeBootstrapCloudHandler" class="clouds.hp.HPBootstrapCloudHandler">-->
-        <!--</bean>-->
-        <!--<bean id="softlayerBootstrapCloudHandler" class="clouds.softlayer.SoftlayerBootstrapCloudHandler">-->
-        <!--</bean>-->
-    </beans>
-
-
-
 
 </beans>

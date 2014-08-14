@@ -73,31 +73,3 @@ exports.getNextTask = function( newDir, callback ) {
     }
 };
 
-
-//        var serverNodeId = firstFile.split('_')[0];
-//        serverNodeIdDir = executingDir + serverNodeId + path.sep;
-//
-//        createNewExecutingDir(serverNodeIdDir);
-//
-//        console.log('Before moving file, serverNodeIdDir=' + serverNodeIdDir);
-//
-//        fs.rename(newDir + firstFile, serverNodeIdDir + firstFile, function (err, data) {
-//            if (err) {
-//                console.log('Rename Error: ' + err);
-//                return;
-//            }
-//
-//            console.log('After moving [' + firstFile + '] file. data is : ', data);
-//
-//            console.log('Before read from JSON, file:' + executingDir + firstFile);
-//            fs.readFile(serverNodeIdDir + firstFile, 'utf8', function (err, data) {
-//                if (err) {
-//                    console.log('Read ' + firstFile + ' error: ' + err);
-//                    return;
-//                }
-//
-//                executeCommand(firstFile, data, args);
-//            });
-//        });
-//    }
-//}

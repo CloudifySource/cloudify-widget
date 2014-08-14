@@ -41,6 +41,7 @@ import play.data.validation.Constraints;
 import play.data.validation.Validation;
 import play.db.ebean.Model;
 import play.i18n.Messages;
+import play.libs.Json;
 import server.ApplicationContext;
 import server.exceptions.ServerException;
 import utils.CollectionUtils;
@@ -52,7 +53,7 @@ import utils.StringUtils;
 
 /**
  * This class represents a widget metadata and relates to a specific {@link User}.
- * See {@link WidgetAdmin#createNewWidget}
+ * See {@link WidgetAdmin}
  * 
  * @author Igor Goldenberg
  * @see WidgetAdmin
@@ -77,7 +78,9 @@ public class Widget
     private String title;
 	private String youtubeVideoUrl;
 
+
     public String cloudName;
+
     @Enumerated(EnumType.STRING)
     public CloudProvider cloudProvider = CloudProvider.SOFTLAYER;
 
@@ -95,7 +98,7 @@ public class Widget
 
     public String loginsString;
 
-    @JsonIgnore
+
     public String managerPrefix;
 
     @ManyToOne
@@ -899,4 +902,27 @@ public class Widget
 //    public void setTheme(String theme) {
 //        this.theme = theme;
 //    }
+
+
+    @JsonIgnore
+    public boolean hasCloudProviderData(){
+        try {
+            if ( !StringUtils.isEmptyOrSpaces(data) ){
+                JsonNode parse = Json.parse(data);
+                return parse.has("cloudProvider");
+            }
+        }catch(Exception e){
+            logger.error("unable to check if I have cloud provider data", e);
+        }
+
+        return false;
+    }
+
+    @JsonIgnore
+    public JsonNode getCloudProvideJson(){
+        if ( hasCloudProviderData() ){
+            return Json.parse(data).get("cloudProvider");
+        }
+        return null;
+    }
 }

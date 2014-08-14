@@ -35,6 +35,10 @@ public class Conf {
 
     public Mails mails = new Mails();
 
+    public AsyncExecutionConf asyncExecution = new AsyncExecutionConf();
+
+    public ResourceConfig resources = new ResourceConfig();
+
 
     // who is sending the mail?
     public GsMailer.Mailer mailer = new GsMailer.Mailer();
@@ -169,6 +173,13 @@ public class Conf {
         public List<GsMailer.Mailer> addresses = new LinkedList<GsMailer.Mailer>();
     }
 
+    public static class ResourceConfig {
+
+        public File recipesBaseDir =   new File(new File(System.getProperty("java.io.tmpdir"), "cloudify-widget"), "recipes");
+        public File cloudProvidersBaseDir = new File(new File(System.getProperty("java.io.tmpdir"), "cloudify-widget"),"cloud-providers");
+
+    }
+
     public ServerConfig getServer(){
         return server;
     }
@@ -196,5 +207,13 @@ public class Conf {
         public void setListId(String listId) {
             this.listId = listId;
         }
+    }
+
+
+    public static class AsyncExecutionConf {
+        public File newScriptsDir = Utils.getFileByRelativePath("node_scripts/_scripts/new");
+        public File executingScriptsDir = Utils.getFileByRelativePath("node_scripts/_scripts/executing");
+        public long statusPollingIntervalMillis = Utils.parseTimeToMillis("10s");
+
     }
 }

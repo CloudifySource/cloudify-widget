@@ -32,7 +32,7 @@ exports.execute = function( opts , handlers ){
     logger.info('executing', opts);
 
     var executable = opts.executable;
-    var argumentsArray = opts.arguments.split(",");
+    var argumentsArray = [].concat(opts.arguments);
 
     var cloudifyHome = opts.cloudifyHome;
 

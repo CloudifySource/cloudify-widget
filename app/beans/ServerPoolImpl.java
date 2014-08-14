@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import akka.util.Duration;
 import beans.config.Conf;
 
-import beans.pool.PoolEvent;
+
 import com.avaje.ebean.Ebean;
 import models.ServerNode;
 import org.apache.commons.collections.Predicate;
@@ -376,11 +376,6 @@ public class ServerPoolImpl implements ServerPool
                             }
                         } catch (Exception e) {
                             logger.error("ServerPool failed to create a new server node", e);
-                            String stackTrace = ExceptionUtils.getFullStackTrace(e);
-                            ApplicationContext.get().getPoolEventManager().handleEvent(new PoolEvent.MachineStateEvent()
-                                    .setType(PoolEvent.Type.ERROR)
-                                    .setErrorMessage(e.getMessage())
-                                    .setErrorStackTrace(stackTrace));
                         }
                         Akka.system().scheduler().scheduleOnce( Duration.Zero() , callback );
                     }

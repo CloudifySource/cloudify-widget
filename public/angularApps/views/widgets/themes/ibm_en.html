@@ -21,7 +21,7 @@
 <div id="video_container" video-container url="widget.youtubeVideoUrl"></div>
 
 
-<div class="advanced_section"  ng-class="{'hidden':!!showAdvanced() || !widgetStatus.instanceIsAvailable }">
+<div class="advanced_section"  ng-class="{'hidden':!!showAdvanced || !widgetStatus.instanceIsAvailable }">
     <!-- temporary solution. we need to understand the best way to embed messages here -->
     <div style="margin:10px auto 0 auto"><b>Username</b>: bluadmin<br><b>Password</b>: 0b9f757f32d98899</div>
 </div>
@@ -40,7 +40,7 @@
     <!-- need to set autocomplete=off explicitly in order to turn off the browser's built-in autocomplete -->
     <form class="advanced_form" autocomplete="off" ng-submit="submitAdvancedData()">
         <div class="error" ng-show="advancedRequiredError">Must fill in details</div>
-        <span ng-switch="cloudType" cloud-type={{cloudType}}>
+        <span ng-switch="cloudType" cloud-type={{widget.cloudType}}>
             <span ng-switch-when="HP">
                 <input ng-model="advancedParams.HP.params.project" placeholder="Project" name="project"/>
                 <input ng-model="advancedParams.HP.params.key" placeholder="HPCS Key" name="key"/>

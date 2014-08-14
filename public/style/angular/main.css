@@ -127,6 +127,10 @@ label.filebutton {
     margin: 0;
     padding: 0; }
 
+.bg-danger {
+  background-color: #f2dede;
+  padding: 10px; }
+
 #main {
   margin: 20px; }
 

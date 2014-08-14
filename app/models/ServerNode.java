@@ -14,6 +14,7 @@
  */
 package models;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -67,6 +68,13 @@ extends Model
 
 
     private Long busySince;
+
+    // indicates when async bootstrap was invoked
+    private Date asyncBootstrapStart;
+
+
+    // indicates when async install was invoked;
+    private Date asyncInstallStart;
 
 	@XStreamAsAttribute
 	private String publicIP;  // todo : change case to Ip
@@ -276,6 +284,22 @@ extends Model
             		conjuction.isNotNull("widget");
             	}
             }
+
+            if ( criteria.asyncBootstrapStartIsNull != null ){
+                if ( criteria.asyncBootstrapStartIsNull ){
+                    conjuction.isNull("asyncBootstrapStart");
+                }else{
+                    conjuction.isNotNull("asyncBootstrapStart");
+                }
+            }
+
+            if ( criteria.asyncInstallStartIsNull != null ){
+                if ( criteria.asyncInstallStartIsNull ){
+                    conjuction.isNull("asyncInstallStart");
+                }else{
+                    conjuction.isNotNull("asyncInstallStart");
+                }
+            }
             
             if ( criteria.widgetInstanceIsNull != null ){
             	if ( criteria.widgetInstanceIsNull ){
@@ -307,7 +331,23 @@ extends Model
 		return CollectionUtils.first(ServerNode.find.where().eq("serverId", serverId).findList());
 	}
 
-	public String toDebugString() {
+    public Date getAsyncBootstrapStart() {
+        return asyncBootstrapStart;
+    }
+
+    public void setAsyncBootstrapStart(Date asyncBootstrapStart) {
+        this.asyncBootstrapStart = asyncBootstrapStart;
+    }
+
+    public Date getAsyncInstallStart() {
+        return asyncInstallStart;
+    }
+
+    public void setAsyncInstallStart(Date asyncInstallStart) {
+        this.asyncInstallStart = asyncInstallStart;
+    }
+
+    public String toDebugString() {
 		return String.format("ServerNode{id='%s', serverId='%s', expirationTime=%d, publicIP='%s', privateIP='%s', busySince=%s}", id, serverId, getTimeLeft(), publicIP, privateIP, busySince);
 	}
 
@@ -459,6 +499,8 @@ extends Model
         private Boolean serverIdIsNull;
         private Boolean widgetIsNull;
         private Boolean widgetInstanceIsNull;
+        private Boolean asyncBootstrapStartIsNull;
+        private Boolean asyncInstallStartIsNull;
         private User user;
 
         public Criteria(QueryConf conf) {
@@ -481,6 +523,16 @@ extends Model
 
         public Criteria setBusy(Boolean busy) {
             this.busy = busy;
+            return this;
+        }
+
+        public Criteria setAsyncBootstrapStartIsNull(Boolean asyncBootstrapStartIsNull) {
+            this.asyncBootstrapStartIsNull = asyncBootstrapStartIsNull;
+            return this;
+        }
+
+        public Criteria setAsyncInstallStartIsNull(Boolean asyncInstallStartIsNull) {
+            this.asyncInstallStartIsNull = asyncInstallStartIsNull;
             return this;
         }
 
@@ -509,5 +561,9 @@ extends Model
             this.user = user;
             return this;
         }
+
+
     }
+
+
 }

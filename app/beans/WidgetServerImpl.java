@@ -21,6 +21,8 @@ import java.util.regex.Pattern;
 
 import beans.config.Conf;
 import beans.scripts.ScriptExecutor;
+import cloudify.widget.common.CloudifyOutputUtils;
+import cloudify.widget.common.asyncscriptexecutor.IAsyncExecution;
 import controllers.WidgetAdmin;
 
 import models.ServerNodeEvent;
@@ -124,10 +126,6 @@ public class WidgetServerImpl implements WidgetServer
     public Status getWidgetStatus(ServerNode server) {
         Status result = new Status();
 
-		if( logger.isDebugEnabled() ){
-			logger.debug( "--- getWidgetStatus serverniode id=" + server.getId() );
-		}        
-        
         List<String> output = new LinkedList<String>();
         result.setOutput(output);
 
@@ -148,35 +146,22 @@ public class WidgetServerImpl implements WidgetServer
 
         }
 
-        if( logger.isDebugEnabled() ){
-        	logger.debug( "Before if" );
-        }
         if (server == null || ( timeLeft != null && timeLeft.longValue() == 0 ) ) {
-        	if( logger.isDebugEnabled() ){
-        		if( logger.isDebugEnabled() ){
-        			logger.debug( "Within if, set state stopped" );
-        		}
-        	}
+            logger.info("no more time left. trial time is over, settings status to STOPPED");
             result.setState(Status.State.STOPPED);
-
             output.add(Messages.get("test.drive.successfully.complete"));
             return result;
         }else{
-        	if( logger.isDebugEnabled() ){
-        		if( logger.isDebugEnabled() ){
-        			logger.debug( "Within else, set instanceId=" + server.getId() );
-        		}
-        	}
+            logger.info("there is still time on trial");
             result.setInstanceId( Long.toString(server.getId()) ); // will need this to register users on specific nodes.
         }
 
-        String cachedOutput = scriptExecutor.getOutput(server);// need to sort out the cache before we decide if the installation finished.
-        if( logger.isDebugEnabled() ){
-        	logger.debug( "cachedOutput for serverNode [" + server.getId() + "] :" + cachedOutput );
-        }
-        result.setRawOutput( Utils.split( cachedOutput, "\n" ) );
 
-        result.setRemote( server.isRemote() ).setHasPemFile( !StringUtils.isEmpty(server.getPrivateKey()) ); // let UI know this is a remote bootstrap.
+        IAsyncExecution bootstrapExecution = scriptExecutor.getBootstrapExecution(server);// need to sort out the cache before we decide if the installation finished.
+
+        result.setRawOutput( bootstrapExecution.getOutputAsList() );
+
+        result.setRemote( server.isRemote() ).setHasPemFile(!StringUtils.isEmpty(server.getPrivateKey())); // let UI know this is a remote bootstrap.
 
         boolean doneFromEvent = false;
 
@@ -210,7 +195,7 @@ public class WidgetServerImpl implements WidgetServer
             }
         }
 
-        output.addAll(Utils.formatOutput(cachedOutput, server.getPrivateIP() + "]", filterOutputLines, filterOutputStrings));
+        output.addAll(CloudifyOutputUtils.formatOutput( bootstrapExecution.getOutput(), server.getPrivateIP() + "]", filterOutputLines, filterOutputStrings));
 
       	logger.debug( ">> output= [{}]" , Arrays.toString( output.toArray( new String[ output.size() ] ) ) );
 
@@ -255,7 +240,7 @@ public class WidgetServerImpl implements WidgetServer
 
 
         try {
-            if (System.currentTimeMillis() - server.getBusySince() > conf.cloudify.deployTimeoutError ) {
+            if (server!= null && server.getBusySince() != null && ( System.currentTimeMillis() - server.getBusySince() > conf.cloudify.deployTimeoutError  ) ) {
                 logWidgetInstanceError(server, result, "widgetInstance is taking too long. More than ", Long.toString(conf.cloudify.deployTimeoutError), " millis \n");
             }
         }catch(Exception e){

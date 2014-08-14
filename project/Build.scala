@@ -38,6 +38,7 @@ object ApplicationBuild extends Build {
       "cloudify.widget" % "api" % "1.0.0",
       "cloudify.widget" % "softlayer" % "1.0.0",
       "cloudify.widget" % "hpcloud" % "1.0.0",
+      "cloudify.widget" % "all-clouds" % "1.0.0",
       "cloudify.widget" % "cli" % "1.0.0"
 
     )

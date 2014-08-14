@@ -24,7 +24,6 @@ import org.apache.commons.io.FileUtils;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import play.Application;
 import play.GlobalSettings;
@@ -47,7 +46,6 @@ import utils.Utils;
 import akka.util.Duration;
 import annotations.AnonymousUsers;
 import beans.config.Conf;
-import beans.scripts.RestoreExecutionService;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.net.SMTPAppender;
@@ -173,7 +171,8 @@ public class Global extends GlobalSettings
     		logger.debug( "---restoreExecutions" );
     	}
     	
-    	RestoreExecutionService.restoreExecutions();
+
+        ApplicationContext.get().getRestoreExecutionService().restoreExecutions();
 	}
 
 	private void uploadInitialData( Application app )

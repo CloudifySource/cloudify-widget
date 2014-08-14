@@ -74,6 +74,18 @@
             </div>
         </div>
 
+        <div class="bg-danger" ng-show="!widget.managerPrefix">
+            In order for the widget to support teardown, you must configure manager prefix.
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="managerPrefix">Management Prefix<abbr class="required_mark" ng-show="required">*</abbr></label>
+            <div class="controls">
+                <input ng-model="widget.managerPrefix" type="text" id="managerPrefix"/>
+
+            </div>
+        </div>
+
         <!-- there is lack of correlation between cloud provider and cloud name conventions,
 
             since the widget has 2 meaning for cloud provider.
@@ -88,7 +100,15 @@
         <div class="control-group">
             <label class="control-label" for="locale">Cloud Name<abbr class="required_mark" ng-show="required">*</abbr></label>
             <div class="controls">
-                <select name="locale" id="cloudProvider" ng-model="widget.cloudName" ng-options="provider for provider in cloudProviders"></select>
+                <select name="locale" id="cloudName" ng-model="widget.cloudName" ng-options="name for name in cloudNames"></select>
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label class="control-label" for="locale">Cloud Provider<abbr class="required_mark" ng-show="required">*</abbr></label>
+            <div class="controls">
+                <select name="locale" id="cloudProvider" ng-model="widget.cloudProvider" ng-options="provider for provider in cloudProviders"></select>
             </div>
         </div>
 

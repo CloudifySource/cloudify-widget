@@ -21,24 +21,21 @@ import java.io.FileFilter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import cloudify.widget.api.clouds.CloudProvider;
 import cloudify.widget.api.clouds.CloudServer;
 import cloudify.widget.api.clouds.CloudServerApi;
-import cloudify.widget.softlayer.SoftlayerCloudServerApi;
-import cloudify.widget.softlayer.SoftlayerConnectDetails;
 import models.ServerNode;
 import models.Widget;
 
 import models.WidgetInstanceUserDetails;
 import org.apache.commons.lang.NumberUtils;
 import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import play.Play;
 import play.Routes;
-import play.cache.Cache;
 import play.i18n.Messages;
 import play.libs.Akka;
 import play.libs.F;
@@ -53,7 +50,6 @@ import server.exceptions.ServerException;
 import utils.CollectionUtils;
 import utils.StringUtils;
 import akka.util.Duration;
-import beans.config.Conf;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.EbeanServer;
@@ -136,7 +132,6 @@ public class Application extends Controller
             }
 
 
-//             ApplicationContext.get().getEventMonitor().eventFired( new Events.PlayWidget( request().remoteAddress(), widget ) );
 
             // credentials validation is made when we attempt to create a PEM file. if credentials are wrong, it will fail.
             RequestBody requestBody = request().body();
@@ -167,12 +162,6 @@ public class Application extends Controller
                 serverNode = ApplicationContext.get().getServerPool().get();
                 logger.info("application will check if server node is null. if null, there are no available servers");
                 if (serverNode == null) {
-                    // if the user clicked another play in the last 30 seconds, we allow ourselves to tell them to wait..
-                    Long timeLeft = getPlayTimeout();
-
-                    if (timeLeft != null) {
-                        throw new ServerException(Messages.get("please.wait.x.sec", (timeLeft - System.currentTimeMillis()) / 1000));
-                    }
                     ApplicationContext.get().getMailSender().sendPoolIsEmptyMail( ApplicationContext.get().getServerPool().getStats().toString() );
                     throw new ServerException("i18n:noAvailableServers");
                 }
@@ -212,7 +201,6 @@ public class Application extends Controller
             if ( StringUtils.isEmptyOrSpaces(widget.getRecipeURL()) ){
                 logger.info("no recipe url. this should be quick. no need for thread");
                 logger.info("installing widget on cloud");
-                setPlayTimeout(remoteAddress);
                 ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress);
             }else{
                 logger.info("recipe url exists. will schedule Akka");
@@ -255,7 +243,6 @@ public class Application extends Controller
                                 }
 
                                 logger.info("installing widget on cloud");
-                                setPlayTimeout(remoteAddress);
                                 ApplicationContext.get().getWidgetServer().deploy(finalWidget, finalServerNode, remoteAddress);
                             }
                         });
@@ -283,22 +270,11 @@ public class Application extends Controller
 
         try {
             if (StringUtils.isEmptyOrSpaces(widget.managerPrefix)) {
-                logger.error("This widget is not configured for reuse or remote teardown. please contact admin.");
                 return null;
             }
 
-            logger.info("searching for existing management");
-            CloudServerApi cloudServerApi = new SoftlayerCloudServerApi();
-            ObjectMapper objectMapper = new ObjectMapper();
-            AdvancedParams advancedParams = objectMapper.readValue(advancedData, AdvancedParams.class);
-
-            SoftlayerConnectDetails connectDetails = new SoftlayerConnectDetails();
-            connectDetails.setKey( advancedParams.params.get("apiKey"));
-            connectDetails.setUsername(advancedParams.params.get("username"));
-            connectDetails.setNetworkId("274");
-            connectDetails.isApiKey = true;
-            cloudServerApi.connect( connectDetails );
-
+            logger.info("searching for existing management using managerPrefix : " + widget.managerPrefix );
+            CloudServerApi cloudServerApi = ApplicationContext.get().getServerApiFactory().advancedParamsToServerApi( widget.cloudProvider, advancedData );
 
             Collection<CloudServer> allMachinesWithTag = cloudServerApi.getAllMachinesWithTag("");
             logger.info("found machines [{}]", CollectionUtils.size(allMachinesWithTag));
@@ -309,20 +285,12 @@ public class Application extends Controller
                     return cloudServer.getServerIp().publicIp;
                 }
             }
-
-//
         }catch(Exception e){
             logger.error("unable to find existing management",e);
             return null;
         }
 
         return null;
-    }
-
-
-    public static class AdvancedParams{
-        public String type;
-        public Map<String,String> params;
     }
 
 
@@ -378,31 +346,6 @@ public class Application extends Controller
 
     }
 
-    private static Long getPlayTimeout(){
-        Long timeLeft = (Long) Cache.get(Controller.request().remoteAddress());
-
-        Conf conf = ApplicationContext.get().conf();
-        if ( timeLeft != null ){
-            Long delta =  timeLeft - System.currentTimeMillis();
-            if ( delta < 0 || delta > conf.settings.stopTimeout ){
-                logger.info("got a weird delta [{}], returning NULL", delta );
-            }
-            return null;
-        }
-
-        return timeLeft;
-    }
-
-    private static void setPlayTimeout( String remoteAddress ){
-        try{
-            Conf conf = ApplicationContext.get().conf();
-            logger.info("counting the user [{}] millis before another deploy" , ApplicationContext.get().conf().settings.stopTimeout );
-            // keep the user for 30 seconds by IP, to avoid immediate widget start after stop
-            Cache.set( remoteAddress, System.currentTimeMillis() + conf.settings.stopTimeout, ( int ) (conf.settings.stopTimeout / 1000) );
-        }catch(Exception e){
-            logger.error("unable to set timeout for remoteAddress",e);
-        }
-    }
 
     private static Result exceptionToStatus( Exception e ){
            Widget.Status status = new Widget.Status();
@@ -440,10 +383,6 @@ public class Application extends Controller
 
                         Widget widget = Widget.getWidget( apiKey );
 
-//                        if ( widget != null ) {
-//                            ApplicationContext.get().getEventMonitor().eventFired( new Events.StopWidget( remoteAddress , widget ) );
-//                        }
-
                         if ( instanceId != null ) {
                             logger.info("stopping server node for widget [{}] and instanceId [{}]", widget, instanceId );
                             ServerNode serverNode = ServerNode.findByWidgetAndInstanceId(widget, instanceId);
@@ -465,19 +404,16 @@ public class Application extends Controller
 	{
 		try
 		{
-			if( logger.isDebugEnabled() ){
-				logger.debug( "~~~ getWidgetStatus, instanceId=" + instanceId );
-			}
+     		logger.debug( "getting status for instance [{}]", instanceId  );
             if (!NumberUtils.isNumber( instanceId )){
                 return badRequest();
             }
             
             ServerNode serverNode = ServerNode.find.byId( Long.parseLong(instanceId) );
-			Widget.Status wstatus = 
+
+            Widget.Status wstatus =
 						ApplicationContext.get().getWidgetServer().getWidgetStatus(serverNode);
-			if( logger.isDebugEnabled() ){
-				logger.debug( "~~~ wstatus=" + wstatus );
-			}
+
 			return statusToResult(wstatus);
 		}catch(ServerException ex)
 		{
@@ -550,11 +486,13 @@ public class Application extends Controller
 
                 )
         );
-
     }
 
+    public static Result getCloudProviders(){
+        return ok (Json.toJson(CloudProvider.values()));
+    }
 
-    public static Result getCloudProviders(  ){
+    public static Result getCloudNames(  ){
 
         String cloudifyHome = ApplicationContext.get().conf().server.environment.cloudifyHome;
         File file = new File(cloudifyHome);
@@ -572,10 +510,11 @@ public class Application extends Controller
 
         List<String> result = new LinkedList<String>();
 
+
         for (File cloudProvider : cloudProviders) {
             result.add(cloudProvider.getName());
         }
-
+        Collections.sort(result);
         return ok(Json.toJson(result));
 
     }
