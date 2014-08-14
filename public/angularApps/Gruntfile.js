@@ -42,14 +42,9 @@ module.exports = function (grunt) {
                 hostname: 'localhost'
             },
             proxies: [
-                {
-                    context: '/widget',
-                    host: '127.0.0.1',
-                    port: 9000,
-                    https: false,
-                    changeOrigin: true,
-                    xforward: false
-                }
+                { context: '/widget', port: 9000, host: '127.0.0.1' },
+                { context: '/cloudProviders', port: 9000, host: '127.0.0.1' },
+                { context: '/cloudNames', port: 9000, host: '127.0.0.1' }
             ],
             livereload: {
                 options: {

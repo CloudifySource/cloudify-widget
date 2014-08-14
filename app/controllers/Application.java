@@ -496,7 +496,7 @@ public class Application extends Controller
         );
     }
 
-    public static Result getCloudProviders(){
+    public static Result getCloudProviders() {
         return ok (Json.toJson(CloudProvider.values()));
     }
 

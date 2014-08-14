@@ -64,7 +64,10 @@
             <label class="control-label" for="cloudType">Cloud Type<abbr class="required_mark" ng-show="required">*</abbr></label>
             <div class="controls">
                 <select name="cloudType" id="cloudType" ng-model="widgetData.cloudType" ng-options="cloudType.id as cloudType.label for cloudType in cloudTypes"></select>
+                <br/>
+                Used for advanced section display
             </div>
+
         </div>
 
         <div class="control-group">
@@ -101,6 +104,8 @@
             <label class="control-label" for="locale">Cloud Name<abbr class="required_mark" ng-show="required">*</abbr></label>
             <div class="controls">
                 <select name="locale" id="cloudName" ng-model="widget.cloudName" ng-options="name for name in cloudNames"></select>
+                <br/>
+                For solo - which cloudify cloud provider should we use? a list of built in types is given
             </div>
         </div>
 
@@ -109,11 +114,13 @@
             <label class="control-label" for="locale">Cloud Provider<abbr class="required_mark" ng-show="required">*</abbr></label>
             <div class="controls">
                 <select name="locale" id="cloudProvider" ng-model="widget.cloudProvider" ng-options="provider for provider in cloudProviders"></select>
+                <br/>
+                Used for the flow we will use in solo scenario
             </div>
         </div>
 
         <div class="control-group" id="social-source-form-section">
-            <label class="control-label" for="locale">Cloud Providers<abbr class="required_mark" ng-show="required">*</abbr></label>
+            <label class="control-label" for="locale">Social Sources<abbr class="required_mark" ng-show="required">*</abbr></label>
             <div class="controls">
                 <span ng-repeat="socialSource in widgetData.socialSources track by socialSource.id">
                     <input name="shareSources" id="shareSources" ng-model="socialSource.active" type="checkbox" /> {{getSocialSourceLabel(socialSource)}}<br/>
