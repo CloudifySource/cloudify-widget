@@ -114,7 +114,7 @@ public class FileBasedScriptExecutor implements ScriptExecutor{
 
         // add application name and service for mail sending
 
-        if ( serverNode.getWidget().sendEmail && !StringUtils.isEmptyOrSpaces(serverNode.getWidget().loginsString) ) {
+        if ( serverNode.getWidget() != null && serverNode.getWidget().sendEmail && !StringUtils.isEmptyOrSpaces(serverNode.getWidget().loginsString) ) {
             logger.info("adding properties for sending email");
             try {
                 result.serviceName = serverNode.getWidget().getConsoleUrlService();
