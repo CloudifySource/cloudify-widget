@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('WidgetApp').service('WidgetsDemoService', function( $http, $log) {
+angular.module('WidgetApp').service('WidgetsDemoService', function( $http) {
 
     this.getDemoWidgets = function( email ){
         return $http({
@@ -10,6 +10,6 @@ angular.module('WidgetApp').service('WidgetsDemoService', function( $http, $log)
                 'email' : email
             }
         });
-    }
+    };
 });
 

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('WidgetApp').controller('PublicDemoCtrl', function ($scope, $location, $log, WidgetsService, $routeParams, $http, $cookieStore, $timeout) {
+angular.module('WidgetApp').controller('PublicDemoCtrl', function ($scope, $location, $log, WidgetsService, $routeParams) {
 
 
     WidgetsService.demo.getDemoWidgets($routeParams.email || 'default_demo@gigaspaces.com').then(function (result) {
@@ -33,9 +33,9 @@ angular.module('WidgetApp').controller('PublicDemoCtrl', function ($scope, $loca
         for (var i = 0; i < $scope.appliedProperties.length; i++) {
             var prop = $scope.appliedProperties[i];
             try {
-                if (!isNaN(parseInt(prop.value))) {
+                if (!isNaN(parseInt(prop.value, 10))) {
                     console.log('found a numeric value', prop);
-                    prop.value = parseInt(prop.value);
+                    prop.value = parseInt(prop.value, 10);
                 }
             } catch (e) {
                 console.log('error', e);
@@ -50,10 +50,10 @@ angular.module('WidgetApp').controller('PublicDemoCtrl', function ($scope, $loca
 
     $scope.addProperty = function () {
         $log.info('adding property');
-        $scope.properties.push({ "key": null, "value": null});
+        $scope.properties.push({ 'key': null, 'value': null});
     };
 
     $scope.needToApplyProperties = function () {
         return $scope.properties.length > 0;
-    }
+    };
 });
