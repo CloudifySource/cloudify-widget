@@ -34,6 +34,6 @@ angular.module('WidgetApp', ['ngRoute','ngCookies']).config(function($routeProvi
             templateUrl : 'views/public/catalog.html'
         })
         .otherwise({
-            redirectTo : '/users/login'
+            redirectTo : '/public/demo'
         });
 });
