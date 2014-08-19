@@ -26,7 +26,7 @@ server{
     error_log /var/log/nginx/__domain_name__/error.log;
 
 
-    location ~  /js/get_widget.js {
+    location ~  ^/js/get_widget.js {
         rewrite ^ $scheme://$host/public-folder/js/get_widget.js;
     }
 
