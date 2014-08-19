@@ -30,7 +30,7 @@ else
     echo "nginx configuration did not change, not restarting"
 fi
 
-\rm -f ${TMP_SITE_CONF}
+# \rm -f ${TMP_SITE_CONF}
 
 
 cd $CURRENT_DIRECTORY
