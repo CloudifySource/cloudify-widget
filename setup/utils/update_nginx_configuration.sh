@@ -23,7 +23,7 @@ fi
 cat ${WIDGET_HOME}/conf/nginx/site.nginx  | sed 's/__domain_name__/'"$SITE_DOMAIN"'/' | sed 's/__staging_name__/'"$SITE_STAGING_DOMAIN"'/' > ${TMP_SITE_CONF}
 cmp  -s ${TMP_SITE_CONF}  ${SITE_CONF_TARGET}
 echo "testing if $TMP_SITE_CONF different from $SITE_CONF_TARGET"
-if [ $? -eq 1 ]; then
+if [ $? -eq 1 ] || [ ! -f $SITE_CONF_TARGET ]; then
     \cp -f ${TMP_SITE_CONF} ${SITE_CONF_TARGET}
     echo "restarting nginx"
     service nginx restart
