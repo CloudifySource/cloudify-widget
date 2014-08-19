@@ -17,6 +17,7 @@ server{
     proxy_set_header   X-Scheme $scheme;
     proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header   Host $http_host;
+    index public-folder/angularApps/index.html;
 
     keepalive_timeout 70;
 
@@ -35,6 +36,10 @@ server{
 
     location ^/public {
         alias /usr/lib/cloudify-widget/public/cloudify;
+    }
+
+    location ^/public-folder {
+            alias /usr/lib/cloudify-widget/public-folder;
     }
 
 
