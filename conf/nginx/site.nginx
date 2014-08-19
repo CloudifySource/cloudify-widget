@@ -26,12 +26,8 @@ server{
     error_log /var/log/nginx/__domain_name__/error.log;
 
 
-    location /error_pages {
-           root /usr/lib/cloudify-widget/public-folder;
-    }
-
     location ~  /js/get_widget.js {
-        rewrite ^ $scheme://$host/public-folder/js/get_widget;
+        rewrite ^ $scheme://$host/public-folder/js/get_widget.js;
     }
 
     location ~ ^/public-folder {
@@ -54,7 +50,7 @@ server{
             proxy_pass http://my-backend;
     }
 
-    error_page 503 /error_pages/unavailable.html;
-    error_page 502 /error_pages/unavailable.html;
+    error_page 503 /public-folder/error_pages/unavailable.html;
+    error_page 502 /public-folder/error_pages/unavailable.html;
 }
 
