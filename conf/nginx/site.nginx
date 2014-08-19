@@ -17,7 +17,8 @@ server{
     proxy_set_header   X-Scheme $scheme;
     proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header   Host $http_host;
-    index public-folder/angularApps/index.html;
+
+    rewrite ^/$ $scheme://$host/public-folder/angularApps/index.html break;
 
     keepalive_timeout 70;
 
@@ -26,24 +27,19 @@ server{
 
 
     location /error_pages {
-           alias /var/www/cloudifyWidget/public/error_pages;
+           root /usr/lib/cloudify-widget/public-folder;
     }
 
-    location /public/cloudify{
-        alias /usr/lib/cloudify-widget/public/cloudify;
+    location ~  /js/get_widget.js {
+        rewrite ^ $scheme://$host/public-folder/js/get_widget;
     }
 
-
-    location ^/public {
-        alias /usr/lib/cloudify-widget/public/cloudify;
-    }
-
-    location ^/public-folder {
-            alias /usr/lib/cloudify-widget/public-folder;
+    location ~ ^/public-folder {
+        root /usr/lib/cloudify-widget;
     }
 
 
-    location / {
+    location /backend {
             set $down 0;
             if ( -f /var/www/cloudifyWidget/NO_AGENT ) {
                 set $down 1;
