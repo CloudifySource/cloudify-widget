@@ -34,6 +34,14 @@ public class ResourceManagerFactory {
         return result;
     }
 
+    public WidgetResourcesUtils.ResourceManager getCloudProviderManager( Widget widget  ){
+        WidgetResourcesUtils.ResourceManager result = new WidgetResourcesUtils.ResourceManager();
+        result.setBaseDir( conf.resources.cloudProvidersBaseDir.getAbsolutePath() );
+        result.setUid( widget.getApiKey() );
+        result.setUrl( widget.getCloudProviderUrl() );
+        return result;
+    }
+
 
 
     public Conf getConf() {

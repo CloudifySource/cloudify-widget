@@ -161,12 +161,16 @@ public class DeployManagerImpl implements DeployManager {
             recipeManager.setUid( widget.getApiKey() );
             recipeManager.setBaseDir( conf.resources.recipesBaseDir.getAbsolutePath() );
 
-            if ( ! recipeManager.isExtracted() ) {
-                recipeManager.download();
-                recipeManager.extract();
-            }
+
             File tempRecipePath = new File( conf.resources.recipesBaseDir.getAbsolutePath() , "copy-" + System.currentTimeMillis() );
-            recipeManager.copy( tempRecipePath );
+            if ( widget.isAutoRefreshRecipe() ){
+                recipeManager.copyFresh(tempRecipePath);
+
+            }else{
+                recipeManager.copyFromCache( tempRecipePath );
+            }
+
+
 
             recipeDir = tempRecipePath;
             if (widget.getRecipeRootPath() != null) {

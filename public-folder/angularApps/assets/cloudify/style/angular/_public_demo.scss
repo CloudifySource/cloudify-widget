@@ -1,0 +1,152 @@
+
+
+
+#publicDemo {
+  height:100%;
+  min-height:1200px;
+  background: url('http://static.softlayer.com/images/blackTheme/layout/bg_pattern.png');
+  .content {
+    width:960px;
+    margin:0 auto;
+    .main-content{
+      background:white;
+      display:table;
+      width:100%;
+      .main-content-items{
+        display:table-row;
+        .nav-links, .widget-preview{
+          display:table-cell;
+          vertical-align: top;
+        }
+      }
+
+    }
+
+    .login-button{
+      color:white;
+      margin-top:5px;
+    }
+    .widget-preview{
+      padding-top:20px;
+      padding-bottom:50px;
+      padding-right:40px;
+      padding-left:40px;
+
+    }
+    .header {
+      background: url('../images/demo/ibm-frame.png') no-repeat;
+      height: 135px;
+      margin: 0 auto;
+    }
+    img {
+      display: none;
+
+    }
+  }
+
+  $widget_width: 600px;
+
+
+
+
+
+
+
+
+  .recipe{
+    right:65px;
+    top:65px;
+    position:absolute;
+  }
+
+
+
+  iframe {
+    width: $widget_width + 13px;
+    border: none;
+    overflow-x: hidden;
+    overflow-y: visible;
+    padding: 0;
+    margin: 0;
+  }
+
+  .logo {
+    width: 350px;
+    height: 90px;
+  }
+
+  .description{
+    color:#231f20;
+    font-size:14px;
+    width: $widget_width;
+  }
+
+  .nav-links{
+    margin-right: 100px;
+    padding-right:5px;
+    overflow-y:auto;    /* Required by Tamir - by design for the public cloudifysource.org page*/
+
+    background-color:white;
+
+    width: 251px;
+    white-space: nowrap;
+
+    .demo-link{
+      &.btn{ padding-right:0; padding-left:0; border-radius: 0;}
+      color:#213540;
+      font-size:18px;
+      &.selected{
+        color:#1181bf;
+        font-size:18px;
+
+        background-color:#f7f7f7;
+
+        .product-icon{
+          filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 1 0\'/></filter></svg>#grayscale");
+          background-size:contain;
+          -webkit-filter: grayscale(0%);
+        }
+      }
+      text-align: left;
+      padding-top:10px;
+      padding-bottom:5px;
+      height:41px;
+      border-bottom:2px solid #DEDEDE;
+      border-top: 1px solid #EDEDED;
+      background:white;
+      cursor: pointer;
+
+      .product-icon{
+        background-repeat: no-repeat;
+        display:inline-block;
+        margin-left:20px;
+        width:40px;
+        height:40px;
+
+        filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale"); /* Firefox 10+, Firefox on Android */
+        filter: gray; /* IE6-9 */
+        -webkit-filter: grayscale(100%); /* Chrome 19+, Safari 6+, Safari 6+ iOS */
+
+
+      }
+
+      .product-name{
+        width:140px;
+        text-overflow: ellipsis;
+        padding-bottom:10px;
+        display:inline-block;
+        margin-left:18px;
+        vertical-align: middle;
+        margin-top:-15px;
+      }
+      .product-name, .product-version {
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+      .product-name{ font-size:18px; }
+      .product-version{ color:grey;}
+    }
+
+  }
+
+}

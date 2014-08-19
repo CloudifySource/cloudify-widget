@@ -51,6 +51,7 @@ public class DemosController extends Controller {
         return ok(  );
     }
 
+
     public static Result listWidgetForDemoUser( Long userId ){
         List<Widget> list = new Widget.WidgetQueryConfig().criteria().setEnabled(true).setUser(User.findById(userId)).done().find().findList();
         List<PublicWidget> publicDetails = new LinkedList<PublicWidget>();

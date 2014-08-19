@@ -78,8 +78,14 @@ public class Widget
     private String title;
 	private String youtubeVideoUrl;
 
+    private boolean autoRefreshRecipe;
+    private boolean autoRefreshProvider;
+
 
     public String cloudName;
+
+    public String cloudProviderUrl;
+    public String cloudProviderRootDir;
 
     @Enumerated(EnumType.STRING)
     public CloudProvider cloudProvider = CloudProvider.SOFTLAYER;
@@ -761,6 +767,40 @@ public class Widget
 
     public boolean isRequiresLogin() {
         return requireLogin == Boolean.TRUE; // solves NPE
+    }
+
+    public boolean isAutoRefreshRecipe() {
+        return autoRefreshRecipe;
+    }
+
+
+
+    public void setAutoRefreshRecipe(boolean autoRefreshRecipe) {
+        this.autoRefreshRecipe = autoRefreshRecipe;
+    }
+
+    public boolean isAutoRefreshProvider() {
+        return autoRefreshProvider;
+    }
+
+    public void setAutoRefreshProvider(boolean autoRefreshProvider) {
+        this.autoRefreshProvider = autoRefreshProvider;
+    }
+
+    public String getCloudProviderRootDir() {
+        return cloudProviderRootDir;
+    }
+
+    public void setCloudProviderRootDir(String cloudProviderRootDir) {
+        this.cloudProviderRootDir = cloudProviderRootDir;
+    }
+
+    public String getCloudProviderUrl() {
+        return cloudProviderUrl;
+    }
+
+    public void setCloudProviderUrl(String cloudProviderUrl) {
+        this.cloudProviderUrl = cloudProviderUrl;
     }
 
     public Boolean getRequireLogin() {

@@ -156,6 +156,9 @@ public class WidgetServerImpl implements WidgetServer
         }
 
 
+
+        // NOTE - bootstrap and install write to the same file.. so it is enough to request only bootstrap execution.
+        // this is not a hack, the interface is just not intuitive to suggest this.
         IAsyncExecution bootstrapExecution = scriptExecutor.getBootstrapExecution(server);// need to sort out the cache before we decide if the installation finished.
 
         result.setRawOutput( bootstrapExecution.getOutputAsList() );

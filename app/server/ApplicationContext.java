@@ -34,6 +34,7 @@ import beans.HmacImpl;
 import beans.config.Conf;
 import beans.tasks.DestroyServersTask;
 import bootstrap.InitialData;
+import utils.ResourceManagerFactory;
 
 import java.util.Collection;
 import java.util.List;
@@ -68,6 +69,7 @@ public class ApplicationContext
     @Inject private CloudServerApi cloudServerApi;
     @Inject private IExecutionRestore restoreExecutionService;
     @Inject private IServerApiFactory serverApiFactory;
+    @Inject private ResourceManagerFactory resourceManagerFactory;
 
     @Inject private static org.springframework.context.ApplicationContext applicationContext;
 
@@ -246,6 +248,14 @@ public class ApplicationContext
 
     public void setCloudServerApi(CloudServerApi cloudServerApi) {
         this.cloudServerApi = cloudServerApi;
+    }
+
+    public ResourceManagerFactory getResourceManagerFactory() {
+        return resourceManagerFactory;
+    }
+
+    public void setResourceManagerFactory(ResourceManagerFactory resourceManagerFactory) {
+        this.resourceManagerFactory = resourceManagerFactory;
     }
 }
 

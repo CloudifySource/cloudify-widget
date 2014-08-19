@@ -1,0 +1,134 @@
+
+
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
+
+
+html, body{
+  height:100%;
+}
+
+.peeling-off-bottom-left:after{
+  display:block;
+  height:17px;
+  width:160px;
+  position: absolute;
+  margin-top:20px;
+  margin-left:-30px;
+  content:"";
+  background: url("/public/img/common/peeling_off.png") -122px -87px;
+}
+
+.peeling-off-left-top:before{
+  display:block;
+  width:20px;
+  height:175px;
+  position: absolute;
+  margin-top:-21px;
+  margin-left:-40px;
+  content:"";
+  background: url("/public/img/common/peeling_off.png") -3px -10px;
+}
+
+.peeling-off-left-bottom:after{
+  display:block;
+  width:20px;
+  height:160px;
+  position: absolute;
+  margin-top:20px;
+  margin-left:-30px;
+  content:"";
+  background: url("/public/img/common/peeling_off.png") -68px -25px;
+}
+
+//.peeling-off-bottom-right:after{
+//  display: block;
+//  height: 20px;
+//  width: 160px;
+//  position: absolute;
+//  margin-top: 20px;
+//  margin-right: -25px;
+//  content: "";
+//  background-image: url("/public/img/common/peeling_off.png") -146px -104px;
+//}
+
+th,
+.table-striped tbody > tr:nth-child(even) > td,
+.table-striped tbody > tr:nth-child(even) > th {
+  background-color: #ffffff;
+}
+
+.controls { .tooltip { line-height:14px;}}
+.info-icon {
+  margin-left: 10px;
+  background-image: url("../images/icons/icon-help.png");
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-top: 5px;
+  *margin-right:.3em;
+  line-height: 14px;
+  vertical-align: top;
+  background-repeat: no-repeat;
+  background-position-y: -20px;
+  &:hover{ background-position-y: 0px }
+}
+
+
+/** when i must hide something - for example, popovers with no content**/
+.forceHide{ display:none !important; }
+
+.adminOnly:before{
+  display:inline-block;
+  font-size:6px;
+  position:absolute;
+  margin-top:7px;
+  margin-left:-5px;
+  title:"Admin Only";
+  height:5px;
+  content:"";
+  width:5px;
+  border-radius: 10px;
+  padding:0;
+  background-color:orange;
+}
+
+#summary{
+  &.summary {display:table; width:100%; padding:0; margin:0 0 20px 0;}
+  &.summary ul {margin:0; padding:0; overflow:hidden; display:table-row;}
+  &.summary li {margin:0; padding:19px; display:table-cell; border-right:1px solid #eee;}
+  &.summary li:last-child {border:none;}
+  &.summary a {display:block; font-size:1.2em; line-height:1.4em; text-transform:uppercase; color:#000;}
+  &.summary .count {display:block; font-size:1.75em; font-weight:bold;}
+}
+
+#main{
+  margin:20px;
+}
+
+label.filebutton {
+  overflow:hidden;
+  input[type=file]{
+    z-index: 999;
+    line-height: 0;
+    font-size: 50px;
+    position: absolute;
+    top: -2px;
+    left: -700px;
+    opacity: 0;
+    filter: alpha(opacity = 0);
+    -ms-filter: "alpha(opacity=0)";
+    cursor: pointer;
+    _cursor: hand;
+    margin: 0;
+    padding:0;
+  }
+}
+
+
+
+.bg-danger{
+  background-color:#f2dede;
+  padding:10px;
+}

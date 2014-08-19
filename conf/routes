@@ -4,7 +4,6 @@
 POST     /widget/description            controllers.WidgetAdmin.postWidgetDescription(authToken:String, widgetId:Long, description:String ?="")
 POST     /widget/requireLogin            controllers.WidgetAdmin.postRequireLogin(authToken:String, widgetId:Long, requireLogin:Boolean, loginVerificationUrl:String ?="", webServicePrivateKey:String?="")
 GET     /exportSchema                   controllers.Application.generateDDL
-GET     /javascriptRoutes               controllers.Application.javascriptRoutes
 
 
 #Demos
@@ -15,20 +14,56 @@ GET     /demos/:userId/list              controllers.DemosController.listWidgetF
 GET     /demos/:userId/:apiKey           controllers.DemosController.getDemoPageForWidget( userId:Long, apiKey:String )
 GET     /demos/:email                    controllers.DemosController.getDemoPageForUser( email:String )
 POST    /demos/verifyWidgetLogin         controllers.Demos.validateUserIdFromLogin(userId:String)
-GET     /api/demo/widget/list           controllers.DemosController.listWidgetForDemoUserByEmail( email: String )
+
 
 #Backend
 GET 	 /backend/getConf           	controllers.Application.getConf( name : String )
+GET     /backend/widgets/:widgetId/resource/details         controllers.WidgetResources.getRecipeResourceDetails( widgetId: Long, authToken: String )
+GET     /backend/widgets/:widgetId/resource/walk            controllers.WidgetResources.getWalkRecipeResourceResult( widgetId: Long, authToken: String )
+POST    /backend/widgets/:widgetId/resource/refresh         controllers.WidgetResources.postManualRefreshResource( widgetId: Long, authToken:String )
+GET     /backend/widgets/:widgetId/resource/content         controllers.WidgetResources.getResourceContent( widgetId: Long, authToken:String, path:String)
+
+GET     /backend/widgets/:widgetId/provider/details         controllers.WidgetResources.getProviderResourceDetails( widgetId: Long, authToken: String )
+GET     /backend/widgets/:widgetId/provider/walk            controllers.WidgetResources.getWalkProviderResourceResult( widgetId: Long, authToken: String )
+POST    /backend/widgets/:widgetId/provider/refresh         controllers.WidgetResources.postManualRefreshProvider( widgetId: Long, authToken:String )
+GET     /backend/widgets/:widgetId/provider/content         controllers.WidgetResources.getProviderContent( widgetId: Long, authToken:String, path:String)
+
+
+
+POST    /backend/login                                     controllers.Application.login
+GET    /backend/isLoggedIn                                 controllers.Application.isLoggedIn
+POST    /backend/logout                                    controllers.Application.logout
+GET     /backend/user/details                               controllers.Application.getUserDetails
+
+
+GET     /backend/application/pool/status  controllers.Application.getPoolStatus
+
+
+GET      /backend/widget/list 					controllers.WidgetAdmin.getAllWidgets
+GET     /backend/widget/icon                    controllers.WidgetAdmin.icon( apiKey: String)
+GET     /backend/widget/:widgetId/get           controllers.WidgetAdmin.getWidgetById( widgetId: Long )
+GET     /backend/widget/:apiKey/public                  controllers.WidgetAdmin.getPublicWidgetDetails( apiKey : String )
+POST     /backend/widget/start		     	    controllers.Application.start( apiKey: String, userId:String?="" )
+POST     /backend/widget/:instanceId/stop	    controllers.Application.stopPoolInstance( apiKey: String, instanceId: String)
+GET      /backend/widget/:instanceId/status     controllers.Application.getWidgetStatus( apiKey: String, instanceId: String )
+POST     /backend/widget/edit                   controllers.WidgetAdmin.postWidget
+POST    /backend/widget/:widgetId/delete                  controllers.WidgetAdmin.deleteWidgetById( widgetId:Long )
+POST     /backend/widget/:widgetId/disable				controllers.WidgetAdmin.disableWidgetById( widgetId:Long)
+POST     /backend/widget/:widgetId/enable 				controllers.WidgetAdmin.enableWidgetById( widgetId:Long)
+
+
+GET     /backend/cloudNames/list                 controllers.Application.getCloudNames
+GET     /backend/cloudProviders/list                 controllers.Application.getCloudProviders
+
+GET     /backend/demo/widget/list           controllers.DemosController.listWidgetForDemoUserByEmail( email: String )
 
 # Widget
-POST     /widget/start		     	    controllers.Application.start( apiKey: String, userId:String?="" )
-POST     /widget/:instanceId/stop	    controllers.Application.stopPoolInstance( apiKey: String, instanceId: String)
-GET      /widget/:instanceId/status     controllers.Application.getWidgetStatus( apiKey: String, instanceId: String )
+
 GET      /widget/:instanceId/pem        controllers.Application.downloadPemFile( instanceId:String )
 GET     /encrypt                        controllers.Application.encrypt( data:String )
 GET     /decrypt                        controllers.Application.decrypt( data:String )
 
-GET     /backend/application/pool/stats  controllers.Application.getPoolStatus( authToken :String )
+
 
 
 # User API
@@ -43,61 +78,29 @@ GET     /api/user/:userId/widgets                                   controllers.
 
 
 # Admin API
-GET     /user/widgetsTemplate           controllers.WidgetAdmin.getUserWidgetTemplate
-GET     /admin/checkPasswordStrength    controllers.WidgetAdmin.checkPasswordStrength( password:String,  email:String )
-GET     /admin/passwordStrength         controllers.WidgetAdmin.getPasswordMatch( authToken:String, password:String)
-POST    /admin/changePassword           controllers.WidgetAdmin.postChangePassword
-POST     /admin/resetPassword           controllers.WidgetAdmin.postResetPassword( email:String, h:String )
-GET      /admin/resetPasswordAction     controllers.WidgetAdmin.resetPasswordAction( p:String, pi:Long)
-GET      /admin/signup                  controllers.WidgetAdmin.getSignupPage
-GET     /admin/account                  controllers.WidgetAdmin.getAccountPage
-GET      /admin/resetPassword           controllers.WidgetAdmin.getResetPasswordPage
-GET      /admin/signin                  controllers.WidgetAdmin.getSigninPage( message:String ?= null )
-GET      /admin/widgets                 controllers.WidgetAdmin.getWidgetsPage
-GET      /user/widgets                  controllers.WidgetAdmin.newWidgetsPage
-GET      /admin/logout                  controllers.WidgetAdmin.logout
-POST     /signin	     		     	controllers.WidgetAdmin.signIn( email: String, password: String )
-POST     /signup      		     		controllers.WidgetAdmin.signUp( email: String, passwordConfirmation: String, password: String, firstname: String, lastname: String  )
-POST     /widget/regenerate	   			controllers.WidgetAdmin.regenerateWidgetApiKey( authToken: String, apiKey: String )
-POST     /widget/:instanceId/shutdown	controllers.WidgetAdmin.shutdownInstance( authToken: String, instanceId: String )
-POST     /widget/disable				controllers.WidgetAdmin.disableWidget( authToken: String, apiKey: String )
-POST     /widget/enable 				controllers.WidgetAdmin.enableWidget( authToken: String, apiKey: String )
-POST     /widget/:widgetId/disable				controllers.WidgetAdmin.disableWidgetById( widgetId:Long)
-POST     /widget/:widgetId/enable 				controllers.WidgetAdmin.enableWidgetById( widgetId:Long)
-GET      /user/list	   					controllers.WidgetAdmin.getAllUsers( authToken: String )
-# POST     /widget/new              	    controllers.WidgetAdmin.createNewWidget( widgetId:String ?= null, authToken: String, productName: String, productVersion: String, title: String, youtubeVideoUrl: String, providerURL: String, recipeURL: String, consolename: String, consoleurl: String, rootpath:String, recipeName:String, consoleUrlService:String )
-POST     /widget/edit                   controllers.WidgetAdmin.postWidget
-GET      /widget/list 					controllers.WidgetAdmin.getAllWidgets( authToken: String )
-POST    /widget/delete                  controllers.WidgetAdmin.deleteWidget( authToken:String, apiKey:String )
-POST    /widget/:widgetId/delete                  controllers.WidgetAdmin.deleteWidgetById( widgetId:Long )
+
+
+
+
+
+
+
+
 
 GET     /widget/previewWidget           controllers.WidgetAdmin.previewWidget( apiKey:String )
-GET     /widget/icon                    controllers.WidgetAdmin.icon( apiKey: String)
+
 GET     /server/headers               	controllers.WidgetAdmin.headers
 GET     /widget/widget                  controllers.WidgetAdmin.getWidget( apiKey:String )
-GET     /widget/:apiKey/public          controllers.WidgetAdmin.getPublicWidgetDetails( apiKey : String )
-GET     /widget/single/:apiKey          controllers.WidgetAdmin.getWidgetSinglePage( apiKey:String )
+
 GET     /widget/login/google/callback/:widgetKey   controllers.WidgetGoogleLoginController.googleLoginCallback( widgetKey:String )
 GET     /widget/login/google                controllers.WidgetGoogleLoginController.loginWithGoogle( widgetKey: String )
 GET     /widget/login/custom            controllers.Assets.at(path="/public/cloudify/pages/logins",file="custom.html")
 POST    /widget/login/custom            controllers.WidgetCustomLoginController.customLogin( widgetKey: String )
-GET     /widget/:widgetId/get           controllers.WidgetAdmin.getWidgetById( authToken:String, widgetId: Long )
 
 
-POST     /admin/pool/manage/add                          controllers.AdminPoolController.addNode( authToken:String )
-POST     /admin/pool/manage/:nodeId/remove               controllers.AdminPoolController.removeNode( authToken:String, nodeId:String )
-GET     /admin/pool/manage/:nodeId/check                controllers.AdminPoolController.checkAvailability( authToken:String, nodeId:String )
-GET     /admin/pool/manage                              controllers.AdminPoolController.index
-GET     /admin/pool/manage/nodes                        controllers.AdminPoolController.getServerNodes( authToken :String)
-GET     /admin/pool/manage/instance                     controllers.AdminPoolController.getWidgetInstances( authToken :String)
-GET     /admin/pool/manage/machines                     controllers.AdminPoolController.getCloudServers( authToken :String)
-GET     /admin/pool/manage/statuses                     controllers.AdminPoolController.getStatuses( authToken :String)
-GET     /admin/pool/manage/events                       controllers.AdminPoolController.poolEvents( authToken: String )
 
-GET     /admin/pool/summary             controllers.AdminPoolController.summary( authToken :String)
 
-GET     /cloudNames/list                 controllers.Application.getCloudNames
-GET     /cloudProviders/list                 controllers.Application.getCloudProviders
+
 
 
 #GET     /user/pool/manage              controllers.UserPoolController.getServerNodePoolPage( authToken:String, project:String, key:String, secretKey:String)
@@ -106,11 +109,9 @@ GET     /cloudProviders/list                 controllers.Application.getCloudPro
 
 GET     /getInjectedScript              controllers.Application.getInjectScript( publicIp:String?="1.1.1.1", privateIp:String?="2.2.2.2" )
 
-GET     /embed/img/:apiKey              controllers.WidgetAdmin.embedImage( apiKey: String)                  
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /public/*file  		     	    controllers.Assets.at(path="/public", file)
 GET     /d                              controllers.DemosController.getDemoPageForUser(email="default_demo@gigaspaces.com")
 GET     /*file        		     	    controllers.Assets.at(path="/public", file)
 
-GET     /                               controllers.WidgetAdmin.index

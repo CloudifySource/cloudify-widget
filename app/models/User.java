@@ -245,14 +245,13 @@ public class User
         return User.find.where().eq( "id", pi ).findUnique();
     }
 
-    static public Session authenticate( String email, String password )
+    static public User authenticate( String email, String password )
 	{
 		User user = find.where().eq("email", email).findUnique();
 
 		if ( user == null )
         {
-            String msg = Messages.get( "invalid.username.password" );
-            throw new ServerException( msg ).getResponseDetails().setError( msg ).done();
+            return null;
         }
 
         if ( StringUtils.equals( user.getPassword(), password ) ){ // we should encrypt
@@ -260,19 +259,11 @@ public class User
             user.save(  );
         }
         else if ( !user.comparePassword( password )){
-            String msg = Messages.get( "invalid.username.password" );
-            throw new ServerException( msg ).getResponseDetails().setError( msg ).done();
+            return null;
         }
 
-        Session session = user.getSession();
 
-        if ( ApplicationContext.get().conf().settings.expireSession ){
-            user.renewAuthToken();
-            user.save();
-        }
-
-        prolongSession( session.authToken, user.getId() );
-        return session;
+        return user;
 	}
 
 	static public User validateAuthToken( String authToken )

@@ -36,13 +36,7 @@ import play.mvc.With;
 import server.ApplicationContext;
 import server.HeaderMessage;
 import server.exceptions.ServerException;
-import utils.CollectionUtils;
 import utils.RestUtils;
-import views.html.common.linkExpired;
-import views.html.widgets.admin.newPassword;
-import views.html.widgets.admin.resetPassword;
-import views.html.widgets.admin.signin;
-import views.html.widgets.admin.signup;
 import views.html.widgets.dashboard.account;
 import views.html.widgets.dashboard.angularjs_widget;
 import views.html.widgets.dashboard.previewWidget;
@@ -76,17 +70,7 @@ public class WidgetAdmin extends Controller
         if ( widgetItem == null ){//|| !widgetItem.isEnabled()){
             return ok();
         }
-        return redirect("/public/angularApps/index.html#/widgets/" + apiKey + "/view?since=" + System.currentTimeMillis());
-    }
-    
-    public static Result getWidgetSinglePage( String apiKey ){
-        Widget widgetItem = Widget.getWidget(apiKey);
-        if ( widgetItem == null ){
-            return notFound("widget does not exist");
-        }else if( !widgetItem.isEnabled() ){
-            return badRequest( "widget disabled");
-        }
-        return ok(widgetSinglePage.render(widgetItem, request().host()));
+        return redirect("/public-folder/angularApps/index.html#/widgets/" + apiKey + "/view?since=" + System.currentTimeMillis());
     }
 
     public static Result icon( String apiKey ){
@@ -98,234 +82,8 @@ public class WidgetAdmin extends Controller
         return ok( widgetItem.getData() ).as( widgetItem.getContentType() );
     }
 
-    public static Result embedImage( String apiKey ){
-        Widget widgetItem = Widget.getWidget(apiKey);
-        if ( widgetItem == null ){
-            return notFound("widget does not exist");
-        }else if( !widgetItem.isEnabled() ){
-            return badRequest( "widget disabled");
-        }
-    	//TODO(ran): This will be project specific logo, with number of users etc, something engaging...
-    	return redirect("/img/cloudify-logo-embed.png");
-    }
-
-    
-
-	/*
-	 * Creates new account.
-	 */
-	public static Result signUp( String email, String passwordConfirmation, String password, String firstname, String lastname )
-	{
-
-        if ( !ApplicationContext.get().conf().features.signup.on ){
-            return internalServerError("Instance does not support signup");
-        }
-
-        try {
-            Constraints.EmailValidator ev =  new Constraints.EmailValidator();
-            if ( StringUtils.isEmpty( email ) || !ev.isValid( email ) ){
-                new HeaderMessage().setError( "Email is incorrect" ).apply( response().getHeaders() );
-                return internalServerError(  );
-            }
-            if ( !validatePassword( password, passwordConfirmation, email ) ) {
-                return internalServerError();
-            }
-
-            User.Session session = User.newUser( firstname, lastname, email, password ).getSession();
-            return RestUtils.resultAsJson( session );
-        } catch ( ServerException ex ) {
-            return resultErrorAsJson( ex.getMessage() );
-        }
-    }
-
-    public static Result logout(){
-        session().clear();
-        response().discardCookies( "authToken" );
-        return redirect( routes.WidgetAdmin.index() );
-    }
-
-    public static Result index()
-    {
-        // lets assume that if we have "authToken" we are already logged in
-        // and we can redirect to widgets.html
-        Http.Cookie authToken = request().cookies().get( "authToken" );
-        if ( authToken != null && User.validateAuthToken( authToken.value(), true ) != null ) {
-            return redirect( "public/angularApps/index.html" );
-        }
-        else{
-            return redirect( routes.WidgetAdmin.getSigninPage( null ) );
-        }
-    }
-
-    /**
-     *
-     * this method will reset the user's password.
-     * the parameters are cryptic on purpose.
-     *
-     * @param p - the hmac
-     * @param pi - the user id
-     * @return -
-     */
-    public static Result resetPasswordAction( String p, Long pi ){
-        User user = User.findById( pi );
-        // validate p
-        if ( !ApplicationContext.get().getHmac().compare( p, user.getEmail(),  user.getId(), user.getPassword()  )){
-            return badRequest(  linkExpired.render() );
-        }
-        // if p is valid lets reset the password
-        String newPasswordStr = StringUtils.substring( p, 0, 7 );
-        user.encryptAndSetPassword( newPasswordStr );
-        user.save();
-        return ok( newPassword.render( newPasswordStr ) );
-    }
-
-    public static Result postResetPassword( String email, String h ){
-        logger.info( "user {} requested password reset", email );
-        if ( !StringUtils.isEmpty( h ) ){
-            return badRequest(  ); // this is a bot.. lets block it.
-        }
-
-        if ( StringUtils.isEmpty( email ) || !(new Constraints.EmailValidator().isValid( email )) ){
-            new HeaderMessage().setError( "Invalid email" ).apply( response().getHeaders() );
-            return badRequest(  );
-        }
-
-        User user = User.find.where(  ).eq( "email",email ).findUnique();
-        if ( user == null ){
-            return ok(  ); // do not notify if user does not exist. this is a security breach..
-            // simply reply that an email was sent to the address.
-        }
-
-        ApplicationContext.get().getMailSender().resetPasswordMail( user );
-        return ok(  );
-    }
 
 
-    public static Result getAccountPage(){
-        return ok( account.render() );
-    }
-
-    public static Result getWidgetsPage(){
-        return ok( widgets.render() );
-    }
-    public static Result getSigninPage( String message ){
-
-        return ok( signin.render( message ));
-    }
-
-    public static Result getSignupPage(){
-        if ( !ApplicationContext.get().conf().features.signup.on ){
-            return internalServerError("Instance does not support feature");
-        }
-        return ok( signup.render() );
-    }
-    public static Result getResetPasswordPage(){
-        return ok( resetPassword.render() );
-    }
-
-
-    public static Result checkPasswordStrength( String password, String email ){
-        if ( !StringUtils.isEmpty( email  ) && new Constraints.EmailValidator().isValid( email )){
-            String result = isPasswordStrongEnough( password, email );
-            if ( result != null ){
-                new HeaderMessage().setError( result ).apply( response().getHeaders() );
-                return internalServerError(  );
-            }
-            return ok(  );
-        }
-        return ok(  );
-    }
-
-    private static String isPasswordStrongEnough( String password, String email ){
-        if ( StringUtils.length( password ) < 4 ){
-            return "Password is too short";
-        }
-        return null;
-    }
-
-    public static Result getPasswordMatch( String authToken, String password ){
-        User user = User.validateAuthToken( authToken );
-        String passwordWeakReason = isPasswordStrongEnough( password, user.getEmail() );
-        if ( passwordWeakReason == null ){
-            return ok( );
-        }
-        return ok( passwordWeakReason );
-    }
-
-    /**
-     *
-     * @param newPassword - the password user chose
-     * @param confirmPassword - the confirmed password
-     * @param email - user's email. used for checking similarity to password. passwords that are similar to email are considered weak.
-     * @return true iff password is considered strong enough according to our policy.
-     */
-    private static boolean validatePassword( String newPassword, String confirmPassword, String email )
-    {
-        if ( !StringUtils.equals( newPassword, confirmPassword ) ) {
-            new HeaderMessage().setError( "Passwords do not match" ).apply( response().getHeaders() );
-            return false;
-        }
-
-        String passwordWeakReason = isPasswordStrongEnough( newPassword, email );
-        if ( passwordWeakReason != null ) {
-            new HeaderMessage().setError( passwordWeakReason ).apply( response().getHeaders() );
-            return false;
-        }
-        return true;
-    }
-    public static Result postChangePassword(){
-        JsonNode parse = request().body().asJson();
-        String authToken = parse.get("authToken").getTextValue();
-        String oldPassword = parse.get("oldPassword").getTextValue();
-        String newPassword = parse.get("newPassword").getTextValue();
-        String confirmPassword = parse.get("confirmPassword").getTextValue();
-
-        User user = User.validateAuthToken( authToken );
-        if ( !user.comparePassword( oldPassword )){
-            new HeaderMessage().setError( "Wrong Password" ).apply( response().getHeaders() );
-            return internalServerError();
-        }
-
-        if ( !validatePassword( newPassword, confirmPassword, user.getEmail() ) ){
-            return internalServerError(  );
-        }
-
-
-        user.encryptAndSetPassword( newPassword );
-        user.save();
-        new HeaderMessage().setSuccess( "Password Changed Successfully" ).apply( response().getHeaders() );
-        return ok(  );
-    }
-
-	/**
-	 * Login with existing account.
-	 * 
-	 * @param email
-	 * @param password
-	 * @return
-	 */
-	public static Result signIn( String email, String password )
-	{
-		try
-		{
-			User.Session session = User.authenticate(email, password);
-
-			return resultAsJson(session);
-		}catch( ServerException ex )
-		{
-			return resultErrorAsJson(ex.getMessage());
-		}
-	}
-
-	
-	public static Result getAllUsers( String authToken )
-	{
-		User.validateAuthToken(authToken);   // TODO : remove these validations and use "action interceptor"
-                                            // there's no official documentation for interceptors. see code sample at : http://stackoverflow.com/questions/9629250/how-to-avoid-passing-parameters-everywhere-in-play2
-		List<User> users = User.getAllUsers();
-
-		return resultAsJson(users);
-	}
 
     /**
      * This function will save the widget.
@@ -345,7 +103,7 @@ public class WidgetAdmin extends Controller
         Http.MultipartFormData body = request().body().asMultipartFormData();
         String widgetString = body.asFormUrlEncoded().get( "widget" )[0];
         boolean removeIcon = body.asFormUrlEncoded().containsKey("removeIcon");
-        String authToken = body.asFormUrlEncoded().get( "authToken" )[0];
+        String authToken = session("authToken");
         Http.MultipartFormData.FilePart picture = body.getFile( "icon" );
 
         JsonNode jsonNode = Json.parse(widgetString);
@@ -435,9 +193,9 @@ public class WidgetAdmin extends Controller
 //
 
 	
-	public static Result getAllWidgets( String authToken )
+	public static Result getAllWidgets(  )
 	{
-		User user = User.validateAuthToken(authToken);
+		User user = User.validateAuthToken(session("authToken"));
 		List<Widget> list = null;
 
         if ( user.getSession().isAdmin() )   {
@@ -470,39 +228,20 @@ public class WidgetAdmin extends Controller
         return ok(Json.toJson(Widget.findByUser( user )));
     }
 
-	public static Result disableWidget( String authToken, String apiKey )
-	{
-        return enableDisableWidget( authToken, apiKey, false );
-	}
-
     public static Result disableWidgetById( Long widgetId )
     {
-        String authToken = request().body().asJson().get("authToken").getTextValue();
-        return enableDisableWidget( authToken, widgetId, false );
+        return enableDisableWidget( widgetId, false );
     }
 
-    private static Result enableDisableWidget( String authToken, String apiKey, boolean enabled )
+    private static Result enableDisableWidget( Long widgetId, boolean enabled )
     {
-        getWidgetSafely( authToken, apiKey ).setEnabled( enabled ).save();
+        getWidgetSafely( session("authToken"), widgetId, true ).setEnabled( enabled ).save();
         return ok(OK_STATUS).as("application/json");
     }
-
-    private static Result enableDisableWidget( String authToken, Long widgetId, boolean enabled )
-    {
-        getWidgetSafely( authToken, widgetId, true ).setEnabled( enabled ).save();
-        return ok(OK_STATUS).as("application/json");
-    }
-
-
-    public static Result enableWidget( String authToken, String apiKey )
-	{
-        return enableDisableWidget( authToken, apiKey, true );
-	}
 
     public static Result enableWidgetById( Long widgetId )
 	{
-        String authToken = request().body().asJson().get("authToken").getTextValue();
-        return enableDisableWidget( authToken, widgetId, true );
+        return enableDisableWidget( widgetId, true );
 	}
 
     private static Widget getWidgetSafely( String authToken, Long widgetId, boolean allowAdmin ){
@@ -526,29 +265,16 @@ public class WidgetAdmin extends Controller
     }
 
 
-    public static Result getWidgetById( String authToken, Long widgetId ){
-        return ok(Json.toJson(getWidgetSafely(authToken, widgetId, false)));
+    public static Result getWidgetById( Long widgetId ){
+        return ok(Json.toJson(getWidgetSafely(session("authToken"), widgetId, false)));
     }
 
-    public static Result getUserWidgetTemplate(){
-        return ok( views.html.widgets.userWidgets.render() ); // we do this so we can get the embed code.. we cannot use angularJS as we might want to email it too..
-    }
-
-
-    public static Result deleteWidget( String authToken, String apiKey ){
-        logger.info( "got a request to delete widget [{}]", apiKey );
-        Widget widget = getWidgetSafely( authToken, apiKey );
-        widget.delete(  );
-        return ok( );
-    }
     public static Result deleteWidgetById( Long widgetId ){
-        String authToken = request().body().asJson().get("authToken").getTextValue();
+        String authToken = session("authToken");
         Widget widget = getWidgetSafely( authToken, widgetId, true );
         widget.delete(  );
         return ok( );
     }
-
-
 
     public static Result previewWidget( String apiKey ){
         Http.Cookie authTokenCookie = request().cookies().get("authToken");

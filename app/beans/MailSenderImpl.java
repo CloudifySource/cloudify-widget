@@ -152,11 +152,12 @@ public class MailSenderImpl implements MailSender {
         }catch(Exception e){
             throw new RuntimeException( String.format( "unable to url encode hmac [%s]", sign ) , e );
         }
-        Call call = routes.WidgetAdmin.resetPasswordAction( encode, user.getId() );
+//        Call call = routes.WidgetAdmin.resetPasswordAction( encode, user.getId() );
 
         // guy - this is not nice. we have to have the request for the absoluteURL.
         // we should find a way to fake the request, just in case we have a job that sends emails with links.
-        String link = call.absoluteURL( Http.Context.current().request() );
+        String link = "N/A"; // todo : decide if we need this feature
+        // call.absoluteURL( Http.Context.current().request() );
 
         String mailContent = views.html.mail.resetPassword.render( user, link ).body();
         GsMailConfiguration mConf = new GsMailConfiguration();

@@ -49,6 +49,7 @@ import server.ApplicationContext;
 import server.HeaderMessage;
 import server.exceptions.ServerException;
 import utils.CollectionUtils;
+import utils.RestUtils;
 import utils.StringUtils;
 import akka.util.Duration;
 
@@ -266,7 +267,8 @@ public class Application extends Controller
         }
     }
 
-    public static Result getPoolStatus( String authToken ){
+    public static Result getPoolStatus(  ){
+        String authToken = session("authToken");
         if ( User.validateAuthToken( authToken ) == null ) {
             return unauthorized();
         }
@@ -457,44 +459,44 @@ public class Application extends Controller
         return ok(textEncryptor.decrypt(data));
     }
 
-    public static Result javascriptRoutes()
-    {
-        response().setContentType( "text/javascript" );
-        return ok(
-                Routes.javascriptRouter( "jsRoutes",
-                        // Routes for Projects
-                        routes.javascript.WidgetAdmin.getAllWidgets(),
-                        routes.javascript.WidgetAdmin.postWidget(),
-                        routes.javascript.WidgetAdmin.checkPasswordStrength(),
-                        routes.javascript.WidgetAdmin.postChangePassword(),
-                        routes.javascript.WidgetAdmin.getPasswordMatch(),
-                        routes.javascript.WidgetAdmin.postWidgetDescription(),
-                        routes.javascript.WidgetAdmin.deleteWidget(),
-                        routes.javascript.WidgetAdmin.postRequireLogin(),
-                        routes.javascript.WidgetAdmin.regenerateWidgetApiKey(),
-                        routes.javascript.WidgetAdmin.enableWidget(),
-                        routes.javascript.WidgetAdmin.disableWidget(),
-
-                        routes.javascript.Application.downloadPemFile(),
-                        routes.javascript.Application.encrypt(),
-                        routes.javascript.Application.decrypt(),
-
-                        routes.javascript.AdminPoolController.addNode(),
-                        routes.javascript.AdminPoolController.poolEvents(),
-                        routes.javascript.AdminPoolController.removeNode(),
-                        routes.javascript.AdminPoolController.checkAvailability(),
-                        routes.javascript.AdminPoolController.summary(),
-                        routes.javascript.AdminPoolController.getCloudServers(),
-                        routes.javascript.AdminPoolController.getServerNodes(),
-                        routes.javascript.AdminPoolController.getWidgetInstances(),
-                        routes.javascript.AdminPoolController.getStatuses(),
-
-
-                        routes.javascript.DemosController.listWidgetForDemoUser()
-
-                )
-        );
-    }
+//    public static Result javascriptRoutes()
+//    {
+//        response().setContentType( "text/javascript" );
+//        return ok(
+//                Routes.javascriptRouter( "jsRoutes",
+//                        // Routes for Projects
+//                        routes.javascript.WidgetAdmin.getAllWidgets(),
+//                        routes.javascript.WidgetAdmin.postWidget(),
+//                        routes.javascript.WidgetAdmin.checkPasswordStrength(),
+//                        routes.javascript.WidgetAdmin.postChangePassword(),
+//                        routes.javascript.WidgetAdmin.getPasswordMatch(),
+//                        routes.javascript.WidgetAdmin.postWidgetDescription(),
+//                        routes.javascript.WidgetAdmin.deleteWidget(),
+//                        routes.javascript.WidgetAdmin.postRequireLogin(),
+//                        routes.javascript.WidgetAdmin.regenerateWidgetApiKey(),
+//                        routes.javascript.WidgetAdmin.enableWidget(),
+//                        routes.javascript.WidgetAdmin.disableWidget(),
+//
+//                        routes.javascript.Application.downloadPemFile(),
+//                        routes.javascript.Application.encrypt(),
+//                        routes.javascript.Application.decrypt(),
+//
+//                        routes.javascript.AdminPoolController.addNode(),
+//                        routes.javascript.AdminPoolController.poolEvents(),
+//                        routes.javascript.AdminPoolController.removeNode(),
+//                        routes.javascript.AdminPoolController.checkAvailability(),
+//                        routes.javascript.AdminPoolController.summary(),
+//                        routes.javascript.AdminPoolController.getCloudServers(),
+//                        routes.javascript.AdminPoolController.getServerNodes(),
+//                        routes.javascript.AdminPoolController.getWidgetInstances(),
+//                        routes.javascript.AdminPoolController.getStatuses(),
+//
+//
+//                        routes.javascript.DemosController.listWidgetForDemoUser()
+//
+//                )
+//        );
+//    }
 
     public static Result getCloudProviders() {
         return ok (Json.toJson(CloudProvider.values()));
@@ -525,5 +527,47 @@ public class Application extends Controller
         Collections.sort(result);
         return ok(Json.toJson(result));
 
+    }
+
+
+    public static Result logout(){
+        session().clear();
+        response().discardCookies( "authToken" );
+        return ok();
+    }
+
+    public static Result login( ){
+
+        JsonNode jsonNode = request().body().asJson();
+        String email = jsonNode.get("email").getTextValue();
+        String password = jsonNode.get("password").getTextValue();
+        User authenticated = User.authenticate(email, password);
+        session("authToken", authenticated.getAuthToken());
+        return ok();
+
+    }
+
+    public static Result isLoggedIn(){
+        Map<String, Boolean> result = new HashMap<String, Boolean>();
+        result.put("loggedIn", Boolean.FALSE);
+        try {
+            String authToken = session("authToken");
+            User user = User.validateAuthToken(authToken);
+
+            if (user != null) {
+                result.put("loggedIn", Boolean.TRUE);
+            }
+            return ok(Json.toJson(result));
+        }catch(Exception e){
+
+        }
+
+        return ok(Json.toJson(result));
+    }
+
+    public static Result getUserDetails(){
+        String authToken = session("authToken");
+        User user = User.validateAuthToken(authToken);
+        return ok(Json.toJson( user ));
     }
 }

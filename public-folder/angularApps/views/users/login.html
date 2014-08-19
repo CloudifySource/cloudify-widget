@@ -1,0 +1,36 @@
+<div class="layout" id="dashboard">
+
+    <div id="base" class="container">
+        <div ng-show="loginError" class="alert alert-error">
+            Invalid username or password
+        </div>
+        <div class="well">
+            <div class="container">
+                <div class="login-form">
+                    <h2>Please Sign In </h2>
+
+                    <form>
+                            <div class="clearfix">
+                                <input type="text" placeholder="Username" ng-model="login.email"/>
+                            </div>
+                            <div class="clearfix">
+                                <input type="password" placeholder="Password" ng-model="login.password" title="password"/>
+                            </div>
+                            <button class="btn btn-primary" type="submit" ng-click="doLogin()">Sign in</button>
+                            <!--<a href="@routes.WidgetAdmin.getResetPasswordPage()" class="btn">Forgot Password</a>-->
+                        <!--<a href="@routes.WidgetAdmin.getSignupPage()">Don't you have account? - Sign Up</a>-->
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+

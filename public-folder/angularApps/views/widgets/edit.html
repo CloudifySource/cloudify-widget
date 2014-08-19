@@ -1,0 +1,150 @@
+
+<div id="editWidget" class=" layout action-panel {{editSection}}">
+    <div id="main">
+    <div class="modal-header"><h1>Edit Widget</h1><h2> {{editSection}} </h2><h3> {{widget.productName}} - {{widget.productVersion}}</h3></div>
+    </div>
+    <div>
+        {{errors}}
+    </div>
+    <form name="widgetForm" class="form-horizontal" style="margin-bottom:0;">
+                            <!--consoleUrlService:"",-->
+                            <!--consoleurl: ""-->
+
+        <div form-field title="Product Name" field-id="productName" value="widget.productName" required="true" tooltip="The name of your product" type="text"></div>
+        <div form-field title="Product Version" field-id="productVersion" value="widget.productVersion" required="true" tooltip="The version of your product" type="text"></div>
+        <div form-field title="Title" field-id="title" value="widget.title" required="true" tooltip="The widget title as it will appear when displaying the widget within a web page" type="text"></div>
+        <div form-field title="Recipe Name" field-id="recipeName" value="widget.recipeName" required="true" tooltip="The name in the recipe for uninstall." type="text"></div>
+        <div form-field title="Recipe URL" field-id="recipeURL" value="widget.recipeURL" required="false" tooltip="A URL (http/https)to the recipe zip file" type="text"></div>
+        <div form-field title="Auto Refresh" field-id="autoRefresh" value="widget.autoRefreshRecipe" required="false" tooltip="should we download the recipe every time, or should this be a manual step?" type="checkbox"></div>
+        <div form-field title="Provider URL" field-id="providerURL" value="widget.providerURL" required="true" tooltip="The URL of the product owner, e.g. http://www.mongodb.org" type="text"></div>
+        <div form-field title="Api Key" field-id="apiKey" value="widget.apiKey" required="false" disabled="true" type="text"></div>
+        <input type="hidden" id="widgetId" name="widgetId" value=""/>
+        <div form-field title="Show Advanced" field-id="showAdvanced" value="widget.showAdvanced" required="false" type="checkbox"></div>
+        <div form-field title="Require Login" field-id="requireLogin" value="widget.requireLogin" required="false" type="checkbox"></div>
+        <div form-field title="Verification URL" field-id="loginVerificationUrl" value="widget.loginVerificationUrl" required="false" type="text"></div>
+        <div form-field title="Web Service Key" field-id="webServiceKey" value="widget.webServiceKey" required="false" type="password"></div>
+        <div form-field title="Youtube Video URL" field-id="youtubeVideoUrl" value="widget.youtubeVideoUrl" required="false" type="text" tooltip="URL of a YouTube video you want to display within the widget"></div>
+        <div form-field title="Console Link Title" field-id="consolename" value="widget.consolename" required="false" type="text" tooltip="The title of the link to the product dashboard / UI in the widget console"></div>
+        <div form-field title="Console URL" field-id="consoleurl" value="widget.consoleurl" required="false" type="text" tooltip="The URL to the product dashboard / UI. Use $HOST as the hostname placeholder, e.g.: http://$HOST:8080/tomcat/index.html"></div>
+        <div form-field title="Console URL Service" field-id="consoleUrlService" value="widget.consoleUrlService" required="false" type="text" tooltip="The name of the service replacing $HOST placeholder"></div>
+        <div form-field title="Root Path" field-id="rootpath" value="widget.rootpath" required="false" type="text"></div>
+
+        <div class="control-group" ng-class="{'error': !!errorId }">
+            <div class="controls">
+
+                        <span class="drop-zone" filemodel="data.widgetIconFile" fileread preview="data.widgetIconPreview" ng-class="{'preview':actions.editIcon!=null, 'nopreview':actions.editIcon == null}" style="border:5px dashed grey; padding:10px; display:inline-block; border-radius: 10px; width:60px; height:60px; margin-left:0;">
+                        <img ng-src="{{data.widgetIconPreview}}" style="height:60px; width:80px; border:none; background:transparent;" ng-show="actions.editIcon != null && actions.editIcon != 'remove'"/>
+                        <img ng-show="actions.editIcon == null" style="height:60px; width:80px;" ng-src="/backend/widget/icon?apiKey={{widget.apiKey}}&d={{lastUpdated}}"/>
+
+        </span>
+                <div style="margin-left:10px; vertical-align: top">
+                    <button class="btn"  ng-click="removeIcon()">Remove Icon</button>
+                    <button class="btn"  ng-click="restoreIcon()">Restore</button>
+                    <label class="filebutton btn" for="myfile">
+                        Browse For File!
+                        <span><input type="file" fileread preview="data.widgetIconPreview" filemodel="data.widgetIconFile" id="myfile" name="myfile"></span>
+                    </label>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div form-field title="Description" field-id="description" value="widget.description" required="false" type="textarea"></div>
+
+
+        <h2> Data </h2>
+        <div class="control-group">
+            <label class="control-label" for="theme">Theme<abbr class="required_mark" ng-show="required">*</abbr></label>
+            <div class="controls">
+                <select name="theme" id="theme" ng-model="widgetData.theme" ng-options="theme.id as theme.label for theme in themes"></select>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="cloudType">Cloud Type<abbr class="required_mark" ng-show="required">*</abbr></label>
+            <div class="controls">
+                <select name="cloudType" id="cloudType" ng-model="widgetData.cloudType" ng-options="cloudType.id as cloudType.label for cloudType in cloudTypes"></select>
+                <br/>
+                Used for advanced section display
+            </div>
+
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="locale">Locale<abbr class="required_mark" ng-show="required">*</abbr></label>
+            <div class="controls">
+                <select name="locale" id="locale" ng-model="widgetData.locale" ng-options="locale.id as locale.label for locale in locales"></select>
+            </div>
+        </div>
+
+        <div class="bg-danger" ng-show="!widget.managerPrefix">
+            In order for the widget to support teardown, you must configure manager prefix.
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="managerPrefix">Management Prefix<abbr class="required_mark" ng-show="required">*</abbr></label>
+            <div class="controls">
+                <input ng-model="widget.managerPrefix" type="text" id="managerPrefix"/>
+
+            </div>
+        </div>
+
+        <!-- there is lack of correlation between cloud provider and cloud name conventions,
+
+            since the widget has 2 meaning for cloud provider.
+
+            One we use to know which credentials fields to expose in the front-end, which steps to do before bootstrap
+            (such as create private key in ec2) and such,
+
+            while cloud name, is the name of the folder under "clouds" in cloudify.
+
+
+         -->
+        <div class="control-group">
+            <label class="control-label" for="locale">Cloud Name<abbr class="required_mark" ng-show="required">*</abbr></label>
+            <div class="controls">
+                <select name="locale" id="cloudName" ng-model="widget.cloudName" ng-options="name for name in cloudNames"></select>
+                <br/>
+                For solo - which cloudify cloud provider should we use? a list of built in types is given
+            </div>
+        </div>
+
+
+        <div class="control-group">
+            <label class="control-label" for="locale">Cloud Provider<abbr class="required_mark" ng-show="required">*</abbr></label>
+            <div class="controls">
+                <select name="locale" id="cloudProvider" ng-model="widget.cloudProvider" ng-options="provider for provider in cloudProviders"></select>
+                <br/>
+                Used for the flow we will use in solo scenario
+            </div>
+        </div>
+
+        <div class="control-group" id="social-source-form-section">
+            <label class="control-label" for="locale">Social Sources<abbr class="required_mark" ng-show="required">*</abbr></label>
+            <div class="controls">
+                <span ng-repeat="socialSource in widgetData.socialSources track by socialSource.id">
+                    <input name="shareSources" id="shareSources" ng-model="socialSource.active" type="checkbox" /> {{getSocialSourceLabel(socialSource)}}<br/>
+                </span>
+
+            </div>
+        </div>
+
+        <div form-field title="Wechat URL" field-id="wechatUrl" value="widgetData.wechatUrl" required="false" type="text"></div>
+        <div form-field title="Twitter Message" field-id="twitterMessage" value="widgetData.twitterMessage" required="false" type="text"></div>
+        <div form-field title="Renren Message" field-id="renrenMessage" value="widgetData.renrenMessage" required="false" type="text"></div>
+        <div form-field title="Tecent Weibo Site" field-id="tecentWeiboSite" value="widgetData.tecentWeiboSite" required="false" type="text"></div>
+        <div form-field title="Sina Weibo Title" field-id="sinaWeiboTitle" value="widgetData.sinaWeiboTitle" required="false" type="text"></div>
+        <div form-field title="Share URL" field-id="shareUrl" value="widgetData.shareUrl" required="false" type="text"></div>
+
+        <div class="modal-footer">
+
+            <div class="control-label"> <abbr style="color:red"> * </abbr> Mandatory fields </div>
+            <a class="btn" href="#/widgets/index">Cancel</a>
+            <input type="submit" class="btn btn-primary"  value="Save" ng-click="saveWidget(widget, actions.editIcon, false)"/>
+            <button class="btn btn-primary" ng-click="saveWidget(widget, actions.editIcon, true)"> Save and Done</button>
+
+        </div>
+    </form>
+    </div>
+</div>
