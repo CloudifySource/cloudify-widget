@@ -78,14 +78,18 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
     $scope.poweredByUrl[ec2] = 'http://aws.amazon.com';
 
     function _hasAdvanced(){
-        var aData = _getAdvanced();
-        var params = aData.params;
-        for ( var i in params ){
-            if ( params.hasOwnProperty(i) && !params[i] ){
-                return false;
+        try {
+            var aData = _getAdvanced();
+            var params = aData.params;
+            for (var i in params) {
+                if (params.hasOwnProperty(i) && !params[i]) {
+                    return false;
+                }
             }
+            return true;
+        }catch(e){
+            return false;
         }
-        return true;
     }
 
 
