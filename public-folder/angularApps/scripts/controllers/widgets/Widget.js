@@ -20,6 +20,11 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         recipeProperties = event.data;
     });
 
+    WidgetReceiveMessageService.addHandler( 'widget_play', function(event){
+        $log.info('playing widget from event', event.data);
+        $scope.play();
+    });
+
     WidgetReceiveMessageService.addHandler( 'widget_advanced_data', function(event){
         $log.info('got new advanced data for widget', event.data);
         advancedDataFromMessage = event.data;
