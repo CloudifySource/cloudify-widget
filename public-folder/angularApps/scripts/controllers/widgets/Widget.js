@@ -34,6 +34,7 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
     var popupWindow = null;
 
     $scope.loginDone = function( loginDetails ){
+        $log.info('login done', loginDetails );
         if ( popupWindow !== null ){
             popupWindow.close();
         }
@@ -181,12 +182,21 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
             return;
         }
         $scope.advancedRequiredError = false;
-        if ( !!$scope.widget.loginsString && !$scope.loginDetails ){
-            var size = popupWidths[$scope.widget.loginsString];
+        var loginsString = $scope.widget.loginsString;
+
+        // guy - this is a hack until we give a better support to all login types and allow to combine different types.
+        // currently we only allow one type in a string. google or custom.
+        if ( loginsString.indexOf('custom') >= 0){
+            loginsString = 'custom';
+        }else if ( loginsString.indexOf('google') >= 0 ){
+            loginsString = 'google';
+        }
+        if ( !!loginsString && !$scope.loginDetails ){
+            var size = popupWidths[loginsString];
             var left = (screen.width/2)-(size.width/2);
             var top = (screen.height/2)-(size.height/2);
 
-            popupWindow = window.open( '/widget/login/' + $scope.widget.loginsString + '?widgetKey=' + apiKey  , 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+ size.width +', height='+ size.height +', top='+top+', left='+left);
+            popupWindow = window.open( window.location.origin + '/public-folder/angularApps/index.html#/logins/' + loginsString + '?widgetKey=' + apiKey  , 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+ size.width +', height='+ size.height +', top='+top+', left='+left);
             return;
         }
         $log.info('starting the widget');

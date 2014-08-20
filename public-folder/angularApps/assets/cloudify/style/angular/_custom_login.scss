@@ -1,0 +1,75 @@
+div.custom-login{
+  $COLOR:#ABABAB;
+  $FORM_CONTENT_TOP_PADDING:10px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  width:630px;
+  margin:30px auto 0;
+  .error{
+    color:red;
+    text-align:center;
+  }
+
+  .forms-section{
+    display:table-row;
+
+    .option-title{
+      color:$COLOR;
+      font-size:20px;
+      padding: 20px 0;
+    }
+
+    .google-login, .divider, .custom-form{
+      display:table-cell;
+      vertical-align:top;
+    }
+
+    .google-login{
+      width:300px;
+      text-align:center;
+      padding-top:$FORM_CONTENT_TOP_PADDING;
+    }
+  }
+  .divider{
+
+    .divider-text{
+      font-size:40px;
+      color:$COLOR;
+      margin-left:-26px;
+      padding:20px 0;
+    }
+    .line{
+      width:2px;
+      background-color: $COLOR;
+      height:100px;
+    }
+  }
+
+  .custom-form{
+    padding-top:$FORM_CONTENT_TOP_PADDING;
+
+    width:300px;
+    text-align:center;
+    .input-section{
+      margin-top:5px;
+      .login-label{
+
+
+        display:inline-block;
+        width:100px;
+        text-align:left;
+
+      }
+      input{
+
+        text-align:left;
+        width: 100px;
+      }
+
+
+    }
+    input[type=submit]{
+      margin-top:10px;
+      width:220px;
+    }
+  }
+}

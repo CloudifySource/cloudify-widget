@@ -123,8 +123,7 @@ public class WidgetGoogleLoginController extends AbstractLoginController {
             loginDetails.setLastName(lastname);
             handleLogin( widget, loginDetails );
 
-
-            return ok(google.render(openId, email));
+            return redirect("/public-folder/angularApps/index.html#/logins/google/callback?userId=" + openId + "&email=" + email );
         } catch (RuntimeException e) {
             logger.error("login was unsuccessful", e);
         }

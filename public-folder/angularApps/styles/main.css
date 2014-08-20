@@ -812,3 +812,49 @@ td.action_col {
         font-size: 18px; }
       #publicDemo .nav-links .demo-link .product-version {
         color: grey; }
+
+div.custom-login {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  width: 630px;
+  margin: 30px auto 0; }
+  div.custom-login .error {
+    color: red;
+    text-align: center; }
+  div.custom-login .forms-section {
+    display: table-row; }
+    div.custom-login .forms-section .option-title {
+      color: #ababab;
+      font-size: 20px;
+      padding: 20px 0; }
+    div.custom-login .forms-section .google-login, div.custom-login .forms-section .divider, div.custom-login .forms-section .custom-form {
+      display: table-cell;
+      vertical-align: top; }
+    div.custom-login .forms-section .google-login {
+      width: 300px;
+      text-align: center;
+      padding-top: 10px; }
+  div.custom-login .divider .divider-text {
+    font-size: 40px;
+    color: #ababab;
+    margin-left: -26px;
+    padding: 20px 0; }
+  div.custom-login .divider .line {
+    width: 2px;
+    background-color: #ababab;
+    height: 100px; }
+  div.custom-login .custom-form {
+    padding-top: 10px;
+    width: 300px;
+    text-align: center; }
+    div.custom-login .custom-form .input-section {
+      margin-top: 5px; }
+      div.custom-login .custom-form .input-section .login-label {
+        display: inline-block;
+        width: 100px;
+        text-align: left; }
+      div.custom-login .custom-form .input-section input {
+        text-align: left;
+        width: 100px; }
+    div.custom-login .custom-form input[type=submit] {
+      margin-top: 10px;
+      width: 220px; }

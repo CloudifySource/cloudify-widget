@@ -2,6 +2,36 @@
 
 angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, WidgetsService, $log, $location, $routeParams  ){
     $log.info('loading controller');
+
+    $scope.logins = [
+        {
+            'id' : 'google',
+            'label' : 'Google',
+            'selected' : false
+        },
+        {
+            'id' : 'custom',
+            'label' : 'Custom',
+            'selected' : false
+        }
+    ];
+
+    $scope.$watch('logins', function(){
+        if ( !$scope.logins || $scope.logins.length === 0 ){
+            return;
+        }
+        var selected = [];
+        for ( var i = 0; i < $scope.logins.length; i++ ){
+
+            var login = $scope.logins[i];
+            if ( !!login.selected ){
+                selected.push(login.id);
+            }
+        }
+        $scope.widget.loginsString = selected.join(',');
+
+    },true);
+
     $scope.lastUpdated = new Date().getTime();
 
     WidgetsService.themes.getThemes().then(function( result ){
@@ -60,6 +90,25 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
     $scope.$watch(function(){return [$scope.widget,$scope.themes];}, function(){
         if ( !!$scope.widget && !!$scope.themes && !$scope.widgetData.theme ){
             $scope.widgetData.theme = WidgetsService.themes.getDefault().id;
+        }
+    },true);
+
+    $scope.$watch(function(){return [$scope.widget,$scope.logins];}, function(){
+        if ( !!$scope.widget && !!$scope.logins ){
+            try{
+                var logins = $scope.widget.loginsString.split(',');
+                _.each( logins, function(item){
+
+                    var scopeLogin = _.find($scope.logins, {'id' : item });
+                    if ( !!scopeLogin ){
+                        scopeLogin.selected = true;
+                    }
+                });
+            }catch(e){
+                $log.error('unable to update logins',e);
+            }
+
+
         }
     },true);
 

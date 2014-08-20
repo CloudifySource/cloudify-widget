@@ -15,7 +15,7 @@
         <div form-field title="Title" field-id="title" value="widget.title" required="true" tooltip="The widget title as it will appear when displaying the widget within a web page" type="text"></div>
         <div form-field title="Recipe Name" field-id="recipeName" value="widget.recipeName" required="true" tooltip="The name in the recipe for uninstall." type="text"></div>
         <div form-field title="Recipe URL" field-id="recipeURL" value="widget.recipeURL" required="false" tooltip="A URL (http/https)to the recipe zip file" type="text"></div>
-        <div form-field title="Auto Refresh" field-id="autoRefresh" value="widget.autoRefreshRecipe" required="false" tooltip="should we download the recipe every time, or should this be a manual step?" type="checkbox"></div>
+        <div form-field title="Auto Refresh Recipe" field-id="autoRefresh" value="widget.autoRefreshRecipe" required="false" tooltip="should we download the recipe every time, or should this be a manual step?" type="checkbox"></div>
         <div form-field title="Provider URL" field-id="providerURL" value="widget.providerURL" required="true" tooltip="The URL of the product owner, e.g. http://www.mongodb.org" type="text"></div>
         <div form-field title="Api Key" field-id="apiKey" value="widget.apiKey" required="false" disabled="true" type="text"></div>
         <input type="hidden" id="widgetId" name="widgetId" value=""/>
@@ -50,8 +50,18 @@
         </div>
 
 
+
         <div form-field title="Description" field-id="description" value="widget.description" required="false" type="textarea"></div>
 
+        <h2> Login </h2>
+        {{logins}}           <br/>
+        {{widget.loginsString}}
+        <div class="control-group" ng-repeat="login in logins">
+            <label class="control-label" for="theme">{{login.label}}</label>
+            <div class="controls" >
+                <input type="checkbox"  ng-model="login.selected"/>
+            </div>
+        </div>
 
         <h2> Data </h2>
         <div class="control-group">

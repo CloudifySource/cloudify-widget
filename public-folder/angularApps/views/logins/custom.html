@@ -1,0 +1,47 @@
+<div class="custom-login">
+    <div class="forms-section">
+        <div class="google-login">
+            <div class="option-title">Register using Google ID</div>
+            <a href="/backend/widget/login/google?widgetKey={{widgetKey}}" >
+
+                <img src="images/sign_in_with_google.png"/>
+            </a>
+        </div>
+        <div class="divider">
+            <div class="line"></div>
+            <div class="divider-text"> OR </div>
+            <div class="line"></div>
+        </div>
+        <div class="custom-form">
+            <div class="option-title">Fill in details</div>
+
+            <form ng-submit="submitForm()">
+                <div class="input-section">
+                    <span class="login-label">
+                        Name
+                    </span>
+                    <input ng-model="login.name" required>
+                </div>
+                <div class="input-section">
+                <span class="login-label">
+                    Last Name
+                </span>
+                    <input ng-model="login.lastName" required>
+                </div>
+
+
+                <div class="input-section">
+                <span class="login-label">
+                    Email
+                </span>
+                    <input ng-model="login.email" required >
+                </div>
+                <input type="submit" value="Submit"/>
+                <div class="error">
+                    {{error}}
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

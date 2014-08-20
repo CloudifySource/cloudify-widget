@@ -11,7 +11,7 @@
     <li ng-show="!widgetStatus.message && !widgetStatus.completed && !isCompleted() && !widgetStatus.reset">{{ellipsis}}</li>
     <li class="error" ng-show="!!widgetStatus.message">{{widgetStatus.message}}</li>
     <li class="important" ng-show="isCompleted()">您的试用已结束，请参考 <a href="http://bluforcloud.com/plans/solo/">单用户计划</a>,&nbsp; 在SoftLayer或者亚马逊云上继续使用BLU Acceleration 服务</li>
-    <li class="important" ng-show="!!widgetStatus.cloudifyUiIsAvailable">Manage your system with <a href="http://{{widgetStatus.publicIp}}:8099" target="_blank" ng-show="!!widgetStatus.cloudifyUiIsAvailable" class="track">Cloudify</a></li>
+    <li class="important" ng-show="!!widgetStatus.cloudifyUiIsAvailable"><a href="http://{{widgetStatus.publicIp}}:8099" target="_blank" ng-show="!!widgetStatus.cloudifyUiIsAvailable" class="track">管理Cloudify</a></li>
     <li class="important" ng-show="!!widgetStatus.instanceIsAvailable">Go to <a href="{{widgetStatus.consoleLink.url}}" class="track" target="_blank">{{widgetStatus.consoleLink.title}}</a></li>
     <!--<li class="important" ng-show="isCompleted()">Test drive successfully completed! <br/><a class='download_link successfully_completed_msg' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a></li>-->
 </ul>

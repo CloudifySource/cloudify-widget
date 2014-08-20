@@ -29,6 +29,14 @@ angular.module('WidgetApp', ['ngRoute','ngCookies']).config(function($routeProvi
             controller: 'UsersLoginCtrl',
             templateUrl: 'views/users/login.html'
         })
+        .when('/logins/custom', {
+            controller : 'LoginsCustomCtrl',
+            templateUrl : 'views/logins/custom.html'
+        })
+        .when('/logins/google/callback', {
+            controller : 'LoginsGoogleCallbackCtrl',
+            templateUrl :'views/logins/googleCallback.html'
+        })
         .when('/public/demo', {
             controller: 'PublicDemoCtrl',
             templateUrl : 'views/public/catalog.html'

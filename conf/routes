@@ -57,6 +57,11 @@ GET     /backend/cloudProviders/list                 controllers.Application.get
 
 GET     /backend/demo/widget/list           controllers.DemosController.listWidgetForDemoUserByEmail( email: String )
 
+
+POST    /backend/widget/login/custom            controllers.WidgetCustomLoginController.customLogin( widgetKey: String )
+GET     /backend/widget/login/google                controllers.WidgetGoogleLoginController.loginWithGoogle( widgetKey: String )
+GET     /backend/widget/login/google/callback/:widgetKey   controllers.WidgetGoogleLoginController.googleLoginCallback( widgetKey:String )
+
 # Widget
 
 GET      /widget/:instanceId/pem        controllers.Application.downloadPemFile( instanceId:String )
@@ -79,33 +84,14 @@ GET     /api/user/:userId/widgets                                   controllers.
 
 # Admin API
 
-
-
-
-
-
-
-
-
 GET     /widget/previewWidget           controllers.WidgetAdmin.previewWidget( apiKey:String )
 
 GET     /server/headers               	controllers.WidgetAdmin.headers
 GET     /widget/widget                  controllers.WidgetAdmin.getWidget( apiKey:String )
 
-GET     /widget/login/google/callback/:widgetKey   controllers.WidgetGoogleLoginController.googleLoginCallback( widgetKey:String )
-GET     /widget/login/google                controllers.WidgetGoogleLoginController.loginWithGoogle( widgetKey: String )
+
+
 GET     /widget/login/custom            controllers.Assets.at(path="/public/cloudify/pages/logins",file="custom.html")
-POST    /widget/login/custom            controllers.WidgetCustomLoginController.customLogin( widgetKey: String )
-
-
-
-
-
-
-
-#GET     /user/pool/manage              controllers.UserPoolController.getServerNodePoolPage( authToken:String, project:String, key:String, secretKey:String)
-#GET     /user/pool/manage/list         controllers.UserPoolController.getAllServers
-#GET     /user/pool/summary             controllers.UserPoolController.summary
 
 GET     /getInjectedScript              controllers.Application.getInjectScript( publicIp:String?="1.1.1.1", privateIp:String?="2.2.2.2" )
 
