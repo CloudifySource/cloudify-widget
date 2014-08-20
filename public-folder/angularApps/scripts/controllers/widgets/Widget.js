@@ -206,10 +206,16 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
 
         // guy - this is a hack until we give a better support to all login types and allow to combine different types.
         // currently we only allow one type in a string. google or custom.
-        if ( loginsString.indexOf('custom') >= 0){
-            loginsString = 'custom';
-        }else if ( loginsString.indexOf('google') >= 0 ){
-            loginsString = 'google';
+        try {
+            if ( !!loginsString ) {
+                if (loginsString.indexOf('custom') >= 0) {
+                    loginsString = 'custom';
+                } else if (loginsString.indexOf('google') >= 0) {
+                    loginsString = 'google';
+                }
+            }
+        } catch(e){
+            $log.info('unable to decide on login system.');
         }
         if ( !!loginsString && !$scope.loginDetails ){
             var size = popupWidths[loginsString];
