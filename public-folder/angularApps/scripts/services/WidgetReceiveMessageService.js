@@ -1,5 +1,5 @@
 'use strict';
-angular.module('WidgetApp').service('WidgetReceiveMessageService', function(  $log ){
+angular.module('WidgetApp').service('WidgetReceiveMessageService', function(  $log, $rootScope ){
     var handlers = {};
 
     function addMessageHandler(  ){
@@ -16,7 +16,13 @@ angular.module('WidgetApp').service('WidgetReceiveMessageService', function(  $l
                 if ( receivedObj.hasOwnProperty('name') && !!receivedObj.name ){
                     var name = receivedObj.name;
                     if ( handlers.hasOwnProperty( name )){
-                        handlers[name](receivedObj);
+                        $rootScope.$apply(function(){
+                            handlers[name](receivedObj);
+                            $rootScope.modified = new Date().getTime();
+                        });
+
+
+
                     }else{
                         $log.error('got an event with unknown name. I do not have a handler ' + name);
                     }

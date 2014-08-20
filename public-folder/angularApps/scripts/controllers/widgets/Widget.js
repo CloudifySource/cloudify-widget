@@ -5,6 +5,7 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
     var apiKey = $routeParams.widgetKey;
 
     var recipeProperties = null;
+    var advancedDataFromMessage = null;
 
 
     function _postMessage( data ){
@@ -14,10 +15,21 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         $window.parent.postMessage(data, /*$window.location.origin*/ '*');
     }
 
-
     WidgetReceiveMessageService.addHandler( 'widget_recipe_properties', function(event){
         $log.info('got new properties for widget', event.data);
         recipeProperties = event.data;
+    });
+
+    WidgetReceiveMessageService.addHandler( 'widget_advanced_data', function(event){
+        $log.info('got new advanced data for widget', event.data);
+        advancedDataFromMessage = event.data;
+    });
+
+    $scope.$watch(function () {
+        return advancedDataFromMessage;
+    }, function () {
+        $log.info('advnaced data from message changed', advancedDataFromMessage);
+        _setAdvanced(advancedDataFromMessage);
     });
 
     $window.$windowScope = $scope;
@@ -47,6 +59,10 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
 
     $scope.widgetStatus = {};
 
+
+    function _setAdvanced( value ){
+        $scope.advancedParams[$scope.cloudType] = value;
+    }
     function _getAdvanced(){
         return $scope.advancedParams[$scope.cloudType];
     }
@@ -517,7 +533,10 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         }catch(e){
             $log.info('unable to decide if share source active',e);
             return false;
+
         }
     };
+
+    _postMessage({name: 'widget_listening'});
 
 });

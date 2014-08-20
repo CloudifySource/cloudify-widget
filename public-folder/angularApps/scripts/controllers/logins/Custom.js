@@ -3,23 +3,24 @@
 
 angular.module('WidgetApp').controller('LoginsCustomCtrl', function ($scope, $location, $log, $routeParams, $http ) {
 
-    $log.info("loading controller");
+    $log.info('loading controller');
 
     $scope.widgetKey = $routeParams.widgetKey;
 
     function recoverLoginFromLocalStorage( ){
         try {
-            if (typeof(Storage) !== "undefined") {
-                if (localStorage.hasOwnProperty("customLogin"))
+            if (typeof(Storage) !== 'undefined') {
+                if (localStorage.hasOwnProperty('customLogin')) {
                     $scope.login = JSON.parse(localStorage.customLogin);
+                }
                 // Code for localStorage/sessionStorage.
-                localStorage.setItem("lastname", "Smith");
+                localStorage.setItem('lastname', 'Smith');
             }
         }catch(e){ $log.error('unable to recover login details', e);}
     }
 
     function saveLoginDetails(){
-        if ( typeof(Storage) !== "undefined" ){
+        if ( typeof(Storage) !== 'undefined' ){
             localStorage.customLogin = JSON.stringify($scope.login);
         }
     }
@@ -41,6 +42,6 @@ angular.module('WidgetApp').controller('LoginsCustomCtrl', function ($scope, $lo
 
         }, function( result ){
             $log.info('got error from backend', $scope.error = result.data);
-        })
+        });
     };
 });
