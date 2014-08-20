@@ -20,6 +20,7 @@ server{
 
     rewrite ^/$ $scheme://$host/public-folder/angularApps/index.html break;
     rewrite ^/public/angularApps/(.*) $scheme://$host/public-folder/angularApps/$1 break;
+    rewrite ^/d$                    $scheme://$host/public-folder/angularApps/index.html#/public/demo
 
     keepalive_timeout 70;
 
