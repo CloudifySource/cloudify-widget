@@ -17,5 +17,5 @@ angular.module('WidgetApp').directive('countdown', function ($timeout) {
 
             scope.$watch('deadline', update);
         }
-    }
+    };
 });

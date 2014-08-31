@@ -19,8 +19,8 @@ angular.module('WidgetApp')
 
                 scope.sections = [
                     {
-                    'id' : 'widgets',
-                    'label' : 'Widgets',
+                        'id' : 'widgets',
+                        'label' : 'Widgets',
                         'url' : '#/widgets/index'
                     },
                     {

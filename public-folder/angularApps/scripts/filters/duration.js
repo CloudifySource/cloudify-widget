@@ -1,5 +1,5 @@
 'use strict';
-angular.module('WidgetApp').filter( 'duration', function( $log ){
+angular.module('WidgetApp').filter( 'duration', function( ){
 
     function padding(number){
 
@@ -19,5 +19,5 @@ angular.module('WidgetApp').filter( 'duration', function( $log ){
         }
 
         return padding(Math.floor(millis / 60000)) + ':' + padding(Math.floor(millis / 1000 % 60));
-    }
+    };
 } );

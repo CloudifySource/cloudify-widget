@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('WidgetApp').controller('WidgetsIndexCtrl', function ($scope, WidgetsService, $log, $location, PoolService) {
+angular.module('WidgetApp').controller('WidgetsIndexCtrl', function ($scope, WidgetsService, $log, $location) {
     $log.info('loading controller');
 
     function load() {

@@ -130,7 +130,7 @@ angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $co
 
     this.sendInstallFinishedEmailTest = function( widget, details){
         return $http.post('/backend/widget/' + widget.id + '/testInstallFinishedEmail', details);
-    }
+    };
 
 
 });

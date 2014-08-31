@@ -1,7 +1,7 @@
 'use strict';
 angular.module('WidgetApp').service('PoolService', function ($http) {
 
-    var authToken = $.cookie('authToken');
+
 
     this.cleanPool = function(){
         return $http.post('/backend/application/pool/clean');
@@ -24,6 +24,6 @@ angular.module('WidgetApp').service('PoolService', function ($http) {
                 'publicIp' : publicIp || '1.1.1.1',
                 'privateIp' : privateIp || '2.2.2.2'
             }
-        })
+        });
     };
 });

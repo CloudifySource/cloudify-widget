@@ -48,7 +48,7 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
 
 
     $scope.$on('$locationChangeStart', function( e ){
-        if ( !!$scope.isDirty && myPath != $location.path() && myPath !== '/widgets/create') {
+        if ( !!$scope.isDirty && myPath !== $location.path() && myPath !== '/widgets/create') {
             if (!confirm('are you sure?')) {
                 e.preventDefault();
             }
@@ -140,13 +140,13 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
         $scope.widget = result.data;
         updateWidgetData(result.data);
 
-        $scope.$watch('widget', function( newValue, oldValue ){
+        $scope.$watch('widget', function( newValue/*, oldValue*/ ){
             if ( !!original ){
                 _setDirty( JSON.stringify(newValue) !== original );
             }else{
                 original = JSON.stringify($scope.widget);
             }
-        },true)
+        },true);
     }
 
     var loadRequest = null;
@@ -235,36 +235,36 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
         }
     },true);
 
-    $scope.saveWidget = function( widget, icon, isDone ){
+    $scope.saveWidget = function (widget, icon, isDone) {
         console.log(['saving widget', widget ]);
-        WidgetsService.saveWidget( widget, icon ).then( function( savedWidget ){
+        WidgetsService.saveWidget(widget, icon).then(function (savedWidget) {
                 toastr.success('widget saved successfully');
 
-            $scope.errors = null;
-            $scope.lastUpdated=new Date().getTime();
-            if ( !angular.isDefined(widget.id) || widget.id === null ){
-                // todo : test if we should override entire widget
-                widget.id = savedWidget.id;
-                widget.apiKey = savedWidget.apiKey;
-                widget.version = savedWidget.version;
+                $scope.errors = null;
+                $scope.lastUpdated = new Date().getTime();
+                if (!angular.isDefined(widget.id) || widget.id === null) {
+                    // todo : test if we should override entire widget
+                    widget.id = savedWidget.id;
+                    widget.apiKey = savedWidget.apiKey;
+                    widget.version = savedWidget.version;
 
-                updateWidgetData(widget.data);
+                    updateWidgetData(widget.data);
 
-                _setDirty( false );
-                $location.path('/widgets/' + savedWidget.id + '/edit')
-            }
-            if ( isDone ){
-                $location.path('/widgets/' + $scope.widget.id + '/preview');
-            }
-                _setDirty( false );
-        },function(result){
+                    _setDirty(false);
+                    $location.path('/widgets/' + savedWidget.id + '/edit');
+                }
+                if (isDone) {
+                    $location.path('/widgets/' + $scope.widget.id + '/preview');
+                }
+                _setDirty(false);
+            }, function (result) {
                 var formErrors = result.data;
-                for ( var i in formErrors ){
-                    if ( formErrors.hasOwnProperty(i)){
-                        toastr.error(formErrors[i],i);
+                for (var i in formErrors) {
+                    if (formErrors.hasOwnProperty(i)) {
+                        toastr.error(formErrors[i], i);
                     }
                 }
-                toastr.error('error while saving the widget','General');
+                toastr.error('error while saving the widget', 'General');
             }
         );
     };
@@ -276,7 +276,7 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
         },function( result ){
             toastr.error('error while sending email', result.data );
         });
-    }
+    };
 
 
 });

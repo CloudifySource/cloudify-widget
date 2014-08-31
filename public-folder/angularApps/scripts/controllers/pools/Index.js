@@ -10,9 +10,9 @@ angular.module('WidgetApp').controller('PoolsIndexCtrl', function ( $scope , $q,
             return;
         }
         else{
-            PoolService.cleanPool().then(function(result){
+            PoolService.cleanPool().then(function(/*result*/){
                 toastr.success('cleaned pool successfully. please wait a couple of minutes before you see machines are deleted');
-            }, function(result){
+            }, function(/*result*/){
                 toastr.error('error while cleaning the pool. please talk to admin');
             });
         }
