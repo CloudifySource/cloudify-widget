@@ -5,7 +5,7 @@ angular.module('WidgetApp').service('i18n', function ($http, $rootScope) {
     var option = {
         lng: 'en',
         fallbackLng: 'en',
-        resGetPath: '/public-folder/js/i18next/dicts/__ns__-__lng__.json'
+        resGetPath: '/public-folder/translations/__ns__-__lng__.json'
     };
 
     function init() {

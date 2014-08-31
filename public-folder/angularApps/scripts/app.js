@@ -7,15 +7,20 @@ angular.module('WidgetApp', ['ngRoute','ngCookies']).config(function($routeProvi
         })
         .when('/widgets/create', {
             controller: 'WidgetsEditCtrl',
-            templateUrl: 'views/widgets/edit.html'
+            templateUrl: 'views/widgets/edit.html',
+            reloadOnSearch: false
         })
         .when('/widgets/:widgetId/edit', {
             controller: 'WidgetsEditCtrl',
-            templateUrl: 'views/widgets/edit.html'
+            templateUrl: 'views/widgets/edit.html',
+            reloadOnSearch: false
         })
         .when('/widgets/index', {
             controller: 'WidgetsIndexCtrl',
-            templateUrl: 'views/widgets/index.html'
+            templateUrl: 'views/widgets/index.html',
+            resolve: {
+                section : function() { return 'widgets'; }
+            }
         })
         .when('/widgets/:widgetId/preview', {
             controller: 'WidgetsPreviewCtrl',
@@ -36,6 +41,19 @@ angular.module('WidgetApp', ['ngRoute','ngCookies']).config(function($routeProvi
         .when('/logins/google/callback', {
             controller : 'LoginsGoogleCallbackCtrl',
             templateUrl :'views/logins/googleCallback.html'
+        })
+        .when('/configuration', {
+            templateUrl : 'views/configuration/index.html',
+            resolve: {
+                section : function() { return 'configuration'; }
+            }
+        })
+        .when('/pool', {
+            templateUrl : 'views/pool/index.html',
+            controller : 'PoolsIndexCtrl',
+            resolve: {
+                section : function() { return 'pool'; }
+            }
         })
         .when('/public/demo', {
             controller: 'PublicDemoCtrl',

@@ -1,0 +1,30 @@
+<div class="control-group" ng-repeat="login in logins">
+    <label class="control-label" for="theme">{{login.label}}</label>
+    <div class="controls" >
+        <input type="checkbox"  ng-model="login.selected"/>
+    </div>
+</div>
+
+<strong>MailChimp Details</strong>
+
+
+<div form-field title="API Key" value="widget.mailChimpDetails.apiKey" required="false" type="text"></div>
+<div form-field title="List ID" value="widget.mailChimpDetails.listId" required="false" type="text"></div>
+<div form-field title="Enabled" value="widget.mailChimpDetails.enabled" required="false" type="checkbox"></div>
+
+
+<strong>Send email after install</strong>
+
+<div>
+    This feature relies on the login the users did.
+</div>
+
+<div form-field title="Enabled" value="widget.installFinishedEmailDetails.enabled" required="false" type="checkbox"></div>
+<div form-field title="API Key" value="widget.installFinishedEmailDetails.mandrillDetails.mandrillApiKey" required="false" type="password"></div>
+<div form-field title="Template Name" value="widget.installFinishedEmailDetails.mandrillDetails.templateName" required="false" type="text"></div>
+
+
+<strong>Test Email</strong>
+<div form-field title="Name" value="testEmail.name" required="false" type="text"></div>
+<div form-field title="Email" value="testEmail.email" required="false" type="text"></div>
+<button ng-click="runEmailTest(widget, testEmail)">Run Text</button>

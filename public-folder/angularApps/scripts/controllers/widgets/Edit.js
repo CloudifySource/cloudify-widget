@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, WidgetsService, $log, $location, $routeParams  ){
+angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, WidgetsService, $log, $location, $route,  $routeParams  ){
     $log.info('loading controller');
 
     $scope.logins = [
@@ -15,6 +15,57 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
             'selected' : false
         }
     ];
+
+
+    $scope.navitems = [
+        {
+            'id' : 'general' ,
+            'label' : 'General'
+        },{
+            'id' : 'icon' ,
+            'label' : 'Icon'
+        },{
+            'id' : 'description' ,
+            'label' : 'Description'
+        },
+
+        {
+            'id':'data',
+            'label' : 'Data'
+        },
+        {
+            'id' : 'login',
+            'label' : 'Login'
+        },
+        {
+            'id' : 'cloudProvider',
+            'label' : 'Cloud Provider'
+        }
+    ];
+
+    var myPath = $location.path();
+
+
+
+    $scope.$on('$locationChangeStart', function( e ){
+        if ( !!$scope.isDirty && myPath != $location.path() && myPath !== '/widgets/create') {
+            if (!confirm('are you sure?')) {
+                e.preventDefault();
+            }
+        }
+    });
+
+    $scope.navigateTo = function(item){
+        $location.search('section', item.id);
+//        $scope.currentSection = item;
+    };
+
+    function _doNavigation () {
+        $scope.currentSection = _.find($scope.navitems, {'id': $routeParams.section || 'general'});
+    }
+    $scope.$watch( function(){ return $routeParams.section; },  _doNavigation );
+    _doNavigation();
+
 
     $scope.$watch('logins', function(){
         if ( !$scope.logins || $scope.logins.length === 0 ){
@@ -68,17 +119,44 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
             $scope.widgetData.socialSources = [];
         }
         WidgetsService.shareSources.updateSocialSources($scope.widgetData.socialSources);
-
-
     }
 
+    updateWidgetData($scope.widget);
+
+
+    var original = null;
+
+    $scope.$watch('isDirty', function(newValue){
+        if ( newValue === false ){
+            original = JSON.stringify($scope.widget);
+        }
+    });
+
+    function _setDirty( value ){
+        $scope.isDirty = value;
+    }
+
+    function onWidgetLoad( result ){
+        $scope.widget = result.data;
+        updateWidgetData(result.data);
+
+        $scope.$watch('widget', function( newValue, oldValue ){
+            if ( !!original ){
+                _setDirty( JSON.stringify(newValue) !== original );
+            }else{
+                original = JSON.stringify($scope.widget);
+            }
+        },true)
+    }
+
+    var loadRequest = null;
     if ( !!$routeParams.widgetId ){
-        WidgetsService.getWidget( $routeParams.widgetId).then(function(result){
-            updateWidgetData(result.data);
-            $scope.widget = result.data;
-
-        });
+        loadRequest = WidgetsService.getWidget( $routeParams.widgetId);
+    }else{
+        loadRequest = WidgetsService.getWidgetDefaultValues();
     }
+
+    loadRequest.then(onWidgetLoad);
 
     $scope.$watch('widgetData', function(){
         $log.info('updating widget data', $scope.widgetData );
@@ -96,7 +174,7 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
     $scope.$watch(function(){return [$scope.widget,$scope.logins];}, function(){
         if ( !!$scope.widget && !!$scope.logins ){
             try{
-                var logins = $scope.widget.loginsString.split(',');
+                var logins = $scope.widget.loginsString && $scope.widget.loginsString.split(',') || '';
                 _.each( logins, function(item){
 
                     var scopeLogin = _.find($scope.logins, {'id' : item });
@@ -160,24 +238,45 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
     $scope.saveWidget = function( widget, icon, isDone ){
         console.log(['saving widget', widget ]);
         WidgetsService.saveWidget( widget, icon ).then( function( savedWidget ){
+                toastr.success('widget saved successfully');
+
             $scope.errors = null;
             $scope.lastUpdated=new Date().getTime();
-            if ( !angular.isDefined(widget.id)){
+            if ( !angular.isDefined(widget.id) || widget.id === null ){
                 // todo : test if we should override entire widget
                 widget.id = savedWidget.id;
                 widget.apiKey = savedWidget.apiKey;
                 widget.version = savedWidget.version;
 
                 updateWidgetData(widget.data);
+
+                _setDirty( false );
+                $location.path('/widgets/' + savedWidget.id + '/edit')
             }
             if ( isDone ){
                 $location.path('/widgets/' + $scope.widget.id + '/preview');
             }
+                _setDirty( false );
         },function(result){
-                $scope.errros = result.data;
+                var formErrors = result.data;
+                for ( var i in formErrors ){
+                    if ( formErrors.hasOwnProperty(i)){
+                        toastr.error(formErrors[i],i);
+                    }
+                }
+                toastr.error('error while saving the widget','General');
             }
         );
     };
+
+
+    $scope.runEmailTest = function(widget, testEmail){
+        WidgetsService.sendInstallFinishedEmailTest( widget, testEmail).then(function(){
+            toastr.success('email was sent successfully');
+        },function( result ){
+            toastr.error('error while sending email', result.data );
+        });
+    }
 
 
 });

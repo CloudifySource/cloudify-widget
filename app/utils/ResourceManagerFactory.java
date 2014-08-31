@@ -26,13 +26,6 @@ public class ResourceManagerFactory {
         return result;
     }
 
-    public WidgetResourcesUtils.ResourceManager getCloudProviderManager( ServerNode serverNode, String url  ){
-        WidgetResourcesUtils.ResourceManager result = new WidgetResourcesUtils.ResourceManager();
-        result.setBaseDir( conf.resources.cloudProvidersBaseDir.getAbsolutePath() );
-        result.setUid( serverNode.getWidget().getApiKey() );
-        result.setUrl( url);
-        return result;
-    }
 
     public WidgetResourcesUtils.ResourceManager getCloudProviderManager( Widget widget  ){
         WidgetResourcesUtils.ResourceManager result = new WidgetResourcesUtils.ResourceManager();

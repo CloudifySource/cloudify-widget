@@ -166,6 +166,7 @@ public class ServerConfig {
         public String urlEndpoint = "s3.amazonaws.com";
         public String recipeDownloadMethod = "wget";
         public String installNode = "false";
+        public String serverNodePasswordRegex = "[a-zA-Z0-9]";
         public String recipeRelativePath;
         public File prebootstrapScript = Utils.getFileByRelativePath("/conf/cloudify/prebootstrap");
 
@@ -219,7 +220,7 @@ public class ServerConfig {
         public String cloudifyEscDirRelativePath = "clouds";
         public String existingManagementMachinePrefix = "cloudify-manager";
         @Config( ignoreNullValues =  true )
-        public boolean removeCloudFolder; // used in dev environment to see the configuration in case it got corrupted.
+        public boolean removeCloudFolder = true; // used in dev environment to see the configuration in case it got corrupted.
 
         public String hardwareId(){
             return zoneName + "/" + hardwareId;

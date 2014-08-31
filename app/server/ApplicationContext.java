@@ -34,6 +34,7 @@ import beans.HmacImpl;
 import beans.config.Conf;
 import beans.tasks.DestroyServersTask;
 import bootstrap.InitialData;
+import services.IWidgetInstallFinishedSender;
 import utils.ResourceManagerFactory;
 
 import java.util.Collection;
@@ -70,6 +71,7 @@ public class ApplicationContext
     @Inject private IExecutionRestore restoreExecutionService;
     @Inject private IServerApiFactory serverApiFactory;
     @Inject private ResourceManagerFactory resourceManagerFactory;
+    @Inject private IWidgetInstallFinishedSender widgetInstallFinishedSender;
 
     @Inject private static org.springframework.context.ApplicationContext applicationContext;
 
@@ -205,27 +207,6 @@ public class ApplicationContext
         this.destroyServersTask = destroyServersTask;
     }
 
-    public ICloudBootstrapDetails getCloudBootstrapDetails( CloudProvider cloudProvider  ){
-        ICloudBootstrapDetails result = null;
-        switch( cloudProvider ){
-
-            case HP:
-                break;
-            case AWS_EC2:
-
-                break;
-            case SOFTLAYER:
-                result = new SoftlayerCloudBootstrapDetails();
-                break;
-            case NA:
-                break;
-        }
-        if ( result == null ){
-            throw new RuntimeException("cloud provider not supported by backend [" +  cloudProvider + "]");
-        }
-        return result;
-    }
-
     public void setApplicationContext(org.springframework.context.ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
@@ -256,6 +237,10 @@ public class ApplicationContext
 
     public void setResourceManagerFactory(ResourceManagerFactory resourceManagerFactory) {
         this.resourceManagerFactory = resourceManagerFactory;
+    }
+
+    public IWidgetInstallFinishedSender getWidgetInstallFinishedSender(){
+        return widgetInstallFinishedSender;
     }
 }
 

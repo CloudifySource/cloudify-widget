@@ -16,7 +16,6 @@ object ApplicationBuild extends Build {
       "commons-collections" % "commons-collections" % "3.0"   ,
       "org.apache.commons" % "commons-exec" % "1.1"  ,
       "commons-configuration" % "commons-configuration" % "1.9",
-
       springPackage % "spring-context" % springVersion,
       springPackage % "spring-core" % springVersion,
       springPackage % "spring-beans" % springVersion,
@@ -28,9 +27,8 @@ object ApplicationBuild extends Build {
       "commons-validator" % "commons-validator" % "1.4.0",
       "mysql" % "mysql-connector-java" % "5.1.18"  ,
       "commons-lang" % "commons-lang" % "2.3",
-      "com.mixpanel" % "mixpanel-java" % "1.0.1",
+
       "org.openid4java" % "openid4java" % "0.9.7",
-      "org.jasypt" % "jasypt" % "1.9.0",
       "org.apache.commons" % "commons-email" % "1.2",
 
 

@@ -26,6 +26,7 @@ import beans.scripts.ScriptFilesUtilities;
 import cloudify.widget.api.clouds.*;
 import cloudify.widget.cli.ICloudBootstrapDetails;
 import cloudify.widget.cli.ICloudifyCliHandler;
+import cloudify.widget.common.StringUtils;
 import cloudify.widget.common.WidgetResourcesUtils;
 import cloudify.widget.common.asyncscriptexecutor.IAsyncExecution;
 import models.ServerNode;
@@ -44,7 +45,6 @@ import server.ServerBootstrapper;
 import server.exceptions.ServerException;
 import utils.CollectionUtils;
 import utils.ResourceManagerFactory;
-import utils.StringUtils;
 import utils.Utils;
 
 import javax.inject.Inject;
@@ -133,7 +133,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                 final CloudServerApi finalCloudServerApi = cloudServerApi;
                  CloudServer server = cloudServerApi.get( createdServer.getId() );
                 ServerNode tmpNode = new ServerNode( server );
-
+                tmpNode.setRandomPassword(StringUtils.generateRandomFromRegex(ApplicationContext.get().conf().server.bootstrap.serverNodePasswordRegex));
                 final ActiveWait wait = new ActiveWait();
 
          wait
@@ -222,11 +222,6 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             return;
         }
         logger.info("destroying server [{}]", serverNode);
-        try{
-            deleteServer(serverNode.getNodeId());
-        }catch(Exception e){
-            logger.info("unable to delete. perhaps this node will remain on the cloud. need to remove manually.");
-        }
 
         try{
             logger.info("reading script from file [{}]", bootstrapConf.teardownScript);
@@ -235,6 +230,14 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         }catch(Exception e){
             logger.info("unable to teardown.",e);
         }
+
+        try{
+            deleteServer(serverNode.getNodeId());
+        }catch(Exception e){
+            logger.info("unable to delete. perhaps this node will remain on the cloud. need to remove manually.");
+        }
+
+
 
         if ( serverNode.getId() != null ){
             logger.info("deleting serverNode");
@@ -309,25 +312,27 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
         logger.info("creating cloud provider for [{}]", serverNode.toDebugString());
         try {
-            String advancedParams = serverNode.getAdvancedParams();
 
-
-            ICloudBootstrapDetails bootstrapDetails = ApplicationContext.get().getCloudBootstrapDetails( serverNode.getWidget().cloudProvider );
+            ICloudBootstrapDetails bootstrapDetails = serverNode.getExecutionDataModel().getCloudBootstrapDetails( serverNode.getWidget().cloudProvider );
 
             if ( serverNode.getWidget().hasCloudProviderData() ){
                 try {
 
                     CloudProvider provider = Json.fromJson(serverNode.getWidget().getCloudProvideJson(), CloudProvider.class);
-                    WidgetResourcesUtils.ResourceManager cloudProviderManager = resourceManagerFactory.getCloudProviderManager(serverNode, provider.url );
-
-                    if ( !cloudProviderManager.isExtracted() ){
-                        cloudProviderManager.download();
-                        cloudProviderManager.extract();
-                    }
-
+                    WidgetResourcesUtils.ResourceManager cloudProviderManager = resourceManagerFactory.getCloudProviderManager( serverNode.getWidget() );
                     String baseDir = ApplicationContext.get().conf().resources.cloudProvidersBaseDir.getAbsolutePath();
                     File myCloudDirCopy = new File(baseDir, "server_node_" + serverNode.getId() );
-                    cloudProviderManager.copy( myCloudDirCopy );
+                    if ( serverNode.getWidget().isAutoRefreshProvider() ){
+                        cloudProviderManager.copyFresh( myCloudDirCopy );
+                    }else{
+                        cloudProviderManager.copyFromCache(myCloudDirCopy);
+                    }
+
+                    if ( !StringUtils.isEmptyOrSpaces(serverNode.getWidget().cloudProviderRootDir) ){
+                        myCloudDirCopy = new File(myCloudDirCopy,serverNode.getWidget().cloudProviderRootDir );
+                    }
+
+                    logger.info("using folder [{}] as cloud provider", myCloudDirCopy);
 
 
                     File myCloudRoot = myCloudDirCopy;
@@ -359,9 +364,6 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
             }
 
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode parse = Json.parse(advancedParams);
-            mapper.readerForUpdating(bootstrapDetails).readValue(parse.get("params"));
             cliHandler.writeBootstrapProperties(bootstrapDetails);
 
             logger.info("cloud bootstrap cloud directory is [{}]", bootstrapDetails.getCloudDirectory() );
@@ -434,7 +436,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 		{
 
             logger.info("Starting bootstrapping for server:{} " , server );
-            String script = getInjectedBootstrapScript( server.getPublicIP(), server.getPrivateIP());
+            String script = getInjectedBootstrapScript( server.getPublicIP(), server.getPrivateIP(), server.getRandomPassword() );
 
 			CloudExecResponse response = cloudServerApi.runScriptOnMachine( script, server.getPublicIP(), null );
 
@@ -456,7 +458,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 	}
 
     @Override
-    public String getInjectedBootstrapScript(String publicIp, String privateIp) {
+    public String getInjectedBootstrapScript(String publicIp, String privateIp, String randomPassword) {
         try {
             String prebootstrapScript = "";
 
@@ -476,6 +478,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             logger.info("reading script from file [{}]", bootstrapConf.script);
             String script = FileUtils.readFileToString(bootstrapConf.script);
             script = script.replace("##publicip##", publicIp)
+                    .replace("##randomPassword##", randomPassword)
                     .replace("##privateip##", privateIp)
                     .replace("##recipeUrl##", bootstrapConf.recipeUrl)
                     .replace("##cloudifyUrl##", bootstrapConf.cloudifyUrl)

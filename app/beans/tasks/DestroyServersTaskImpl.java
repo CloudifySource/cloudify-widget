@@ -35,7 +35,7 @@ public class DestroyServersTaskImpl implements DestroyServersTask {
         List<ServerNode> all = ServerNode.findByCriteria( new ServerNode.QueryConf().criteria().setRemote(false).done() );
         for (ServerNode serverNode : all) {
             logger.debug("checking to see if server [{}] expired", serverNode.toDebugString());
-            if (serverNode.isExpired()) {
+            if (serverNode.isExpired() || serverNode.isStopped() ) {
                 DestroySingleServerTask task = new DestroySingleServerTask().setServerNode(serverNode).setServerPool(serverPool);
                 Akka.system().scheduler().scheduleOnce(Duration.create(0, TimeUnit.MILLISECONDS), task);
             } else {

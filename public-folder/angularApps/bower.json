@@ -10,6 +10,7 @@
     "i18next": "~1.7.3",
     "jquery-cookie": "~1.4.1",
     "lodash": "~2.4.1",
-    "font-awesome": "~4.1.0"
+    "font-awesome": "~4.1.0",
+    "toastr": "~2.0.3"
   }
 }

@@ -235,13 +235,17 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         resetWidgetStatus();
         $scope.widgetStatus.state = play;
 
-        var requestData = {};
+        var requestData = { 'executionData' : {} };
         if ( !!_hasAdvanced() ){
-            requestData.advancedData = _getAdvanced();
+            requestData.executionData.advancedData = _getAdvanced();
         }
 
         if ( !!recipeProperties ){
-            requestData.recipeProperties = recipeProperties;
+            requestData.executionData.recipeProperties = recipeProperties;
+        }
+
+        if ( !!$scope.loginDetails ){
+            requestData.executionData.loginDetails = $scope.loginDetails;
         }
 
 

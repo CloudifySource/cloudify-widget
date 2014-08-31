@@ -20,18 +20,21 @@ import java.util.List;
 
 import javax.persistence.*;
 
-import cloudify.widget.api.clouds.CloudProvider;
+import cloudify.widget.allclouds.executiondata.ExecutionDataModel;
+
 import cloudify.widget.api.clouds.CloudServer;
 import cloudify.widget.api.clouds.ServerIp;
+import cloudify.widget.common.StringUtils;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import play.cache.Cache;
 import play.db.ebean.Model;
-import play.libs.Json;
+
+import server.ApplicationContext;
 import utils.CollectionUtils;
-import utils.StringUtils;
+
 
 import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Junction;
@@ -65,6 +68,9 @@ extends Model
 
     @OneToOne
     private Lead lead;
+
+    @JsonIgnore
+    public String randomPassword;
 
 
     private Long busySince;
@@ -105,12 +111,15 @@ extends Model
 
     @Version
     private long version = 0;
-    
-    @Lob
-    public String advancedParams = null;
 
+
+    // a free text json to all execution relevant data
+    // for example
+    // - advancedParams
+    // - properties
+    // - prebootstrapData (image sharing on aws).
     @Lob
-    public String recipeProperties = null;
+    public String executionData = null;
 
 
     @OneToOne( cascade = CascadeType.REMOVE)
@@ -132,6 +141,7 @@ extends Model
 
 	public ServerNode( CloudServer srv )
 	{
+
 		this.serverId  = srv.getId();
         ServerIp serverIp = srv.getServerIp();
         publicIP = serverIp.publicIp;
@@ -162,30 +172,6 @@ extends Model
 	{
 		return publicIP;
 	}
-    
-    public String getAdvancedParams(){
-    	return advancedParams;
-    }
-
-    public String getRecipeProperties(){
-        return recipeProperties;
-    }
-    
-	public void setAdvancedParams(String text) {
-		// TODO Auto-generated method stub
-		advancedParams = text;
-	}
-
-    public void setRecipeProperties( String text ){ recipeProperties = text; }
-	
-	public CloudProvider getCloudProvider(){
-		String typeStr = Json.parse( advancedParams ).get( "type" ).asText();
-		return CloudProvider.findByLabel( typeStr );
-	}
-    
-    public boolean hasAdvancedParams(){
-    	return !StringUtils.isEmptyOrSpaces(advancedParams); 
-    }    
 
 	public void setPublicIP(String publicIP) {
 		this.publicIP = publicIP;
@@ -335,6 +321,30 @@ extends Model
         return asyncBootstrapStart;
     }
 
+    public String getExecutionData() {
+        return executionData;
+    }
+
+    public void setExecutionData(String executionData) {
+        this.executionData = executionData;
+    }
+
+    @JsonIgnore
+    public ExecutionDataModel getExecutionDataModel(){
+        ExecutionDataModel result = new ExecutionDataModel();
+        result.setEncryptionKey(ApplicationContext.get().conf().applicationSecret);
+        result.decrypt( executionData );
+        return result;
+    }
+
+    public String getRandomPassword() {
+        return randomPassword;
+    }
+
+    public void setRandomPassword(String randomPassword) {
+        this.randomPassword = randomPassword;
+    }
+
     public void setAsyncBootstrapStart(Date asyncBootstrapStart) {
         this.asyncBootstrapStart = asyncBootstrapStart;
     }
@@ -361,7 +371,6 @@ extends Model
                 ", publicIP='" + publicIP + '\'' +
                 ", privateIP='" + privateIP + '\'' +
                 ", busySince=" + busySince +
-                ", advancedParams=" + advancedParams +
                 ", remote=" + remote +
                 ", widget=" + widget +
                 ", widgetInstance=" + widgetInstance +

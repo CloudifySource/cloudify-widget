@@ -20,7 +20,7 @@ angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $co
 
 
     this.getWidgets = function( ){
-        console.log(['getting all widgets', authToken]);
+        $log.info(['getting all widgets', authToken]);
         return $http({
             'method': 'GET',
             'url' : '/backend/widget/list',
@@ -29,6 +29,10 @@ angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $co
 
             }
         });
+    };
+
+    this.getWidgetDefaultValues = function(){
+        return $http.get('/backend/widget/defaultValues');
     };
 
 
@@ -41,6 +45,7 @@ angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $co
             }
         });
     };
+
 
     this.getWidgetByKey = function( widgetKey ){
         return $http({
@@ -121,6 +126,11 @@ angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $co
             return $.post('/backend/widget/' + instanceId + '/stop?apiKey=' + apiKey);
         }
     };
+
+
+    this.sendInstallFinishedEmailTest = function( widget, details){
+        return $http.post('/backend/widget/' + widget.id + '/testInstallFinishedEmail', details);
+    }
 
 
 });

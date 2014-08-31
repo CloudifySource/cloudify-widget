@@ -1,0 +1,45 @@
+<div form-field title="Auto Refresh Cloud Provider" value="widget.autoRefreshProvider" required="false" tooltip="should we download a new provider each time?" type="checkbox"></div>
+<div form-field title="Cloud Provider URL" value="widget.cloudProviderUrl" required="false" tooltip="the url for a zip file" type="text"></div>
+<div form-field title="Cloud Provider Root Dir" value="widget.cloudProviderRootDir" required="false" tooltip="path inside the zip file to the directory" type="text"></div>
+
+<!-- there is lack of correlation between cloud provider and cloud name conventions,
+
+since the widget has 2 meaning for cloud provider.
+
+One we use to know which credentials fields to expose in the front-end, which steps to do before bootstrap
+(such as create private key in ec2) and such,
+
+while cloud name, is the name of the folder under "clouds" in cloudify.
+
+
+-->
+
+<div class="control-group">
+    <label class="control-label" for="locale">Cloud Name<abbr class="required_mark" ng-show="required">*</abbr></label>
+    <div class="controls">
+        <select name="locale" id="cloudName" ng-model="widget.cloudName" ng-options="name for name in cloudNames"></select>
+        <br/>
+        For solo - which cloudify cloud provider should we use? a list of built in types is given
+    </div>
+</div>
+
+
+<div class="control-group">
+    <label class="control-label" for="locale">Cloud Provider<abbr class="required_mark" ng-show="required">*</abbr></label>
+    <div class="controls">
+        <select name="locale" id="cloudProvider" ng-model="widget.cloudProvider" ng-options="provider for provider in cloudProviders"></select>
+        <br/>
+        Used for the flow we will use in solo scenario
+    </div>
+</div>
+
+        <h1> AWS Image Sharing </h1>
+        <div>
+            this section is in case you are running widget for EC2 and need to share an image.<br/>
+            leave this section blank if it is not relevant to you.
+        </div>
+
+
+<div form-field title="AWS Image API Key" value="widget.awsImageShare.apiKey" required="false" tooltip="api key for image owner" type="text"></div>
+<div form-field title="AWS Image API Secret Key" value="widget.awsImageShare.apiSecretKey" required="false" tooltip="api secret key for image owner" type="password"></div>
+<div form-field title="Default AWS Image Id" value="widget.awsImageShare.imageId" required="false" tooltip="default image id. can be overridden from front-end api" type="text"></div>

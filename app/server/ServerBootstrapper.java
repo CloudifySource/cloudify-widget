@@ -76,7 +76,7 @@ public interface ServerBootstrapper
      * @param privateIp
      * @return
      */
-    public String getInjectedBootstrapScript(String publicIp, String privateIp);
+    public String getInjectedBootstrapScript(String publicIp, String privateIp, String randomPassword);
 
 
 

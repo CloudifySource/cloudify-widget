@@ -18,6 +18,7 @@
     <!--<bean id="widgetServer" class="mocks.WidgetServerMock"/>-->
     <!--<bean id="mailSender" class="mocks.MailSenderMock"/>-->
     <!--<bean id="initialData" class="mocks.MockInitialData"/>-->
+    <bean id="widgetInstallFinishedSender" class="services.WidgetInstallFinishedSenderMock"/>
 
     <!--<bean id="cloudServerApi" class="cloudify.widget.softlayer.SoftlayerCloudServerApi"/>-->
 

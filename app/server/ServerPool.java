@@ -42,4 +42,8 @@ public interface ServerPool
     // pool should check if it is full or not and act appropriately.
 
     public void runHealthCheck();
+
+    public void clearPool();
+
+    public Object getPoolNodesByStatus();
 }

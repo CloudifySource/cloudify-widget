@@ -1,0 +1,87 @@
+<div class="layout" id="pool-page">
+    <div class="pool-status-section-title">
+        Pool Status
+        <div class="pool-status-section-subtitle">
+            next update in :  <span countdown deadline="nextUpdate"></span> milliseconds
+        </div>
+    </div>
+
+    <div class="pool-status-section">
+
+        <div class="pool-status-overview">
+            <div class="pool-status-overview-item">
+                <div class="pool-status-overview-item-value">{{poolStatus.nonBusyServers}}</div>
+                <div class="pool-status-overview-item-label">free</div>
+            </div >
+            <div class="pool-status-overview-item">
+                <div class="pool-status-overview-item-value">{{poolStatus.busyServers}}</div>
+                <div class="pool-status-overview-item-label">occupied</div>
+            </div>
+            <div class="pool-status-overview-item">
+                <div class="pool-status-overview-item-value">{{poolStatus.undergoingBootstrap}}</div>
+                <div class="pool-status-overview-item-label">undergoing process</div>
+            </div>
+        </div>
+    </div>
+    <div class="clean-pool bg-info">
+        <div class="title">Cleaning the pool - THIS FEATURE IS NOT FULLY TESTED YET!</div>
+        <div class="content">
+            By clicking 'clean the pool' button you will empty your pool.<br/>
+            All machines will be marked as occupied and stopped immediately.<br/>
+            It will take time until new machines will be available in the pool assuming bootstrap works properly<br/>
+            This process happens asynchronously so you might not see immediate results<br/>
+            <br/>
+            Also, this might miss machines that are currently being created and bootstrapped. <br/>
+            Please make sure manually that we got all machines. <br/>
+            <br/>
+            <button ng-click="cleanPool()">Clean Pool</button>
+        </div>
+    </div>
+
+    <div class="page-content">
+    <h1> Pool Nodes </h1>
+    <h2> Free Nodes </h2>
+
+
+        <table class="table table-bordered table-striped">
+            <tr>
+                <td>Node ID</td>
+                <td>Public IP</td>
+            </tr>
+            <tr ng-repeat="node in poolNodes.free">
+                <td>
+                    {{node.id}}
+                </td>
+                <td>
+                    {{node.ip}}
+                </td>
+            </tr>
+        </table>
+
+
+         <h2> Occupied Nodes </h2>
+        <table class="table table-bordered table-striped">
+            <tr>
+                <td>Node ID</td>
+                <td>Public IP</td>
+                <td>Time Left</td>
+            </tr>
+            <tr ng-class="{'stopped' : node.stopped}" ng-repeat="node in poolNodes.occupied">
+                <td>
+                    {{node.id}}
+                </td>
+                <td>
+                    {{node.ip}}
+                </td>
+                <td>
+                    {{node.timeLeft|duration}}
+                </td>
+            </tr>
+        </table>
+        <h1> Bootstrap Script </h1>
+
+        <pre>{{bootstrapScript}}</pre>
+    </div>
+
+
+</div>

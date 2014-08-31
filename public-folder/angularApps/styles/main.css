@@ -285,28 +285,6 @@ td.action_col {
 .code {
   cursor: text !important; }
 
-#dashboard .pool-status-section-title {
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  padding: 20px; }
-#dashboard .pool-status-section {
-  display: table;
-  width: 400px;
-  margin: 0 auto;
-  text-align: center;
-  color: red; }
-  #dashboard .pool-status-section .pool-status-overview {
-    display: table-row; }
-    #dashboard .pool-status-section .pool-status-overview .pool-status-overview-item {
-      display: table-cell; }
-      #dashboard .pool-status-section .pool-status-overview .pool-status-overview-item .pool-status-overview-item-value {
-        font-size: 47px;
-        line-height: 40px;
-        width: 100px; }
-      #dashboard .pool-status-section .pool-status-overview .pool-status-overview-item .pool-status-overview-item-label {
-        width: 100px; }
-
 @-webkit-keyframes rotate {
   from {
     -webkit-transform: rotate(0deg); }
@@ -703,8 +681,17 @@ td.action_col {
       line-height: 26px;
       vertical-align: bottom; }
 
-#social-source-form-section input[type=checkbox] {
+#editWidget #social-source-form-section input[type=checkbox] {
   vertical-align: top; }
+#editWidget .explanation {
+  margin-left: 180px;
+  width: 300px;
+  margin-bottom: 20px; }
+#editWidget .navigation .nav li {
+  padding: 20px;
+  cursor: pointer; }
+  #editWidget .navigation .nav li:hover, #editWidget .navigation .nav li.active {
+    background: #CECECE; }
 
 #publicDemo {
   height: 100%;
@@ -858,3 +845,43 @@ div.custom-login {
     div.custom-login .custom-form input[type=submit] {
       margin-top: 10px;
       width: 220px; }
+
+#pool-page .pool-status-section-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 20px; }
+  #pool-page .pool-status-section-title .pool-status-section-subtitle {
+    font-size: 13px;
+    font-weight: normal; }
+#pool-page .pool-status-section {
+  display: table;
+  width: 400px;
+  margin: 0 auto;
+  text-align: center; }
+  #pool-page .pool-status-section .pool-status-overview {
+    display: table-row; }
+    #pool-page .pool-status-section .pool-status-overview .pool-status-overview-item {
+      display: table-cell; }
+      #pool-page .pool-status-section .pool-status-overview .pool-status-overview-item .pool-status-overview-item-value {
+        font-size: 47px;
+        line-height: 40px;
+        width: 100px; }
+      #pool-page .pool-status-section .pool-status-overview .pool-status-overview-item .pool-status-overview-item-label {
+        width: 100px; }
+#pool-page .bg-info {
+  background: #d9edf7;
+  padding: 20px; }
+#pool-page .clean-pool {
+  width: 800px;
+  margin: 0 auto; }
+  #pool-page .clean-pool .title {
+    font-weight: bold; }
+#pool-page .page-content {
+  width: 1100px;
+  margin: 0 auto; }
+#pool-page table .stopped, #pool-page table .stopped td {
+  background: red; }
+
+.base-layout .nav li.active a {
+  background: #676767; }

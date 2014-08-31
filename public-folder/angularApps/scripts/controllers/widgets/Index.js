@@ -5,10 +5,6 @@ angular.module('WidgetApp').controller('WidgetsIndexCtrl', function ($scope, Wid
 
     function load() {
 
-        PoolService.getStatus().then(function (result) {
-            $scope.poolStatus = result.data;
-        });
-
         WidgetsService.getWidgets().then(function (result) {
             $scope.widgets = result.data;
 
@@ -17,6 +13,8 @@ angular.module('WidgetApp').controller('WidgetsIndexCtrl', function ($scope, Wid
             }
         });
     }
+
+
 
     load();
 
