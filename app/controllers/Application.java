@@ -488,8 +488,13 @@ public class Application extends Controller
         String email = jsonNode.get("email").getTextValue();
         String password = jsonNode.get("password").getTextValue();
         User authenticated = User.authenticate(email, password);
-        session("authToken", authenticated.getAuthToken());
-        return ok();
+        if ( authenticated != null ) {
+            session("authToken", authenticated.getAuthToken());
+            return ok();
+        }else{
+            return  badRequest();
+        }
+
 
     }
 

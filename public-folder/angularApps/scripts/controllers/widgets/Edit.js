@@ -244,9 +244,7 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
                 $scope.lastUpdated = new Date().getTime();
                 if (!angular.isDefined(widget.id) || widget.id === null) {
                     // todo : test if we should override entire widget
-                    widget.id = savedWidget.id;
-                    widget.apiKey = savedWidget.apiKey;
-                    widget.version = savedWidget.version;
+                    widget = savedWidget;
 
                     updateWidgetData(widget.data);
 
