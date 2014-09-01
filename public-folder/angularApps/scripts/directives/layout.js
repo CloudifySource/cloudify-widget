@@ -33,6 +33,10 @@ angular.module('WidgetApp')
                         'label':'Pool',
                         'url' : '#/pool'
                     },{
+                        'id': 'account',
+                        'label':'Account',
+                        'url' : '#/user/account'
+                    },{
                         'id'  :'configuration',
                         'label' : 'Configuration',
                         'url' : '#/configuration'

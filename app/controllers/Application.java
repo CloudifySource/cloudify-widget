@@ -253,6 +253,37 @@ public class Application extends Controller
 		}
 	}
 
+
+    public static Result changePassword( ){
+        try {
+
+            User user = validateSession();
+
+
+            JsonNode jsonNode = request().body().asJson();
+            String currentPassword = jsonNode.get("currentPassword").getTextValue();
+
+            if ( !user.comparePassword(currentPassword) ){
+                return badRequest("wrong current password");
+            }
+
+            String newPassword = jsonNode.get("newPassword").getTextValue();
+            String newPasswordAgain = jsonNode.get("newPasswordAgain").getTextValue();
+
+            if ( !newPassword.equals(newPasswordAgain)){
+                return badRequest("new password does not match");
+            }
+
+            user.encryptAndSetPassword( newPassword );
+            user.save();
+            return ok("password saved successfully");
+
+
+        }catch(Exception e){
+            return badRequest("please check currentPassword, newPassword and newPasswordAgain are sent on request");
+        }
+    }
+
     public static Result getInjectScript( String publicIp, String privateIp ){
         validateSession();
         String randomPassword = StringUtils.generateRandomFromRegex(ApplicationContext.get().conf().server.bootstrap.serverNodePasswordRegex);

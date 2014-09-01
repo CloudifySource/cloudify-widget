@@ -22,6 +22,10 @@ angular.module('WidgetApp', ['ngRoute','ngCookies']).config(function($routeProvi
                 section : function() { return 'widgets'; }
             }
         })
+        .when('/user/account', {
+            controller: 'UsersAccountCtrl',
+            templateUrl: 'views/users/account.html'
+        })
         .when('/widgets/:widgetId/preview', {
             controller: 'WidgetsPreviewCtrl',
             templateUrl: 'views/widgets/preview.html'

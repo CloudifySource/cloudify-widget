@@ -24,6 +24,7 @@ POST    /backend/login                                     controllers.Applicati
 GET    /backend/isLoggedIn                                 controllers.Application.isLoggedIn
 POST    /backend/logout                                    controllers.Application.logout
 GET     /backend/user/details                               controllers.Application.getUserDetails
+POST    /backend/user/password/change                   controllers.Application.changePassword
 
 
 GET     /backend/application/pool/status  controllers.Application.getPoolStatus

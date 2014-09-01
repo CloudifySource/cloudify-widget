@@ -1,0 +1,20 @@
+<div class="layout" id="account">
+
+
+
+
+<div id="main">
+
+    <div ng-class="{'alert alert-danger' : false === changePassword.success, 'alert alert-success' : !!changePassword.success }">
+        {{changePassword.statusMessage}}
+    </div>
+
+    <h1> Change Password</h1>
+
+<div form-field title="Current Password" value="changePassword.currentPassword" required="true" type="password"></div>
+<div form-field title="New Password" value="changePassword.newPassword" required="true" type="password"></div>
+<div form-field title="New Password Again" value="changePassword.newPasswordAgain" required="true" type="password"></div>
+
+    <button ng-click="changePassword()">Submit</button>
+</div>
+</div>

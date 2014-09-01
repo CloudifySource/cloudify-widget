@@ -20,6 +20,11 @@ angular.module('WidgetApp').service('ApplicationService', function( $http ){
     };
 
     this.getUserDetails = function(){
-        return $http.get('backend/user/details');
+        return $http.get('/backend/user/details');
     };
+
+
+    this.changePassword = function( currentPassword, newPassword, newPassowrdAgain ){
+        return $http.post('/backend/user/password/change', {'currentPassword' : currentPassword, 'newPassword' : newPassword , 'newPasswordAgain' : newPassowrdAgain });
+    }
 });
