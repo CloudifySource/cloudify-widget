@@ -55,8 +55,11 @@ public class WidgetInstallFinishedSenderImpl implements IWidgetInstallFinishedSe
                 mandrillDetails.templateContent = new HashMap<String, String>();
             }
 
+            // need to make sure this list is aligned with _login.html list -- our documentation -- all the time
+            mandrillDetails.templateContent.put("username", serverNode.getExecutionDataModel().getLoginDetails().name );
             mandrillDetails.templateContent.put("randomValue", serverNode.getRandomPassword() );
             mandrillDetails.templateContent.put("publicIp", serverNode.getPublicIP() );
+
 
             if ( mandrillDetails.mandrillMessage == null ){
                 mandrillDetails.mandrillMessage = new MandrillMessage();

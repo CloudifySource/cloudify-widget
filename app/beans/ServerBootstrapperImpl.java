@@ -415,19 +415,23 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
     @Override
     public List<ServerNode> recoverUnmonitoredMachines() {
         logger.info("recovering lost machines");
-                List<ServerNode> result = new ArrayList<ServerNode>(  );
-        Collection<CloudServer> allMachinesWithTag = cloudServerApi.getAllMachinesWithTag( this.bootstrapMachineOptions.getMask() );
-        logger.info( "found [{}] total machines with matching tags. filtering lost", CollectionUtils.size(allMachinesWithTag)  );
-        if ( !CollectionUtils.isEmpty( allMachinesWithTag )){
-            for ( CloudServer server : allMachinesWithTag ) {
-                ServerNode serverNode = ServerNode.getServerNode( server.getId() );
-                if ( serverNode == null ){
-                    ServerNode newServerNode = new ServerNode( server );
-                    logger.info( "found an unmonitored machine - I should add it to the DB [{}]", newServerNode );
-                    result.add( newServerNode );
-                }
-            }
-        }
+        List<ServerNode> result = new ArrayList<ServerNode>();
+
+        // removing this code as it is not relevant anymore after the random value feature.
+        // instead we should allow entering values manually
+
+//        Collection<CloudServer> allMachinesWithTag = cloudServerApi.getAllMachinesWithTag(this.bootstrapMachineOptions.getMask());
+//        logger.info("found [{}] total machines with matching tags. filtering lost", CollectionUtils.size(allMachinesWithTag));
+//        if (!CollectionUtils.isEmpty(allMachinesWithTag)) {
+//            for (CloudServer server : allMachinesWithTag) {
+//                ServerNode serverNode = ServerNode.getServerNode(server.getId());
+//                if (serverNode == null) {
+//                    ServerNode newServerNode = new ServerNode(server);
+//                    logger.info("found an unmonitored machine - I should add it to the DB [{}]", newServerNode);
+//                    result.add(newServerNode);
+//                }
+//            }
+//        }
         return result;
     }
 

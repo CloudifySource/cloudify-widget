@@ -5,6 +5,18 @@ angular.module('WidgetApp').controller('PoolsIndexCtrl', function ( $scope , $q,
         $log.info('cleaning pool');
     };
 
+    $scope.stopServerNode = function(serverNode){
+        if ( !confirm('are you sure you want to stop this server node?')){
+            return;
+        }
+
+        PoolService.stopServerNode(serverNode.modelId).then(function(){
+            toastr.success('stopped successfully');
+        },function( result ){
+            toastr.error('error while stopping', result.data);
+        })
+    };
+
     $scope.cleanPool = function(){
         if ( !confirm ('are you sure you want clean the pool? this feature is not fully tested yet')){
             return;

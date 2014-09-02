@@ -149,16 +149,11 @@ public class Application extends Controller
                 }
             }
 
-            if ( executionData != null ){
+
+            if ( !StringUtils.isEmptyOrSpaces(widget.getRecipeURL()) ){
                 serverNode = new ServerNode();
-
-                ExecutionDataModel edm = new ExecutionDataModel();
-                edm.setEncryptionKey(ApplicationContext.get().conf().applicationSecret);
-                edm.setRaw(executionData.toString());
-
-                serverNode.setExecutionData( edm.encrypt() );
                 serverNode.setRemote(true);
-                serverNode.setWidget(widget);
+
                 serverNode.save();
             }else{
                 serverNode = ApplicationContext.get().getServerPool().get();
@@ -168,6 +163,18 @@ public class Application extends Controller
                     throw new ServerException("i18n:noAvailableServers");
                 }
                 logger.info("it seems server node is not null. deployment continues as planned");
+            }
+
+
+            if ( executionData != null ) {
+                ExecutionDataModel edm = new ExecutionDataModel();
+                edm.setEncryptionKey(ApplicationContext.get().conf().applicationSecret);
+                edm.setRaw(executionData.toString());
+
+                serverNode.setExecutionData(edm.encrypt());
+
+                serverNode.setWidget(widget);
+                serverNode.save();
             }
 
             try {
@@ -403,6 +410,19 @@ public class Application extends Controller
         logger.debug( "~~~ status=" + status );
         logger.debug("statusToResult > result: [{}]", result);
         return ok( Json.toJson( result ));
+    }
+
+    public static Result stopServerNode( Long serverNodeId ){
+        validateSession();
+        ServerNode serverNode = ServerNode.find.byId(serverNodeId);
+
+        if ( serverNode != null ){
+            serverNode.setStopped(true);
+            serverNode.setBusySince(System.currentTimeMillis());
+            serverNode.save();
+        }
+
+        return ok();
     }
 
 

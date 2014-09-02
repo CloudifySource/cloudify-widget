@@ -12,6 +12,10 @@ angular.module('WidgetApp').service('PoolService', function ($http) {
 
     };
 
+    this.stopServerNode = function( serverNodeId ){
+        return $http.post('/backend/application/pool/stopNode/' + serverNodeId );
+    };
+
     this.getPoolNodesByStatus = function(){
         return $http.get('/backend/application/pool/nodesByStatus');
     };

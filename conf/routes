@@ -61,7 +61,8 @@ GET     /backend/widget/login/google/callback/:widgetKey   controllers.WidgetGoo
 
 
 
-POST    /backend/application/pool/clean                  controllers.Application.cleanPool
+POST    /backend/application/pool/stopNode/:serverNodeId        controllers.Application.stopServerNode( serverNodeId: Long )
+POST    /backend/application/pool/clean                         controllers.Application.cleanPool
 GET    /backend/application/pool/nodesByStatus                  controllers.Application.getPoolNodesByStatus
 
 
