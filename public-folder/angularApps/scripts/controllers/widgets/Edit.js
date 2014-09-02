@@ -242,19 +242,17 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
 
                 $scope.errors = null;
                 $scope.lastUpdated = new Date().getTime();
+
+                $scope.widget = savedWidget;
+                updateWidgetData(widget.data);
+                _setDirty(false);
                 if (!angular.isDefined(widget.id) || widget.id === null) {
-                    // todo : test if we should override entire widget
-                    widget = savedWidget;
-
-                    updateWidgetData(widget.data);
-
-                    _setDirty(false);
                     $location.path('/widgets/' + savedWidget.id + '/edit');
                 }
                 if (isDone) {
                     $location.path('/widgets/' + $scope.widget.id + '/preview');
                 }
-                _setDirty(false);
+
             }, function (result) {
                 var formErrors = result.data;
                 for (var i in formErrors) {
