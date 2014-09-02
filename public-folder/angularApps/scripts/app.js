@@ -15,6 +15,13 @@ angular.module('WidgetApp', ['ngRoute','ngCookies']).config(function($routeProvi
             templateUrl: 'views/widgets/edit.html',
             reloadOnSearch: false
         })
+        .when('/pool/output', {
+            controller: 'PoolsCreateMachineOutputCtrl',
+            templateUrl : 'views/pool/createMachineOutput.html',
+            resolve : {
+                section : function(){ return 'poolOutput'; }
+            }
+        })
         .when('/widgets/index', {
             controller: 'WidgetsIndexCtrl',
             templateUrl: 'views/widgets/index.html',
@@ -24,7 +31,10 @@ angular.module('WidgetApp', ['ngRoute','ngCookies']).config(function($routeProvi
         })
         .when('/user/account', {
             controller: 'UsersAccountCtrl',
-            templateUrl: 'views/users/account.html'
+            templateUrl: 'views/users/account.html',
+            resolve: {
+                section: function(){ return 'account'; }
+            }
         })
         .when('/widgets/:widgetId/preview', {
             controller: 'WidgetsPreviewCtrl',

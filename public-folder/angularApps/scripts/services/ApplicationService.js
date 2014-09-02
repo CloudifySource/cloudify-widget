@@ -26,5 +26,5 @@ angular.module('WidgetApp').service('ApplicationService', function( $http ){
 
     this.changePassword = function( currentPassword, newPassword, newPassowrdAgain ){
         return $http.post('/backend/user/password/change', {'currentPassword' : currentPassword, 'newPassword' : newPassword , 'newPasswordAgain' : newPassowrdAgain });
-    }
+    };
 });

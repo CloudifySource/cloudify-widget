@@ -9,7 +9,7 @@
  Use it wisely
  **/
 angular.module('WidgetApp')
-    .directive('layout', function ($log, ApplicationService, $location, $route ) {
+    .directive('layout', function ($log, ApplicationService, $location, $route, CreateMachineOutputService , $timeout ) {
         return {
             templateUrl: 'views/directives/layout.html',
             restrict: 'C',
@@ -23,6 +23,7 @@ angular.module('WidgetApp')
                         'label' : 'Widgets',
                         'url' : '#/widgets/index'
                     },
+
                     {
                         'id' : 'demo',
                         'label' : 'Demo',
@@ -33,6 +34,11 @@ angular.module('WidgetApp')
                         'label':'Pool',
                         'url' : '#/pool'
                     },{
+                        'id' :'poolOutput',
+                        'label' : 'Pool Output',
+                        'url' : '#/pool/output'
+                    },
+                    {
                         'id': 'account',
                         'label':'Account',
                         'url' : '#/user/account'
@@ -51,9 +57,24 @@ angular.module('WidgetApp')
                     ApplicationService.logout().then(function (/*result*/) {
                         $location.path('#/user/login');
                     });
-
-
                 };
+
+                function loadUnreadOutput(){
+                    CreateMachineOutputService.countUnread().then(function(result){
+
+                        var count = parseInt(result.data.result,10);
+                        var section = _.filter(scope.sections, {'id': 'poolOutput'})[0];
+                        if ( !isNaN(count) && count > 0 ) {
+
+                            section.tag = count;
+                        }else{
+                            section.tag = null;
+                        }
+                        $timeout(loadUnreadOutput,30000);
+                    });
+                }
+
+                loadUnreadOutput();
 
                 ApplicationService.isLoggedIn().then(function( result ){
                     scope.loggedIn = result.data.loggedIn;

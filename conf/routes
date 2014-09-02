@@ -26,6 +26,12 @@ POST    /backend/logout                                    controllers.Applicati
 GET     /backend/user/details                               controllers.Application.getUserDetails
 POST    /backend/user/password/change                   controllers.Application.changePassword
 
+GET     /backend/createMachineOutput/index              controllers.CreateMachineOutputController.index
+POST     /backend/createMachineOutput/:outputId/delete              controllers.CreateMachineOutputController.delete( outputId:Long)
+POST     /backend/createMachineOutput/deleteAll              controllers.CreateMachineOutputController.deleteAll
+GET     /backend/createMachineOutput/countUnread              controllers.CreateMachineOutputController.countUnread
+POST    /backend/createMachineOutput/markAllRead            controllers.CreateMachineOutputController.markAllRead
+
 
 GET     /backend/application/pool/status  controllers.Application.getPoolStatus
 

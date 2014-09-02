@@ -29,6 +29,7 @@ import cloudify.widget.cli.ICloudifyCliHandler;
 import cloudify.widget.common.StringUtils;
 import cloudify.widget.common.WidgetResourcesUtils;
 import cloudify.widget.common.asyncscriptexecutor.IAsyncExecution;
+import models.CreateMachineOutput;
 import models.ServerNode;
 
 import org.apache.commons.exec.CommandLine;
@@ -439,6 +440,15 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             String script = getInjectedBootstrapScript( server.getPublicIP(), server.getPrivateIP(), server.getRandomPassword() );
 
 			CloudExecResponse response = cloudServerApi.runScriptOnMachine( script, server.getPublicIP(), null );
+
+            try {
+                CreateMachineOutput output = new CreateMachineOutput();
+                output.setCreated(System.currentTimeMillis());
+                output.setContent(Json.stringify(Json.toJson(response)));
+                output.save();
+            }catch(Exception e){
+                logger.error("unable to save create machine output",e);
+            }
 
             logger.info("script finished");
 			logger.info("Bootstrap for server: {} finished successfully successfully. " +

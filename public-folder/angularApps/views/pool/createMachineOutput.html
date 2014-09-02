@@ -1,0 +1,33 @@
+<div class="layout" id="pool-page">
+    <div id="main">
+
+
+
+        <div class="row" id="search_panel" style="padding-bottom:20px;">
+            <div class="span4">
+                <div class="actions">
+                    <button class="btn" ng-click="deleteAll()">Delete All</button>
+                </div>
+            </div>
+        </div>
+
+
+
+      <table class="table table-bordered table-striped">
+          <tr>
+              <td> ID </td>
+              <td style="min-width:200px;"> When </td>
+              <td style="width:100%"> Content </td>
+              <td> Read </td>
+              <td> Action </td>
+          </tr>
+          <tr ng-repeat="e in errors | orderBy:'-id'">
+              <td>{{e.id}}</td>
+              <td>{{123456722289 | date:'medium' }}</td>
+              <td><pre>{{e.content}}</pre></td>
+              <td>{{e.outputRead}}</td>
+              <td> <button class="btn" ng-click="deleteError(e.id)">Delete</button></td>
+          </tr>
+      </table>
+    </div>
+</div>

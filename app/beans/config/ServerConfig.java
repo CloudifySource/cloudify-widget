@@ -166,7 +166,7 @@ public class ServerConfig {
         public String urlEndpoint = "s3.amazonaws.com";
         public String recipeDownloadMethod = "wget";
         public String installNode = "false";
-        public String serverNodePasswordRegex = "[a-zA-Z0-9]";
+        public String serverNodePasswordRegex = "[a-zA-Z0-9]{16}";
         public String recipeRelativePath;
         public File prebootstrapScript = Utils.getFileByRelativePath("/conf/cloudify/prebootstrap");
 
