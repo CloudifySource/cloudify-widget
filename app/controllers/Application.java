@@ -18,6 +18,7 @@ import static utils.RestUtils.OK_STATUS;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.StringReader;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -31,6 +32,7 @@ import models.User;
 import models.Widget;
 
 import models.WidgetInstanceUserDetails;
+import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.lang.NumberUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -66,7 +68,7 @@ import com.avaje.ebeaninternal.server.ddl.DdlGenerator;
  * 
  * @author Igor Goldenberg
  */
-public class Application extends Controller
+public class Application extends GsController
 {
 
     private static Logger logger = LoggerFactory.getLogger(Application.class);
@@ -291,11 +293,14 @@ public class Application extends Controller
         }
     }
 
+    // download the file
     public static Result getInjectScript( String publicIp, String privateIp ){
         validateSession();
         String randomPassword = StringUtils.generateRandomFromRegex(ApplicationContext.get().conf().server.bootstrap.serverNodePasswordRegex);
         String injectedScript = ApplicationContext.get().getServerBootstrapper().getInjectedBootstrapScript( publicIp, privateIp, randomPassword);
-        return ok(injectedScript);
+
+
+        return ok(new ReaderInputStream( new StringReader(injectedScript)));
     }
 
     public static Result getPoolStatus(  ){
@@ -567,10 +572,6 @@ public class Application extends Controller
         return ok(Json.toJson(result));
     }
 
-    private static User validateSession(){
-        String authToken = session("authToken");
-        return User.validateAuthToken(authToken);
-    }
 
     public static Result getUserDetails(){
         return ok(Json.toJson( validateSession() ));

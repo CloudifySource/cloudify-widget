@@ -1,6 +1,12 @@
 'use strict';
 
-angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, $log, $sce, $window, $routeParams, $filter, WidgetDbService, WidgetReceiveMessageService, WidgetsService, CloudTypesService, i18n, WidgetLocalesService ) {
+angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, $log, $sce, $window, $routeParams, $filter,
+                                                              WidgetDbService,
+                                                              WidgetReceiveMessageService,
+                                                              WidgetsService,
+                                                              CloudTypesService,
+                                                              i18n,
+                                                              WidgetLocalesService ) {
 
     var apiKey = $routeParams.widgetKey;
 
@@ -272,6 +278,15 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         WidgetDbService.remove(); // remove the cookie
         _postMessage({name: 'widget_stop'});
         $scope.widgetStatus.state = stop;
+        try {
+            WidgetsService.stop( apiKey, $scope.widgetStatus.instanceId).then(function(){
+                $log.info('stopped successfully');
+            }, function(result){
+                $log.error('did not stop. got error', result.data);
+            });
+        }catch(e){
+            $log.error('unable to stop',e);
+        }
         resetWidgetStatus();
 
     };

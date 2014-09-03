@@ -76,3 +76,6 @@ GET     /backend/application/decrypt                        controllers.Applicat
 GET      /backend/widget/:instanceId/pem        controllers.Application.downloadPemFile( instanceId:String )
 
 
+GET     /backend/recipe/tmpDownloadLink            controllers.RecipeController.getTempRecipeDownloadLink()
+
+

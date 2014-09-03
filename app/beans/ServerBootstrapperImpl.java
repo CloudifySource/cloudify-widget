@@ -232,7 +232,16 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             logger.info("unable to teardown.",e);
         }
 
+
+        try {
+            serverNode.setStopped(true);
+            serverNode.save();
+        } catch (Exception e) {
+            logger.error("unable to set server as stop", e);
+        }
+
         try{
+
             deleteServer(serverNode.getNodeId());
         }catch(Exception e){
             logger.info("unable to delete. perhaps this node will remain on the cloud. need to remove manually.");

@@ -14,7 +14,7 @@ angular.module('WidgetApp').controller('PoolsIndexCtrl', function ( $scope , $q,
             toastr.success('stopped successfully');
         },function( result ){
             toastr.error('error while stopping', result.data);
-        })
+        });
     };
 
     $scope.cleanPool = function(){
@@ -30,9 +30,9 @@ angular.module('WidgetApp').controller('PoolsIndexCtrl', function ( $scope , $q,
         }
     };
 
-    PoolService.getBootstrapScript().then(function(result){
-        $scope.bootstrapScript = result.data;
-    });
+    $scope.downloadRecipe = function(){
+      // guy - I know manipulating the dom from the controller is WRONG.. but using a directive approach in thie
+    };
 
 
 
