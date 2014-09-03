@@ -5,6 +5,7 @@ import cloudify.widget.common.MandrillSender;
 import com.microtripit.mandrillapp.lutung.view.MandrillMessage;
 import models.ServerNode;
 import models.Widget;
+import models.WidgetInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +44,6 @@ public class WidgetInstallFinishedSenderImpl implements IWidgetInstallFinishedSe
         }else{
             MandrillSender.MandrillEmailDetails mandrillDetails = widget.installFinishedEmailDetails.getMandrillDetails();
 
-            mandrillDetails.templateContent = new HashMap<String, String>();
-
             MandrillMessage.Recipient recipient = new MandrillMessage.Recipient();
             recipient.setType(MandrillMessage.Recipient.Type.TO);
             recipient.setName(loginDetails.name);
@@ -55,7 +54,17 @@ public class WidgetInstallFinishedSenderImpl implements IWidgetInstallFinishedSe
                 mandrillDetails.templateContent = new HashMap<String, String>();
             }
 
+
+            WidgetInstance.ConsoleLink instanceLink = serverNode.getWidgetInstance().getLink();
+            String linkTitle = instanceLink.title;
+            if ( mandrillDetails.templateContent.containsKey("linkTitle") ){
+                linkTitle = mandrillDetails.templateContent.get("linkTitle");
+            }
+            String linkUrl = instanceLink.url.replace("$HOST", serverNode.getPublicIP());
+            String linkStr = "<a href=\"" + linkUrl + "\">" + linkTitle + "</a>";
+
             // need to make sure this list is aligned with _login.html list -- our documentation -- all the time
+            mandrillDetails.templateContent.put("link", linkStr  );
             mandrillDetails.templateContent.put("username", serverNode.getExecutionDataModel().getLoginDetails().name );
             mandrillDetails.templateContent.put("randomValue", serverNode.getRandomPassword() );
             mandrillDetails.templateContent.put("publicIp", serverNode.getPublicIP() );

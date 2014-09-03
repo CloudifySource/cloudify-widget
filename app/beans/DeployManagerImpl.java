@@ -159,10 +159,11 @@ public class DeployManagerImpl implements DeployManager {
                 logger.info("recipe url is null. nothing to execute");
                 server.createEvent("recipe already installed", ServerNodeEvent.Type.DONE).save();
 
+                WidgetInstance widgetInstance = widget.addWidgetInstance(server, null);
                 widgetInstallFinishedSender.send( widget, server);
 
 
-                return widget.addWidgetInstance(server, null);
+                return widgetInstance;
 
             }
             logger.info(" Widget [{}] has recipe url [{}]", widget.getRecipeName(), recipeURL);

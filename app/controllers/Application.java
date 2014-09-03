@@ -27,11 +27,8 @@ import cloudify.widget.api.clouds.CloudProvider;
 import cloudify.widget.api.clouds.CloudServer;
 import cloudify.widget.api.clouds.CloudServerApi;
 import cloudify.widget.common.StringUtils;
-import models.ServerNode;
-import models.User;
-import models.Widget;
+import models.*;
 
-import models.WidgetInstanceUserDetails;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.lang.NumberUtils;
 import org.codehaus.jackson.JsonNode;
@@ -636,7 +633,10 @@ public class Application extends GsController
 
             mockServerNode.setRandomPassword("some_random_value_mock");
 
-
+            WidgetInstance widgetInstance = new WidgetInstance();
+            widgetInstance.setWidget(widget);
+            widgetInstance.setServerNode(mockServerNode);
+            mockServerNode.setWidgetInstance(widgetInstance);
 
             ApplicationContext.get().getWidgetInstallFinishedSender().send(widget, mockServerNode);
         }catch(Exception e){

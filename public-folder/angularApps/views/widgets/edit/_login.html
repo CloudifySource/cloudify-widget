@@ -22,12 +22,12 @@
 <div form-field title="Enabled" value="widget.installFinishedEmailDetails.enabled" required="false" type="checkbox"></div>
 <div form-field title="API Key" value="widget.installFinishedEmailDetails.mandrillDetails.mandrillApiKey" required="false" type="password"></div>
 <div form-field title="Template Name" value="widget.installFinishedEmailDetails.mandrillDetails.templateName" required="false" type="text"></div>
-
+<div form-field title="Email Link Title" value="widget.installFinishedEmailDetails.mandrillDetails.templateContent.linkTitle" required="false" type="text"></div>
 
 <strong>Test Email</strong>
 <div form-field title="Name" value="testEmail.name" required="false" type="text"></div>
 <div form-field title="Email" value="testEmail.email" required="false" type="text"></div>
-<button ng-click="runEmailTest(widget, testEmail)">Run Text</button>
+<button ng-click="runEmailTest(widget, testEmail)">Run Test</button>
 
 <br/><br/>
 <strong>Available Parameters For Email</strong>
@@ -41,5 +41,8 @@
     </li>
     <li>
         <code>publicIp</code> - the instance's public ip.
+    </li>
+    <li>
+        <code>link</code> - an anchor tag. we use the URL from 'general' section, and the 'Email Link Title' from above to construct a url <code>&lt;a href="the_ip"> The Email Link Title &lt/a></code>
     </li>
 </ul>
