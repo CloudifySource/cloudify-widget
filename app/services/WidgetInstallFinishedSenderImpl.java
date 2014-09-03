@@ -65,7 +65,7 @@ public class WidgetInstallFinishedSenderImpl implements IWidgetInstallFinishedSe
 
             // need to make sure this list is aligned with _login.html list -- our documentation -- all the time
             mandrillDetails.templateContent.put("link", linkStr  );
-            mandrillDetails.templateContent.put("username", serverNode.getExecutionDataModel().getLoginDetails().name );
+            mandrillDetails.templateContent.put("name", serverNode.getExecutionDataModel().getLoginDetails().name );
             mandrillDetails.templateContent.put("randomValue", serverNode.getRandomPassword() );
             mandrillDetails.templateContent.put("publicIp", serverNode.getPublicIP() );
 
