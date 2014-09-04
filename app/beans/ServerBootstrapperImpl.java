@@ -455,12 +455,12 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 			CloudExecResponse response = cloudServerApi.runScriptOnMachine( script, server.getPublicIP(), null );
 
             try {
-                if ( response.getExitStatus() != 0 ) {
+
                     CreateMachineOutput output = new CreateMachineOutput();
                     output.setCreated(System.currentTimeMillis());
                     output.setContent(Json.stringify(Json.toJson(response)));
                     output.save();
-                }
+
             }catch(Exception e){
                 logger.error("unable to save create machine output",e);
             }
