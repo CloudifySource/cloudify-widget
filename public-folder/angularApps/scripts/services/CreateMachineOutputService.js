@@ -8,7 +8,8 @@ angular.module('WidgetApp').service('CreateMachineOutputService', function ($htt
         return $http.get('/backend/createMachineOutput/index').then(function(result){
             _.each(result.data, function(item){
                 item.contentObj = JSON.parse(item.content);
-            })
+            });
+            return result;
         });
     };
 
