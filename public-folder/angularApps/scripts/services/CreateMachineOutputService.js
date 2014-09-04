@@ -5,7 +5,11 @@ angular.module('WidgetApp').service('CreateMachineOutputService', function ($htt
 
 
     this.index = function () {
-        return $http.get('/backend/createMachineOutput/index');
+        return $http.get('/backend/createMachineOutput/index').then(function(result){
+            _.each(result.data, function(item){
+                item.contentObj = JSON.parse(item.content);
+            })
+        });
     };
 
     this.deleteError = function (id) {

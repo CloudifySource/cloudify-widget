@@ -25,8 +25,8 @@
           <tr ng-repeat="e in errors | orderBy:'-id'">
               <td>{{e.id}}</td>
               <td>{{e.created | date:'medium' }}</td>
-              <td><pre>{{e.content.exitStatus}}</pre></td>
-              <td><pre>{{e.content.output}}</pre></td>
+              <td><pre>{{e.contentObj.exitStatus}}</pre></td>
+              <td><pre>{{e.contentObj.output}}</pre></td>
               <td>{{e.outputRead}}</td>
               <td> <button class="btn" ng-click="deleteError(e.id)">Delete</button></td>
           </tr>
