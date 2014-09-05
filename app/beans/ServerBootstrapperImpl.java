@@ -123,41 +123,48 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         ServerNode serverNode = null;
         int retries = bootstrapConf.createServerRetries;
         for ( int i =0 ; i <  retries && serverNode == null ; i++){
-            logger.info( "creating new server node, try #[{}]",i );
-            final CloudServerCreated createdServer = CollectionUtils.first(cloudServerApi.create( bootstrapMachineOptions ));
+            logger.info( "creating new server node, try #[{}/{}]",i, retries );
 
-
+            // guy - this try/catch is very important as this function is used as part of creation of N servers.
+            // if we throw an exception here, we might miss the other N-1 servers as well.
+            // another reason this try catch is very important is the "undergoing bootstrap" count which relies
+            // on the collection size we return from "createServer(N)" - if we throw an exception here, we will
+            // miss the "decreaseAndGet" invocation, and the pool state will not longer by correct.
+            // as we will have a permanent "in progress" server.
+            try {
+                final CloudServerCreated createdServer = CollectionUtils.first(cloudServerApi.create(bootstrapMachineOptions));
 //            PoolEvent.ServerNodeEvent newServerNodeEvent = new PoolEvent.ServerNodeEvent().setType(PoolEvent.Type.CREATE).setServerNode(tmpNode);
+                if (createdServer != null) {
+                    final CloudServerApi finalCloudServerApi = cloudServerApi;
+                    CloudServer server = cloudServerApi.get(createdServer.getId());
+                    ServerNode tmpNode = new ServerNode(server);
+                    tmpNode.setRandomPassword(StringUtils.generateRandomFromRegex(ApplicationContext.get().conf().server.bootstrap.serverNodePasswordRegex));
+                    final ActiveWait wait = new ActiveWait();
 
+                    wait
+                            .setIntervalMillis(TimeUnit.SECONDS.toMillis(10))
+                            .setTimeoutMillis(TimeUnit.SECONDS.toMillis(120))
+                            .waitUntil(new Wait.Test() {
+                                @Override
+                                public boolean resolved() {
+                                    logger.info("Waiting for a server activation... Left timeout: {} sec", wait.getTimeLeftMillis() / 1000);
+                                    return finalCloudServerApi.get(createdServer.getId()).isRunning();
+                                }
+                            });
 
-            if (createdServer != null) {
-                final CloudServerApi finalCloudServerApi = cloudServerApi;
-                 CloudServer server = cloudServerApi.get( createdServer.getId() );
-                ServerNode tmpNode = new ServerNode( server );
-                tmpNode.setRandomPassword(StringUtils.generateRandomFromRegex(ApplicationContext.get().conf().server.bootstrap.serverNodePasswordRegex));
-                final ActiveWait wait = new ActiveWait();
-
-         wait
-                .setIntervalMillis(TimeUnit.SECONDS.toMillis(10))
-                .setTimeoutMillis(TimeUnit.SECONDS.toMillis(120))
-                .waitUntil(new Wait.Test() {
-                    @Override
-                    public boolean resolved() {
-                        logger.info("Waiting for a server activation... Left timeout: {} sec", wait.getTimeLeftMillis() / 1000);
-                        return finalCloudServerApi.get( createdServer.getId()).isRunning();
-                    }
-                });
-
-                if ( bootstrap(tmpNode)) { // bootstrap success
+                    if (bootstrap(tmpNode)) { // bootstrap success
 //                    poolEventManager.handleEvent(newServerNodeEvent);
-                    serverNode = tmpNode;
-                    logger.info("successful bootstrap on [{}]", serverNode);
-                } else { // bootstrap failed
-                    logger.info("bootstrap failed, deleting server");
-                    deleteServer(tmpNode.getNodeId()); // deleting the machine from cloud.
+                        serverNode = tmpNode;
+                        logger.info("successful bootstrap on [{}]", serverNode);
+                    } else { // bootstrap failed
+                        logger.info("bootstrap failed, deleting server");
+                        deleteServer(tmpNode.getNodeId()); // deleting the machine from cloud.
+                    }
+                } else { // create server failed
+                    logger.info("unable to create machine. try [{}/{}]", i + 1, retries);
                 }
-            } else { // create server failed
-                logger.info("unable to create machine. try [{}/{}]", i + 1, retries);
+            }catch(Exception e){
+                logger.info("error creating server",e);
             }
 
         }
