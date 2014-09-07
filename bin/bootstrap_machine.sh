@@ -219,6 +219,11 @@ download_recipe() {
     else
         echo "not installing recipe [$INSTALL_RECIPE]"
     fi
+
+    echo "erasing content from file blustratus-single-service.properties"
+    find / -name "blustratus-single-service.properties" -print |  xargs sed -i '1~1d'
+    find / -name "blustratus-single-service.properties.bak" -type f -delete
+
 }
 
 init
