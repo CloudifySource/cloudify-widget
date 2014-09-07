@@ -34,6 +34,9 @@ server{
     }
 
     location ~ ^/public-folder {
+        if ( $document_uri ~* \.(html|json)$ ){
+             expires 0;
+        }
         root /usr/lib/cloudify-widget;
     }
 
