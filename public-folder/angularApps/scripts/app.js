@@ -10,6 +10,9 @@ angular.module('WidgetApp', ['ngRoute','ngCookies']).config(function($routeProvi
             templateUrl: 'views/widgets/edit.html',
             reloadOnSearch: false
         })
+        .when('/configuration/docs', {
+            templateUrl: 'views/configuration/docs.html'
+        })
         .when('/widgets/:widgetId/edit', {
             controller: 'WidgetsEditCtrl',
             templateUrl: 'views/widgets/edit.html',

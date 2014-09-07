@@ -15,8 +15,6 @@
 package controllers;
 
 import com.avaje.ebean.Ebean;
-import controllers.compositions.UserCheck;
-import data.validation.GsConstraints;
 import models.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -27,10 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.Form;
 import play.libs.Json;
-import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
-import play.mvc.With;
 import server.ApplicationContext;
 import server.HeaderMessage;
 import utils.Utils;
@@ -50,7 +46,7 @@ import static utils.RestUtils.OK_STATUS;
  * 
  * @author Igor Goldenberg
  */
-public class WidgetAdmin extends Controller
+public class WidgetAdmin extends GsController
 {
 
     private static Logger logger = LoggerFactory.getLogger( WidgetAdmin.class );
@@ -242,13 +238,6 @@ public class WidgetAdmin extends Controller
 		return ok(OK_STATUS).as("application/json");
 	}
 
-
-    @With( UserCheck.class )
-    public static Result listWidgets( Long userId, String authToken ){
-        User user = ( User) ctx().args.get("user");
-        return ok(Json.toJson(Widget.findByUser( user )));
-    }
-
     public static Result disableWidgetById( Long widgetId )
     {
         return enableDisableWidget( widgetId, false );
@@ -316,41 +305,5 @@ public class WidgetAdmin extends Controller
         return ok(Json.toJson(new PublicWidget(w)));
     }
 
-
-
-
-//    public static Result createNewWidget( String widgetId, String authToken,  String productName, String productVersion,
-//										  String title, String youtubeVideoUrl, String providerURL,
-//										  String recipeURL, String consolename, String consoleurl, String rootpath, String recipeName, String consoleUrlService )
-//	{
-//        User user = User.validateAuthToken(authToken);
-//        Widget widget = null;
-//        if ( !NumberUtils.isNumber( widgetId ) ){
-//		    widget = user.createNewWidget( productName, productVersion, title, youtubeVideoUrl, providerURL, recipeURL, consolename, consoleurl, rootpath );
-//        }else{
-//            Long widgetIdLong = Long.parseLong( widgetId );
-//            widget = Widget.findByUserAndId( user, widgetIdLong );
-//            if ( widget == null ){
-//                new HeaderMessage().setError( "User is not allowed to edit this widget" ).apply( response().getHeaders() );
-//                return badRequest(  );
-//            }
-//            widget.setProductName( productName );
-//            widget.setProductVersion( productVersion );
-//            widget.setTitle( title );
-//            widget.setYoutubeVideoUrl( youtubeVideoUrl );
-//            widget.setProviderURL( providerURL );
-//            widget.setRecipeURL( recipeURL );
-//            widget.setConsoleName( consolename );
-//            widget.setConsoleURL( consoleurl );
-//            widget.setRecipeRootPath( rootpath );
-//            widget.setRecipeName( recipeName );
-//            widget.setConsoleUrlService( consoleUrlService );
-//            widget.save();
-//        }
-//
-//        logger.info( "edited widget : " + widget.toString() );
-//        return ok( Json.toJson(widget) );
-////		return resultAsJson(widget);
-//	}
 
 }

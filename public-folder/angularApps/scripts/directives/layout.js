@@ -45,7 +45,7 @@ angular.module('WidgetApp')
                     },{
                         'id'  :'configuration',
                         'label' : 'Configuration',
-                        'url' : '#/configuration'
+                        'url' : '#/configuration/docs'
                     }
                 ];
 

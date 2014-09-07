@@ -4,6 +4,7 @@
 angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $cookies, WidgetThemes,
                                                                 CloudTypesService, $window, MixpanelService,
                                                                 CloudService,
+                                                                UsersService,
                                                                 WidgetsDemoService,
                                                                 WidgetLocalesService, WidgetShareSourcesService  ){
     var authToken = $.cookie('authToken');
@@ -11,6 +12,7 @@ angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $co
 
 
     this.themes = WidgetThemes;
+    this.users = UsersService;
     this.cloudTypes = CloudTypesService;
     this.locales = WidgetLocalesService;
     this.shareSources = WidgetShareSourcesService;
@@ -20,14 +22,9 @@ angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $co
 
 
     this.getWidgets = function( ){
-        $log.info(['getting all widgets', authToken]);
         return $http({
             'method': 'GET',
-            'url' : '/backend/widget/list',
-            'params': {
-                'authToken' : authToken
-
-            }
+            'url' : '/backend/widget/list'
         });
     };
 

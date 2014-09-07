@@ -7,15 +7,15 @@ GET     /exportSchema                   controllers.Application.generateDDL
 GET 	 /backend/getConf           	controllers.Application.getConf( name : String )
 
 
-GET     /backend/widgets/:widgetId/resource/details         controllers.WidgetResources.getRecipeResourceDetails( widgetId: Long, authToken: String )
-GET     /backend/widgets/:widgetId/resource/walk            controllers.WidgetResources.getWalkRecipeResourceResult( widgetId: Long, authToken: String )
-POST    /backend/widgets/:widgetId/resource/refresh         controllers.WidgetResources.postManualRefreshResource( widgetId: Long, authToken:String )
-GET     /backend/widgets/:widgetId/resource/content         controllers.WidgetResources.getResourceContent( widgetId: Long, authToken:String, path:String)
+GET     /backend/widgets/:widgetId/resource/details         controllers.WidgetResources.getRecipeResourceDetails( widgetId: Long  )
+GET     /backend/widgets/:widgetId/resource/walk            controllers.WidgetResources.getWalkRecipeResourceResult( widgetId: Long)
+POST    /backend/widgets/:widgetId/resource/refresh         controllers.WidgetResources.postManualRefreshResource( widgetId: Long )
+GET     /backend/widgets/:widgetId/resource/content         controllers.WidgetResources.getResourceContent( widgetId: Long, path:String)
 
-GET     /backend/widgets/:widgetId/provider/details         controllers.WidgetResources.getProviderResourceDetails( widgetId: Long, authToken: String )
-GET     /backend/widgets/:widgetId/provider/walk            controllers.WidgetResources.getWalkProviderResourceResult( widgetId: Long, authToken: String )
-POST    /backend/widgets/:widgetId/provider/refresh         controllers.WidgetResources.postManualRefreshProvider( widgetId: Long, authToken:String )
-GET     /backend/widgets/:widgetId/provider/content         controllers.WidgetResources.getProviderContent( widgetId: Long, authToken:String, path:String)
+GET     /backend/widgets/:widgetId/provider/details         controllers.WidgetResources.getProviderResourceDetails( widgetId: Long)
+GET     /backend/widgets/:widgetId/provider/walk            controllers.WidgetResources.getWalkProviderResourceResult( widgetId: Long )
+POST    /backend/widgets/:widgetId/provider/refresh         controllers.WidgetResources.postManualRefreshProvider( widgetId: Long)
+GET     /backend/widgets/:widgetId/provider/content         controllers.WidgetResources.getProviderContent( widgetId: Long, path:String)
 
 
 
@@ -76,6 +76,9 @@ GET     /backend/application/decrypt                        controllers.Applicat
 GET      /backend/widget/:instanceId/pem        controllers.Application.downloadPemFile( instanceId:String )
 
 
-GET     /backend/recipe/tmpDownloadLink            controllers.RecipeController.getTempRecipeDownloadLink()
+GET     /backend/recipe/tmpDownloadLink            controllers.RecipeController.getTempRecipeDownloadLink
+
+
+GET /backend/user/details                       controllers.UsersController.getUserDetails
 
 
