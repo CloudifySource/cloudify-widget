@@ -1,9 +1,11 @@
 
 'use strict';
 
-angular.module('WidgetApp').controller('LoginsCustomCtrl', function ($scope, $location, $log, $routeParams, $http ) {
+angular.module('WidgetApp').controller('LoginsCustomCtrl', function ($scope, $location, $log, $routeParams, $http, i18n  ) {
 
     $log.info('loading controller');
+
+    i18n.setLanguage($routeParams.locale || 'cn'); // ==> set the new language
 
     $scope.widgetKey = $routeParams.widgetKey;
 

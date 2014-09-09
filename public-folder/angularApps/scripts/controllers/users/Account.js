@@ -18,6 +18,6 @@ angular.module('WidgetApp').controller('UsersAccountCtrl', function($scope, $log
         $scope.userDetails = result.data;
     }, function(result){
         toastr.error('unable to get user details', result.data);
-    })
+    });
 
 });

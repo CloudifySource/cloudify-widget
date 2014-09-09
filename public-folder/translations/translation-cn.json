@@ -3,5 +3,12 @@
     "resetWidgetStatusMessage" : "由于用户太多，目前试用版服务器资源已分配完，请稍后再试",
     "noAvailableServers" : "由于用户太多，目前试用版服务器资源已分配完，请稍后再试",
     "acquiringMachines" : "正在获取服务器， 可能需要一分钟左右的时间，请耐心等候。。。",
-    "invalidCredentials" : "Invalid Credentials"
+    "invalidCredentials" : "Invalid Credentials",
+    "loginRegisterWithGoogleId" : "用谷歌账号登录",
+    "loginFillInDetails" : "填写详细信息",
+    "loginName" : "名",
+    "loginLastName" : "姓氏",
+    "loginEmail" : " 电子邮箱",
+    "loginSubmit" : "提交"
+
 }

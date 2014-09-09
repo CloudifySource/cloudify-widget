@@ -233,7 +233,7 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
             var left = (screen.width/2)-(size.width/2);
             var top = (screen.height/2)-(size.height/2);
 
-            popupWindow = window.open( window.location.origin + '/public-folder/angularApps/index.html#/logins/' + loginsString + '?widgetKey=' + apiKey  , 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+ size.width +', height='+ size.height +', top='+top+', left='+left);
+            popupWindow = window.open( window.location.origin + '/public-folder/angularApps/index.html#/logins/' + loginsString + '?locale=' + language + '&widgetKey=' + apiKey  , 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+ size.width +', height='+ size.height +', top='+top+', left='+left);
             return;
         }
         $log.info('starting the widget');
