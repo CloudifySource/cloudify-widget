@@ -1,5 +1,6 @@
 {
     "installationCompletedSuccessfully" : "安装成功完成",
+    "testDriveSuccessfullyCompleted" : "<p>您的试用已结束，请参考 <a href='http://bluforcloud.com/plans/solo/' class='download_link successfully_completed_msg track' target='_blank'>单用户计划</a>,  在SoftLayer或者亚马逊云上继续使用BLU Acceleration 服务</p>",
     "resetWidgetStatusMessage" : "由于用户太多，目前试用版服务器资源已分配完，请稍后再试",
     "noAvailableServers" : "由于用户太多，目前试用版服务器资源已分配完，请稍后再试",
     "acquiringMachines" : "正在获取服务器， 可能需要一分钟左右的时间，请耐心等候。。。",
