@@ -193,6 +193,13 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
     }
 
 
+    $scope.showActionItem = function(){
+        try {
+            return !!$scope.widgetStatus.output && $scope.widgetStatus.output.length === 1 && $scope.widgetStatus.output[0] === 'i18n:testDriveSuccessfullyCompleted';
+        }catch(e){}
+        return false;
+    };
+
     $scope.isCompleted = function(){
         return $scope.widgetStatus.state === stop && !$scope.widgetStatus.instanceId && !$scope.widgetStatus.message && $scope.widgetStatus.timeleftMillis === 0;
     };
