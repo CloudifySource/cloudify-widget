@@ -244,7 +244,7 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
                 $scope.lastUpdated = new Date().getTime();
 
                 $scope.widget = savedWidget;
-                updateWidgetData(widget.data);
+                updateWidgetData(widget);
                 _setDirty(false);
                 if (!angular.isDefined(widget.id) || widget.id === null) {
                     $location.path('/widgets/' + savedWidget.id + '/edit');
