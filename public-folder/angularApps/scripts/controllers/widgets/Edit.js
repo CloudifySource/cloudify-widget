@@ -112,13 +112,17 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
     $scope.widgetData = {};
 
 
-    function updateWidgetData( widget ){
+    function updateWidgetData( widgetData ){
 
-        $scope.widgetData = ( !!widget.data && JSON.parse(widget.data) ) || {};
-        if ( !$scope.widgetData.socialSources ){
+        if ( widgetData.hasOwnProperty('data')){
+            widgetData = widgetData.data;
+        }
+        $scope.widgetData = ( !!widgetData && angular.fromJson(widgetData) ) || {};
+        if (!$scope.widgetData.socialSources) {
             $scope.widgetData.socialSources = [];
         }
         WidgetsService.shareSources.updateSocialSources($scope.widgetData.socialSources);
+
     }
 
     updateWidgetData($scope.widget);
@@ -158,13 +162,12 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
 
     loadRequest.then(onWidgetLoad);
 
-    $scope.$watch('widgetData', function(){
+    $scope.$watch('widgetData', function() {
         $log.info('updating widget data', $scope.widgetData );
 
         $scope.widget.data = JSON.stringify($scope.widgetData);
         $log.info('widget.data is now' , $scope.widget.data);
-    },true);
-
+    });
     $scope.$watch(function(){return [$scope.widget,$scope.themes];}, function(){
         if ( !!$scope.widget && !!$scope.themes && !$scope.widgetData.theme ){
             $scope.widgetData.theme = WidgetsService.themes.getDefault().id;
@@ -193,7 +196,9 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
 
     $scope.$watch(function(){return [$scope.widget,$scope.cloudTypes];}, function(){
         if ( !!$scope.widget && !!$scope.cloudTypes && !$scope.widgetData.cloudType ){
-            $scope.widgetData.cloudType = WidgetsService.cloudTypes.getDefault().id;
+            var cloudTypeId = WidgetsService.cloudTypes.getDefault().id;
+            $log.info('setting cloud type to', cloudTypeId );
+            $scope.widgetData.cloudType = cloudTypeId;
         }
     },true);
 
@@ -267,12 +272,24 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
 
 
     $scope.runEmailTest = function(widget, testEmail){
-        WidgetsService.sendInstallFinishedEmailTest( widget, testEmail).then(function(){
+        WidgetsService.checkers.sendInstallFinishedEmailTest( widget, testEmail).then(function(){
             toastr.success('email was sent successfully');
         },function( result ){
             toastr.error('error while sending email', result.data );
         });
     };
+
+    $scope.shareImageTest = { 'operation' : 'ADD'};
+    $scope.runImageShareTest = function(widget, testImageShare){
+        $scope.shareImageTestRunning = true;
+        WidgetsService.checkers.checkAwsEc2ImageSharing( widget, testImageShare).then(function(result){
+            toastr.success('success', result.data);
+            $scope.shareImageTestRunning = false;
+        }, function(result){
+            toastr.error('error while sharing image', result.data );
+            $scope.shareImageTestRunning = false;
+        })
+    }
 
 
 });

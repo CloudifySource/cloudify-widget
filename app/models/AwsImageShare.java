@@ -1,5 +1,6 @@
 package models;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import play.db.ebean.Model;
 
 import javax.persistence.Entity;
@@ -21,7 +22,9 @@ public class AwsImageShare extends Model{
     private String imageId;
     private String apiKey;
     private String apiSecretKey;
+    private String endpoint;
 
+    @JsonIgnore
     @OneToOne
     private Widget widget;
 
@@ -58,5 +61,20 @@ public class AwsImageShare extends Model{
         this.apiSecretKey = apiSecretKey;
     }
 
+    public String getEndpoint() {
+        return endpoint;
+    }
 
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    @JsonIgnore
+    public Widget getWidget() {
+        return widget;
+    }
+
+    public void setWidget(Widget widget) {
+        this.widget = widget;
+    }
 }

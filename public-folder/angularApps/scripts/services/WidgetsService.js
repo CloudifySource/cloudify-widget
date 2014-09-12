@@ -5,6 +5,7 @@ angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $co
                                                                 CloudTypesService, $window, MixpanelService,
                                                                 CloudService,
                                                                 UsersService,
+                                                                CheckersService,
                                                                 WidgetsDemoService,
                                                                 WidgetLocalesService, WidgetShareSourcesService  ){
     var authToken = $.cookie('authToken');
@@ -17,6 +18,7 @@ angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $co
     this.locales = WidgetLocalesService;
     this.shareSources = WidgetShareSourcesService;
     this.cloud = CloudService;
+    this.checkers = CheckersService;
 
     this.demo = WidgetsDemoService;
 
@@ -123,11 +125,5 @@ angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $co
             return $.post('/backend/widget/' + instanceId + '/stop?apiKey=' + apiKey);
         }
     };
-
-
-    this.sendInstallFinishedEmailTest = function( widget, details){
-        return $http.post('/backend/widget/' + widget.id + '/testInstallFinishedEmail', details);
-    };
-
 
 });

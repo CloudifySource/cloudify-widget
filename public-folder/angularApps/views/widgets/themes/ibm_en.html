@@ -42,19 +42,22 @@
     <!-- need to set autocomplete=off explicitly in order to turn off the browser's built-in autocomplete -->
     <form class="advanced_form" autocomplete="off" ng-submit="submitAdvancedData()">
         <div class="error" ng-show="advancedRequiredError">Must fill in details</div>
-        <span ng-switch="cloudType" cloud-type={{widget.cloudType}}>
+        <span ng-switch="cloudType">
+
+
             <span ng-switch-when="HP">
                 <input ng-model="advancedParams.HP.params.project" placeholder="Project" name="project"/>
                 <input ng-model="advancedParams.HP.params.key" placeholder="HPCS Key" name="key"/>
                 <input ng-model="advancedParams.HP.params.secretKey" placeholder="HPCS Secret Key" type="password" name="secretKey"/>
             </span>
             <span ng-switch-when="SOFTLAYER">
-                <input ng-model="advancedParams.SOFTLAYER.params.username" placeholder="User ID" title="User ID" name="userId"/>
-                <input ng-model="advancedParams.SOFTLAYER.params.apiKey" type="password" title="API Key" placeholder="API Key" name="apiKey"/>
+                <input ng-model="advancedParams.SOFTLAYER.params.username" placeholder="Softlayer User ID" title="User ID" name="userId"/>
+                <input ng-model="advancedParams.SOFTLAYER.params.apiKey" type="password" title="Softlayer API Key" placeholder="API Key" name="apiKey"/>
             </span>
-            <span ng-switch-when="EC2">
-                <input ng-model="advancedParams.EC2.params.key" placeholder="Key"/>
-                <input ng-model="advancedParams.EC2.params.secretKey" placeholder="Secret Key" type="password"/>
+            <span ng-switch-when="AWS_EC2">
+
+                <input ng-model="advancedParams.AWS_EC2.params.key" placeholder="AWS Key"/>
+                <input ng-model="advancedParams.AWS_EC2.params.secretKey" placeholder="AWS Secret Key" type="password"/>
             </span>
         </span>
         <div class="form-footer-links">

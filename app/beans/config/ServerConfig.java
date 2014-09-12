@@ -174,7 +174,7 @@ public class ServerConfig {
         @Config(ignoreNullValues = true)
         public long sleepBeforeBootstrapMillis = Utils.parseTimeToMillis("20s"); // sleep before bootstrap
         @Config(ignoreNullValues = true)
-        public int createServerRetries = 3; // retries to create server
+        public int createServerRetries = 10; // retries to create server
         @Config(ignoreNullValues = true)
         public int bootstrapRetries = 3; // retries to bootstrap
         public String bootstrapApplicationUrl = null;

@@ -149,12 +149,15 @@ public class Application extends GsController
             }
 
 
+            logger.info("deciding if remote by checking if recipe URL is null or not :: [{}]", widget.getRecipeURL()    );
             if ( !StringUtils.isEmptyOrSpaces(widget.getRecipeURL()) ){
+                logger.info("server node is remote using solo mode");
                 serverNode = new ServerNode();
                 serverNode.setRemote(true);
 
                 serverNode.save();
             }else{
+                logger.info("not remote. using free trial");
                 serverNode = ApplicationContext.get().getServerPool().get();
                 logger.info("application will check if server node is null. if null, there are no available servers");
                 if (serverNode == null) {
@@ -166,7 +169,8 @@ public class Application extends GsController
 
 
             if ( executionData != null ) {
-                ExecutionDataModel edm = new ExecutionDataModel();
+                logger.info("saving execution model on the server");
+                ExecutionDataModel edm = ApplicationContext.get().getNewExecutionDataModel();
                 edm.setEncryptionKey(ApplicationContext.get().conf().applicationSecret);
                 edm.setRaw(executionData.toString());
 
@@ -174,21 +178,6 @@ public class Application extends GsController
 
                 serverNode.setWidget(widget);
                 serverNode.save();
-            }
-
-            try {
-                logger.info("trying to save user details on server node");
-                String widgetInstanceUserDetailsStr = session().get(WidgetInstanceUserDetails.COOKIE_NAME);
-
-                if ( !StringUtils.isEmptyOrSpaces(widgetInstanceUserDetailsStr) && !StringUtils.isEmptyOrSpaces(widget.loginsString) ) {
-                    logger.info("I got a cookie");
-                    WidgetInstanceUserDetails widgetInstanceUserDetails = Json.fromJson(Json.parse( widgetInstanceUserDetailsStr ), WidgetInstanceUserDetails.class);
-                    widgetInstanceUserDetails.save();
-                    serverNode.widgetInstanceUserDetails = widgetInstanceUserDetails;
-                    serverNode.save();
-                }
-            }catch(Exception e){
-                logger.error("unable to save widget instance user details",e);
             }
 
             // run the "bootstrap" and "deploy" in another thread.
@@ -587,61 +576,4 @@ public class Application extends GsController
         return ok( Json.toJson(ApplicationContext.get().getServerPool().getPoolNodesByStatus() ) );
     }
 
-    public static Result testInstallFinishedEmail( Long widgetId ){
-
-        if ( request().body() == null ){
-            return internalServerError("data required but missing");
-        }
-
-        JsonNode jsonNode = request().body().asJson();
-        if ( jsonNode == null ){
-            return internalServerError("data required but missing ");
-        }
-        if ( !jsonNode.has("email")){
-            return internalServerError("email required but missing");
-        }
-
-        if ( !jsonNode.has("name")){
-            return internalServerError("name required but missing");
-        }
-
-
-        String email = jsonNode.get("email").getTextValue();
-        String name = jsonNode.get("name").getTextValue();
-
-        try {
-            User user = validateSession();
-            Widget widget = Widget.findByUserAndId(user, widgetId);
-            ServerNode mockServerNode = new ServerNode();
-            mockServerNode.setPublicIP("1.1.1.1");
-
-            ExecutionDataModel.LoginDetails loginDetails = new ExecutionDataModel.LoginDetails();
-            loginDetails.email = email;
-            loginDetails.name = name;
-            loginDetails.lastName = "mock last name";
-            loginDetails.userId = "mockUserId";
-
-            Map<String, ExecutionDataModel.LoginDetails> jsonMap = new HashMap<String, ExecutionDataModel.LoginDetails>();
-            jsonMap.put("loginDetails", loginDetails);
-
-            String executionDataStr = new ObjectMapper().writeValueAsString(jsonMap);
-            jsonMap.put("loginDetails", loginDetails);
-            ExecutionDataModel model = new ExecutionDataModel();
-            model.setRaw(executionDataStr);
-            model.setEncryptionKey(ApplicationContext.get().conf().applicationSecret);
-            mockServerNode.setExecutionData(model.encrypt());
-
-            mockServerNode.setRandomPassword("some_random_value_mock");
-
-            WidgetInstance widgetInstance = new WidgetInstance();
-            widgetInstance.setWidget(widget);
-            widgetInstance.setServerNode(mockServerNode);
-            mockServerNode.setWidgetInstance(widgetInstance);
-
-            ApplicationContext.get().getWidgetInstallFinishedSender().send(widget, mockServerNode);
-        }catch(Exception e){
-            return internalServerError(e.toString());
-        }
-        return ok();
-    }
 }

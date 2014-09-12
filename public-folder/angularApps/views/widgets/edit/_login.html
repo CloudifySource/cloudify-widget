@@ -27,7 +27,15 @@
 <strong>Test Email</strong>
 <div form-field title="Name" value="testEmail.name" required="false" type="text"></div>
 <div form-field title="Email" value="testEmail.email" required="false" type="text"></div>
-<button ng-click="runEmailTest(widget, testEmail)">Run Test</button>
+
+
+<div class="control-group" ng-class="{'error': !!errorId }">
+    <div class="controls">
+        <button ng-click="runEmailTest(widget, testEmail)">Run Test</button>
+    </div>
+</div>
+
+
 
 <br/><br/>
 <strong>Available Parameters For Email</strong>

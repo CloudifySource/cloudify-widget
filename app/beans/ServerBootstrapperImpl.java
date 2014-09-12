@@ -19,23 +19,21 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
+import beans.cloudbootstrap.CloudProviderCreatorFactory;
+import beans.cloudbootstrap.ICloudProviderCreator;
 import beans.cloudify.CloudifyRestClient;
 import beans.config.ServerConfig;
 import beans.scripts.ScriptExecutor;
 import beans.scripts.ScriptFilesUtilities;
 import cloudify.widget.api.clouds.*;
-import cloudify.widget.cli.ICloudBootstrapDetails;
 import cloudify.widget.cli.ICloudifyCliHandler;
 import cloudify.widget.common.StringUtils;
-import cloudify.widget.common.WidgetResourcesUtils;
 import cloudify.widget.common.asyncscriptexecutor.IAsyncExecution;
 import models.CreateMachineOutput;
 import models.ServerNode;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.io.FileUtils;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,6 +165,10 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                 logger.info("error creating server",e);
             }
 
+        }
+
+        if ( serverNode == null ){
+            logger.error("create server failed " + retries + " times. need to alert user about this");
         }
         return serverNode;
 
@@ -308,100 +310,15 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
        logger.info("closing");
     }
 
-    /**
-     *
-     *
-     * Copies the cloud directory for this server node's execution.
-     *
-     * Writes the properties files (advanced + custom) to the cloud's properties file.
-     *
-     * Supports 2 types of cloud providers:
-     *
-     *  - the ones that come built in with cloudify
-     *  - external providers that are available by a URL as a ZIP file.
-     *
-     *
-     * @param serverNode - the serverNode we want to create a new folder.
-     * @return the File indicating location of new cloud folder.
-     */
-    @Override
-    public File createCloudProvider( ServerNode serverNode  ){
 
-        logger.info("creating cloud provider for [{}]", serverNode.toDebugString());
-        try {
-
-            ICloudBootstrapDetails bootstrapDetails = serverNode.getExecutionDataModel().getCloudBootstrapDetails( serverNode.getWidget().cloudProvider );
-
-            if ( serverNode.getWidget().hasCloudProviderData() ){
-                try {
-
-                    CloudProvider provider = Json.fromJson(serverNode.getWidget().getCloudProvideJson(), CloudProvider.class);
-                    WidgetResourcesUtils.ResourceManager cloudProviderManager = resourceManagerFactory.getCloudProviderManager( serverNode.getWidget() );
-                    String baseDir = ApplicationContext.get().conf().resources.cloudProvidersBaseDir.getAbsolutePath();
-                    File myCloudDirCopy = new File(baseDir, "server_node_" + serverNode.getId() );
-                    if ( serverNode.getWidget().isAutoRefreshProvider() ){
-                        cloudProviderManager.copyFresh( myCloudDirCopy );
-                    }else{
-                        cloudProviderManager.copyFromCache(myCloudDirCopy);
-                    }
-
-                    if ( !StringUtils.isEmptyOrSpaces(serverNode.getWidget().cloudProviderRootDir) ){
-                        myCloudDirCopy = new File(myCloudDirCopy,serverNode.getWidget().cloudProviderRootDir );
-                    }
-
-                    logger.info("using folder [{}] as cloud provider", myCloudDirCopy);
-
-
-                    File myCloudRoot = myCloudDirCopy;
-                    if ( !StringUtils.isEmptyOrSpaces(provider.rootPath) ){
-                        myCloudRoot = new File(myCloudRoot, provider.rootPath );
-                    }
-
-
-                    bootstrapDetails.setCloudDirectory( myCloudRoot.getAbsolutePath() );
-                    bootstrapDetails.setCloudPropertiesFile( new File(myCloudRoot, provider.propertiesFileName ));
-
-                }catch(Exception e){
-                    logger.error("unable to parse cloud provider json [{}]" , serverNode.getWidget().getData());
-                }
-            }
-
-            if (!StringUtils.isEmpty(serverNode.getWidget().getCloudName())) {
-
-                String cloudName = serverNode.getWidget().getCloudName();
-                // in case we simply have a cloud name, we construct the relevant paths
-                File cloudsBaseDir = new File ( ApplicationContext.get().conf().server.environment.cloudifyHome, "clouds");
-                File myCloudDir = new File(cloudsBaseDir, cloudName);
-                File myCloudDirCopy = new File(myCloudDir.getAbsolutePath() + "_" + System.currentTimeMillis());
-                FileUtils.copyDirectory( myCloudDir, myCloudDirCopy);
-                File propertiesFile = new File(myCloudDirCopy, cloudName + "-cloud.properties");
-
-                bootstrapDetails.setCloudDirectory(myCloudDirCopy.getAbsolutePath());
-                bootstrapDetails.setCloudPropertiesFile(propertiesFile);
-
-            }
-
-            cliHandler.writeBootstrapProperties(bootstrapDetails);
-
-            logger.info("cloud bootstrap cloud directory is [{}]", bootstrapDetails.getCloudDirectory() );
-            logger.info("cloud bootstrap properties file is [{}]", bootstrapDetails.getCloudPropertiesFile().getAbsolutePath() );
-
-            File bootstrapPropertiesFile = bootstrapDetails.getCloudPropertiesFile();
-            new CustomPropertiesWriter().writeProperties(serverNode, bootstrapPropertiesFile);
-            return new File(bootstrapDetails.getCloudDirectory());
-        }catch( Exception e ){
-            logger.error("failed creating cloud provider",e);
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public ServerNode bootstrapCloud(ServerNode serverNode) {
         File newCloudFolder = null;
         try{
             logger.info("bootstrapping cloud with details [{}]", serverNode);
-             newCloudFolder = createCloudProvider( serverNode );
-
+            ICloudProviderCreator creator = new CloudProviderCreatorFactory().getCreator(serverNode.getWidget().cloudProvider);
+            newCloudFolder = creator.createCloudProvider(serverNode);
 
                         //Command line for bootstrapping remote cloud.
             CommandLine cmdLine =
@@ -409,7 +326,6 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             cmdLine.addArgument( newCloudFolder.getName() );
 
             IAsyncExecution asyncExecution = scriptExecutor.runBootstrapScript(cmdLine, serverNode);
-
 
             // wait for bootstrap to complete and write output details (such as IP) to the serverNode;
             ScriptFilesUtilities.waitForFinishBootstrappingAndSaveServerNode( serverNode, asyncExecution );
@@ -562,12 +478,6 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
     public void setScriptExecutor(ScriptExecutor scriptExecutor) { this.scriptExecutor = scriptExecutor; }
 
-    public static class CloudProvider{
-        public String url;
-        public String propertiesFileName;
-        public String rootPath; // relative root path from extracted folder
-
-    }
 
     public ResourceManagerFactory getResourceManagerFactory() {
         return resourceManagerFactory;

@@ -44,6 +44,13 @@
 
     <bean id="applicationContext" class="server.ApplicationContext"/>
 
+
+    <bean id="cloudifyCliHandler" class="cloudify.widget.cli.softlayer.CloudifyCliHandlerImpl"/>
+
+    <bean id="executionDataModel" class="cloudify.widget.allclouds.executiondata.ExecutionDataModel" scope="prototype">
+        <property name="serverApiFactory" ref="serverApiFactory"/>
+    </bean>
+
     <bean id="scriptExecutor" class="beans.scripts.FileBasedScriptExecutor">
         <property name="conf"  ref="conf"/>
     </bean>
@@ -84,15 +91,23 @@
             <property name="tag" value="#{conf.server.bootstrap.tag}"/>
         </bean>
 
-        <bean id="cliHandler" class="cloudify.widget.cli.softlayer.SoftlayerCloudifyCliHandler"/>
+
 
 
 
 
     </beans>
 
-    <beans profile="stub">
+    <beans profile="solo"> <!-- enable running solo but don't bother with pool -->
         <bean id="cloudServerApi" class="mocks.cloud.CloudServerApiMock"/>
+        <bean id="machineOptions" class="mocks.cloud.MachineOptionsMock"/>
+
+        <bean id="fileBasedScriptExecutor" class="mocks.cloud.FileBasedScriptExecutorMock">
+        <property name="nodeId" value="962"/>
+        <property name="conf" ref="conf"/>
+        </bean>
+
+
     </beans>
 
 </beans>

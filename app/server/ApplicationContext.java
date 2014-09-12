@@ -19,11 +19,10 @@ import javax.inject.Inject;
 
 import beans.scripts.IExecutionRestore;
 import cloudify.widget.allclouds.advancedparams.IServerApiFactory;
-import cloudify.widget.api.clouds.CloudProvider;
+import cloudify.widget.allclouds.executiondata.ExecutionDataModel;
 import cloudify.widget.api.clouds.CloudServerApi;
-import cloudify.widget.cli.ICloudBootstrapDetails;
-import cloudify.widget.cli.softlayer.SoftlayerCloudBootstrapDetails;
 
+import cloudify.widget.cli.ICloudifyCliHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +71,7 @@ public class ApplicationContext
     @Inject private IServerApiFactory serverApiFactory;
     @Inject private ResourceManagerFactory resourceManagerFactory;
     @Inject private IWidgetInstallFinishedSender widgetInstallFinishedSender;
+    @Inject private ICloudifyCliHandler cloudifyCliHandler;
 
     @Inject private static org.springframework.context.ApplicationContext applicationContext;
 
@@ -184,8 +184,13 @@ public class ApplicationContext
     }
 
 
+    public ICloudifyCliHandler getCloudifyCliHandler() {
+        return cloudifyCliHandler;
+    }
 
-
+    public void setCloudifyCliHandler(ICloudifyCliHandler cloudifyCliHandler) {
+        this.cloudifyCliHandler = cloudifyCliHandler;
+    }
 
     public InitialData getInitialData()
     {
@@ -234,6 +239,8 @@ public class ApplicationContext
     public ResourceManagerFactory getResourceManagerFactory() {
         return resourceManagerFactory;
     }
+
+    public ExecutionDataModel getNewExecutionDataModel(){ return getBean("executionDataModel"); }
 
     public void setResourceManagerFactory(ResourceManagerFactory resourceManagerFactory) {
         this.resourceManagerFactory = resourceManagerFactory;

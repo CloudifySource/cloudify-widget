@@ -68,7 +68,10 @@ GET    /backend/application/pool/nodesByStatus                  controllers.Appl
 
 GET     /backend/application/bootstrap/script              controllers.Application.getInjectScript( publicIp:String?="1.1.1.1", privateIp:String?="2.2.2.2" )
 
-POST    /backend/widget/:widgetId/testInstallFinishedEmail  controllers.Application.testInstallFinishedEmail( widgetId:Long )
+## checkers
+POST    /backend/checkers/widget/:widgetId/testInstallFinishedEmail  controllers.checkers.CheckInstallFinishedEmailSendController.testInstallFinishedEmail( widgetId:Long )
+POST    /backend/checkers/widget/:widgetId/testImageShareController  controllers.checkers.CheckImageShareController.testImageSharing( widgetId: Long )
+## end of checkers
 
 GET     /backend/application/encrypt                        controllers.Application.encrypt( data:String )
 GET     /backend/application/decrypt                        controllers.Application.decrypt( data:String )

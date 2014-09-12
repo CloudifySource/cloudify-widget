@@ -107,7 +107,7 @@ public class Widget
     public MailChimpDetails mailChimpDetails;
 
     @OneToOne(mappedBy = "widget", fetch = FetchType.LAZY)
-    public AwsImageShare awsImageShare;
+    private AwsImageShare awsImageShare;
 
 
     private Boolean showAdvanced;
@@ -757,6 +757,13 @@ public class Widget
 
     }
 
+    public AwsImageShare getAwsImageShare() {
+        return awsImageShare;
+    }
+
+    public void setAwsImageShare(AwsImageShare awsImageShare) {
+        this.awsImageShare = awsImageShare;
+    }
 
     @Transient
     @JsonProperty

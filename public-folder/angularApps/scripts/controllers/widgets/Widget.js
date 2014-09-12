@@ -23,6 +23,16 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
 
     WidgetReceiveMessageService.addHandler( 'widget_recipe_properties', function(event){
         $log.info('got new properties for widget', event.data);
+        if ( !Array.isArray(event.data) ){
+            $log.info('converting format');
+            recipeProperties = [];
+            for ( var k in event.data ){
+                if ( event.data.hasOwnProperty(k)) {
+                    recipeProperties.push({'key': k, 'value': event.data[k]});
+                }
+            }
+            $log.info('after format conversion', recipeProperties);
+        }
         recipeProperties = event.data;
     });
 
@@ -75,6 +85,7 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         $scope.advancedParams[$scope.cloudType] = value;
     }
     function _getAdvanced(){
+
         return $scope.advancedParams[$scope.cloudType];
     }
 
@@ -395,7 +406,9 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
     $scope.$watch('widget', function( /*newValue*/ ){
         setLanguage();
         updateSocialShares();
-//        $scope.cloudType = ( $scope.widget && $scope.widget.data && $scope.widget.cloudProvider ) || myConf.cloudProvider;
+
+        $scope.cloudType = ( $scope.widget && $scope.widget.data && $scope.widget.data.cloudType ) || (typeof(myConf) !== 'undefined' && !!myConf && myConf.cloudProvider);
+        $log.info('cloud type is ' + $scope.cloudType);
     });
 
 

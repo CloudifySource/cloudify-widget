@@ -60,8 +60,6 @@ public interface ServerBootstrapper
 
     public void close();
 
-    public File createCloudProvider( ServerNode serverNode  );
-
     /**
      *
      * @param serverNode return serverNode if bootstrap was a success, otherwise return null.

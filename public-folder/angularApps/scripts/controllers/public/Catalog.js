@@ -23,15 +23,24 @@ angular.module('WidgetApp').controller('PublicDemoCtrl', function ($scope, $loca
 
 
     $log.info('hello from controlller');
-    $scope.appliedProperties = null;
+
     $scope.properties = [];
+    $scope.propertiesMap = {};
+    var propertiesChanged = false;
 
 
-    $scope.applyProperties = function () {
-        $log.info('applying properties');
-        $scope.appliedProperties = $scope.properties;
-        for (var i = 0; i < $scope.appliedProperties.length; i++) {
-            var prop = $scope.appliedProperties[i];
+    function propertiesByFormat( format ){
+        if ( format === 'list'){
+            return $scope.properties;
+        }else{
+            return $scope.propertiesMap;
+
+        }
+    }
+
+    function parseIntProperties(){
+
+        _.each($scope.properties, function(prop){
             try {
                 if (!isNaN(parseInt(prop.value, 10))) {
                     console.log('found a numeric value', prop);
@@ -40,12 +49,30 @@ angular.module('WidgetApp').controller('PublicDemoCtrl', function ($scope, $loca
             } catch (e) {
                 console.log('error', e);
             }
+        });
+    }
+
+    $scope.$watch('properties', function(){
+        $log.info('converting ints for the demo');
+        parseIntProperties();
+        $log.info('creating a map clone for the demo');
+        $scope.propertiesMap = {};//reset
+        try {
+            _.each($scope.properties, function(item) { $scope.propertiesMap[item.key] = item.value; });
+        } catch (e) {
+            $log.error('error converting to propertiesMap');
         }
+        propertiesChanged = true;
+    },true);
 
+    $scope.removeProperty = function(i){
+        _.remove($scope.properties, function(e){ return e === i; });
+    };
 
-        frames[0].postMessage({'name': 'widget_recipe_properties', 'data': $scope.appliedProperties }, frames[0].location.origin);
-
-        $scope.properties = [];
+    $scope.applyProperties = function ( format ) {
+        $log.info('applying properties');
+        frames[0].postMessage({'name': 'widget_recipe_properties', 'data': propertiesByFormat(format)}, frames[0].location.origin);
+        propertiesChanged = false;
     };
 
     $scope.addProperty = function () {
@@ -54,6 +81,8 @@ angular.module('WidgetApp').controller('PublicDemoCtrl', function ($scope, $loca
     };
 
     $scope.needToApplyProperties = function () {
-        return $scope.properties.length > 0;
+        return !!propertiesChanged;
     };
+
+    setTimeout(function(){propertiesChanged = false;},0);
 });

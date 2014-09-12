@@ -358,20 +358,21 @@ public class ServerPoolImpl implements ServerPool
                     public void run() {
                         try {
                             if ( !isPoolWillBeSaturated() ){
-                                int createNewServerCount = 1;
-
+                                int createNewServerCount = 1; // if we do not create the servers one by one, this algorithm becomes unmaintainable.
+                                                              // do not change this algorithm.
                                 undergoingBootstrapCount.addAndGet(createNewServerCount);
                                 logger.info("creating new :: undergoing bootstrap count [{}]", getStats() );
 
                                 List<ServerNode> servers = serverBootstrapper.createServers(createNewServerCount);
+                                undergoingBootstrapCount.decrementAndGet();
+
                                 for (ServerNode srv : servers) {
                                     srv.save();
-                                    undergoingBootstrapCount.decrementAndGet();
                                     logger.info("after create :: undergoing bootstrap count [{}]", getStats());
                                 }
                             }
                             else {
-                                logger.info("not creating :: non busy [{}] ; .", getStats().nonBusyServers, undergoingBootstrapCount.get() ,conf.server.pool.maxNodes);
+                                logger.info("not creating :: stats [{}] .", getStats());
                             }
                         } catch (Exception e) {
                             logger.error("ServerPool failed to create a new server node", e);

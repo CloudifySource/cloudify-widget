@@ -127,6 +127,10 @@ label.filebutton {
   background-color: #f2dede;
   padding: 10px; }
 
+.bg-info {
+  background-color: #d9edf7;
+  padding: 10px; }
+
 #main {
   margin: 20px; }
 

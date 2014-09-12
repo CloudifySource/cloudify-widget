@@ -79,13 +79,6 @@ public class ServerBootstrapperMock implements ServerBootstrapper
         logger.info("rebooting serverNode [{}]", serverNode );
         return true;
     }
-
-    @Override
-    public File createCloudProvider(ServerNode serverNode) {
-        logger.info("creating cloud provider : " + serverNode );
-        return new File("mockBootstrapper");
-    }
-
     @Override
     public String getInjectedBootstrapScript(String publicIp, String privateIp, String randomPassword) {
         return "mock script";

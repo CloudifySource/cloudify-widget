@@ -277,7 +277,7 @@ public class Global extends GlobalSettings
             throw new RuntimeException("you need to configure spring.context and spring.profiles");
         }
 
-        logger.info("spring context is at : ["  + contextPath + "]");
+        logger.info("spring context is at : ["  + contextPath + "] and profiles are [" + contextProfiles + "]" );
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
         applicationContext.getEnvironment().setActiveProfiles(contextProfiles.split(","));
         applicationContext.setConfigLocation(contextPath);

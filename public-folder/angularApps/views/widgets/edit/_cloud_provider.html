@@ -42,4 +42,42 @@ while cloud name, is the name of the folder under "clouds" in cloudify.
 
 <div form-field title="AWS Image API Key" value="widget.awsImageShare.apiKey" required="false" tooltip="api key for image owner" type="text"></div>
 <div form-field title="AWS Image API Secret Key" value="widget.awsImageShare.apiSecretKey" required="false" tooltip="api secret key for image owner" type="password"></div>
+<div class="bg-info explanation">
+    endpoints look like <br/><pre>ec2.<code>REGION</code>.amazonaws.com</pre><br/>
+    leave empty to use default.
+</div>
+
+
+<div form-field title="Endpoint" value="widget.awsImageShare.endpoint" required="false" tooltip="api key for image owner" type="text"></div>
+
 <div form-field title="Default AWS Image Id" value="widget.awsImageShare.imageId" required="false" tooltip="default image id. can be overridden from front-end api" type="text"></div>
+
+
+<h3> Test Image sharing </h3>
+
+<div class="bg-info explanation">
+    First you need to save the widget, then fill in an accountId you want to share with and submit the test. <br/>
+    Wait for a notification on the top right to see if everything went well. <br/>
+</div>
+<div form-field title="Account ID to share with" value="shareImageTest.accountId" required="false" tooltip="account id to share image with"></div>
+<div class="control-group" ng-class="{'error': !!errorId }">
+    <label class="control-label">Operation<abbr class="required_mark" ng-show="required">*</abbr></label>
+    <div class="controls">
+        <input type="radio" ng-model="shareImageTest.operation" value="ADD"/> ADD <br/>
+        <input type="radio" ng-model="shareImageTest.operation" value="REMOVE"/> REMOVE <br/>
+    </div>
+</div>
+
+<div class="control-group" ng-class="{'error': !!errorId }">
+    <div class="controls">
+        <span ng-show="!!shareImageTestRunning">
+            <i class="fa fa-cog fa-spin" style="font-size:27px;"></i> Waiting for result
+        </span>
+        <button ng-show="!shareImageTestRunning" ng-click="runImageShareTest(widget, shareImageTest)">Run Test</button>
+    </div>
+</div>
+
+
+
+
+

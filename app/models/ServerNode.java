@@ -331,7 +331,7 @@ extends Model
 
     @JsonIgnore
     public ExecutionDataModel getExecutionDataModel(){
-        ExecutionDataModel result = new ExecutionDataModel();
+        ExecutionDataModel result = ApplicationContext.get().getNewExecutionDataModel();
         result.setEncryptionKey(ApplicationContext.get().conf().applicationSecret);
         result.decrypt( executionData );
         return result;
