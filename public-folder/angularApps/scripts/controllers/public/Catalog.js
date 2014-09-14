@@ -24,7 +24,7 @@ angular.module('WidgetApp').controller('PublicDemoCtrl', function ($scope, $loca
 
     $log.info('hello from controlller');
 
-    $scope.properties = [{"key" : "myString", "value" : "2aj"}];
+    $scope.properties = [];
     $scope.propertiesMap = {};
     var propertiesChanged = false;
 

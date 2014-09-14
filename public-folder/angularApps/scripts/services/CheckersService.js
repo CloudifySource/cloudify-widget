@@ -7,5 +7,5 @@ angular.module('WidgetApp').service('CheckersService', function( $http  ) {
 
     this.checkAwsEc2ImageSharing = function( widget, details ){
         return $http.post('/backend/checkers/widget/'+ widget.id + '/testImageShareController',details);
-    }
+    };
 });

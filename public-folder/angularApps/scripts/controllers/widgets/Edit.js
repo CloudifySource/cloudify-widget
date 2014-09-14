@@ -288,8 +288,8 @@ angular.module('WidgetApp').controller('WidgetsEditCtrl', function($scope, Widge
         }, function(result){
             toastr.error('error while sharing image', result.data );
             $scope.shareImageTestRunning = false;
-        })
-    }
+        });
+    };
 
 
 });

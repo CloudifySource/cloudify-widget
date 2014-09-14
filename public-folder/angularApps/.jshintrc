@@ -25,6 +25,7 @@
         "_":false,
         "confirm":false,
         "mixpanel":false,
-        "toastr": false
+        "toastr": false,
+        "myConf" : false
     }
 }
