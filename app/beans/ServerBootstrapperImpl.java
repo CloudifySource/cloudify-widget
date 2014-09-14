@@ -34,6 +34,7 @@ import models.ServerNode;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,12 +151,27 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
                                 }
                             });
 
-                    if (bootstrap(tmpNode)) { // bootstrap success
+                    BootstrapResponse bootstrap = bootstrap(tmpNode);
+                    if (bootstrap.success) { // bootstrap success
 //                    poolEventManager.handleEvent(newServerNodeEvent);
                         serverNode = tmpNode;
                         logger.info("successful bootstrap on [{}]", serverNode);
                     } else { // bootstrap failed
                         logger.info("bootstrap failed, deleting server");
+
+                        try{
+                            CreateMachineOutput output = new CreateMachineOutput();
+                            output.setCurrentTry(i);
+                            output.setMaxTries(retries);
+                            output.setCreated(System.currentTimeMillis());
+                            output.setException(ExceptionUtils.getFullStackTrace(bootstrap.e));
+                            output.setOutput(bootstrap.response.getOutput());
+                            output.setExitCode(bootstrap.response.getExitStatus());
+                            output.save();
+                        }catch(Exception e){
+                            logger.error("unable to save create machine output",e);
+                        }
+
                         deleteServer(tmpNode.getNodeId()); // deleting the machine from cloud.
                     }
                 } else { // create server failed
@@ -180,50 +196,33 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
     }
 
+    public static class BootstrapResponse{
+        public CloudExecResponse response = null;
+        public boolean success = false;
+        public Exception e;
+    }
 
-    private boolean bootstrap( ServerNode serverNode ){
 
+    private BootstrapResponse bootstrap( ServerNode serverNode ){
+        BootstrapResponse response = new BootstrapResponse();
         long timeout = bootstrapConf.sleepBeforeBootstrapMillis;
-        int bootstrapRetries = bootstrapConf.bootstrapRetries;
 
         logger.info("Server created, wait {} milliseconds before starting to bootstrap machine: {}", timeout, serverNode.getPublicIP());
 
         Utils.threadSleep(timeout);
+        // bootstrap machine: firewall, jvm, start cloudify
+        try {
+            response.response = bootstrapMachine(serverNode);
 
+            BootstrapValidationResult bootstrapValidationResult = validateBootstrap(serverNode);
 
-        boolean bootstrapSuccess = false;
-        Exception lastBootstrapException = null;
-        for (int i = 0; i < bootstrapRetries && !bootstrapSuccess; i++) {
-            // bootstrap machine: firewall, jvm, start cloudify
-            logger.info("bootstrapping machine try #[{}]", i);
-            try {
-                bootstrapMachine(serverNode);
-                BootstrapValidationResult bootstrapValidationResult = validateBootstrap(serverNode);
-                if (bootstrapValidationResult.isValid()) {
-                    bootstrapSuccess = true;
-                } else {
-                    logger.info("machine [{}] did not bootstrap successfully [{}] retrying", serverNode, bootstrapValidationResult);
-                    try{
-                        cloudServerApi.rebuild( serverNode.getNodeId() );
-                    }catch(Exception e){
-                        // exceptions may occur if cloud does not support this operation, so
-                    }
-                }
-            } catch (RuntimeException e) {
-                lastBootstrapException = e;
+            if (bootstrapValidationResult.isValid()) {
+                response.success = true;
             }
+        } catch (RuntimeException e) {
+            response.e = e;
         }
-
-        if (!bootstrapSuccess) {
-//            poolEventManager.handleEvent(new PoolEvent.ServerNodeEvent()
-//                    .setType(PoolEvent.Type.UPDATE)
-//                    .setServerNode(serverNode)
-//                    .setErrorMessage(lastBootstrapException.getMessage())
-//                    .setErrorStackTrace(ExceptionUtils.getFullStackTrace(lastBootstrapException)));
-//            logger.error("unable to bootstrap machine", lastBootstrapException);
-        }
-        return bootstrapSuccess;
-
+        return response;
     }
 
     @Override
@@ -367,7 +366,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
         return result;
     }
 
-    private void bootstrapMachine( ServerNode server ){
+    private CloudExecResponse bootstrapMachine( ServerNode server ){
 
 		try
 		{
@@ -377,22 +376,12 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
 
 			CloudExecResponse response = cloudServerApi.runScriptOnMachine( script, server.getPublicIP(), null );
 
-            try {
-
-                    CreateMachineOutput output = new CreateMachineOutput();
-                    output.setCreated(System.currentTimeMillis());
-                    output.setContent(Json.stringify(Json.toJson(response)));
-                    output.save();
-
-            }catch(Exception e){
-                logger.error("unable to save create machine output",e);
-            }
-
             logger.info("script finished");
 			logger.info("Bootstrap for server: {} finished successfully successfully. " +
                     "ExitStatus: {} \nOutput:  {}", new Object[]{server,
                     response.getExitStatus(),
                     response.getOutput()} );
+            return response;
 		}catch(Exception ex)
 		{
             logger.error("unable to bootstrap machine [{}]", server, ex);
@@ -403,6 +392,7 @@ public class ServerBootstrapperImpl implements ServerBootstrapper
             }
 			throw new ServerException("Failed to bootstrap cloudify machine: " + server.toDebugString(), ex);
 		}
+
 	}
 
     @Override
