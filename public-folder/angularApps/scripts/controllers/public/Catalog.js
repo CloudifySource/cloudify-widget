@@ -24,7 +24,7 @@ angular.module('WidgetApp').controller('PublicDemoCtrl', function ($scope, $loca
 
     $log.info('hello from controlller');
 
-    $scope.properties = [];
+    $scope.properties = [{"key" : "myString", "value" : "2aj"}];
     $scope.propertiesMap = {};
     var propertiesChanged = false;
 
@@ -42,7 +42,8 @@ angular.module('WidgetApp').controller('PublicDemoCtrl', function ($scope, $loca
 
         _.each($scope.properties, function(prop){
             try {
-                if (!isNaN(parseInt(prop.value, 10))) {
+
+                if (!isNaN(prop.value) && !isNaN(parseInt(prop.value, 10))) {
                     console.log('found a numeric value', prop);
                     prop.value = parseInt(prop.value, 10);
                 }
