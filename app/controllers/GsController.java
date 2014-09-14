@@ -17,18 +17,23 @@ public class GsController extends Controller{
 
     private static Logger logger = LoggerFactory.getLogger(GsController.class);
 
-    public static User validateSession(){
+    public static User validateSession( boolean silent ){
         String authToken = session("authToken");
 
 
         try {
-            if ( request().headers().containsKey(GS_AUTH_TOKEN)) {
-                authToken = request().headers().get(GS_AUTH_TOKEN)[0];
+            if ( request().getHeader(GS_AUTH_TOKEN) != null ) {
+                authToken = request().getHeader(GS_AUTH_TOKEN);
             }
         }catch(Exception e){
             logger.warn("error while reading auth token from ",e);
         }
-        return User.validateAuthToken(authToken,true);
+        return User.validateAuthToken(authToken,silent);
+    }
+
+
+    public static User validateSession(  ){
+        return validateSession( false );
     }
 
 }

@@ -301,10 +301,8 @@ public class Application extends GsController
     }
 
     public static Result getPoolStatus(  ){
-        String authToken = session("authToken");
-        if ( User.validateAuthToken( authToken ) == null ) {
-            return unauthorized();
-        }
+        validateSession();
+
         return ok(Json.toJson(ApplicationContext.get().getServerPool().getStats()));
     }
 
