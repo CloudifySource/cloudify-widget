@@ -72,9 +72,9 @@ public class AwsEc2CloudProviderCreator extends ACloudProviderCreator {
                 serverNode.setPrivateKey(data.getContent());
                 serverNode.save();
 
-                FileUtils.writeStringToFile(new File(bootstrapDetails.getCloudDirectory(), "my.key"), data.getContent());
+                FileUtils.writeStringToFile(new File(bootstrapDetails.getCloudDirectory(), "upload/my.pem"), data.getContent());
 
-                ec2CloudBootstrapDetails.setKeyFile("my.key");
+                ec2CloudBootstrapDetails.setKeyFile("my.pem");
             }catch(Exception e){
                 throw new RuntimeException("unable to create & save private key",e);
             }

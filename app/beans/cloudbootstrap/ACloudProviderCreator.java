@@ -62,6 +62,7 @@ public abstract class ACloudProviderCreator implements ICloudProviderCreator
             prepareCloudAccount();
             generateFolder();
             createPrivateKey();
+            writeProperties();
             return getCloudProviderFolder();
         }catch(UnsupportedOperationException e){
             logger.info("unsupported cloud provider",e);
@@ -152,7 +153,7 @@ public abstract class ACloudProviderCreator implements ICloudProviderCreator
         }
     }
 
-    protected void writeProperties( ICloudBootstrapDetails bootstrapDetails ){
+    protected void writeProperties( ){
         cliHandler.writeBootstrapProperties(bootstrapDetails);
 
         logger.info("cloud bootstrap cloud directory is [{}]", bootstrapDetails.getCloudDirectory() );
