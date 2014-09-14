@@ -103,13 +103,23 @@ public class CreateMachineOutput extends Model {
     }
 
     @Transient
-    public boolean hasException(){
-        return exception != null;
+    public boolean isHasException(){
+        return getException() != null;
     }
 
     @Transient
-    public boolean hasOutput(){
-        return output != null;
+    public boolean isHasOutput(){
+        return getOutput() != null;
+    }
+
+    @Transient
+    public String getExceptionLink(){
+        return isHasException() ? "/backend/createMachineOutput/" + id + "/exception" : null;
+    }
+
+    @Transient
+    public String getOutputLink(){
+        return isHasOutput() ? "/backend/createMachineOutput/" + id + "/output" : null;
     }
 
 

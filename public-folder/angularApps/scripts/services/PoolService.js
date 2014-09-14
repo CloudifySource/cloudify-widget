@@ -24,4 +24,13 @@ angular.module('WidgetApp').service('PoolService', function ($http) {
         return $http.get('/backend/recipe/tmpDownloadLink');
     };
 
+
+    this.getAllMachinesFromCloud = function(){
+        return $http.get('/backend/pool/getAllMatchingTag');
+    };
+
+    this.stopCloudMachine = function(nodeId ){
+        return $http.post('/backend/pool/stopCloudNode', { 'nodeId' : nodeId });
+    };
+
 });

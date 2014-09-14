@@ -27,7 +27,10 @@ GET     /backend/user/details                               controllers.Applicat
 POST    /backend/user/password/change                   controllers.Application.changePassword
 
 GET     /backend/createMachineOutput/index              controllers.CreateMachineOutputController.index
+GET     /backend/createMachineOutput/getSince              controllers.CreateMachineOutputController.getSince( timestamp:Long)
 POST     /backend/createMachineOutput/:outputId/delete              controllers.CreateMachineOutputController.delete( outputId:Long)
+GET     /backend/createMachineOutput/:outputId/exception              controllers.CreateMachineOutputController.getException( outputId:Long)
+GET     /backend/createMachineOutput/:outputId/output              controllers.CreateMachineOutputController.getOutput( outputId:Long)
 POST     /backend/createMachineOutput/deleteAll              controllers.CreateMachineOutputController.deleteAll
 GET     /backend/createMachineOutput/countUnread              controllers.CreateMachineOutputController.countUnread
 POST    /backend/createMachineOutput/markAllRead            controllers.CreateMachineOutputController.markAllRead
@@ -64,6 +67,10 @@ GET     /backend/widget/login/google/callback/:widgetKey   controllers.WidgetGoo
 POST    /backend/application/pool/stopNode/:serverNodeId        controllers.Application.stopServerNode( serverNodeId: Long )
 POST    /backend/application/pool/clean                         controllers.Application.cleanPool
 GET    /backend/application/pool/nodesByStatus                  controllers.Application.getPoolNodesByStatus
+
+
+GET     /backend/pool/getAllMatchingTag                         controllers.PoolController.getAllMachinesThatMatchPrefix
+POST    /backend/pool/stopCloudNode                             controllers.PoolController.stopCloudNode
 
 
 GET     /backend/application/bootstrap/script              controllers.Application.getInjectScript( publicIp:String?="1.1.1.1", privateIp:String?="2.2.2.2" )

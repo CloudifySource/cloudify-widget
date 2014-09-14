@@ -30,6 +30,42 @@ angular.module('WidgetApp').controller('PoolsIndexCtrl', function ( $scope , $q,
         }
     };
 
+
+    $scope.stopCloudNode = function(cloudNode){
+        cloudNode.status = 'user requested to stop this';
+        cloudNode.canStop = false;
+        PoolService.stopCloudMachine(cloudNode.id).then(function(){
+            toastr.success('node ' + cloudNode.id +  ' stop request was sent successfully');
+            cloudNode.status = 'stopped due to user request';
+        }, function(result){
+            toastr.error(result.data, 'error stopping cloud node');
+            cloudNode.status = 'error while stopping';
+            cloudNode.canStop = true;
+        });
+    };
+
+    $scope.foundInDb = function(cloudNode){
+
+        var filterFunc = function( poolNode ){ return poolNode.id === cloudNode.id; };
+
+        if ( !!$scope.poolNodes ){
+            return _.filter($scope.poolNodes.free || [], filterFunc).length > 0 ||
+             _.filter($scope.poolNodes.occupied || [], filterFunc).length > 0;
+        }else{
+            return false;
+        }
+
+    };
+
+    $scope.loadCloudNodes = function(){
+        PoolService.getAllMachinesFromCloud().then(function(result){
+            toastr.success('got cloud nodes');
+            $scope.cloudNodes = result.data;
+        }, function(result){
+            toastr.error(result.data);
+        });
+    };
+
     $scope.downloadRecipe = function(){
       // guy - I know manipulating the dom from the controller is WRONG.. but using a directive approach in thie
     };

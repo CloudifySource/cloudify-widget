@@ -86,6 +86,35 @@
                 </td>
             </tr>
         </table>
+
+
+        <h2> Nodes from cloud - good for leaks </h2>
+        <div class="bg bg-info">
+            This section is not automatically updated as this call may be heavy. <br/>
+            You will have to click the button below to fetch new data <br/>
+            <button ng-click="loadCloudNodes()">Load Cloud Nodes</button>
+        </div>
+
+        <table class="table table-bordered table-striped">
+            <tr>
+                <td>Node ID</td>
+                <td>Name</td>
+                <td>public IP</td>
+                <td>stats</td>
+                <td>Found in DB</td>
+                <td>Actions</td>
+            </tr>
+            <tr ng-repeat="node in cloudNodes">
+                <td>{{node.id}}</td>
+                <td>{{node.name}}</td>
+                <td>{{node.serverIp.publicIp}}</td>
+                <td>{{foundInDb(node)}}</td>
+                <td>{{node.status}}</td>
+                <td>
+                    <button ng-disabled="node.canStop === false" ng-click="stopCloudNode(node)">Stop</button>
+                </td>
+            </tr>
+        </table>
         <h1> Bootstrap Script </h1>
 
 
