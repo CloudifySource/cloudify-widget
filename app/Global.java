@@ -196,9 +196,11 @@ public class Global extends GlobalSettings
     public Result onError( Http.RequestHeader requestHeader, Throwable throwable )
     {
 
-        if ( throwable instanceof Response401){
-            return play.mvc.Results.unauthorized();
-        }
+        try {
+            if (throwable.getCause() instanceof Response401) {
+                return play.mvc.Results.unauthorized(throwable.getCause().getMessage());
+            }
+        }catch(Exception e){}
         logger.error(  "experienced error [{}]", Utils.requestToString( requestHeader ), throwable );
 
         // todo : maybe this should be a method implemented in the exception.
