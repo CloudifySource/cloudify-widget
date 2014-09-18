@@ -53,6 +53,11 @@ angular.module('WidgetApp')
                         'label' : 'Documentation',
                         'url' : '#/documentation/configuration',
                         'canShow' : function( ){ return true; }
+                    },{
+                        'id' : 'login',
+                        'label' : 'Login',
+                        'url' : '#/users/login',
+                        'canShow' : function(){ return !scope.loggedIn; }
                     }
                 ];
 

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('WidgetApp').controller('DocsIndexCtrl', function ( $scope, $routeParams, $location, $log ) {
+angular.module('WidgetApp').controller('DocsIndexCtrl', function ( $scope, $routeParams, $location, $log, WidgetsService ) {
     $scope.docsSections = [
 //        {
 //            'label' : 'Configuration',
@@ -9,12 +9,20 @@ angular.module('WidgetApp').controller('DocsIndexCtrl', function ( $scope, $rout
         {
             'label' : 'Frontend API',
             'id' : 'frontendApi'
-        }//,
-//        {
-//            'label' : 'Backend API',
-//            'id' : 'backendApi'
-//        }
+        },
+        {
+            'label' : 'Backend API',
+            'id' : 'backendApi'
+        }
     ];
+
+
+    $scope.domain = $location.host() + ':' + $location.port();
+    WidgetsService.users.getUserDetails().then(function(result){
+        $scope.accountUuid = result.data.session.authToken;
+    }, function(){
+        toastr.info('login to get copy-paste version for commands', 'Not logged in');
+    });
 
 
     $scope.messages = [
