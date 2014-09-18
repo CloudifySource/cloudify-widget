@@ -1,6 +1,11 @@
 
 .base-layout {
+  .navbar{
+    z-index:1;
+    position:relative;
+  }
   .nav {
+
     li {
       .tag{
         background: red;

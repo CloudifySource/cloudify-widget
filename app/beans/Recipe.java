@@ -84,13 +84,11 @@ public class Recipe {
         Collection<File> files = FileUtils.listFiles(recipeRootDirectory, fileFilter, null);
 
         if (CollectionUtils.isEmpty( files ) ) {
-            throw new ServerException(Messages.get("recipe.not.valid.1",
-                    Type.APPLICATION.fileIdentifier, Type.SERVICE.fileIdentifier));
+            throw new ServerException("could not find recipe groovy file.");
         }
 
         if ( CollectionUtils.size( files ) > 1) {
-            throw new ServerException(Messages.get("recipe.not.valid.2",
-                    Type.APPLICATION.fileIdentifier, Type.SERVICE.fileIdentifier));
+            throw new ServerException("found multiple recipe groovy files.");
         }
 
         File filename = CollectionUtils.first(files);

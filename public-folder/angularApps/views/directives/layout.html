@@ -6,15 +6,15 @@
     <div class="navbar-inner">
         <div class="brand">
         </div>
-        <ul class="nav pull-right" ng-show="loggedIn">
+        <ul class="nav pull-right">
 
-            <li ng-repeat="section in sections" ng-class="{'active' : isCurrentSection(section)}">
+            <li ng-repeat="section in sections" ng-class="{'active' : isCurrentSection(section)}" ng-show="section.canShow()">
                 <a href="{{section.url}}">{{section.label}}</a>
                 <span class="tag" ng-show="!!section.tag">{{section.tag}}</span>
             </li>
 
 
-            <li><button class="btn btn-link" ng-click="doLogout()" style="color:white">Logout</button></li>
+            <li><button class="btn btn-link" ng-click="doLogout()" ng-show="loggedIn" style="color:white">Logout</button></li>
 
         </ul>
     </div>

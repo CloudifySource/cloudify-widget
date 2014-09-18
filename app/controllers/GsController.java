@@ -4,6 +4,8 @@ import models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.mvc.Controller;
+import server.ApplicationContext;
+import server.exceptions.Response401;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,7 +35,19 @@ public class GsController extends Controller{
 
 
     public static User validateSession(  ){
-        return validateSession( false );
+        return validateSession(false);
+    }
+
+    public static void validateHmac(){
+        if ( !request().queryString().containsKey("hmac")){
+            throw new Response401("hmac is missing");
+        }
+
+        String hmac = request().queryString().get("hmac")[0];
+        String uri = request().path();
+        if ( !ApplicationContext.get().getHmac().compare( hmac, uri ) ){
+            throw new Response401("hmac does not validate");
+        }
     }
 
 }

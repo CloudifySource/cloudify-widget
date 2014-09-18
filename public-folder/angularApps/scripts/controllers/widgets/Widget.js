@@ -591,6 +591,6 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         }
     };
 
-    _postMessage({name: 'widget_listening'});
+    _postMessage({name: 'widget_loaded'});
 
 });

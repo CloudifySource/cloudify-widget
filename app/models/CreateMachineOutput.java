@@ -1,7 +1,9 @@
 package models;
 
+import beans.HmacImpl;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import play.db.ebean.Model;
+import server.ApplicationContext;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -33,6 +35,8 @@ public class CreateMachineOutput extends Model {
 
     @Lob
     private String exception;
+
+    private boolean alertWasSent;
 
     private boolean outputRead = false;
 
@@ -112,17 +116,33 @@ public class CreateMachineOutput extends Model {
         return getOutput() != null;
     }
 
+    private String sign( String link ){
+        HmacImpl hmac = ApplicationContext.get().getHmac();
+        return hmac.sign( link );
+    }
+
+    private String getSignedLink( String link ){
+        return link + "?hmac=" + sign(link);
+    }
+
     @Transient
     public String getExceptionLink(){
-        return isHasException() ? "/backend/createMachineOutput/" + id + "/exception" : null;
+        return isHasException() ? getSignedLink("/backend/createMachineOutput/" + id + "/exception") : null;
     }
 
     @Transient
     public String getOutputLink(){
-        return isHasOutput() ? "/backend/createMachineOutput/" + id + "/output" : null;
+        return isHasOutput() ? getSignedLink("/backend/createMachineOutput/" + id + "/output") : null;
     }
 
 
+    public boolean isAlertWasSent() {
+        return alertWasSent;
+    }
+
+    public void setAlertWasSent(boolean alertWasSent) {
+        this.alertWasSent = alertWasSent;
+    }
 
     public void setCreated(Long created) {
         this.created = created;

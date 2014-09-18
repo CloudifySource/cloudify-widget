@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('WidgetApp', ['ngRoute','ngCookies']).config(function($routeProvider){
+angular.module('WidgetApp', ['ngRoute','ngCookies', 'hljs']).config(function($routeProvider){
     $routeProvider
         .when('/widgets/welcome', {
             templateUrl : '/widgets/welcome.html'
@@ -64,6 +64,15 @@ angular.module('WidgetApp', ['ngRoute','ngCookies']).config(function($routeProvi
             resolve: {
                 section : function() { return 'configuration'; }
             }
+        })
+        .when('/documentation/configuration', {
+            templateUrl : 'views/documentation/index.html',
+            controller: 'DocsIndexCtrl',
+            reloadOnSearch: false,
+            resolve : {
+                section : function(){ return 'documentation'; }
+            }
+
         })
         .when('/pool', {
             templateUrl : 'views/pool/index.html',

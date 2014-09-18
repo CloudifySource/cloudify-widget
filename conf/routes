@@ -27,7 +27,7 @@ GET     /backend/user/details                               controllers.Applicat
 POST    /backend/user/password/change                   controllers.Application.changePassword
 
 GET     /backend/createMachineOutput/index              controllers.CreateMachineOutputController.index
-GET     /backend/createMachineOutput/getSince              controllers.CreateMachineOutputController.getSince( timestamp:Long)
+GET     /backend/createMachineOutput/readFirstUnread    controllers.CreateMachineOutputController.readFirstUnread
 POST     /backend/createMachineOutput/:outputId/delete              controllers.CreateMachineOutputController.delete( outputId:Long)
 GET     /backend/createMachineOutput/:outputId/exception              controllers.CreateMachineOutputController.getException( outputId:Long)
 GET     /backend/createMachineOutput/:outputId/output              controllers.CreateMachineOutputController.getOutput( outputId:Long)

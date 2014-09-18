@@ -36,17 +36,28 @@ public class CreateMachineOutputController extends GsController{
     }
 
 
-    static public Result getSince( Long timestamp ){
-        validateSession();
-        List<CreateMachineOutput> created = CreateMachineOutput.finder.where().gt("created", timestamp).setOrderBy("created asc").setMaxRows(1).findList();
-        if ( CollectionUtils.size(created) == 0){
+    /**
+     *
+     * this function is used for monitoring.
+     * just give me one that was unread so far, and mark it as read
+     *
+     * @return
+     */
+    static public Result readFirstUnread( ){
+        boolean sendingAlert = false;
+        if ( request().queryString().containsKey("sendingAlert") ){
+            sendingAlert = "true".equals(request().queryString().get("sendingAlert")[0]);
+        }
+        List<CreateMachineOutput> output = CreateMachineOutput.finder.where().eq("alertWasSent", Boolean.FALSE).orderBy("created asc").setMaxRows(1).findList();
+        if ( CollectionUtils.size(output) == 0){
             return notFound();
         }else{
-            return ok(Json.toJson(CollectionUtils.first( created )));
+            CreateMachineOutput first = CollectionUtils.first(output);
+            first.setAlertWasSent(sendingAlert);
+            first.save();
+            return ok(Json.toJson(first));
         }
-
     }
-
 
     static public Result delete( Long outputId ){
         validateSession();
@@ -61,13 +72,13 @@ public class CreateMachineOutputController extends GsController{
     }
 
     static public Result getException( Long outputId ){
-        validateSession();
+        validateHmac();
         CreateMachineOutput createMachineOutput = CreateMachineOutput.finder.byId(outputId);
         return ok( createMachineOutput.getException() );
     }
 
     static public Result getOutput( Long outputId ){
-        validateSession();
+        validateHmac();
         CreateMachineOutput createMachineOutput = CreateMachineOutput.finder.byId(outputId);
         return ok(createMachineOutput.getOutput());
     }

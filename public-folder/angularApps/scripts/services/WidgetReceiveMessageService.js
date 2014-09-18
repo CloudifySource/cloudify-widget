@@ -7,11 +7,7 @@ angular.module('WidgetApp').service('WidgetReceiveMessageService', function(  $l
         {
             $log.debug('widget got message');
             try{
-                var receivedObj = event.data;
-
-                if ( typeof(receivedObj) ==='string' ){
-                    receivedObj = JSON.parse(receivedObj);
-                }
+                var receivedObj = angular.toJson(event.data);
 
                 if ( receivedObj.hasOwnProperty('name') && !!receivedObj.name ){
                     var name = receivedObj.name;

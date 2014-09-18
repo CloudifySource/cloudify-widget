@@ -1,7 +1,5 @@
 <div class="layout" id="pool-page">
-    <div id="main">
-
-
+    <div id="main" style="width:600px; margin:0 auto;">
 
         <div class="row" id="search_panel" style="padding-bottom:20px;">
             <div class="span4">
@@ -12,20 +10,29 @@
         </div>
 
 
+        <div class="bg bg-info">
+            This page shows failures for bootstrap. (only failures..)<br/>
+            Even if the exit code was 0, the bootstrap failed because when we pinged it, <br/>
+            the service was down. <br/>
+        </div>
 
-      <table class="table table-bordered table-striped" style="width:500px;">
+      <table class="table table-bordered table-striped">
           <tr>
               <td> ID </td>
               <td style="min-width:200px;"> When </td>
               <td style="width:100%"> Exit Code </td>
+              <td>Tries</td>
               <td> Read </td>
+
               <td>Links</td>
+
               <td> Action </td>
           </tr>
           <tr ng-repeat="e in errors | orderBy:'-id'">
               <td>{{e.id}}</td>
               <td>{{e.created | date:'medium' }}</td>
               <td><pre>{{e.exitCode}}</pre></td>
+              <td>{{e.currentTry}} / {{e.maxTries}}</td>
               <td>{{e.outputRead}}</td>
               <td>
                   <a ng-show="!!e.exceptionLink" ng-href="{{e.exceptionLink}}" target="_blank">Exception</a>&nbsp;&nbsp;&nbsp;&nbsp;

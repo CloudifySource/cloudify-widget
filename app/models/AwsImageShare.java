@@ -2,10 +2,12 @@ package models;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import play.db.ebean.Model;
+import utils.StringUtils;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 
 /**
  * Created with IntelliJ IDEA.
@@ -72,6 +74,12 @@ public class AwsImageShare extends Model{
     @JsonIgnore
     public Widget getWidget() {
         return widget;
+    }
+
+    @Transient
+    @JsonIgnore
+    public boolean isValid(){
+        return !StringUtils.isAnyEmptyOrSpaces( imageId, apiKey, apiSecretKey, endpoint);
     }
 
     public void setWidget(Widget widget) {

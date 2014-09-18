@@ -21,31 +21,38 @@ angular.module('WidgetApp')
                     {
                         'id' : 'widgets',
                         'label' : 'Widgets',
-                        'url' : '#/widgets/index'
+                        'url' : '#/widgets/index',
+                        'canShow' : function( ){ return scope.loggedIn; }
                     },
 
                     {
                         'id' : 'demo',
                         'label' : 'Demo',
-                        'url' : '#/public/demo'
+                        'url' : '#/public/demo',
+                        'canShow' : function(){ return true; }
 
                     },{
                         'id': 'pool',
                         'label':'Pool',
-                        'url' : '#/pool'
+                        'url' : '#/pool',
+                        'canShow' : function( ){ return scope.loggedIn; }
+
                     },{
                         'id' :'poolOutput',
                         'label' : 'Pool Output',
-                        'url' : '#/pool/output'
+                        'url' : '#/pool/output',
+                        'canShow' : function( ){ return scope.loggedIn; }
                     },
                     {
                         'id': 'account',
                         'label':'Account',
-                        'url' : '#/user/account'
+                        'url' : '#/user/account',
+                        'canShow' : function( ){ return scope.loggedIn; }
                     },{
-                        'id'  :'configuration',
-                        'label' : 'Configuration',
-                        'url' : '#/configuration/docs'
+                        'id'  :'documentation',
+                        'label' : 'Documentation',
+                        'url' : '#/documentation/configuration',
+                        'canShow' : function( ){ return true; }
                     }
                 ];
 
