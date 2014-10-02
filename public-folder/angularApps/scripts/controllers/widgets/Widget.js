@@ -92,7 +92,11 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
     $scope.widgetStatus = {};
 
     $scope.$watch('widgetStatus', function () {
-        _postMessage({'name': 'widget_status', 'data': $scope.widgetStatus});
+        var data = $scope.widgetStatus;
+        if ( data.hasOwnProperty('status') ){
+            data = data.status;
+        }
+        _postMessage({'name': 'widget_status', 'data': data});
     }, true);
 
 
