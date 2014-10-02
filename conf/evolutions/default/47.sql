@@ -1,3 +1,4 @@
+ALTER TABLE server_node  DROP FOREIGN KEY fk_server_node_lead;
 drop table lead;
 
 create table lead_details (
