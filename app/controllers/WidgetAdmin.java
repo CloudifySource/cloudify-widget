@@ -134,7 +134,7 @@ public class WidgetAdmin extends GsController
 
             if ( w.mailChimpDetails != null ){
                 if ( w.mailChimpDetails.getId() != null ) {
-                    w.mailChimpDetails.update();
+                    w. mailChimpDetails.update();
                 }
                 w.mailChimpDetails.save();
             }

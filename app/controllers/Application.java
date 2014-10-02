@@ -149,6 +149,8 @@ public class Application extends GsController
             }
 
 
+
+
             logger.info("deciding if remote by checking if recipe URL is null or not :: [{}]", widget.getRecipeURL()    );
             if ( !StringUtils.isEmptyOrSpaces(widget.getRecipeURL()) ){
                 logger.info("server node is remote using solo mode");
@@ -178,6 +180,19 @@ public class Application extends GsController
 
                 serverNode.setWidget(widget);
                 serverNode.save();
+            }
+
+
+            try {
+                logger.info("saving lead details");
+                if (serverNode.getExecutionDataModel().has(ExecutionDataModel.JsonKeys.LEAD_DETAILS)) {
+                    LeadDetails leadDetails = new LeadDetails();
+                    leadDetails.setData(serverNode.getExecutionDataModel().getFieldAsString(ExecutionDataModel.JsonKeys.LEAD_DETAILS));
+                    leadDetails.save();
+                }
+                logger.info("lead details saved");
+            } catch (Exception e) {
+                logger.error("unable to save lead details", e);
             }
 
             // run the "bootstrap" and "deploy" in another thread.

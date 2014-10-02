@@ -66,9 +66,6 @@ extends Model
 	private String serverId;
 
 
-    @OneToOne
-    private Lead lead;
-
     @JsonIgnore
     public String randomPassword;
 
@@ -182,12 +179,7 @@ extends Model
             return Long.MAX_VALUE; // leave forever;
         }
         if (widgetInstance != null) {
-            if ( lead != null) {
-                return busySince + lead.getLeadExtraTimeout() - System.currentTimeMillis();
-            } else {
-                return Math.max(EXPIRED_TIME, busySince + widgetInstance.getWidget().getLifeExpectancy() - System.currentTimeMillis());
-            }
-
+            return Math.max(EXPIRED_TIME, busySince + widgetInstance.getWidget().getLifeExpectancy() - System.currentTimeMillis());
         }
         // server nodes can be busy but without a widget if we just took them from the pool and have yet assigned them a widget instance.
         return null;
@@ -470,13 +462,7 @@ extends Model
         return createEvent(s, ServerNodeEvent.Type.INFO);
     }
 
-    public Lead getLead() {
-        return lead;
-    }
 
-    public void setLead(Lead lead) {
-        this.lead = lead;
-    }
 
     public static ServerNode findByWidgetAndInstanceId(Widget widget, String instanceId) {
         return find.where().eq("widget",widget).eq("id", instanceId).findUnique();

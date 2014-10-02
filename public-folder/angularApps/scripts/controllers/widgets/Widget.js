@@ -12,6 +12,7 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
 
     var recipeProperties = null;
     var advancedDataFromMessage = null;
+    var leadDetails = null;
 
 
     function _postMessage( data ){
@@ -36,9 +37,19 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         recipeProperties = event.data;
     });
 
+    WidgetReceiveMessageService.addHandler( 'widget_stop' , function(event){
+        $log.info('stopping widget from event', event.data);
+        $scope.stop();
+    });
+
     WidgetReceiveMessageService.addHandler( 'widget_play', function(event){
         $log.info('playing widget from event', event.data);
         $scope.play();
+    });
+
+    WidgetReceiveMessageService.addHandler('widget_lead_details', function (event) {
+        $log.info('got lead details', event.data);
+        leadDetails = event.data;
     });
 
     WidgetReceiveMessageService.addHandler( 'widget_advanced_data', function(event){
@@ -79,6 +90,10 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
 
 
     $scope.widgetStatus = {};
+
+    $scope.$watch('widgetStatus', function () {
+        _postMessage({'name': 'widget_status', 'data': $scope.widgetStatus});
+    }, true);
 
 
     function _setAdvanced( value ){
@@ -268,6 +283,11 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
             requestData.executionData.recipeProperties = recipeProperties;
         }
 
+
+        if ( !!leadDetails ){
+            requestData.executionData.leadDetails = leadDetails;
+        }
+
         if ( !!$scope.loginDetails ){
             requestData.executionData.loginDetails = $scope.loginDetails;
         }
@@ -294,7 +314,7 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
 
     $scope.stop = function(){
         WidgetDbService.remove(); // remove the cookie
-        _postMessage({name: 'widget_stop'});
+        _postMessage({name: 'widget_stopped'});
         $scope.widgetStatus.state = stop;
         try {
             WidgetsService.stop( apiKey, $scope.widgetStatus.instanceId).then(function(){
