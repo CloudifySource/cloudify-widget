@@ -24,30 +24,19 @@
 
 
                     <h2> Recipe Properties </h2>
-                    <div ng-show="needToApplyProperties()" style="color:red">Don't forget to apply properties</div>
+
+                    <div ng-show="needToApplyProperties()" style="color:red">Don't forget to click 'send to widget' when you finish</div>
                     <div ng-repeat="property in properties">
-                        <input ng-model="property.key"> = <input ng-model="property.value"/>
+                        <input ng-model="property.key"> = <input ng-model="property.value"/> &nbsp; <button ng-click="removeProperty(property)">remove</button>
                     </div>
-                    <button ng-click="applyProperties()">Apply</button>
+                    <button ng-click="applyProperties('list')">Send list format to widget</button>
+                    <button ng-click="applyProperties('map')">Send map format to widget</button>
                     <button ng-click="addProperty()">Add</button>
-                    <div ng-show="!!appliedProperties && appliedProperties.length > 0">
-                        <h2> Applied Properties</h2>
-                        <div class="applied-properties">
-                            <table border="1" style="border-collapse: collapse;border:1px solid black; width:400px; margin:0 auto;">
-                                <tr>
-                                    <td>Key</td>
-                                    <td>Value</td>
-                                </tr>
-                                <tr ng-repeat="property in appliedProperties">
-                                    <td>
-                                        {{property.key}}
-                                    </td>
-                                    <td>
-                                        {{property.value}}
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
+                    <div>
+                        <h3> Json structure as list</h3>
+                        <pre> {{ properties | json }} </pre>
+                        <h3> Json structure as map</h3>
+                        <pre> {{ propertiesMap | json }} </pre>
                     </div>
 
                 </div>

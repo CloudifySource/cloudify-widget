@@ -18,11 +18,8 @@ import java.io.File;
 import java.util.*;
 
 import javax.persistence.*;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
 
 import beans.Recipe;
-import beans.config.Conf;
 import beans.config.ServerConfig;
 import cloudify.widget.api.clouds.CloudProvider;
 import com.avaje.ebean.Junction;
@@ -38,7 +35,6 @@ import org.codehaus.jackson.map.annotate.JsonRootName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.validation.Constraints;
-import play.data.validation.Validation;
 import play.db.ebean.Model;
 import play.i18n.Messages;
 import play.libs.Json;
@@ -78,8 +74,8 @@ public class Widget
     private String title;
 	private String youtubeVideoUrl;
 
-    private boolean autoRefreshRecipe;
-    private boolean autoRefreshProvider;
+    private boolean autoRefreshRecipe = true;
+    private boolean autoRefreshProvider = true;
 
 
     public String cloudName;
@@ -90,7 +86,7 @@ public class Widget
     @Enumerated(EnumType.STRING)
     public CloudProvider cloudProvider = CloudProvider.SOFTLAYER;
 
-    public boolean sendEmail;
+
 
     // optional
 	private String recipeURL = null;
@@ -108,8 +104,10 @@ public class Widget
     public String managerPrefix;
 
     @ManyToOne
-    @JsonIgnore
     public MailChimpDetails mailChimpDetails;
+
+    @OneToOne(mappedBy = "widget", fetch = FetchType.LAZY)
+    private AwsImageShare awsImageShare;
 
 
     private Boolean showAdvanced;
@@ -118,8 +116,9 @@ public class Widget
 	private String consoleName;
 
 
-    @OneToOne( cascade = CascadeType.REMOVE )
-    public MandrillDetails mandrillDetails = null;
+    @JsonProperty
+    @OneToOne( cascade = CascadeType.REMOVE,  mappedBy = "widget")
+    public InstallFinishedEmailDetails installFinishedEmailDetails = null;
 
 
     // guy - this is a temporary work around until cloudify will sort
@@ -758,6 +757,13 @@ public class Widget
 
     }
 
+    public AwsImageShare getAwsImageShare() {
+        return awsImageShare;
+    }
+
+    public void setAwsImageShare(AwsImageShare awsImageShare) {
+        this.awsImageShare = awsImageShare;
+    }
 
     @Transient
     @JsonProperty

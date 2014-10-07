@@ -1,0 +1,10 @@
+this package is meant for controllers that we create just for "test now" buttons.
+
+
+for example - "send email with mandrill" to see that you have setup your mandrill details correctly.
+
+no need for these controllers to pollute the REAL controllers of the application.
+
+each one should be really small and test a specific scenario.
+
+They should not be used to any other flow.

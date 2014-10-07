@@ -23,6 +23,7 @@ import server.ServerPool;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class ServerPoolMock implements ServerPool 
 {
@@ -64,6 +65,18 @@ public class ServerPoolMock implements ServerPool
         logger.info("adding new server to pool");
         callback.run();
 
+    }
+
+    @Override
+    public void clearPool() {
+        logger.info("clearing the pool");
+
+    }
+
+    @Override
+    public Object getPoolNodesByStatus() {
+        logger.info("returning poolNodes by status");
+        return new HashMap();
     }
 
     @Override

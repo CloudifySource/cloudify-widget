@@ -15,7 +15,7 @@
 
 package mocks;
 
-import models.Lead;
+
 import models.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,9 +41,7 @@ public class MailSenderMock implements MailSender {
 
     }
 
-    public void sendRegistrationMail( Lead lead ){
-        logger.info( "sending registration mail");
-    }
+
 
     @Override
     public void sendChangelog() {

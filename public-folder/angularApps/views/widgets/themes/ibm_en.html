@@ -7,15 +7,17 @@
 <ul id="log">
 
     <li ng-show="pendingOutput()">{{'acquiringMachines' | i18n}}</li>
-    <li ng-show="!widgetStatus.message && !isCompleted()" ng-repeat="o in widgetStatus.safeOutput" ng-bind-html="o"></li>
-    <li ng-show="!widgetStatus.message && !widgetStatus.completed && !isCompleted() && !widgetStatus.reset">{{ellipsis}}</li>
+    <li ng-show="!showActionItem() && !widgetStatus.message && !isCompleted()" ng-repeat="o in widgetStatus.safeOutput" ng-bind-html="o"></li>
+    <li ng-show="!showActionItem() && !widgetStatus.message && !widgetStatus.completed && !isCompleted() && !widgetStatus.reset">{{ellipsis}}</li>
     <li class="error" ng-show="!!widgetStatus.message">{{widgetStatus.message}}</li>
-    <li class="important" ng-show="isCompleted()">Now that your trial is over, check out the <a href='http://bluforcloud.com/plans/solo/' class='download_link successfully_completed_msg track' target='_blank'>Solo plan</a> to run BLU Acceleration on your own Softlayer or AWS Cloud.        </li>
+    <li class="important" ng-show="showActionItem() || isCompleted()">Now that your trial is over, check out the <a href='http://bluforcloud.com/plans/solo/' class='download_link successfully_completed_msg track' target='_blank'>Solo plan</a> to run BLU Acceleration on your own Softlayer or AWS Cloud.        </li>
+    <li class="important" ng-show="!!widgetStatus.cloudifyUiIsAvailable"><a href="http://{{widgetStatus.publicIp}}:8099" target="_blank" ng-show="!!widgetStatus.cloudifyUiIsAvailable" class="track">Manage with Cloudify</a></li>
+    <li class="important" ng-show="!!widgetStatus.instanceIsAvailable">Go to <a href="{{widgetStatus.consoleLink.url}}" class="track" target="_blank">{{widgetStatus.consoleLink.title}}</a></li>
     <!--<li class="important" ng-show="isCompleted()">Test drive successfully completed! <br/><a class='download_link successfully_completed_msg' target='_blank' href='http://www.cloudifysource.org/downloads/get_cloudify'>Download Cloudify here</a> or read the <a class='documentation_link' target='_blank' href='http://www.cloudifysource.org/guide/2.3/qsg/quick_start_guide_helloworld'>documentation</a></li>-->
 </ul>
 <ul id="links">
     <li ng-show="!!widgetStatus.instanceIsAvailable"><a href="{{widgetStatus.consoleLink.url}}" class="track" target="_blank">{{widgetStatus.consoleLink.title}}</a></li>
-    <li><span ng-show="!widgetStatus.cloudifyUiIsAvailable">Cloudify</span><a href="http://{{widgetStatus.publicIp}}:8099" target="_blank" ng-show="!!widgetStatus.cloudifyUiIsAvailable" class="track">Cloudify</a></li>
+    <!--<li><span ng-show="!widgetStatus.cloudifyUiIsAvailable">Manage with Cloudify</span><a href="http://{{widgetStatus.publicIp}}:8099" target="_blank" ng-show="!!widgetStatus.cloudifyUiIsAvailable" class="track">Manage with Cloudify</a></li>-->
 </ul>
 <span id="time_left" ng-show="!!widgetStatus.timeleftMillis">Trial time left: <span id="time_left_counter">{{getTimeLeft()}} minutes</span></span>
 <div id="video_container" video-container url="widget.youtubeVideoUrl"></div>
@@ -23,7 +25,7 @@
 
 <div class="advanced_section"  ng-class="{'hidden':!!showAdvanced || !widgetStatus.instanceIsAvailable }">
     <!-- temporary solution. we need to understand the best way to embed messages here -->
-    <div style="margin:10px auto 0 auto"><b>Username</b>: bluadmin<br><b>Password</b>: 0b9f757f32d98899</div>
+    <div style="margin:10px auto 0 auto"><b>Username</b>: bluadmin<br>We sent the password with instructions in E-mail</div>
 </div>
 
 </div>
@@ -40,19 +42,22 @@
     <!-- need to set autocomplete=off explicitly in order to turn off the browser's built-in autocomplete -->
     <form class="advanced_form" autocomplete="off" ng-submit="submitAdvancedData()">
         <div class="error" ng-show="advancedRequiredError">Must fill in details</div>
-        <span ng-switch="cloudType" cloud-type={{widget.cloudType}}>
+        <span ng-switch="cloudType">
+
+
             <span ng-switch-when="HP">
                 <input ng-model="advancedParams.HP.params.project" placeholder="Project" name="project"/>
                 <input ng-model="advancedParams.HP.params.key" placeholder="HPCS Key" name="key"/>
                 <input ng-model="advancedParams.HP.params.secretKey" placeholder="HPCS Secret Key" type="password" name="secretKey"/>
             </span>
             <span ng-switch-when="SOFTLAYER">
-                <input ng-model="advancedParams.SOFTLAYER.params.username" placeholder="User ID" title="User ID" name="userId"/>
-                <input ng-model="advancedParams.SOFTLAYER.params.apiKey" type="password" title="API Key" placeholder="API Key" name="apiKey"/>
+                <input ng-model="advancedParams.SOFTLAYER.params.username" placeholder="Softlayer User ID" title="User ID" name="userId"/>
+                <input ng-model="advancedParams.SOFTLAYER.params.apiKey" type="password" title="Softlayer API Key" placeholder="API Key" name="apiKey"/>
             </span>
-            <span ng-switch-when="EC2">
-                <input ng-model="advancedParams.EC2.params.key" placeholder="Key"/>
-                <input ng-model="advancedParams.EC2.params.secretKey" placeholder="Secret Key" type="password"/>
+            <span ng-switch-when="AWS_EC2">
+
+                <input ng-model="advancedParams.AWS_EC2.params.key" placeholder="AWS Key"/>
+                <input ng-model="advancedParams.AWS_EC2.params.secretKey" placeholder="AWS Secret Key" type="password"/>
             </span>
         </span>
         <div class="form-footer-links">

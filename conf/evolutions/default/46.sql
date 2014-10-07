@@ -1,0 +1,1 @@
+alter table create_machine_output add column alert_was_sent tinyint(1) default 0;

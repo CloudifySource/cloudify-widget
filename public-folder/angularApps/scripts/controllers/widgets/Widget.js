@@ -1,10 +1,18 @@
 'use strict';
 
-angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, $log, $sce, $window, $routeParams, $filter, WidgetDbService, WidgetReceiveMessageService, WidgetsService, CloudTypesService, i18n, WidgetLocalesService ) {
+angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, $log, $sce, $window, $routeParams, $filter,
+                                                              WidgetDbService,
+                                                              WidgetReceiveMessageService,
+                                                              WidgetsService,
+                                                              CloudTypesService,
+                                                              i18n,
+                                                              WidgetLocalesService ) {
 
     var apiKey = $routeParams.widgetKey;
 
     var recipeProperties = null;
+    var advancedDataFromMessage = null;
+    var leadDetails = null;
 
 
     function _postMessage( data ){
@@ -14,10 +22,46 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         $window.parent.postMessage(data, /*$window.location.origin*/ '*');
     }
 
-
     WidgetReceiveMessageService.addHandler( 'widget_recipe_properties', function(event){
         $log.info('got new properties for widget', event.data);
+        if ( !Array.isArray(event.data) ){
+            $log.info('converting format');
+            recipeProperties = [];
+            for ( var k in event.data ){
+                if ( event.data.hasOwnProperty(k)) {
+                    recipeProperties.push({'key': k, 'value': event.data[k]});
+                }
+            }
+            $log.info('after format conversion', recipeProperties);
+        }
         recipeProperties = event.data;
+    });
+
+    WidgetReceiveMessageService.addHandler( 'widget_stop' , function(event){
+        $log.info('stopping widget from event', event.data);
+        $scope.stop();
+    });
+
+    WidgetReceiveMessageService.addHandler( 'widget_play', function(event){
+        $log.info('playing widget from event', event.data);
+        $scope.play();
+    });
+
+    WidgetReceiveMessageService.addHandler('widget_lead_details', function (event) {
+        $log.info('got lead details', event.data);
+        leadDetails = event.data;
+    });
+
+    WidgetReceiveMessageService.addHandler( 'widget_advanced_data', function(event){
+        $log.info('got new advanced data for widget', event.data);
+        advancedDataFromMessage = event.data;
+    });
+
+    $scope.$watch(function () {
+        return advancedDataFromMessage;
+    }, function () {
+        $log.info('advnaced data from message changed', advancedDataFromMessage);
+        _setAdvanced(advancedDataFromMessage);
     });
 
     $window.$windowScope = $scope;
@@ -47,7 +91,20 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
 
     $scope.widgetStatus = {};
 
+    $scope.$watch('widgetStatus', function () {
+        var data = $scope.widgetStatus;
+        if ( data.hasOwnProperty('status') ){
+            data = data.status;
+        }
+        _postMessage({'name': 'widget_status', 'data': data});
+    }, true);
+
+
+    function _setAdvanced( value ){
+        $scope.advancedParams[$scope.cloudType] = value;
+    }
     function _getAdvanced(){
+
         return $scope.advancedParams[$scope.cloudType];
     }
 
@@ -62,14 +119,18 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
     $scope.poweredByUrl[ec2] = 'http://aws.amazon.com';
 
     function _hasAdvanced(){
-        var aData = _getAdvanced();
-        var params = aData.params;
-        for ( var i in params ){
-            if ( params.hasOwnProperty(i) && !params[i] ){
-                return false;
+        try {
+            var aData = _getAdvanced();
+            var params = aData.params;
+            for (var i in params) {
+                if (params.hasOwnProperty(i) && !params[i]) {
+                    return false;
+                }
             }
+            return true;
+        }catch(e){
+            return false;
         }
-        return true;
     }
 
 
@@ -162,6 +223,13 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
     }
 
 
+    $scope.showActionItem = function(){
+        try {
+            return !!$scope.widgetStatus.output && $scope.widgetStatus.output.length === 1 && $scope.widgetStatus.output[0] === 'i18n:testDriveSuccessfullyCompleted';
+        }catch(e){}
+        return false;
+    };
+
     $scope.isCompleted = function(){
         return $scope.widgetStatus.state === stop && !$scope.widgetStatus.instanceId && !$scope.widgetStatus.message && $scope.widgetStatus.timeleftMillis === 0;
     };
@@ -186,17 +254,23 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
 
         // guy - this is a hack until we give a better support to all login types and allow to combine different types.
         // currently we only allow one type in a string. google or custom.
-        if ( loginsString.indexOf('custom') >= 0){
-            loginsString = 'custom';
-        }else if ( loginsString.indexOf('google') >= 0 ){
-            loginsString = 'google';
+        try {
+            if ( !!loginsString ) {
+                if (loginsString.indexOf('custom') >= 0) {
+                    loginsString = 'custom';
+                } else if (loginsString.indexOf('google') >= 0) {
+                    loginsString = 'google';
+                }
+            }
+        } catch(e){
+            $log.info('unable to decide on login system.');
         }
         if ( !!loginsString && !$scope.loginDetails ){
             var size = popupWidths[loginsString];
             var left = (screen.width/2)-(size.width/2);
             var top = (screen.height/2)-(size.height/2);
 
-            popupWindow = window.open( window.location.origin + '/public-folder/angularApps/index.html#/logins/' + loginsString + '?widgetKey=' + apiKey  , 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+ size.width +', height='+ size.height +', top='+top+', left='+left);
+            popupWindow = window.open( window.location.origin + '/public-folder/angularApps/index.html#/logins/' + loginsString + '?locale=' + language + '&widgetKey=' + apiKey  , 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+ size.width +', height='+ size.height +', top='+top+', left='+left);
             return;
         }
         $log.info('starting the widget');
@@ -204,13 +278,22 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         resetWidgetStatus();
         $scope.widgetStatus.state = play;
 
-        var requestData = {};
+        var requestData = { 'executionData' : {} };
         if ( !!_hasAdvanced() ){
-            requestData.advancedData = _getAdvanced();
+            requestData.executionData.advancedData = _getAdvanced();
         }
 
         if ( !!recipeProperties ){
-            requestData.recipeProperties = recipeProperties;
+            requestData.executionData.recipeProperties = recipeProperties;
+        }
+
+
+        if ( !!leadDetails ){
+            requestData.executionData.leadDetails = leadDetails;
+        }
+
+        if ( !!$scope.loginDetails ){
+            requestData.executionData.loginDetails = $scope.loginDetails;
         }
 
 
@@ -235,8 +318,17 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
 
     $scope.stop = function(){
         WidgetDbService.remove(); // remove the cookie
-        _postMessage({name: 'widget_stop'});
+        _postMessage({name: 'widget_stopped'});
         $scope.widgetStatus.state = stop;
+        try {
+            WidgetsService.stop( apiKey, $scope.widgetStatus.instanceId).then(function(){
+                $log.info('stopped successfully');
+            }, function(result){
+                $log.error('did not stop. got error', result.data);
+            });
+        }catch(e){
+            $log.error('unable to stop',e);
+        }
         resetWidgetStatus();
 
     };
@@ -338,7 +430,9 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
     $scope.$watch('widget', function( /*newValue*/ ){
         setLanguage();
         updateSocialShares();
-//        $scope.cloudType = ( $scope.widget && $scope.widget.data && $scope.widget.cloudProvider ) || myConf.cloudProvider;
+
+        $scope.cloudType = ( $scope.widget && $scope.widget.data && $scope.widget.data.cloudType ) || (typeof(myConf) !== 'undefined' && !!myConf && myConf.cloudProvider);
+        $log.info('cloud type is ' + $scope.cloudType);
     });
 
 
@@ -517,7 +611,10 @@ angular.module('WidgetApp').controller('WidgetCtrl',function ($scope, $timeout, 
         }catch(e){
             $log.info('unable to decide if share source active',e);
             return false;
+
         }
     };
+
+    _postMessage({name: 'widget_loaded'});
 
 });

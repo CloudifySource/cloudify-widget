@@ -1,0 +1,25 @@
+<div class="layout" id="documentation">
+
+    <div id="main" class="sefi">
+
+        <div class="navigation">
+            <ul class="nav nav-tabs">
+                    <li ng-repeat="section in docsSections" ng-click="showSection(section)" ng-class="{'active' : currentSection === section}">{{section.label}}</li>
+            </ul>
+        </div>
+
+
+        <div ng-show="currentSection.id === 'configuration'">
+            <div ng-include="'views/documentation/configuration.html'"></div>
+        </div>
+
+
+        <div ng-show="currentSection.id === 'backendApi'">
+            <div ng-include="'views/documentation/backendApi.html'"></div>
+        </div>
+
+        <div ng-show="currentSection.id === 'frontendApi'">
+            <div ng-include="'views/documentation/frontendApi.html'"></div>
+        </div>
+    </div>
+</div>

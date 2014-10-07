@@ -64,10 +64,6 @@ public class ServerBootstrapperMock implements ServerBootstrapper
         return null;
     }
 
-    @Override
-    public String getInjectedBootstrapScript(String publicIp, String privateIp) {
-        return "mock does not do injections :(";
-    }
 
 
     @Override
@@ -83,11 +79,9 @@ public class ServerBootstrapperMock implements ServerBootstrapper
         logger.info("rebooting serverNode [{}]", serverNode );
         return true;
     }
-
     @Override
-    public File createCloudProvider(ServerNode serverNode) {
-        logger.info("creating cloud provider : " + serverNode );
-        return new File("mockBootstrapper");
+    public String getInjectedBootstrapScript(String publicIp, String privateIp, String randomPassword) {
+        return "mock script";
     }
 
     @Override

@@ -1,7 +1,0 @@
-{
-    "installationCompletedSuccessfully" : "Installation completed successfully",
-    "resetWidgetStatusMessage" : "We are so hot that we ran out of instances. Please try again later.",
-    "noAvailableServers" : "We are so hot that we ran out of instances. Please try again later.",
-    "acquiringMachines" : "Acquiring machine. This might take a few seconds, please wait...",
-    "invalidCredentials" : "Invalid Credentials"
-}

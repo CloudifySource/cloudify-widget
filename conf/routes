@@ -1,32 +1,22 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
-POST     /widget/description            controllers.WidgetAdmin.postWidgetDescription(authToken:String, widgetId:Long, description:String ?="")
-POST     /widget/requireLogin            controllers.WidgetAdmin.postRequireLogin(authToken:String, widgetId:Long, requireLogin:Boolean, loginVerificationUrl:String ?="", webServicePrivateKey:String?="")
 GET     /exportSchema                   controllers.Application.generateDDL
-
-
-#Demos
-GET     /demos/loginWithGoogle           controllers.Demos.loginWithGoogle
-GET     /demos/googleLoginCallback       controllers.Demos.googleLoginCallback
-GET     /demos/embedded/:email           controllers.DemosController.getEmbeddedDemoPage( email:String )
-GET     /demos/:userId/list              controllers.DemosController.listWidgetForDemoUser( userId:Long )
-GET     /demos/:userId/:apiKey           controllers.DemosController.getDemoPageForWidget( userId:Long, apiKey:String )
-GET     /demos/:email                    controllers.DemosController.getDemoPageForUser( email:String )
-POST    /demos/verifyWidgetLogin         controllers.Demos.validateUserIdFromLogin(userId:String)
-
 
 #Backend
 GET 	 /backend/getConf           	controllers.Application.getConf( name : String )
-GET     /backend/widgets/:widgetId/resource/details         controllers.WidgetResources.getRecipeResourceDetails( widgetId: Long, authToken: String )
-GET     /backend/widgets/:widgetId/resource/walk            controllers.WidgetResources.getWalkRecipeResourceResult( widgetId: Long, authToken: String )
-POST    /backend/widgets/:widgetId/resource/refresh         controllers.WidgetResources.postManualRefreshResource( widgetId: Long, authToken:String )
-GET     /backend/widgets/:widgetId/resource/content         controllers.WidgetResources.getResourceContent( widgetId: Long, authToken:String, path:String)
 
-GET     /backend/widgets/:widgetId/provider/details         controllers.WidgetResources.getProviderResourceDetails( widgetId: Long, authToken: String )
-GET     /backend/widgets/:widgetId/provider/walk            controllers.WidgetResources.getWalkProviderResourceResult( widgetId: Long, authToken: String )
-POST    /backend/widgets/:widgetId/provider/refresh         controllers.WidgetResources.postManualRefreshProvider( widgetId: Long, authToken:String )
-GET     /backend/widgets/:widgetId/provider/content         controllers.WidgetResources.getProviderContent( widgetId: Long, authToken:String, path:String)
+
+GET     /backend/widgets/:widgetId/resource/details         controllers.WidgetResources.getRecipeResourceDetails( widgetId: Long  )
+GET     /backend/widgets/:widgetId/resource/walk            controllers.WidgetResources.getWalkRecipeResourceResult( widgetId: Long)
+POST    /backend/widgets/:widgetId/resource/refresh         controllers.WidgetResources.postManualRefreshResource( widgetId: Long )
+GET     /backend/widgets/:widgetId/resource/content         controllers.WidgetResources.getResourceContent( widgetId: Long, path:String)
+
+GET     /backend/widgets/:widgetId/provider/details         controllers.WidgetResources.getProviderResourceDetails( widgetId: Long)
+GET     /backend/widgets/:widgetId/provider/walk            controllers.WidgetResources.getWalkProviderResourceResult( widgetId: Long )
+POST    /backend/widgets/:widgetId/provider/refresh         controllers.WidgetResources.postManualRefreshProvider( widgetId: Long)
+GET     /backend/widgets/:widgetId/provider/content         controllers.WidgetResources.getProviderContent( widgetId: Long, path:String)
+
 
 
 
@@ -34,6 +24,16 @@ POST    /backend/login                                     controllers.Applicati
 GET    /backend/isLoggedIn                                 controllers.Application.isLoggedIn
 POST    /backend/logout                                    controllers.Application.logout
 GET     /backend/user/details                               controllers.Application.getUserDetails
+POST    /backend/user/password/change                   controllers.Application.changePassword
+
+GET     /backend/createMachineOutput/index              controllers.CreateMachineOutputController.index
+GET     /backend/createMachineOutput/readFirstUnread    controllers.CreateMachineOutputController.readFirstUnread
+POST     /backend/createMachineOutput/:outputId/delete              controllers.CreateMachineOutputController.delete( outputId:Long)
+GET     /backend/createMachineOutput/:outputId/exception              controllers.CreateMachineOutputController.getException( outputId:Long)
+GET     /backend/createMachineOutput/:outputId/output              controllers.CreateMachineOutputController.getOutput( outputId:Long)
+POST     /backend/createMachineOutput/deleteAll              controllers.CreateMachineOutputController.deleteAll
+GET     /backend/createMachineOutput/countUnread              controllers.CreateMachineOutputController.countUnread
+POST    /backend/createMachineOutput/markAllRead            controllers.CreateMachineOutputController.markAllRead
 
 
 GET     /backend/application/pool/status  controllers.Application.getPoolStatus
@@ -50,7 +50,7 @@ POST     /backend/widget/edit                   controllers.WidgetAdmin.postWidg
 POST    /backend/widget/:widgetId/delete                  controllers.WidgetAdmin.deleteWidgetById( widgetId:Long )
 POST     /backend/widget/:widgetId/disable				controllers.WidgetAdmin.disableWidgetById( widgetId:Long)
 POST     /backend/widget/:widgetId/enable 				controllers.WidgetAdmin.enableWidgetById( widgetId:Long)
-
+GET     /backend/widget/defaultValues                       controllers.WidgetAdmin.getWidgetDefaultValues()
 
 GET     /backend/cloudNames/list                 controllers.Application.getCloudNames
 GET     /backend/cloudProviders/list                 controllers.Application.getCloudProviders
@@ -62,42 +62,33 @@ POST    /backend/widget/login/custom            controllers.WidgetCustomLoginCon
 GET     /backend/widget/login/google                controllers.WidgetGoogleLoginController.loginWithGoogle( widgetKey: String )
 GET     /backend/widget/login/google/callback/:widgetKey   controllers.WidgetGoogleLoginController.googleLoginCallback( widgetKey:String )
 
-# Widget
-
-GET      /widget/:instanceId/pem        controllers.Application.downloadPemFile( instanceId:String )
-GET     /encrypt                        controllers.Application.encrypt( data:String )
-GET     /decrypt                        controllers.Application.decrypt( data:String )
 
 
+POST    /backend/application/pool/stopNode/:serverNodeId        controllers.Application.stopServerNode( serverNodeId: Long )
+POST    /backend/application/pool/clean                         controllers.Application.cleanPool
+GET    /backend/application/pool/nodesByStatus                  controllers.Application.getPoolNodesByStatus
 
 
-# User API
-POST   /api/user/:userId/lead                                       controllers.LeadsController.postLead( userId:String, authToken:String )
-GET    /api/user/:userId/lead/list                                  controllers.LeadsController.getLeads( userId:String, authToken:String )
-GET    /api/user/:userId/lead/:email                                controllers.LeadsController.getLead( userId:String, authToken:String, email:String )
-POST    /api/user/:userId/lead/:leadId/validate                      controllers.LeadsController.confirmEmail( userId:String, authToken:String, leadId:Long, confirmationCode:String )
-GET     /api/admin/:userId/lead/list                                controllers.LeadsController.getAdminLeads( userId:String, authToken:String )
-POST    /api/user/:userId/lead/:leadId/prolong/:instanceId          controllers.LeadsController.assignLeadToWidgetInstance( userId:String , authToken:String , leadId:Long , instanceId:Long )
-
-GET     /api/user/:userId/widgets                                   controllers.WidgetAdmin.listWidgets( userId:Long, authToken:String )
+GET     /backend/pool/getAllMatchingTag                         controllers.PoolController.getAllMachinesThatMatchPrefix
+POST    /backend/pool/stopCloudNode                             controllers.PoolController.stopCloudNode
 
 
-# Admin API
+GET     /backend/application/bootstrap/script              controllers.Application.getInjectScript( publicIp:String?="1.1.1.1", privateIp:String?="2.2.2.2" )
 
-GET     /widget/previewWidget           controllers.WidgetAdmin.previewWidget( apiKey:String )
+## checkers
+POST    /backend/checkers/widget/:widgetId/testInstallFinishedEmail  controllers.checkers.CheckInstallFinishedEmailSendController.testInstallFinishedEmail( widgetId:Long )
+POST    /backend/checkers/widget/:widgetId/testImageShareController  controllers.checkers.CheckImageShareController.testImageSharing( widgetId: Long )
+## end of checkers
 
-GET     /server/headers               	controllers.WidgetAdmin.headers
-GET     /widget/widget                  controllers.WidgetAdmin.getWidget( apiKey:String )
+GET     /backend/application/encrypt                        controllers.Application.encrypt( data:String )
+GET     /backend/application/decrypt                        controllers.Application.decrypt( data:String )
+
+GET      /backend/widget/:instanceId/pem        controllers.Application.downloadPemFile( instanceId:String )
 
 
-
-GET     /widget/login/custom            controllers.Assets.at(path="/public/cloudify/pages/logins",file="custom.html")
-
-GET     /getInjectedScript              controllers.Application.getInjectScript( publicIp:String?="1.1.1.1", privateIp:String?="2.2.2.2" )
+GET     /backend/recipe/tmpDownloadLink            controllers.RecipeController.getTempRecipeDownloadLink
 
 
-# Map static resources from the /public folder to the /assets URL path
-GET     /public/*file  		     	    controllers.Assets.at(path="/public", file)
-GET     /d                              controllers.DemosController.getDemoPageForUser(email="default_demo@gigaspaces.com")
-GET     /*file        		     	    controllers.Assets.at(path="/public", file)
+GET /backend/user/details                       controllers.UsersController.getUserDetails
+
 

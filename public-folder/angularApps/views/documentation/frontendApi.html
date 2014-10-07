@@ -1,0 +1,51 @@
+<div class="section">
+    <div>
+        <p>
+            contributions The frontend API works with PostMessage and ReceiveMessage. <br/>
+            We recommend reading <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window.postMessage" target="_blank">Mozilla's short documentation</a><br/>
+            on the topic. This page will summarize the message the widget receives and the messages it will post.
+        </p>
+    </div>
+</div>
+<h1>General</h1>
+<div class="section">
+    basically all the messages (posted or received) have the same structure. <br/>
+
+    <div snippet>
+        {
+            "name" : event_name,
+            "data" : data_object
+        }
+    </div>
+
+    You can pass an object or a string, the widget will handle conversion to an object in case it is a string. <br/>
+    The widget might pass a string or an object.<br/>
+    We hold the right to change this at any given moment. <br/>
+    We recommend using a safe code. <br/>
+    If you are using angular you can simply use
+    <div snippet> angular.toJson(event.data); </div>
+
+    and if you do not have angularjs you can always do
+    <div snippet>
+if ( typeof(event.data) === 'string' ){
+   event.data = JSON.parse(event.data);
+}
+    </div>
+</div>
+<h1>Overview</h1>
+<div class="section">
+    Here is a short summary of each message<br/>
+    <div ng-repeat="msg in messages">
+        <strong>{{msg.name}}</strong>
+        <ul>
+            <li ng-repeat="d in msg.data"><a ng-click="showMessageDocumentation(d)">{{d}}</a></li>
+        </ul>
+    </div>
+
+    <div ng-show="!!currentMessage" ng-include="getMessageIncludeUrl()"></div>
+
+</div>
+
+
+
+

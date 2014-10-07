@@ -24,6 +24,8 @@
         "i18n":false,
         "_":false,
         "confirm":false,
-        "mixpanel":false
+        "mixpanel":false,
+        "toastr": false,
+        "myConf" : false
     }
 }

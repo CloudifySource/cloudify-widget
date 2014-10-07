@@ -1,4 +1,4 @@
-<div>
+<div class="base-layout">
 <div class="navbar navbar-inverse">
     <div class="pull-left logotype">
         <img src="images/common/gigaspaces_logo.png">
@@ -6,13 +6,16 @@
     <div class="navbar-inner">
         <div class="brand">
         </div>
-        <ul class="nav pull-right" ng-show="loggedIn">
+        <ul class="nav pull-right">
+
+            <li ng-repeat="section in sections" ng-class="{'active' : isCurrentSection(section)}" ng-show="section.canShow()">
+                <a href="{{section.url}}">{{section.label}}</a>
+                <span class="tag" ng-show="!!section.tag">{{section.tag}}</span>
+            </li>
 
 
-            <!--<li><a href="#/user/account" id="account">Account</a></li>-->
-            <li><a href="#/public/demo">Demo</a></li>
-            <li><a href="#/widgets/index" >Dashboard</a></li>
-            <li><button class="btn btn-link" ng-click="doLogout()" style="color:white">Logout</button></li>
+            <li><button class="btn btn-link" ng-click="doLogout()" ng-show="loggedIn" style="color:white">Logout</button></li>
+
 
         </ul>
     </div>
@@ -20,4 +23,5 @@
 <div ng-transclude>
 
 </div>
+    <div style="height:300px;" class="footer"></div>
 </div>

@@ -41,6 +41,7 @@ import scala.collection.JavaConversions;
 import server.ApplicationContext;
 import server.exceptions.ExceptionResponse;
 import server.exceptions.ExceptionResponseDetails;
+import server.exceptions.Response401;
 import utils.StringUtils;
 import utils.Utils;
 import akka.util.Duration;
@@ -147,7 +148,6 @@ public class Global extends GlobalSettings
             logger.error("unable to reconfigure logback");
         }
 
-        logger.error("testing");
 
         try{
             ApplicationContext.get().getMailSender().sendChangelog();
@@ -196,6 +196,11 @@ public class Global extends GlobalSettings
     public Result onError( Http.RequestHeader requestHeader, Throwable throwable )
     {
 
+        try {
+            if (throwable.getCause() instanceof Response401) {
+                return play.mvc.Results.unauthorized(throwable.getCause().getMessage());
+            }
+        }catch(Exception e){}
         logger.error(  "experienced error [{}]", Utils.requestToString( requestHeader ), throwable );
 
         // todo : maybe this should be a method implemented in the exception.
@@ -274,7 +279,7 @@ public class Global extends GlobalSettings
             throw new RuntimeException("you need to configure spring.context and spring.profiles");
         }
 
-        logger.info("spring context is at : ["  + contextPath + "]");
+        logger.info("spring context is at : ["  + contextPath + "] and profiles are [" + contextProfiles + "]" );
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext();
         applicationContext.getEnvironment().setActiveProfiles(contextProfiles.split(","));
         applicationContext.setConfigLocation(contextPath);

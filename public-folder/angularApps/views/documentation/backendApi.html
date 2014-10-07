@@ -1,0 +1,55 @@
+<div class="section">
+    <div>
+        <p>
+            To work with the backend API you will need our API Key. <br/>
+            You can see your API key once you log in to the widget. <br/>
+            Just go to <code>Account</code> section.<br/>
+        </p>
+        <p>
+            Once you have the API key, you need to add it to the Header request.<br/>
+
+        </p>
+        <div snippet>AccountUuid: api_key</div>
+    </div>
+</div>
+
+<h1>GET: /backend/application/pool/status</h1>
+<div class="section">
+    returns the pool status.<br/>
+    <br/>
+    <span ng-show="!!loggedIn">
+    Use the following CURL command to try it out now
+    <br/>
+    <pre  >curl http://{{domain}}/backend/application/pool/status --header "AccountUuid: {{accountUuid}}"</pre>
+    <br/>
+    </span>
+
+    <div snippet>
+        {
+            "all":-1,
+            "nonRemote":-1,
+            "busyServers":-1,
+            "nonBusyServers":-1,
+            "minLimit":-1,
+            "maxLimit":-1,
+            "undergoingBootstrap":-1,
+            "belowLimit":false
+        }
+    </div>
+
+    Where <code>-1</code> represents a number you will receive. <br/>
+    Most of the properties are deprecated by now, and soon will be ommitted from response,<br/>
+    The relevant fields are
+    <ul>
+        <li>nonBusyServers - represents the current pool size</li>
+        <li>undergoingBootstrap - represents the number of machines that will soon be available in the pool</li>
+        <li>busyServers - The servers currently used in the pool</li>
+    </ul>
+
+
+
+</div>
+
+
+
+

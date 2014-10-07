@@ -1,0 +1,28 @@
+<dt>{{item.name}}</dt>
+<dd>
+    <table>
+        <tr ng-show="!!item.type">
+            <td>
+                Type
+            </td>
+            <td>
+                {{item.type}}
+            </td>
+        </tr>
+
+        <tr ng-show="!!item.example">
+            <td>
+                Example
+            </td>
+            <td>
+                {{item.example}}
+            </td>
+        </tr>
+    </table>
+    <div ng-repeat="child in item.children">
+        child goes here
+        <!--<dl ng-show="!!item.children" documentation-item="child" >-->
+<!---->
+        <!--</dl>-->
+    </div>
+</dd>

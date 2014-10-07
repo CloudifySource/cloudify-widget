@@ -34,4 +34,14 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         return "\"" + s + "\"";
     }
 
+    // true iff any of the strings is empty
+    public static boolean isAnyEmptyOrSpaces( String ... str ){
+        for (String s : str) {
+            if ( isEmptyOrSpaces(s)){
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

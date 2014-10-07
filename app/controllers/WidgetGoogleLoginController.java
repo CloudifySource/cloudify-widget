@@ -2,6 +2,9 @@ package controllers;
 
 import cloudify.widget.common.MailChimpWidgetLoginHandler;
 import models.Widget;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.message.BasicNameValuePair;
 import org.openid4java.consumer.ConsumerManager;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.message.AuthRequest;
@@ -11,7 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.DynamicForm;
 import play.mvc.Result;
-import views.html.logins.google;
+
+import java.util.LinkedList;
+import java.util.List;
+
 
 /**
  * Created with IntelliJ IDEA.
@@ -123,7 +129,14 @@ public class WidgetGoogleLoginController extends AbstractLoginController {
             loginDetails.setLastName(lastname);
             handleLogin( widget, loginDetails );
 
-            return redirect("/public-folder/angularApps/index.html#/logins/google/callback?userId=" + openId + "&email=" + email );
+            List<NameValuePair> params = new LinkedList<NameValuePair>();
+            params.add(new BasicNameValuePair("email",email));
+            params.add(new BasicNameValuePair("userId",openId));
+            params.add(new BasicNameValuePair("firstName",firstname));
+            params.add(new BasicNameValuePair("lastName",lastname));
+
+            String format = URLEncodedUtils.format(params, "UTF-8");
+            return redirect("/public-folder/angularApps/index.html#/logins/google/callback?" + format );
         } catch (RuntimeException e) {
             logger.error("login was unsuccessful", e);
         }

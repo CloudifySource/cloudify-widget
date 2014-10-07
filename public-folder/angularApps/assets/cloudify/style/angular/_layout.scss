@@ -1,0 +1,31 @@
+
+.base-layout {
+  .navbar{
+    z-index:1;
+    position:relative;
+  }
+  .nav {
+
+    li {
+      .tag{
+        background: red;
+        padding: 0px;
+        border-radius: 50px;
+        font-size: 12px;
+        min-width: 25px;
+        display: inline-block;
+        text-align: center;
+        font-weight: bold;
+        color: white;
+        margin-top: -40px;
+        margin-right: 10px;
+        float: right;
+      }
+    }
+    li.active {
+      a {
+        background: #676767;
+      }
+    }
+  }
+}

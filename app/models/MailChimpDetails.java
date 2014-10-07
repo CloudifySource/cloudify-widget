@@ -55,11 +55,11 @@ public class MailChimpDetails extends Model {
         this.enabled = enabled;
     }
 
+
     @Override
     public String toString() {
         return "MailChimpDetails{" +
                 "id=" + id +
-                ", apiKey='" + apiKey + '\'' +
                 ", listId='" + listId + '\'' +
                 ", enabled=" + enabled +
                 "} " + super.toString();

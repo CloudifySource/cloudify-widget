@@ -14,9 +14,12 @@
  */
 package utils;
 
+import com.microtripit.mandrillapp.lutung.view.MandrillMessage;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.ObjectMapper;
 import play.Play;
+import play.api.Configuration;
 import play.data.validation.Validation;
 import play.libs.Time;
 import play.mvc.Http;
@@ -77,12 +80,31 @@ public class Utils
         return errors;
     }
 
+
+
     public static void update( JsonNode json, Object obj ){
         ObjectMapper mapper = new ObjectMapper();
         try {
             mapper.readerForUpdating( obj ).treeToValue( json, obj.getClass() );
         } catch (Exception e) {
             throw new RuntimeException ( "unable to update model ",e);
+        }
+    }
+
+
+    public static ObjectMapper getObjectMapper(){
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.getSerializationConfig().addMixInAnnotations(MandrillMessage.class, MandrillMessageMixin.class);
+        mapper.getDeserializationConfig().addMixInAnnotations(MandrillMessage.class, MandrillMessageMixin.class);
+        return mapper;
+    }
+
+
+
+    private static class MandrillMessageMixin{
+        @JsonIgnore
+        public void setTags(String... tags) {
+
         }
     }
 

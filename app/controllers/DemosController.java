@@ -23,8 +23,6 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 import server.ApplicationContext;
-import views.html.widgets.demos.userDemoIndex;
-import views.html.widgets.demos.userDemoIndexEmbeddable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -36,22 +34,6 @@ import java.util.List;
  */
 public class DemosController extends Controller {
 
-    public static Result getDemoPageForUser( String email ){
-        return ok( userDemoIndex.render( email ) );
-    }
-
-    public static Result getEmbeddedDemoPage( String email ){
-        if ( email.endsWith( ApplicationContext.get().conf().demoUserEmailSuffix ) ) {
-            User user = User.find.where().eq( "email", email ).findUnique();
-            if ( user != null ) {
-                return ok( userDemoIndexEmbeddable.render( user.getId() ) );
-            }
-        }
-
-        return ok(  );
-    }
-
-
     public static Result listWidgetForDemoUser( Long userId ){
         List<Widget> list = new Widget.WidgetQueryConfig().criteria().setEnabled(true).setUser(User.findById(userId)).done().find().findList();
         List<PublicWidget> publicDetails = new LinkedList<PublicWidget>();
@@ -61,14 +43,6 @@ public class DemosController extends Controller {
         }
 
         return ok(Json.toJson(publicDetails));
-    }
-
-    public static Result getDemoPageForWidget( Long userId, String apiKey ){
-        Widget widget = Widget.getWidget(apiKey);
-        if ( widget == null ){
-            return badRequest("could not find widget : " + apiKey );
-        }
-        return ok(views.html.widgets.demos.widgetDemo.render(widget, request().host()));
     }
 
     public static Result listWidgetForDemoUserByEmail( String email ){

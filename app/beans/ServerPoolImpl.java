@@ -14,16 +14,14 @@
  */
 package beans;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import akka.util.Duration;
 import beans.config.Conf;
 
 
+import cloudify.widget.allclouds.executiondata.ExecutionDataModel;
 import com.avaje.ebean.Ebean;
 import models.ServerNode;
 import org.apache.commons.collections.Predicate;
@@ -70,8 +68,9 @@ public class ServerPoolImpl implements ServerPool
         public boolean evaluate( Object o )
         {
             ServerNode node = (ServerNode) o;
-            boolean result = !node.isRemote() && StringUtils.isEmptyOrSpaces(node.getAdvancedParams());
-            logger.debug("server [{}] is remote [{}] advanced params [{}] result [{}]", node.getId(), node.isRemote(), node.getAdvancedParams() , result );
+            boolean hasAdvancedParams = node.getExecutionDataModel().has(ExecutionDataModel.JsonKeys.ADVANCED_DATA);
+            boolean result = !node.isRemote() && !hasAdvancedParams;
+            logger.debug("server [{}] is remote [{}] advanced params [{}] result [{}]", node.getId(), node.isRemote() , hasAdvancedParams, result );
             return result;
         }
     };
@@ -359,20 +358,22 @@ public class ServerPoolImpl implements ServerPool
                     public void run() {
                         try {
                             if ( !isPoolWillBeSaturated() ){
-                                int createNewServerCount = 1;
 
-                                undergoingBootstrapCount.addAndGet(createNewServerCount);
+
+                                undergoingBootstrapCount.addAndGet(1);
                                 logger.info("creating new :: undergoing bootstrap count [{}]", getStats() );
 
-                                List<ServerNode> servers = serverBootstrapper.createServers(createNewServerCount);
+                                List<ServerNode> servers = serverBootstrapper.createServers(1);
+                                // fixing this.
+                                undergoingBootstrapCount.decrementAndGet();
                                 for (ServerNode srv : servers) {
                                     srv.save();
-                                    undergoingBootstrapCount.decrementAndGet();
+
                                     logger.info("after create :: undergoing bootstrap count [{}]", getStats());
                                 }
                             }
                             else {
-                                logger.info("not creating :: non busy [{}] ; .", getStats().nonBusyServers, undergoingBootstrapCount.get() ,conf.server.pool.maxNodes);
+                                logger.info("not creating :: stats [{}] .", getStats());
                             }
                         } catch (Exception e) {
                             logger.error("ServerPool failed to create a new server node", e);
@@ -390,5 +391,69 @@ public class ServerPoolImpl implements ServerPool
     public void setConf( Conf conf )
     {
         this.conf = conf;
+    }
+
+    @Override
+    public void clearPool() {
+        int limit = 1000;
+        ServerNode serverNode = null;
+
+        // the idea behind this approach is that we immediately open a request to create a new server for every
+        // server we get from pool.
+        // otherwise, the request to create new servers is delayed until we delete all server, and that might take a long time.
+
+        while( (serverNode = get()) != null && limit > 0){
+            limit --;
+            serverNode.setBusySince( System.currentTimeMillis());
+            serverNode.setStopped( true );
+            serverNode.save();
+        }
+
+        // this is another way to go at it.. but does not give as good results as the above.
+
+//        List<ServerNode> all = ServerNode.all();
+//        Collection<ServerNode> select = CollectionUtils.select(all, nonBusyServerPredicate);
+//        logger.info("found [{}] nodes in the pool", CollectionUtils.size(select));
+//        for (ServerNode serverNode : select) {
+//
+//        }
+//        Ebean.save(select);
+
+        logger.info("cleaned pool successfully");
+    }
+
+    public Object getPoolNodesByStatus(){
+        Map<String,Collection> nodes = new HashMap<String, Collection>();
+        List<ServerNode> all = ServerNode.all();
+        nodes.put("free", convert(CollectionUtils.select(all, nonBusyServerPredicate)));
+        nodes.put("occupied", convert(CollectionUtils.select(all, busyServerPredicate)));
+        return nodes;
+    }
+
+
+    public Collection<PoolNode> convert( Collection<ServerNode> coll ){
+        Collection<PoolNode> result = new LinkedList<PoolNode>();
+
+        for (ServerNode item : coll) {
+            result.add(new PoolNode(item));
+        }
+
+        return result;
+    }
+
+    public static class PoolNode{
+        public String ip;
+        public Long timeLeft;
+        public String id;
+        public String modelId;
+        public boolean stopped;
+
+        public PoolNode( ServerNode serverNode ){
+            ip = serverNode.getPublicIP();
+            timeLeft = serverNode.getTimeLeft();
+            id = serverNode.getNodeId();
+            modelId = serverNode.getId().toString();
+            stopped = serverNode.isStopped();
+        }
     }
 }

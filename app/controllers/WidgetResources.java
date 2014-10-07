@@ -15,12 +15,12 @@ import utils.ResourceManagerFactory;
  * Date: 8/17/14
  * Time: 6:10 PM
  */
-public class WidgetResources extends Controller {
+public class WidgetResources extends GsController {
 
 
-    static public Result getRecipeResourceDetails( Long widgetId, String authToken ){
-        User user = User.validateAuthToken( authToken );
-        Widget w = Widget.findByUserAndId( user, widgetId );
+    static public Result getRecipeResourceDetails( Long widgetId ){
+
+        Widget w = Widget.findByUserAndId( validateSession(), widgetId );
 
         ResourceManagerFactory resourceManagerFactory = ApplicationContext.get().getResourceManagerFactory();
         WidgetResourcesUtils.ResourceManager widgetRecipeManager = resourceManagerFactory.getWidgetRecipeManager(w);
@@ -33,9 +33,9 @@ public class WidgetResources extends Controller {
 
     }
 
-    static public Result getWalkRecipeResourceResult( Long widgetId, String authToken ){
-        User user = User.validateAuthToken(authToken);
-        Widget w = Widget.findByUserAndId(user,widgetId);
+    static public Result getWalkRecipeResourceResult( Long widgetId ){
+
+        Widget w = Widget.findByUserAndId(validateSession(),widgetId);
 
         ResourceManagerFactory resourceManagerFactory = ApplicationContext.get().getResourceManagerFactory();
         WidgetResourcesUtils.ResourceManager widgetRecipeManager = resourceManagerFactory.getWidgetRecipeManager(w);
@@ -44,10 +44,10 @@ public class WidgetResources extends Controller {
 
     }
 
-    static public Result postManualRefreshResource( Long widgetId, String authToken ){
+    static public Result postManualRefreshResource( Long widgetId ){
 
-        User user = User.validateAuthToken(authToken);
-        Widget w = Widget.findByUserAndId(user,widgetId);
+
+        Widget w = Widget.findByUserAndId(validateSession(),widgetId);
 
         ResourceManagerFactory resourceManagerFactory = ApplicationContext.get().getResourceManagerFactory();
         WidgetResourcesUtils.ResourceManager widgetRecipeManager = resourceManagerFactory.getWidgetRecipeManager(w);
@@ -56,11 +56,11 @@ public class WidgetResources extends Controller {
         widgetRecipeManager.download();
         widgetRecipeManager.extract();
 
-        return getRecipeResourceDetails( widgetId, authToken );
+        return getRecipeResourceDetails( widgetId );
     }
 
-    static public Result getResourceContent( Long widgetId, String authToken, String path ){
-        User user = User.validateAuthToken(authToken);
+    static public Result getResourceContent( Long widgetId, String path ){
+        User user = validateSession();
         Widget w = Widget.findByUserAndId(user,widgetId);
 
         ResourceManagerFactory resourceManagerFactory = ApplicationContext.get().getResourceManagerFactory();
@@ -70,8 +70,8 @@ public class WidgetResources extends Controller {
     }
 
 
-    static public Result getProviderResourceDetails( Long widgetId, String authToken ){
-        User user = User.validateAuthToken( authToken );
+    static public Result getProviderResourceDetails( Long widgetId ){
+        User user = validateSession();
         Widget w = Widget.findByUserAndId( user, widgetId );
 
         ResourceManagerFactory resourceManagerFactory = ApplicationContext.get().getResourceManagerFactory();
@@ -85,9 +85,9 @@ public class WidgetResources extends Controller {
 
     }
 
-    static public Result getWalkProviderResourceResult( Long widgetId, String authToken ){
-        User user = User.validateAuthToken(authToken);
-        Widget w = Widget.findByUserAndId(user,widgetId);
+    static public Result getWalkProviderResourceResult( Long widgetId ){
+
+        Widget w = Widget.findByUserAndId(validateSession(),widgetId);
 
         ResourceManagerFactory resourceManagerFactory = ApplicationContext.get().getResourceManagerFactory();
         WidgetResourcesUtils.ResourceManager widgetRecipeManager = resourceManagerFactory.getWidgetRecipeManager(w);
@@ -96,9 +96,9 @@ public class WidgetResources extends Controller {
 
     }
 
-    static public Result postManualRefreshProvider( Long widgetId, String authToken ){
+    static public Result postManualRefreshProvider( Long widgetId ){
 
-        User user = User.validateAuthToken(authToken);
+        User user = validateSession();
         Widget w = Widget.findByUserAndId(user,widgetId);
 
         ResourceManagerFactory resourceManagerFactory = ApplicationContext.get().getResourceManagerFactory();
@@ -108,12 +108,12 @@ public class WidgetResources extends Controller {
         widgetRecipeManager.download();
         widgetRecipeManager.extract();
 
-        return getRecipeResourceDetails( widgetId, authToken );
+        return getRecipeResourceDetails( widgetId );
     }
 
-    static  public Result getProviderContent( Long widgetId, String authToken, String path ){
-        User user = User.validateAuthToken(authToken);
-        Widget w = Widget.findByUserAndId(user,widgetId);
+    static  public Result getProviderContent( Long widgetId, String path ){
+
+        Widget w = Widget.findByUserAndId(validateSession(),widgetId);
 
         ResourceManagerFactory resourceManagerFactory = ApplicationContext.get().getResourceManagerFactory();
         WidgetResourcesUtils.ResourceManager widgetRecipeManager = resourceManagerFactory.getWidgetRecipeManager(w);

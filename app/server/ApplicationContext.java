@@ -19,11 +19,10 @@ import javax.inject.Inject;
 
 import beans.scripts.IExecutionRestore;
 import cloudify.widget.allclouds.advancedparams.IServerApiFactory;
-import cloudify.widget.api.clouds.CloudProvider;
+import cloudify.widget.allclouds.executiondata.ExecutionDataModel;
 import cloudify.widget.api.clouds.CloudServerApi;
-import cloudify.widget.cli.ICloudBootstrapDetails;
-import cloudify.widget.cli.softlayer.SoftlayerCloudBootstrapDetails;
 
+import cloudify.widget.cli.ICloudifyCliHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +33,7 @@ import beans.HmacImpl;
 import beans.config.Conf;
 import beans.tasks.DestroyServersTask;
 import bootstrap.InitialData;
+import services.IWidgetInstallFinishedSender;
 import utils.ResourceManagerFactory;
 
 import java.util.Collection;
@@ -70,6 +70,8 @@ public class ApplicationContext
     @Inject private IExecutionRestore restoreExecutionService;
     @Inject private IServerApiFactory serverApiFactory;
     @Inject private ResourceManagerFactory resourceManagerFactory;
+    @Inject private IWidgetInstallFinishedSender widgetInstallFinishedSender;
+    @Inject private ICloudifyCliHandler cloudifyCliHandler;
 
     @Inject private static org.springframework.context.ApplicationContext applicationContext;
 
@@ -182,8 +184,13 @@ public class ApplicationContext
     }
 
 
+    public ICloudifyCliHandler getCloudifyCliHandler() {
+        return cloudifyCliHandler;
+    }
 
-
+    public void setCloudifyCliHandler(ICloudifyCliHandler cloudifyCliHandler) {
+        this.cloudifyCliHandler = cloudifyCliHandler;
+    }
 
     public InitialData getInitialData()
     {
@@ -203,27 +210,6 @@ public class ApplicationContext
 
     public void setDestroyServersTask(DestroyServersTask destroyServersTask) {
         this.destroyServersTask = destroyServersTask;
-    }
-
-    public ICloudBootstrapDetails getCloudBootstrapDetails( CloudProvider cloudProvider  ){
-        ICloudBootstrapDetails result = null;
-        switch( cloudProvider ){
-
-            case HP:
-                break;
-            case AWS_EC2:
-
-                break;
-            case SOFTLAYER:
-                result = new SoftlayerCloudBootstrapDetails();
-                break;
-            case NA:
-                break;
-        }
-        if ( result == null ){
-            throw new RuntimeException("cloud provider not supported by backend [" +  cloudProvider + "]");
-        }
-        return result;
     }
 
     public void setApplicationContext(org.springframework.context.ApplicationContext applicationContext) throws BeansException {
@@ -254,8 +240,14 @@ public class ApplicationContext
         return resourceManagerFactory;
     }
 
+    public ExecutionDataModel getNewExecutionDataModel(){ return getBean("executionDataModel"); }
+
     public void setResourceManagerFactory(ResourceManagerFactory resourceManagerFactory) {
         this.resourceManagerFactory = resourceManagerFactory;
+    }
+
+    public IWidgetInstallFinishedSender getWidgetInstallFinishedSender(){
+        return widgetInstallFinishedSender;
     }
 }
 

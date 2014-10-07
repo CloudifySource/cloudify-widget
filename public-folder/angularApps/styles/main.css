@@ -127,6 +127,10 @@ label.filebutton {
   background-color: #f2dede;
   padding: 10px; }
 
+.bg-info {
+  background-color: #d9edf7;
+  padding: 10px; }
+
 #main {
   margin: 20px; }
 
@@ -284,28 +288,6 @@ td.action_col {
     top: 40%; } }
 .code {
   cursor: text !important; }
-
-#dashboard .pool-status-section-title {
-  text-align: center;
-  font-size: 20px;
-  font-weight: bold;
-  padding: 20px; }
-#dashboard .pool-status-section {
-  display: table;
-  width: 400px;
-  margin: 0 auto;
-  text-align: center;
-  color: red; }
-  #dashboard .pool-status-section .pool-status-overview {
-    display: table-row; }
-    #dashboard .pool-status-section .pool-status-overview .pool-status-overview-item {
-      display: table-cell; }
-      #dashboard .pool-status-section .pool-status-overview .pool-status-overview-item .pool-status-overview-item-value {
-        font-size: 47px;
-        line-height: 40px;
-        width: 100px; }
-      #dashboard .pool-status-section .pool-status-overview .pool-status-overview-item .pool-status-overview-item-label {
-        width: 100px; }
 
 @-webkit-keyframes rotate {
   from {
@@ -703,8 +685,17 @@ td.action_col {
       line-height: 26px;
       vertical-align: bottom; }
 
-#social-source-form-section input[type=checkbox] {
+#editWidget #social-source-form-section input[type=checkbox] {
   vertical-align: top; }
+#editWidget .explanation {
+  margin-left: 180px;
+  width: 300px;
+  margin-bottom: 20px; }
+#editWidget .navigation .nav li {
+  padding: 20px;
+  cursor: pointer; }
+  #editWidget .navigation .nav li:hover, #editWidget .navigation .nav li.active {
+    background: #CECECE; }
 
 #publicDemo {
   height: 100%;
@@ -858,3 +849,144 @@ div.custom-login {
     div.custom-login .custom-form input[type=submit] {
       margin-top: 10px;
       width: 220px; }
+
+#pool-page .pool-status-section-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 20px; }
+  #pool-page .pool-status-section-title .pool-status-section-subtitle {
+    font-size: 13px;
+    font-weight: normal; }
+#pool-page .pool-status-section {
+  display: table;
+  width: 400px;
+  margin: 0 auto;
+  text-align: center; }
+  #pool-page .pool-status-section .pool-status-overview {
+    display: table-row; }
+    #pool-page .pool-status-section .pool-status-overview .pool-status-overview-item {
+      display: table-cell; }
+      #pool-page .pool-status-section .pool-status-overview .pool-status-overview-item .pool-status-overview-item-value {
+        font-size: 47px;
+        line-height: 40px;
+        width: 100px; }
+      #pool-page .pool-status-section .pool-status-overview .pool-status-overview-item .pool-status-overview-item-label {
+        width: 100px; }
+#pool-page .bg-info {
+  background: #d9edf7;
+  padding: 20px; }
+#pool-page .clean-pool {
+  width: 800px;
+  margin: 0 auto; }
+  #pool-page .clean-pool .title {
+    font-weight: bold; }
+#pool-page .page-content {
+  width: 1100px;
+  margin: 0 auto; }
+#pool-page table .stopped, #pool-page table .stopped td {
+  background: red; }
+
+.base-layout .navbar {
+  z-index: 1;
+  position: relative; }
+.base-layout .nav li .tag {
+  background: red;
+  padding: 0px;
+  border-radius: 50px;
+  font-size: 12px;
+  min-width: 25px;
+  display: inline-block;
+  text-align: center;
+  font-weight: bold;
+  color: white;
+  margin-top: -40px;
+  margin-right: 10px;
+  float: right; }
+.base-layout .nav li.active a {
+  background: #676767; }
+
+#documentation .navigation .nav {
+  background: #32637C;
+  color: white;
+  font-weight: bold;
+  margin-left: -20px;
+  width: 1240px; }
+  #documentation .navigation .nav li {
+    padding: 20px;
+    cursor: pointer; }
+    #documentation .navigation .nav li:hover, #documentation .navigation .nav li.active {
+      color: black;
+      background: #d9edf7; }
+#documentation #main {
+  position: relative;
+  padding-top: 40px;
+  padding-left: 20px;
+  background: #d9edf7;
+  padding-right: 20px;
+  padding-bottom: 200px;
+  font-family: helvetica, arial, freesans, clean, sans-serif;
+  width: 1200px;
+  margin: -60px 0 0 300px;
+  z-index: 0;
+  font-size: 15px;
+  line-height: 17px; }
+  #documentation #main .section {
+    position: relative;
+    padding-bottom: 20px; }
+    #documentation #main .section::after {
+      content: "";
+      display: table;
+      clear: both; }
+    #documentation #main .section .snippet {
+      top: 0;
+      vertical-align: top;
+      right: 0; }
+#documentation a {
+  cursor: pointer; }
+#documentation .plunkr-link {
+  cursor: pointer;
+  padding-top: 20px;
+  display: block;
+  margin: 0 auto;
+  -moz-box-shadow: inset 0px 1px 0px 0px #fce2c1;
+  -webkit-box-shadow: inset 0px 1px 0px 0px #fce2c1;
+  box-shadow: inset 0px 1px 0px 0px #fce2c1;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ffc477), color-stop(1, #fb9e25));
+  background: -moz-linear-gradient(center top, #ffc477 5%, #fb9e25 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffc477', endColorstr='#fb9e25');
+  background-color: #ffc477;
+  -webkit-border-top-left-radius: 20px;
+  -moz-border-radius-topleft: 20px;
+  border-top-left-radius: 20px;
+  -webkit-border-top-right-radius: 20px;
+  -moz-border-radius-topright: 20px;
+  border-top-right-radius: 20px;
+  -webkit-border-bottom-right-radius: 20px;
+  -moz-border-radius-bottomright: 20px;
+  border-bottom-right-radius: 20px;
+  -webkit-border-bottom-left-radius: 20px;
+  -moz-border-radius-bottomleft: 20px;
+  border-bottom-left-radius: 20px;
+  text-indent: 0;
+  border: 1px solid #eeb44f;
+  color: #ffffff;
+  font-family: Arial;
+  font-size: 25px;
+  font-weight: bold;
+  font-style: normal;
+  height: 70px;
+  line-height: 50px;
+  width: 500px;
+  text-decoration: none;
+  text-align: center;
+  text-shadow: 1px 1px 0px #cc9f52;
+  /* This button was generated using CSSButtonGenerator.com */ }
+  #documentation .plunkr-link:hover {
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #fb9e25), color-stop(1, #ffc477));
+    background: -moz-linear-gradient(center top, #fb9e25 5%, #ffc477 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fb9e25', endColorstr='#ffc477');
+    background-color: #fb9e25; }
+  #documentation .plunkr-link:active {
+    position: relative;
+    top: 1px; }

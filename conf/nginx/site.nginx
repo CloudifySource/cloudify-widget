@@ -21,6 +21,7 @@ server{
     rewrite ^/$ $scheme://$host/public-folder/angularApps/index.html break;
     rewrite ^/public/angularApps/(.*) $scheme://$host/public-folder/angularApps/$1 break;
     rewrite ^/d$   $scheme://$host/public-folder/angularApps/index.html#/public/demo break;
+    rewrite ^/widget/(.*)/public$  $scheme://$host/public-folder/angularApps/index.html#/widgets/$1/view break;
 
     keepalive_timeout 70;
 
@@ -33,6 +34,9 @@ server{
     }
 
     location ~ ^/public-folder {
+        if ( $document_uri ~* \.(html|json)$ ){
+             expires 0;
+        }
         root /usr/lib/cloudify-widget;
     }
 

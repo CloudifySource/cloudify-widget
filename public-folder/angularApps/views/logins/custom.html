@@ -1,7 +1,7 @@
 <div class="custom-login">
     <div class="forms-section">
         <div class="google-login">
-            <div class="option-title">Register using Google ID</div>
+            <div class="option-title">{{ 'loginRegisterWithGoogleId' | i18n }}</div>
             <a href="/backend/widget/login/google?widgetKey={{widgetKey}}" >
 
                 <img src="images/sign_in_with_google.png"/>
@@ -13,18 +13,18 @@
             <div class="line"></div>
         </div>
         <div class="custom-form">
-            <div class="option-title">Fill in details</div>
+            <div class="option-title">{{ 'loginFillInDetails' | i18n }}</div>
 
             <form ng-submit="submitForm()">
                 <div class="input-section">
                     <span class="login-label">
-                        Name
+                        {{ 'loginName' | i18n }}
                     </span>
                     <input ng-model="login.name" required>
                 </div>
                 <div class="input-section">
                 <span class="login-label">
-                    Last Name
+                    {{ 'loginLastName' | i18n }}
                 </span>
                     <input ng-model="login.lastName" required>
                 </div>
@@ -32,11 +32,11 @@
 
                 <div class="input-section">
                 <span class="login-label">
-                    Email
+                    {{ 'loginEmail' | i18n }}
                 </span>
                     <input ng-model="login.email" required >
                 </div>
-                <input type="submit" value="Submit"/>
+                <input type="submit" value="{{'loginSubmit' | i18n}}"/>
                 <div class="error">
                     {{error}}
                 </div>

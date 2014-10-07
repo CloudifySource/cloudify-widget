@@ -4,6 +4,8 @@
 angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $cookies, WidgetThemes,
                                                                 CloudTypesService, $window, MixpanelService,
                                                                 CloudService,
+                                                                UsersService,
+                                                                CheckersService,
                                                                 WidgetsDemoService,
                                                                 WidgetLocalesService, WidgetShareSourcesService  ){
     var authToken = $.cookie('authToken');
@@ -11,24 +13,25 @@ angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $co
 
 
     this.themes = WidgetThemes;
+    this.users = UsersService;
     this.cloudTypes = CloudTypesService;
     this.locales = WidgetLocalesService;
     this.shareSources = WidgetShareSourcesService;
     this.cloud = CloudService;
+    this.checkers = CheckersService;
 
     this.demo = WidgetsDemoService;
 
 
     this.getWidgets = function( ){
-        console.log(['getting all widgets', authToken]);
         return $http({
             'method': 'GET',
-            'url' : '/backend/widget/list',
-            'params': {
-                'authToken' : authToken
-
-            }
+            'url' : '/backend/widget/list'
         });
+    };
+
+    this.getWidgetDefaultValues = function(){
+        return $http.get('/backend/widget/defaultValues');
     };
 
 
@@ -41,6 +44,7 @@ angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $co
             }
         });
     };
+
 
     this.getWidgetByKey = function( widgetKey ){
         return $http({
@@ -121,6 +125,5 @@ angular.module('WidgetApp').service('WidgetsService', function( $http, $log, $co
             return $.post('/backend/widget/' + instanceId + '/stop?apiKey=' + apiKey);
         }
     };
-
 
 });

@@ -1,5 +1,24 @@
-#social-source-form-section{
-  input[type=checkbox]{
-    vertical-align: top;
+#editWidget{
+  #social-source-form-section{
+    input[type=checkbox]{
+      vertical-align: top;
+    }
+  }
+
+  .explanation {
+    margin-left:180px;
+    width:300px;
+    margin-bottom:20px;
+  }
+
+
+  .navigation .nav{
+    li {
+      padding:20px;
+      cursor:pointer;
+      &:hover, &.active{
+        background:#CECECE;
+      }
+    }
   }
 }

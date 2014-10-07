@@ -166,6 +166,7 @@ public class ServerConfig {
         public String urlEndpoint = "s3.amazonaws.com";
         public String recipeDownloadMethod = "wget";
         public String installNode = "false";
+        public String serverNodePasswordRegex = "[a-zA-Z0-9]{16}";
         public String recipeRelativePath;
         public File prebootstrapScript = Utils.getFileByRelativePath("/conf/cloudify/prebootstrap");
 
@@ -173,7 +174,7 @@ public class ServerConfig {
         @Config(ignoreNullValues = true)
         public long sleepBeforeBootstrapMillis = Utils.parseTimeToMillis("20s"); // sleep before bootstrap
         @Config(ignoreNullValues = true)
-        public int createServerRetries = 3; // retries to create server
+        public int createServerRetries = 10; // retries to create server
         @Config(ignoreNullValues = true)
         public int bootstrapRetries = 3; // retries to bootstrap
         public String bootstrapApplicationUrl = null;
@@ -219,7 +220,7 @@ public class ServerConfig {
         public String cloudifyEscDirRelativePath = "clouds";
         public String existingManagementMachinePrefix = "cloudify-manager";
         @Config( ignoreNullValues =  true )
-        public boolean removeCloudFolder; // used in dev environment to see the configuration in case it got corrupted.
+        public boolean removeCloudFolder = true; // used in dev environment to see the configuration in case it got corrupted.
 
         public String hardwareId(){
             return zoneName + "/" + hardwareId;

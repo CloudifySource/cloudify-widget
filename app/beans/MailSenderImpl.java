@@ -17,7 +17,7 @@ package beans;
 
 import beans.config.Conf;
 import controllers.routes;
-import models.Lead;
+
 import models.User;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -67,25 +67,7 @@ public class MailSenderImpl implements MailSender {
         }
     }
 
-    @Override
-    public void sendRegistrationMail(Lead lead) {
-        logger.info( "sending registration email to lead [{}]", lead.toDebugString() );
 
-        String mailContent = views.html.mail.registration.render(lead).body();
-        GsMailConfiguration mConf = new GsMailConfiguration();
-        mConf.addRecipient( GsMailer.RecipientType.TO,  lead.email, "HP Cloud Registration")
-                .setBodyHtml( mailContent )
-                .setBodyText( mailContent )
-                .setFrom( conf.mails.registrationFrom.email, conf.mails.registrationFrom.name )
-                .setReplyTo( conf.mailer )
-                .setSubject( "Your App Catalog Free Trial Verification" );
-
-        if ( conf.mails.registrationCc.isValid() ){
-            mConf.addRecipient( GsMailer.RecipientType.BCC, conf.mails.registrationCc.email, conf.mails.registrationCc.name );
-        }
-
-        ApplicationContext.get().getMailer().send(mConf);
-    }
 
     @Override
     public void sendChangelog() {

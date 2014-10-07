@@ -15,10 +15,14 @@
     <meta name="viewport" content="width=device-width">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
-    <!-- build:css(.tmp,app) styles/main.css?aaed4f52308ab3a1 -->
+    <!-- build:css(.tmp,app) styles/main.css?2a3ad7776f67ece6 -->
+    <link href="bower_components/toastr/toastr.css?8438fd33c285aa0a" rel="stylesheet">
     <link href="styles/bootstrap/css/bootstrap.min.css?6d6aba38da64e010" rel="stylesheet">
-    <link href="styles/main.css?aaed4f52308ab3a1" rel="stylesheet">
+    <link href="styles/main.css?2a3ad7776f67ece6" rel="stylesheet">
     <link href="bower_components/font-awesome/css/font-awesome.min.css?bbfef9385083d307" rel="stylesheet">
+
+    <link rel="stylesheet" href="http://yandex.st/highlightjs/8.0/styles/github.min.css">
+
 
 
 
@@ -42,44 +46,64 @@
 <script src="bower_components/angular-cookies/angular-cookies.js?a31a0209b93bc805"></script>
 <script src="bower_components/angular-sanitize/angular-sanitize.js?c054bb865fb1d819"></script>
 <script src="bower_components/angular-route/angular-route.js?9557cbbe1fc74e63"></script>
+<script src="bower_components/toastr/toastr.js?832b12118dee6720"></script>
 <!-- endbuild -->
 
+
 <!-- build:js({.tmp,app}) scripts/scripts.js -->
-<script src="scripts/app.js?b5335879db12605c"></script>
-<script src="scripts/controllers/widgets/Index.js?937efd4e436bd48c"></script>
-<script src="scripts/controllers/widgets/Edit.js?167ecb98e07a562c"></script>
+<script src="scripts/app.js?32eccd9468fb6ab8"></script>
+<script src="scripts/controllers/widgets/Index.js?08dfb03f07ef086b"></script>
+<script src="scripts/controllers/widgets/Edit.js?bc57cd9e2204ff9d"></script>
 <script src="scripts/controllers/widgets/View.js?507e4c3ec722b803"></script>
 <script src="scripts/controllers/widgets/Preview.js?dd2c2411dee450fe"></script>
-<script src="scripts/controllers/widgets/Widget.js?d8fb3100211846d7"></script>
-<script src="scripts/controllers/public/Catalog.js?ea99888cd98cea20"></script>
-<script src="scripts/controllers/logins/Custom.js?ea99888cd98cea20"></script>
-<script src="scripts/controllers/logins/GoogleCallback.js?ea99888cd98cea20"></script>
+<script src="scripts/controllers/widgets/Widget.js?c5d34b10fa8deff9"></script>
+<script src="scripts/controllers/public/Catalog.js?a72c128baf7f7418"></script>
+<script src="scripts/controllers/logins/Custom.js?5a226cd68f268091"></script>
+<script src="scripts/controllers/logins/GoogleCallback.js?88c66199a6e73686"></script>
+<script src="scripts/controllers/pools/Index.js?1b9d4aecc988f5e2"></script>
+<script src="scripts/controllers/users/Account.js?8aa7b4d49bc3c6c6"></script>
+<script src="scripts/controllers/pools/CreateMachineOutput.js?f2a674c9fe91dffa"></script>
+<script src="scripts/controllers/documentation/Configuration.js?ce2acd75bf06f81a"></script>
+<script src="scripts/controllers/documentation/Index.js?71123701193daebe"></script>
 
 <script src="scripts/controllers/users/Login.js?f3bbda728ecfe8a5"></script>
 
-<script src="scripts/services/WidgetsService.js?195323360634a9b9"></script>
-<script src="scripts/services/i18n.js?120901951c8da676"></script>
+<script src="scripts/services/WidgetsService.js?f8dbc90fc217a0f4"></script>
+<script src="scripts/services/i18n.js?1ed631ec3b0efcd4"></script>
 <script src="scripts/services/WidgetThemesService.js?a1588c8f6d4b828a"></script>
 <script src="scripts/services/WidgetDbService.js?239cff9642d87f47"></script>
 <script src="scripts/services/MixpanelService.js?a017956a7bf77e86"></script>
 <script src="scripts/services/CloudTypesService.js?027823059d6f62d7"></script>
-<script src="scripts/services/WidgetReceiveMessageService.js?681283bac03bd5dd"></script>
+<script src="scripts/services/WidgetReceiveMessageService.js?199668ff62fcad31"></script>
 <script src="scripts/services/WidgetLocalesService.js?63c7bd3fdfddde11"></script>
 <script src="scripts/services/WidgetShareSourcesService.js?e59eb607feaa48f3"></script>
-<script src="scripts/services/PoolService.js?036faea059585b9f"></script>
+<script src="scripts/services/PoolService.js?4cdba4763f15d4eb"></script>
 <script src="scripts/services/CloudService.js?2d1e8d6c02f97210"></script>
-<script src="scripts/services/ApplicationService.js?0361455eb0d85fa2"></script>
+<script src="scripts/services/ApplicationService.js?9e658210e4151fff"></script>
 <script src="scripts/services/WidgetsDemoService.js?542b24021fdb39ee"></script>
+<script src="scripts/services/CreateMachineOutputService.js?51d1cba600476ce3"></script>
+<script src="scripts/services/UsersService.js?7726b2c9879778c3"></script>
+<script src="scripts/services/CheckersService.js?ab06562be0c47fe1"></script>
 
 
-<script src="scripts/directives/layout.js?4ffe54fea1847425"></script>
+<script src="scripts/directives/layout.js?4d7312026b2970f4"></script>
 <script src="scripts/directives/img.js?6f5ec3f698195837"></script>
 <script src="scripts/directives/formField.js?8bd2d68f4cf893a6"></script>
 <script src="scripts/directives/fileread.js?39fe11e082fc4630"></script>
 <script src="scripts/directives/embedCode.js?9c29d26b7a61401f"></script>
 <script src="scripts/directives/videoContainer.js?7fc682db0b75a98c"></script>
+<script src="scripts/directives/countdown.js?6869febd0443ab40"></script>
+<script src="scripts/directives/downloadRecipeButton.js?274b41e449243eb3"></script>
+<script src="scripts/directives/documentationItem.js?7c7f47eea5541968"></script>
+<script src="scripts/directives/plunkr.js?dbf71d1525d18bd9"></script>
+<script src="scripts/directives/snippet.js?3c231f2aedc174d9"></script>
 
 <script src="scripts/filters/i18n.js?427cb7ad1da44f77"></script>
+<script src="scripts/filters/duration.js?dc38a29018b3fa30"></script>
+
+
+<script src="http://yandex.st/highlightjs/8.0/highlight.min.js"></script>
+<script src="http://pc035860.github.io/angular-highlightjs/angular-highlightjs.min.js"></script>
 <!-- endbuild -->
 </body>
 </html>

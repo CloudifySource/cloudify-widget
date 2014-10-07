@@ -1,0 +1,15 @@
+{
+    "installationCompletedSuccessfully" : "Installation completed successfully",
+    "testDriveSuccessfullyCompleted" : "<p>Now that your trial is over, check out the <a href='http://bluforcloud.com/plans/solo/' class='download_link successfully_completed_msg track' target='_blank'>Solo plan</a> to run BLU Acceleration on your own Softlayer or AWS Cloud.</p>",
+    "resetWidgetStatusMessage" : "We are so hot that we ran out of instances. Please try again later.",
+    "noAvailableServers" : "We are so hot that we ran out of instances. Please try again later.",
+    "acquiringMachines" : "Acquiring machine. This might take a few seconds, please wait...",
+    "invalidCredentials" : "Invalid Credentials",
+    "loginRegisterWithGoogleId" : "Register using Google ID",
+    "loginFillInDetails" : "Fill in details",
+    "loginName" : "Name",
+    "loginLastName" : "Last Name",
+    "loginEmail" : " Email",
+    "loginSubmit" : "Submit",
+    "registerWithGoogleId" : "Register using Google ID"
+}

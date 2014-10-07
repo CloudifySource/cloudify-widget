@@ -15,41 +15,30 @@
 package controllers;
 
 import com.avaje.ebean.Ebean;
-import controllers.compositions.UserCheck;
-import data.validation.GsConstraints;
 import models.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.Form;
-import play.data.validation.Constraints;
 import play.libs.Json;
-import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
-import play.mvc.With;
 import server.ApplicationContext;
 import server.HeaderMessage;
-import server.exceptions.ServerException;
-import utils.RestUtils;
-import views.html.widgets.dashboard.account;
-import views.html.widgets.dashboard.angularjs_widget;
-import views.html.widgets.dashboard.previewWidget;
-import views.html.widgets.dashboard.widgets;
-import views.html.widgets.widget;
-import views.html.widgets.widgetSinglePage;
+import utils.Utils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static utils.RestUtils.*;
+import static utils.RestUtils.OK_STATUS;
 
 
 /**
@@ -57,7 +46,7 @@ import static utils.RestUtils.*;
  * 
  * @author Igor Goldenberg
  */
-public class WidgetAdmin extends Controller
+public class WidgetAdmin extends GsController
 {
 
     private static Logger logger = LoggerFactory.getLogger( WidgetAdmin.class );
@@ -109,14 +98,14 @@ public class WidgetAdmin extends Controller
         JsonNode jsonNode = Json.parse(widgetString);
         Widget w = null;
         User user = null;
-        if ( jsonNode.has( "id" ) ){
+        if ( jsonNode.has( "apiKey" ) &&  !jsonNode.get("apiKey").isNull() && StringUtils.isNotEmpty(jsonNode.get("apiKey").getTextValue()) ){
             String widgetApiKey = jsonNode.get("apiKey").asText();
             w = getWidgetSafely( authToken, widgetApiKey );
         }else{
             user = User.validateAuthToken( authToken );
         }
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = Utils.getObjectMapper();
 
         Form<Widget> validator = form( Widget.class ).bind( jsonNode );
 
@@ -126,7 +115,7 @@ public class WidgetAdmin extends Controller
         if ( validator.hasErrors() ){
             new HeaderMessage().populateFormErrors( validator ).apply( response().getHeaders() );
             logger.error("trying to save an invalid widget " + validator.toString());
-            return badRequest( );
+            return badRequest( validator.errorsAsJson() );
         }
 
         try {
@@ -143,8 +132,34 @@ public class WidgetAdmin extends Controller
                 user.addNewWidget( w );
             }
 
+            if ( w.mailChimpDetails != null ){
+                if ( w.mailChimpDetails.getId() != null ) {
+                    w. mailChimpDetails.update();
+                }
+                w.mailChimpDetails.save();
+            }
+
+
+
             w.update();
             w.save(  );
+            if ( w.installFinishedEmailDetails != null ){
+                w.installFinishedEmailDetails.setWidget( w );
+                if ( w.installFinishedEmailDetails.getId() != null ){
+                    w.installFinishedEmailDetails.update();
+                }
+                w.installFinishedEmailDetails.save();
+            }
+
+            if ( w.getAwsImageShare() != null ){
+                w.getAwsImageShare().setWidget(w);
+                if ( w.getAwsImageShare().getId() != null ){
+                    w.getAwsImageShare().update();
+                }
+                w.getAwsImageShare().save();
+            }
+
+
             w.refresh( );
 
             if ( removeIcon ){
@@ -190,6 +205,11 @@ public class WidgetAdmin extends Controller
     }
 
 
+    // we want to return default values for the widget
+    public static Result getWidgetDefaultValues(){
+        return ok(Json.toJson(new Widget()));
+    }
+
 //
 
 	
@@ -207,7 +227,7 @@ public class WidgetAdmin extends Controller
         }
 
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = Utils.getObjectMapper();
         mapper.getSerializationConfig().addMixInAnnotations( Widget.class, Widget.IncludeInstancesMixin.class );
         return ok( Json.toJson(list) );
 	}
@@ -220,13 +240,6 @@ public class WidgetAdmin extends Controller
 		ApplicationContext.get().getWidgetServer().undeploy( ServerNode.getServerNode( instanceId )); // todo : link to user somehow
 		return ok(OK_STATUS).as("application/json");
 	}
-
-
-    @With( UserCheck.class )
-    public static Result listWidgets( Long userId, String authToken ){
-        User user = ( User) ctx().args.get("user");
-        return ok(Json.toJson(Widget.findByUser( user )));
-    }
 
     public static Result disableWidgetById( Long widgetId )
     {
@@ -276,17 +289,7 @@ public class WidgetAdmin extends Controller
         return ok( );
     }
 
-    public static Result previewWidget( String apiKey ){
-        Http.Cookie authTokenCookie = request().cookies().get("authToken");
 
-        if ( authTokenCookie == null ){
-             redirect("/");
-        }
-
-        String authToken = authTokenCookie.value();
-        Widget widget = getWidgetSafely( authToken, apiKey );
-        return ok( previewWidget.render(widget, request().host()));
-    }
 	
 	public static Result regenerateWidgetApiKey( String authToken, String apiKey )
 	{
@@ -297,60 +300,7 @@ public class WidgetAdmin extends Controller
 		return ok( Json.toJson( result ) );
 	}
 
-	public static Result headers()
-	{
-    	Http.Request req = Http.Context.current().request();
-    	
-    	StringBuilder sb = new StringBuilder("HEADERS:");
-    	sb.append( "\nRemote address: " ).append( req.remoteAddress() );
-    	
-    	Map<String, String[]> headerMap = req.headers();
-    	for (String headerKey : headerMap.keySet()) 
-    	{
-    	    for( String s : headerMap.get(headerKey) )
-    	    	sb.append( "\n" ).append( headerKey ).append( "=" ).append( s );
-    	}
 
-    	return ok(sb.toString());
-	}
-
-    public static Result postRequireLogin( String authToken, Long widgetId, boolean requireLogin,  String loginVerificationUrl, String webServiceKey ){
-
-        Widget widget = getWidgetSafely( authToken, widgetId, false );
-        if ( widget == null ){
-            new HeaderMessage().setError(" User is not allowed to edit this widget ").apply(response().getHeaders());
-            return badRequest();
-        }
-        GsConstraints.UrlValidator validator = new GsConstraints.UrlValidator();
-        if ( !validator.isValid(loginVerificationUrl) ){
-            new HeaderMessage().addFormError("loginVerificationUrl", "invalid value").apply(response().getHeaders());
-            return badRequest();
-        }
-
-        widget.setRequireLogin( requireLogin );
-        widget.setLoginVerificationUrl( loginVerificationUrl );
-        widget.setWebServiceKey( webServiceKey );
-        widget.save();
-        return ok();
-    }
-
-    public static Result postWidgetDescription( String authToken, Long widgetId, String description ){
-
-        Widget widget = getWidgetSafely( authToken, widgetId, false );
-        if ( widget == null ){
-            new HeaderMessage().setError(" User is not allowed to edit this widget ").apply(response().getHeaders());
-            return badRequest();
-        }
-
-        widget.setDescription( description );
-        widget.save(  );
-        return ok(  );
-
-    }
-
-    public static Result newWidgetsPage(){
-        return ok( angularjs_widget.render() );
-    }
 
 
     public static Result getPublicWidgetDetails( String apiKey ){
@@ -358,41 +308,5 @@ public class WidgetAdmin extends Controller
         return ok(Json.toJson(new PublicWidget(w)));
     }
 
-
-
-
-//    public static Result createNewWidget( String widgetId, String authToken,  String productName, String productVersion,
-//										  String title, String youtubeVideoUrl, String providerURL,
-//										  String recipeURL, String consolename, String consoleurl, String rootpath, String recipeName, String consoleUrlService )
-//	{
-//        User user = User.validateAuthToken(authToken);
-//        Widget widget = null;
-//        if ( !NumberUtils.isNumber( widgetId ) ){
-//		    widget = user.createNewWidget( productName, productVersion, title, youtubeVideoUrl, providerURL, recipeURL, consolename, consoleurl, rootpath );
-//        }else{
-//            Long widgetIdLong = Long.parseLong( widgetId );
-//            widget = Widget.findByUserAndId( user, widgetIdLong );
-//            if ( widget == null ){
-//                new HeaderMessage().setError( "User is not allowed to edit this widget" ).apply( response().getHeaders() );
-//                return badRequest(  );
-//            }
-//            widget.setProductName( productName );
-//            widget.setProductVersion( productVersion );
-//            widget.setTitle( title );
-//            widget.setYoutubeVideoUrl( youtubeVideoUrl );
-//            widget.setProviderURL( providerURL );
-//            widget.setRecipeURL( recipeURL );
-//            widget.setConsoleName( consolename );
-//            widget.setConsoleURL( consoleurl );
-//            widget.setRecipeRootPath( rootpath );
-//            widget.setRecipeName( recipeName );
-//            widget.setConsoleUrlService( consoleUrlService );
-//            widget.save();
-//        }
-//
-//        logger.info( "edited widget : " + widget.toString() );
-//        return ok( Json.toJson(widget) );
-////		return resultAsJson(widget);
-//	}
 
 }

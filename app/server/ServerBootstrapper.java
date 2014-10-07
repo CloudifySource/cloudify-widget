@@ -60,8 +60,6 @@ public interface ServerBootstrapper
 
     public void close();
 
-    public File createCloudProvider( ServerNode serverNode  );
-
     /**
      *
      * @param serverNode return serverNode if bootstrap was a success, otherwise return null.
@@ -76,7 +74,7 @@ public interface ServerBootstrapper
      * @param privateIp
      * @return
      */
-    public String getInjectedBootstrapScript(String publicIp, String privateIp);
+    public String getInjectedBootstrapScript(String publicIp, String privateIp, String randomPassword);
 
 
 

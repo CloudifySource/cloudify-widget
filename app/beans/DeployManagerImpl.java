@@ -18,6 +18,7 @@ import java.io.File;
 
 import javax.inject.Inject;
 
+import cloudify.widget.allclouds.executiondata.ExecutionDataModel;
 import cloudify.widget.common.WidgetResourcesUtils;
 import models.ServerNode;
 import models.ServerNodeEvent;
@@ -30,7 +31,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import server.ApplicationContext;
 import server.DeployManager;
+import services.IWidgetInstallFinishedSender;
+import utils.ResourceManagerFactory;
 import utils.StringUtils;
 import utils.Utils;
 import beans.api.ExecutorFactory;
@@ -59,6 +63,9 @@ public class DeployManagerImpl implements DeployManager {
 
     @Inject
     private ScriptExecutor scriptExecutor;
+
+    @Inject
+    private IWidgetInstallFinishedSender widgetInstallFinishedSender;
 
 
     @Override
@@ -151,17 +158,17 @@ public class DeployManagerImpl implements DeployManager {
             if (StringUtils.isEmpty(recipeURL)) {
                 logger.info("recipe url is null. nothing to execute");
                 server.createEvent("recipe already installed", ServerNodeEvent.Type.DONE).save();
-                return widget.addWidgetInstance(server, null);
+
+                WidgetInstance widgetInstance = widget.addWidgetInstance(server, null);
+                widgetInstallFinishedSender.send( widget, server);
+
+
+                return widgetInstance;
 
             }
             logger.info(" Widget [{}] has recipe url [{}]", widget.getRecipeName(), recipeURL);
 
-            WidgetResourcesUtils.ResourceManager recipeManager = new WidgetResourcesUtils.ResourceManager();
-            recipeManager.setUrl( recipeURL );
-            recipeManager.setUid( widget.getApiKey() );
-            recipeManager.setBaseDir( conf.resources.recipesBaseDir.getAbsolutePath() );
-
-
+            WidgetResourcesUtils.ResourceManager recipeManager  = ApplicationContext.get().getResourceManagerFactory().getWidgetRecipeManager( widget );
             File tempRecipePath = new File( conf.resources.recipesBaseDir.getAbsolutePath() , "copy-" + System.currentTimeMillis() );
             if ( widget.isAutoRefreshRecipe() ){
                 recipeManager.copyFresh(tempRecipePath);

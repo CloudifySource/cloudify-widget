@@ -1,5 +1,6 @@
 package beans;
 
+import cloudify.widget.allclouds.executiondata.ExecutionDataModel;
 import models.ServerNode;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.jackson.JsonNode;
@@ -24,12 +25,13 @@ public class CustomPropertiesWriter {
 
     public void writeProperties( ServerNode server, File file  ){
         logger.info("checking to see if need to write custom properties");
-        if (!StringUtils.isEmptyOrSpaces(server.getRecipeProperties())) {
+        ExecutionDataModel executionDataModel = server.getExecutionDataModel();
+        if (executionDataModel.has(ExecutionDataModel.JsonKeys.RECIPE_PROPERTIES ) ) {
             logger.info("user passed properties for the recipe. writing them to a file [{}]", file);
 
             Collection<String> newLines = new LinkedList<String>();
             newLines.add("");
-            JsonNode recipePropertiesJson = Json.parse(server.getRecipeProperties());
+            JsonNode recipePropertiesJson = executionDataModel.getFieldAsJson(ExecutionDataModel.JsonKeys.RECIPE_PROPERTIES);
 
             int i = 0;
             while (recipePropertiesJson.has(i)) {

@@ -1,0 +1,19 @@
+<div class="control-group" ng-class="{'error': !!errorId }">
+    <div class="controls">
+
+                        <span class="drop-zone" filemodel="data.widgetIconFile" fileread preview="data.widgetIconPreview" ng-class="{'preview':actions.editIcon!=null, 'nopreview':actions.editIcon == null}" style="border:5px dashed grey; padding:10px; display:inline-block; border-radius: 10px; width:60px; height:60px; margin-left:0;">
+                        <img ng-src="{{data.widgetIconPreview}}" style="height:60px; width:80px; border:none; background:transparent;" ng-show="actions.editIcon != null && actions.editIcon != 'remove'"/>
+                        <img ng-show="actions.editIcon == null" style="height:60px; width:80px;" ng-src="/backend/widget/icon?apiKey={{widget.apiKey}}&d={{lastUpdated}}"/>
+
+        </span>
+        <div style="margin-left:10px; vertical-align: top">
+            <button class="btn"  ng-click="removeIcon()">Remove Icon</button>
+            <button class="btn"  ng-click="restoreIcon()">Restore</button>
+            <label class="filebutton btn" for="myfile">
+                Browse For File!
+                <span><input type="file" fileread preview="data.widgetIconPreview" filemodel="data.widgetIconFile" id="myfile" name="myfile"></span>
+            </label>
+        </div>
+
+    </div>
+</div>

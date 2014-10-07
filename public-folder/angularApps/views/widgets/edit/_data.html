@@ -1,0 +1,57 @@
+
+<div class="control-group">
+    <label class="control-label" for="theme">Theme<abbr class="required_mark" ng-show="required">*</abbr></label>
+    <div class="controls">
+        <select name="theme" id="theme" ng-model="widgetData.theme" ng-options="theme.id as theme.label for theme in themes"></select>
+    </div>
+</div>
+
+<div class="control-group">
+    <label class="control-label" for="cloudType">Cloud Type<abbr class="required_mark" ng-show="required">*</abbr></label>
+    <div class="controls">
+        <select name="cloudType" id="cloudType" ng-model="widgetData.cloudType" ng-options="cloudType.id as cloudType.label for cloudType in cloudTypes"></select>
+        <br/>
+        Used for advanced section display
+    </div>
+
+</div>
+
+<div class="control-group">
+    <label class="control-label" for="locale">Locale<abbr class="required_mark" ng-show="required">*</abbr></label>
+    <div class="controls">
+        <select name="locale" id="locale" ng-model="widgetData.locale" ng-options="locale.id as locale.label for locale in locales"></select>
+    </div>
+</div>
+
+
+<div class="bg-danger explanation" ng-show="!widget.managerPrefix">
+    In order for the widget to support teardown, you must configure manager prefix.
+</div>
+
+<div class="control-group">
+
+    <label class="control-label" for="managerPrefix">Management Prefix<abbr class="required_mark" ng-show="required">*</abbr></label>
+    <div class="controls">
+        <input ng-model="widget.managerPrefix" type="text" id="managerPrefix"/>
+
+
+    </div>
+</div>
+
+
+<div class="control-group" id="social-source-form-section">
+    <label class="control-label" for="locale">Social Sources<abbr class="required_mark" ng-show="required">*</abbr></label>
+    <div class="controls">
+                <span ng-repeat="socialSource in widgetData.socialSources track by socialSource.id">
+                    <input name="shareSources" id="shareSources" ng-model="socialSource.active" type="checkbox" /> {{getSocialSourceLabel(socialSource)}}<br/>
+                </span>
+
+    </div>
+</div>
+
+<div form-field title="Wechat URL" field-id="wechatUrl" value="widgetData.wechatUrl" required="false" type="text"></div>
+<div form-field title="Twitter Message" field-id="twitterMessage" value="widgetData.twitterMessage" required="false" type="text"></div>
+<div form-field title="Renren Message" field-id="renrenMessage" value="widgetData.renrenMessage" required="false" type="text"></div>
+<div form-field title="Tecent Weibo Site" field-id="tecentWeiboSite" value="widgetData.tecentWeiboSite" required="false" type="text"></div>
+<div form-field title="Sina Weibo Title" field-id="sinaWeiboTitle" value="widgetData.sinaWeiboTitle" required="false" type="text"></div>
+<div form-field title="Share URL" field-id="shareUrl" value="widgetData.shareUrl" required="false" type="text"></div>

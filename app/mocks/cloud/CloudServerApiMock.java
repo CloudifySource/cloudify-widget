@@ -69,6 +69,11 @@ public class CloudServerApiMock implements CloudServerApi {
     }
 
     @Override
+    public CloudExecResponse runScriptOnMachine(String s, String s2, ISshDetails iSshDetails, ISshOutputHandler outputHandler) {
+        return null;
+    }
+
+    @Override
     public void connect() {
 
     }

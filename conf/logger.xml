@@ -119,4 +119,74 @@
         <appender-ref ref="ERRORS"/>
     </logger>
 
+
+
+
+
+
+    <appender name="JCLOUDS_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>log/jclouds.log</file>
+
+        <encoder>
+            <Pattern>%d %-5p [%c] [%thread] %m%n</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="JCLOUDS_WIREFILE" class="ch.qos.logback.core.FileAppender">
+        <file>log/jclouds-wire.log</file>
+
+        <encoder>
+            <Pattern>%d %-5p [%c] [%thread] %m%n</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="JCLOUDS_COMPUTEFILE" class="ch.qos.logback.core.FileAppender">
+        <file>log/jclouds-compute.log</file>
+
+        <encoder>
+            <Pattern>%d %-5p [%c] [%thread] %m%n</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="JCLOUDS_SSHFILE" class="ch.qos.logback.core.FileAppender">
+        <file>log/jclouds-ssh.log</file>
+
+        <encoder>
+            <Pattern>%d %-5p [%c] [%thread] %m%n</Pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.jclouds">
+        <level value="DEBUG" />
+        <appender-ref ref="JCLOUDS_FILE" />
+    </logger>
+
+    <logger name="jclouds.compute">
+        <level value="DEBUG" />
+        <appender-ref ref="JCLOUDS_COMPUTEFILE" />
+    </logger>
+
+    <logger name="jclouds.wire">
+        <level value="DEBUG" />
+        <appender-ref ref="JCLOUDS_WIREFILE" />
+    </logger>
+
+    <logger name="jclouds.headers">
+        <level value="DEBUG" />
+        <appender-ref ref="JCLOUDS_WIREFILE" />
+    </logger>
+
+    <logger name="jclouds.ssh">
+        <level value="DEBUG" />
+        <appender-ref ref="JCLOUDS_SSHFILE" />
+    </logger>
+
+    <logger name="net.schmizz">
+        <level value="DEBUG" />
+        <appender-ref ref="JCLOUDS_SSHFILE" />
+    </logger>
+
+
+
+
 </configuration>

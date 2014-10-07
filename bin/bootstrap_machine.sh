@@ -201,12 +201,29 @@ download_recipe() {
 
         echo "going into $RECIPE_RELATIVE_PATH to install"
         cd "$RECIPE_RELATIVE_PATH"
+
+        RANDOM_VALUE="##randomPassword##"
+        if [ ! -z "$RANDOM_VALUE" ] && [ "$RANDOM_VALUE" != "" ];then
+            echo "replacing random value in properties file"
+            sed -i.bak s/0b9f757f32d98899/$RANDOM_VALUE/g blustratus-single-service.properties
+            sed -i.bak s/9d09f80532d213f1/$RANDOM_VALUE/g blustratus-single-service.properties
+        else
+            echo "random value is not specified"
+        fi
+
+
+
         echo "I am at `pwd` and I am invoking install command on localhost"
         ${CLOUDIFY_FOLDER}/bin/cloudify.sh "connect http://localhost:8100; install-service  -disableSelfHealing --verbose -timeout 200 ."
 
     else
         echo "not installing recipe [$INSTALL_RECIPE]"
     fi
+
+    echo "erasing content from file blustratus-single-service.properties"
+    find / -name "blustratus-single-service.properties" -print |  xargs sed -i '1~1d'
+    find / -name "blustratus-single-service.properties.bak" -type f -delete
+
 }
 
 init
